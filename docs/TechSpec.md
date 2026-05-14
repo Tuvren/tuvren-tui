@@ -62,6 +62,8 @@
 
 The repo-owned release workflow currently publishes **versioned GitHub release assets** with SHA-256 sidecars and relies on the public package resolver to search `KRAKEN_LIB_PATH`, staged `ts/prebuilds/...`, and the local Cargo build. The approved target-state replaces that public install story with one public package (`tuvren-tui`) that consumes auxiliary scoped native packages published under the new organization. Here "auxiliary" means they are not the documented direct install target; it does not imply a private-registry-only topology. Standalone release assets may still be published for provenance and manual acquisition, but after Epic P they are no longer part of the automatic resolver path unless a caller points `TUVREN_LIB_PATH` at them. Source-build fallback remains valid for repo-side development and verification.
 
+Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Their package metadata must declare the supported `os`, `cpu`, and `libc` values so musl-based systems such as Alpine do not silently install an incompatible `.so`. Separate musl-targeted packages remain out of scope until a later compatibility wave promotes them.
+
 ## 2. Architecture Decision Records (ADRs)
 ### 2.1 Active Inherited Decisions
 
@@ -629,7 +631,7 @@ current_brownfield:
 approved_target_state:
   resolver_search_order:
     - TUVREN_LIB_PATH
-    - node_modules/@tuvren/tuvren-tui-<platform>-<arch>/<libName>
+    - resolve @tuvren/tuvren-tui-<platform>-<arch> by package name for the current platform and derive <libName> from the resolved package root
     - native/target/release/<libName>
     - diagnostic_error
 notes:
@@ -637,6 +639,7 @@ notes:
   - "Approved target-state publishes one public package, tuvren-tui, that consumes auxiliary scoped native packages under the new organization."
   - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are no longer a first-class automatic resolver search path after Epic P."
   - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build in repo checkouts, and finally an explicit diagnostic failure."
+  - "Resolver lookup must be package-manager-layout agnostic: resolve the auxiliary package by name first, then derive the shared-library path from the resolved package root rather than assuming a nested node_modules filesystem layout."
   - "If the public package uses platform-native optional dependencies, the install contract must explicitly tolerate npm clients omitting them and surface the missing-native case through the documented diagnostic path."
   - "Repo-side verification that dlopen's directly must still validate the local Cargo-built artifact rather than a stale packaged binary."
   - "No long-lived KRAKEN_LIB_PATH compatibility alias is planned after the Tuvren hard cut."

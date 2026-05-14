@@ -143,6 +143,7 @@ Then each supported platform target produces an auxiliary scoped native package 
 And the repository and package ownership needed to publish under the Tuvren organization are in place
 And the public package remains the only documented install target
 And published package metadata is sufficient for the resolver to discover the correct native library automatically
+And Linux auxiliary packages declare the supported os, cpu, and libc metadata so glibc-only artifacts are not installed on unsupported musl hosts
 And the chosen Bun package-manager strategy either proves the supported install path does not silently materialize unrelated platform payloads or records the supported fallback and diagnostic path if Bun's optional-dependency behavior would do so
 ```
 
@@ -159,6 +160,7 @@ When the resolver loads the native library
 Then it searches TUVREN_LIB_PATH first
 And otherwise resolves the correct auxiliary scoped native package artifact for the current platform
 And source checkouts still fall back to the local Cargo-built artifact when packaged binaries are absent
+And ordinary public installs fail with the documented diagnostic instead of source-building when neither the override nor the packaged native artifact is available
 ```
 
 **PROD-P006 Add Cross-Platform Host Smoke Verification**
@@ -183,7 +185,7 @@ And GatePolicy documents the new cross-platform trust posture
 - **Effort:** 5
 - **Dependencies:** PROD-P002, PROD-P003, PROD-P005
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.1, §1.2, §3, §6, [Architecture](./Architecture.md) §1.3 and §1.4
-- **Description:** Rewrite the public getting-started and adoption narrative around Tuvren as a general-purpose framework with a productized imperative core, while preserving the repo's architectural invariant that Rust owns mutable UI state. Install instructions, naming, scope framing, and developer expectations must match the new packaging contract and runtime posture.
+- **Description:** Rewrite the public getting-started and adoption narrative around Tuvren as a general-purpose framework with a productized imperative core, while preserving the repo's architectural invariant that Rust owns mutable UI state. Install instructions, naming, scope framing, README messaging, and developer expectations must match the new packaging contract and runtime posture.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given a new developer discovering the project after the rename
@@ -191,6 +193,7 @@ When they read the primary onboarding and install guidance
 Then the product is described as a general-purpose terminal framework
 And the docs present Bun as the active runtime contract
 And the install and naming guidance match the shipped Tuvren package and resolver behavior
+And README plus the primary onboarding entrypoints reflect the same framework story and install contract
 ```
 
 **ADOPT-Q002 Refresh Showcase Framing Without Losing the Agentic Proof Point**
@@ -213,12 +216,13 @@ And example framing makes clear why those workloads are the harshest demonstrati
 - **Effort:** 2
 - **Dependencies:** ADOPT-Q001, PROD-P005
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3, [TechSpec](./TechSpec.md) ADR-T42, ADR-T43, §4.2, §4.3
-- **Description:** Publish concise migration guidance for pre-`1.0` adopters covering the Kraken-to-Tuvren rename, the new public package name, the `TUVREN_LIB_PATH` override, and the removal of long-lived compatibility aliases.
+- **Description:** Publish concise migration guidance for pre-`1.0` adopters covering the Kraken-to-Tuvren rename, the new public package name, shared-library and release-asset renames, the `TUVREN_LIB_PATH` override, and the removal of long-lived compatibility aliases.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given an adopter familiar with Kraken-era package and resolver names
 When they read the migration guidance
 Then they can translate the old package, facade, and environment-variable names to the new Tuvren contract
+And the guidance includes a concrete old-to-new mapping for package, facade, shared-library, release-asset, and environment-variable names
 And the guidance explicitly states that the rename is a hard pre-1.0 cut rather than an alias-supported transition
 ```
 
