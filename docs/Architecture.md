@@ -1,14 +1,14 @@
 # Solution Architecture
 
 ## 0. Version History & Changelog
+- v3.3.0 - Rebalanced the architecture around a general-purpose Tuvren framework posture, elevated productization to an architectural concern, and added host-side framework-service direction with explicit Brownfield transition notes.
 - v3.2.1 - Clarified the Text and Transcript bounded-context responsibilities so the substrate work ratified downstream is recognized as a deepening of existing logical contexts rather than a new container.
 - v3.2.0 - Reformatted to the current stage-2 framework skeleton and clarified logical boundaries without changing the approved cross-language architecture.
-- v3.1.0 - Clarified the architectural emphasis around transcript-heavy surfaces, anchor-aware viewports, developer tooling, and pane-oriented workflows.
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Architectural Strategy & Archetype Alignment
 - **Architectural Pattern:** Modular monolith with a cross-language facade.
-- **Why this pattern fits the PRD:** Kraken is a single-process library rather than a networked product. The PRD asks for native performance, low memory use, and fast developer onboarding; a modular monolith avoids the operational premium of distributed systems while still preserving clean boundaries between the native performance engine and the host-facing API.
+- **Why this pattern fits the PRD:** Tuvren is a single-process framework rather than a networked product. The PRD asks for native performance, low memory use, and fast developer onboarding; a modular monolith avoids the operational premium of distributed systems while still preserving clean boundaries between the native performance engine and the host-facing API.
 - **Core trade-offs accepted:** The architecture favors explicit host-driven control over hidden background orchestration, keeps all mutable UI state in one native authority, and accepts a tighter internal coupling inside the native core in exchange for lower latency and a smaller foreign-function surface.
 
 ### 1.1 Core Architectural Invariant
@@ -24,10 +24,17 @@
 
 | Emphasis | Choice | Why it matters |
 | --- | --- | --- |
-| **Transcript-heavy surfaces** | Treat long-lived transcript, log, and trace views as a first-class workload within the Native Core rather than as a host-side tree-management pattern. | Streaming, dense, long-running workflows are now product-defining. |
-| **Anchor-aware viewports** | Prefer logical viewport anchors, unread markers, and nested-scroll handoff over raw row-offset management. | Operator readability must survive ongoing content churn. |
+| **General-purpose framework posture** | Keep the architecture broad enough for general terminal application shapes instead of treating one showcase workload as the whole product definition. | The product story now targets a framework, not only a specialist library. |
+| **Flagship demanding workloads** | Continue treating long-lived transcript, log, trace, and pane-heavy surfaces as the proving grounds that validate the broader framework design. | Agentic and operator-style products still justify the hardest architectural requirements. |
+| **Anchor-aware viewports** | Prefer logical viewport anchors, unread markers, and nested-scroll handoff over raw row-offset management where streaming surfaces require it. | The general-purpose story must still survive demanding update churn in flagship workloads. |
 | **Developer tooling as product work** | Treat overlays, snapshots, traces, and inspection surfaces as architecture-level concerns. | The framework must be inspectable before it can be dependable. |
-| **Pane-oriented composition** | Treat multi-region workflows as a primary application shape rather than secondary visual garnish. | Agent consoles, repo inspectors, and ops tools depend on simultaneous navigation, viewing, and inspection. |
+| **Host-layer framework services** | Commands, keymaps, and future declarative integration surfaces belong in the Host Layer over the same native authority rather than as parallel mutable runtimes. | The framework needs application-level ergonomics without weakening the native-state invariant. |
+| **Productization as architecture work** | Distribution, install trust, onboarding, and release verification are treated as architecture-governed workstreams rather than afterthought chores. | A competitive framework needs a trustworthy delivery shape, not only a strong engine. |
+
+### 1.4 Brownfield Transition Note
+- **Approved future public product name:** `Tuvren`
+- **Current source-tree reality:** The repo, package names, examples, and release workflow still carry `Kraken` naming today.
+- **Architectural interpretation:** The logical design is governed by the future public framework direction, while downstream implementation artifacts must continue to distinguish current Brownfield naming from approved target-state naming until the rename wave lands.
 
 ## 2. System Containers
 ### 2.1 Native Core
@@ -39,7 +46,7 @@
 
 ### 2.2 Host Language Bindings
 - **Logical Type:** Host SDK / developer facade
-- **Responsibility:** Provide an ergonomic typed API for Developers, translate host-language intent into command calls, own loop policy, maintain developer-assigned ID maps, and assemble higher-level composites and examples without becoming a second source of UI truth.
+- **Responsibility:** Provide an ergonomic typed API for Developers, translate host-language intent into command calls, own loop policy, maintain developer-assigned ID maps, assemble higher-level composites and examples, and host future framework services such as commands, keymaps, and declarative integrations without becoming a second source of UI truth.
 - **Inputs:** Developer code, application state changes, optional replay streams, userland commands
 - **Outputs:** Native command calls, host-facing Widget abstractions, developer-friendly diagnostics, example and composite surfaces
 - **Depends on:** Native Core, Script Runtime
@@ -84,12 +91,12 @@
 ## 3. Container Diagram (Mermaid)
 ```mermaid
 C4Container
-    title Kraken TUI — Container Diagram
+    title Tuvren TUI — Container Diagram
 
     Person(developer, "Developer", "Composes terminal interfaces")
     Person(enduser, "End User", "Interacts with the running terminal application")
 
-    System_Boundary(kraken, "Kraken TUI") {
+    System_Boundary(tuvren, "Tuvren TUI") {
         Container(host, "Host Language Bindings", "SDK / facade", "Ergonomic developer API, loop policy, composites, examples")
         Container(core, "Native Core", "Native library boundary", "State authority for layout, rendering, events, rich text, scroll, transcript, and diagnostics")
     }
@@ -200,9 +207,30 @@ sequenceDiagram
     Render->>Term: Emit clipped update without losing operator position
 ```
 
+### 4.5 Command Dispatch from Keymap Resolution
+- **Maps to PRD capability:** Epic 11 - Commands & Keymap Foundations
+```mermaid
+sequenceDiagram
+    actor EU as End User
+    participant Term as Terminal
+    participant Event as Native Event Context
+    participant Host as Host Framework Services
+    participant App as Developer Application
+    participant Core as Native Core
+
+    EU->>Term: Press a bound key sequence
+    Term->>Event: Deliver raw key input
+    Event->>Core: Buffer normalized key event through the existing facade
+    App->>Host: Drain events and evaluate active keymap
+    Host->>Host: Resolve focused context, command binding, and dispatch policy
+    Host-->>App: Invoke the selected command
+    App->>Core: Apply resulting widget or state mutations through normal host wrappers
+    Core->>Core: Recompute dirty state and schedule the next render pass
+```
+
 ## 5. Resilience & Cross-Cutting Concerns
 ### 5.1 Security / Identity Strategy
-- Kraken is a local, in-process library with no network authentication boundary in its primary architecture.
+- Tuvren is a local, in-process framework with no network authentication boundary in its primary architecture.
 - The primary security-sensitive boundary is the host-to-native facade, so correctness centers on Handle validation, panic containment, string validation, and explicit copy semantics rather than identity or session management.
 
 ### 5.2 Failure Handling Strategy
@@ -245,7 +273,7 @@ sequenceDiagram
 - **Mitigation or follow-up:** Preserve explicit destroy semantics, leak warnings, and strong diagnostics around invalid-handle usage.
 
 ### Risk 4 - Terminal Backend and Capability Variation Remain a Hard External Dependency
-- **Why it matters:** The product depends on real terminal behavior that Kraken does not control.
+- **Why it matters:** The product depends on real terminal behavior that Tuvren does not control.
 - **Mitigation or follow-up:** Keep backend abstraction, degrade gracefully, and continue using examples and replay fixtures to catch capability-sensitive regressions.
 
 ### Risk 5 - Layout and Pane Density Can Push the Intended Workload Envelope
@@ -253,9 +281,17 @@ sequenceDiagram
 - **Mitigation or follow-up:** Preserve subtree invalidation, measure dense examples continuously, and resist feature additions that bypass the existing layout model without evidence.
 
 ### Risk 6 - Cross-Language Maintenance Cost Is Real Even When Performance Wins
-- **Why it matters:** A cross-language library gains performance and ergonomics, but it also carries more boundary contracts, packaging surface, and testing responsibility than a single-language framework.
+- **Why it matters:** A cross-language framework gains performance and ergonomics, but it also carries more boundary contracts, packaging surface, and testing responsibility than a single-language framework.
 - **Mitigation or follow-up:** Keep the facade narrow, maintain strong integration tests, and document the boundary contract rigorously.
 
 ### Risk 7 - Background Rendering Remains Tempting but Semantically Expensive
 - **Why it matters:** Background rendering can look attractive under benchmark pressure but can easily undermine event ordering, state visibility, and terminal lifecycle guarantees.
 - **Mitigation or follow-up:** Preserve synchronous rendering as the default contract and require benchmark, semantic, and shutdown parity before any promotion of experimental threading.
+
+### Risk 8 - Host-Layer Framework Growth Can Reintroduce Split-Brain State
+- **Why it matters:** Commands, keymaps, and future declarative integration layers increase framework ergonomics, but they also increase the risk that host-side orchestration quietly starts owning mutable UI semantics that the architecture reserves for the Native Core.
+- **Mitigation or follow-up:** Treat host-side framework services as orchestration over the existing command protocol only, and defer plugin-slot architecture until the command/keymap and declarative contracts prove stable without duplicating native state.
+
+### Risk 9 - Hard-Cut Rename and Productization Work Can Fracture Delivery
+- **Why it matters:** The move from Kraken to Tuvren, combined with package and release-contract changes, creates a real chance of shipping a stronger architecture behind a weaker public install story if the cutover is partial or incoherent.
+- **Mitigation or follow-up:** Make rename, package topology, release automation, diagnostics, and onboarding part of the same productization wave rather than scattering them across unrelated technical chores.

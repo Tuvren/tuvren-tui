@@ -1,22 +1,23 @@
 # Product Requirements Document
 
 ## 0. Version History & Changelog
+- v2.4.0 - Reframed the product as a general-purpose framework, activated productization and framework-foundation scope, and adopted the future public name Tuvren with an explicit Brownfield transition note.
 - v2.3.0 - Reformatted to the current stage-1 framework skeleton while preserving approved scope, roadmap context, and operator preferences.
 - v2.2.0 - Approved the current product emphasis around long-lived developer and agent workflows.
-- v2.1.0 - Matured scope boundaries, non-functional constraints, and roadmap continuity for the v0-v2 product line.
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Target Archetype
-- **Target Archetype:** Cross-language terminal UI library and SDK for TypeScript-first developers, with Bun-native ergonomics as a key adoption path.
-- **Vision:** Terminal interface development becomes as productive as web UI development without sacrificing performance or requiring a systems programming background.
-- **Problem:** Developers building terminal dashboards and interactive CLI tools in the TypeScript ecosystem face a forced trade-off between ergonomic but resource-heavy solutions and performant but ergonomically hostile solutions. No current option combines native performance, familiar layout semantics, and composable Widgets behind an approachable TypeScript API.
+- **Target Archetype:** General-purpose terminal UI framework and SDK for TypeScript-first developers, with a productized imperative core and Bun-native ergonomics in the current public release posture.
+- **Vision:** Terminal interface development becomes as productive as web UI development without sacrificing performance, inspectability, or the ability to ship demanding terminal products from a TypeScript workflow.
+- **Problem:** Developers building terminal applications in the TypeScript ecosystem still face a forced trade-off between ergonomic but resource-heavy solutions, performant but ergonomically hostile primitives, and toolkit surfaces that do not feel productized or extensible enough to trust for real application delivery.
 - **Jobs to Be Done:**
-  - Primary: "When building interactive terminal applications in TypeScript, I want pre-built composable interface elements with native performance and familiar layout semantics, so I can ship polished terminal UIs in hours, not days, especially for long-running developer and agent workflows, without the overhead of full-framework reconciliation or learning a systems language."
-  - Secondary: "When using Bun as my primary runtime, I want a TUI library designed for Bun's foreign-function model from day one, so I don't fight compatibility shims or WASM overhead."
+  - Primary: "When building interactive terminal applications in TypeScript, I want a general-purpose framework with composable interface primitives, native performance, and productized release ergonomics, so I can ship polished terminal apps in hours instead of days without dropping into a systems-language-heavy workflow."
+  - Secondary: "When building demanding terminal products such as agent consoles, operator dashboards, repo inspectors, or other information-dense tools, I want the same framework to stay stable under streaming output, long transcripts, dense panes, and heavy inspection surfaces."
+  - Tertiary: "When using Bun as my primary runtime, I want a TUI framework designed for Bun's foreign-function model from day one, so I don't fight compatibility shims or WASM overhead."
 
 ### 1.1 Product Posture
-- **Current Product Emphasis:** Kraken's near-term differentiation is long-lived, information-dense terminal applications for developer and agent workflows. The product is especially valuable when interfaces must remain stable under streaming output, long transcripts, dense inspection surfaces, and pane-based navigation.
-- **JTBD Priority Order:** Ship Faster > Bun-native DX > Escape React Overhead > Own the Full Stack
+- **Current Product Emphasis:** Tuvren tells a general-purpose framework story. Its showcase and proving grounds remain demanding agentic and developer-facing products because those workloads stress the performance, viewport, and inspectability requirements that motivated the project in the first place.
+- **JTBD Priority Order:** Ship Faster > Productized Trust > Framework Foundations > Bun-native DX > Own the Full Stack
 
 ### 1.2 Version Roadmap Context
 
@@ -25,12 +26,19 @@
 | **v0** | Core interaction surface | Widget composition, layout, styling, keyboard and mouse input, scrolling, cross-platform terminal handling, and rich text rendering |
 | **v1** | Product polish | Animation system and theming foundation |
 | **v2** | Hardening and advanced DX | Core hardening, tree operations for reconciler support, theme inheritance, TextArea, choreography, lightweight JSX reconciler, and foundational accessibility |
+| **v3** | Productization and framework foundations | Public rename to Tuvren, packaging and release trust, onboarding polish, general-purpose framework positioning, and first-class command/keymap foundations |
+| **v4** | Declarative and extensibility expansion | Effect-based declarative integration over the same core runtime, followed by post-v1 plugin-slot exploration once framework foundations stabilize |
+
+### 1.3 Brownfield Transition Note
+- **Approved future public name:** `Tuvren`
+- **Current source-tree reality:** The repo, packages, examples, and release workflow still use `Kraken` / `kraken-tui` naming today.
+- **Planning rule:** This PRD governs the future public product direction. Downstream artifacts must keep the current Brownfield naming explicit anywhere implementation reality still differs until the productization wave executes the rename.
 
 ## 2. Ubiquitous Language (Glossary)
 | Term | Definition | Do Not Use |
 | --- | --- | --- |
 | **Widget** | A composable visual building block that can display content, accept input, or contain other Widgets. | Component, Element, Node, Control |
-| **Developer** | A person using Kraken TUI to build terminal applications. | Author, User, Consumer, Client |
+| **Developer** | A person using Tuvren to build terminal applications. | Author, User, Consumer, Client |
 | **End User** | The person interacting with the terminal application a Developer built. | User, Customer, Operator |
 | **Composition Tree** | The hierarchical arrangement of Widgets that defines the interface structure. | DOM, Widget Tree, Node Tree, Scene Graph |
 | **Surface** | The terminal display area to which the Composition Tree is rendered. | Screen, Canvas, View, Buffer |
@@ -41,22 +49,22 @@
 
 ## 3. Actors & Personas
 ### 3.1 Primary Actor
-- **Role:** The Rapid Dashboard Builder
-- **Context:** Comfortable with TypeScript and terminal tooling, but unwilling to spend weeks learning a new paradigm or a systems language.
-- **Goals:** Compose useful, polished dashboards and agent interfaces quickly; rely on strong defaults; reach a meaningful first layout fast.
-- **Frictions:** Boilerplate-heavy frameworks, missing defaults, memory-heavy React-style solutions, and any approach that makes the first real interface take more than roughly 30 minutes.
+- **Role:** The General-Purpose Terminal Application Builder
+- **Context:** Comfortable with TypeScript and terminal tooling, but unwilling to spend weeks learning a new paradigm or a systems language just to ship terminal applications with professional polish.
+- **Goals:** Build dashboards, inspectors, prompts, editors, and operator surfaces quickly; rely on strong defaults; reach a meaningful first application shape fast; trust the install and release path enough to recommend the framework to others.
+- **Frictions:** Boilerplate-heavy frameworks, missing defaults, memory-heavy React-style solutions, unproductized install flows, and any approach that makes the first real interface take more than roughly 30 minutes.
 - **Current Workarounds:** Cobbled-together ANSI escape sequences, Ink with growing memory concerns, or leaving the terminal for a web dashboard that breaks the workflow.
 
 ### 3.2 Secondary Actor
-- **Role:** The Ship-It CLI Developer
-- **Context:** Pragmatic builder who values a working interactive prompt faster than reading API reference material.
-- **Goals:** Build installers, config wizards, and professional-feeling interactive CLIs quickly; copy-paste examples and adapt them with minimal ceremony.
-- **Frictions:** Slow onboarding, excessive architecture ceremony, and APIs that make common flows like prompts or lists harder than they should be.
+- **Role:** The Agentic Product Builder
+- **Context:** Building assistants, operator consoles, repo tooling, or other long-lived terminal products where streaming output, dense panes, and stable viewports are not edge cases but the product's normal workload.
+- **Goals:** Reuse the same framework for demanding agentic and developer-facing products without losing viewport stability, inspectability, or performance under continuous updates.
+- **Frictions:** Host-side tree explosion, fragile viewport behavior under streaming churn, weak diagnostics, and framework stories that sound general-purpose but break down under real operator workloads.
 
 ### 3.3 Tertiary Actor
 - **Role:** The Bun Ecosystem Native
 - **Context:** Already committed to Bun and wants tools that feel native to the runtime rather than ported from a Node.js or browser-first worldview.
-- **Goals:** Use a zero- or near-zero-dependency terminal UI library that integrates cleanly with Bun's foreign-function model.
+- **Goals:** Use a zero- or near-zero-dependency terminal UI framework that integrates cleanly with Bun's foreign-function model.
 - **Frictions:** WASM layers, compatibility shims, polyfill-heavy stacks, and tools that feel architecturally foreign to Bun.
 
 ## 4. Functional Capabilities
@@ -66,7 +74,7 @@
 - **Capability:** A Developer can compose Widgets into hierarchical layouts of arbitrary depth.
 - **Capability:** A Developer can add and remove Widgets from the Composition Tree at runtime.
 - **Capability:** A Developer can set and update Widget content dynamically.
-- **Rationale:** Without fast composition, Kraken fails its primary job of helping Developers ship polished terminal interfaces in hours instead of days.
+- **Rationale:** Without fast composition, the framework fails its primary job of helping Developers ship polished terminal interfaces in hours instead of days.
 
 ### Epic 2 — Spatial Layout
 - **Priority:** P0
@@ -74,7 +82,7 @@
 - **Capability:** A Developer can specify dimensional bounds including fixed, percentage, min/max, flex-grow, and flex-shrink behavior.
 - **Capability:** Layout resolves automatically on Composition Tree mutation without Developer intervention.
 - **Capability:** Layout adapts to Surface dimensions, including terminal resize.
-- **Rationale:** Familiar layout semantics are central to Kraken's promise of web-like productivity in a terminal environment.
+- **Rationale:** Familiar layout semantics are central to Tuvren's promise of web-like productivity in a terminal environment.
 
 ### Epic 3 — Visual Styling
 - **Priority:** P0
@@ -108,7 +116,7 @@
 - **Capability:** The system operates on major OS families without platform-specific Developer code.
 - **Capability:** The system adapts to terminal capabilities such as color depth and dimensions.
 - **Capability:** The system manages terminal mode lifecycle, including raw mode and alternate screen handling, transparently.
-- **Rationale:** A terminal UI library that requires platform-specific application code fails the "ship faster" promise for OSS and team adoption.
+- **Rationale:** A terminal UI framework that requires platform-specific application code fails the "ship faster" promise for OSS and team adoption.
 
 ### Epic 7 — Rich Text Rendering
 - **Priority:** P0
@@ -135,6 +143,25 @@
 - **Capability:** The system ships with at least two built-in Themes: light and dark.
 - **Rationale:** Theming improves reuse, consistency, and adaptation across applications without forcing Developers to restyle every Widget manually.
 
+### Epic 10 — Productized Installation & Release Trust
+- **Priority:** P0
+- **Capability:** A Developer can install the framework on supported platforms without requiring a local Rust toolchain in the ordinary public install path.
+- **Capability:** A Developer receives actionable diagnostics when the native layer cannot be found or loaded.
+- **Capability:** Release artifacts, package naming, and platform support feel stable and trustworthy enough for the framework to be adopted in production terminal applications.
+- **Rationale:** A framework cannot compete credibly at product level if its install, release, and runtime-loading story feels like a source-checkout-only developer experience.
+
+### Epic 11 — Commands & Keymap Foundations
+- **Priority:** P0
+- **Capability:** A Developer can define reusable commands and trigger them through keyboard-driven keymaps without reimplementing focus-aware dispatch and command routing in every app.
+- **Capability:** The framework provides a consistent foundation for command palettes, keyboard shortcuts, and other application-level interaction patterns over the same core runtime.
+- **Rationale:** Moving from a productized imperative core to a competitive framework requires first-class application orchestration primitives, and commands plus keymaps are the minimum viable moat for that transition.
+
+### Epic 12 — Optional Declarative Integration Layer
+- **Priority:** P1
+- **Capability:** A Developer can opt into a declarative application model layered over the same imperative runtime contract without fragmenting the framework into separate state authorities.
+- **Capability:** The imperative core remains the canonical mental model even when a declarative integration layer is used.
+- **Rationale:** A competitive framework can support multiple development styles, but the declarative story must deepen adoption without undermining the clarity and authority of the core imperative runtime.
+
 ## 5. Non-Functional Constraints
 | Constraint Area | Requirement | Rationale |
 | --- | --- | --- |
@@ -143,19 +170,26 @@
 | **Performance** | A Render Pass stays below 16ms when operating within the intended workload envelope. | Preserves 60fps-capable responsiveness for real-time dashboards and streaming workflows. |
 | **Performance** | Foreign-function overhead stays below 1ms per cross-boundary call. | Ensures the language boundary does not become the bottleneck. |
 | **Operability** | The host-language package stays below 75KB. | Keeps the TypeScript layer intentionally thin so the value remains in the Native Core. |
+| **Operability** | Supported public releases install and load on supported platforms without requiring a local source build in the ordinary path. | Productized adoption depends on a trustworthy install path, not just a strong source-checkout story. |
+| **Operability** | Linux, macOS, and Windows public install and load paths receive automated smoke verification before the productization wave is considered complete. | Cross-platform credibility is part of the framework promise, not an optional afterthought. |
 | **Adoption** | Time to Hello World stays below 15 minutes for a competent TypeScript Developer. | Reinforces the primary JTBD: shipping faster. |
+| **Adoption** | The public story must be understandable as a general-purpose framework without hiding the demanding agentic/operator workloads that prove the design under stress. | The framework needs broad appeal without losing the concrete workload that justifies its deeper architecture. |
 | **Stability** | Semantic versioning guarantees begin at public v1.0 GA; pre-GA releases may include breaking changes. | Sets realistic trust expectations for open source adoption. |
 | **Contributor Experience** | Module boundaries, architecture decisions, and build environment remain understandable and reproducible. | Makes contribution and long-term maintenance realistic. |
 | **Accessibility** | Accessibility is not a v0/v1 hard constraint and is tracked as a v2 commitment. | Keeps MVP scope disciplined while preserving accessibility as a real product requirement. |
 
 ## 6. Boundary Analysis
 ### In Scope
+- General-purpose framework support for terminal dashboards, interactive CLIs, inspectors, editors, and operator-facing interfaces.
 - Composable Widget system for terminal dashboards and interactive CLI interfaces.
 - Flexbox-compatible layout resolution.
 - Keyboard-driven interaction with focus management.
 - Mouse interaction including click-to-focus, scroll, and hit-testing.
 - Rich text rendering including Markdown, syntax highlighting, and extensible parser pipelines.
 - Imperative composition API as the primary mental model.
+- Productized installation, release, and onboarding experience for supported platforms.
+- Framework-level command and keybinding foundations over the same imperative runtime.
+- An optional declarative integration layer over the same runtime contract, without introducing a second mutable UI authority.
 - Incremental rendering through dirty-region tracking.
 - Cross-platform terminal abstraction.
 - Scrollable regions.
@@ -171,26 +205,29 @@
 - Internationalization features such as RTL layout support and localization hooks.
 - Widget state persistence through serialization and deserialization of the Composition Tree.
 - Background render threading as part of the default product contract unless later evidence justifies promotion.
-- Broad packaging and distribution polish as the primary product objective ahead of dependable long-lived workflow support.
+- React or Solid parity as the public declarative strategy for the current roadmap.
+- Plugin-slot extensibility before command/keymap foundations and the declarative integration layer stabilize.
+- Host runtime expansion beyond the current Bun-first public posture for the immediate roadmap wave.
+- Broad new widget breadth as a substitute for productization, release trust, and framework-level interaction foundations.
 
 ## 7. Conceptual Diagrams (Mermaid)
 ### 7.1 System Context
 ```mermaid
 C4Context
-    title Kraken TUI — System Context
+    title Tuvren TUI — System Context
 
     Person(developer, "Developer", "TypeScript developer composing terminal interfaces")
     Person(enduser, "End User", "Person interacting with the terminal application")
 
-    System(kraken, "Kraken TUI", "Composable terminal interface library with native performance and Flexbox layout")
+    System(tuvren, "Tuvren TUI", "Composable terminal interface framework with native performance and Flexbox layout")
 
     System_Ext(terminal, "Terminal Emulator", "Host application rendering the Surface")
     System_Ext(runtime, "Script Runtime", "Host runtime executing Developer code via foreign function interface")
     System_Ext(os, "Operating System", "Provides terminal I/O primitives and process lifecycle")
 
-    Rel(developer, kraken, "Composes Widgets, defines Layout Constraints, handles Events")
+    Rel(developer, tuvren, "Composes Widgets, defines Layout Constraints, handles Events")
     Rel(enduser, terminal, "Provides keyboard and mouse input, reads visual output")
-    Rel(kraken, terminal, "Writes to Surface via terminal escape sequences")
+    Rel(tuvren, terminal, "Writes to Surface via terminal escape sequences")
     Rel(kraken, runtime, "Exposes Widget API via foreign function interface")
     Rel(terminal, os, "Terminal I/O")
 ```
@@ -264,11 +301,14 @@ _The following are developer-stated implementation preferences. They are preserv
 
 | Preference | Value |
 | --- | --- |
+| Future public product name | `Tuvren` |
+| Future public package name | `tuvren-tui` |
+| Planned hosting organization move | Yes; current repo is expected to move into another organization as part of the productization wave |
 | Core implementation language | Rust |
 | Target runtime | Bun |
 | FFI mechanism | `bun:ffi` |
 | Layout engine | Taffy |
 | Terminal backend | crossterm |
-| Future reconciler path | Lightweight JSX factory plus `@preact/signals-core`, with optional Effect integration |
+| Future declarative path | Imperative core remains canonical; declarative integration should center on `Effect`, not React or Solid parity |
 | Build artifact | `cdylib` |
 | Dev environment | `devenv` (Nix) |
