@@ -61,5 +61,5 @@
 ## Current Repo-Specific Notes
 
 - `TechSpec.md` is now a **current-state Brownfield spec**, not a future-phase memo.
-- `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped; the next active wave is not selected yet. Older v6/v4 material remains continuity context, not the active backlog.
+- `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped and activates **Epic P — Tuvren Identity, Packaging, and Release Migration** plus **Epic Q — Adoption and Framework Positioning** as the current backlog. Older v6/v4 material remains continuity context, not the active backlog.
 - `reports/GatePolicy.md` reflects the current CI host test surface, including install smoke and runner tests.

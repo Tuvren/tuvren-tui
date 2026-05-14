@@ -290,7 +290,7 @@ sequenceDiagram
 
 ### Risk 8 - Host-Layer Framework Growth Can Reintroduce Split-Brain State
 - **Why it matters:** Commands, keymaps, and future declarative integration layers increase framework ergonomics, but they also increase the risk that host-side orchestration quietly starts owning mutable UI semantics that the architecture reserves for the Native Core.
-- **Mitigation or follow-up:** Treat host-side framework services as orchestration over the existing command protocol only, and defer plugin-slot architecture until the command/keymap and declarative contracts prove stable without duplicating native state.
+- **Mitigation or follow-up:** Treat host-side framework services as orchestration over the existing command protocol only, and defer plugin-slot architecture until after `v1.0` and until the command/keymap and declarative contracts prove stable without duplicating native state.
 
 ### Risk 9 - Hard-Cut Rename and Productization Work Can Fracture Delivery
 - **Why it matters:** The move from Kraken to Tuvren, combined with package and release-contract changes, creates a real chance of shipping a stronger architecture behind a weaker public install story if the cutover is partial or incoherent.

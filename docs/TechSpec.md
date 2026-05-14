@@ -60,7 +60,7 @@
 | macOS | x64 | `kraken-tui-<tag>-darwin-x64.dylib` | `tuvren-tui-<tag>-darwin-x64.dylib` | `@tuvren/tuvren-tui-darwin-x64` |
 | Windows | x64 | `kraken-tui-<tag>-win32-x64.dll` | `tuvren-tui-<tag>-win32-x64.dll` | `@tuvren/tuvren-tui-win32-x64` |
 
-The repo-owned release workflow currently publishes **versioned GitHub release assets** with SHA-256 sidecars and relies on the public package resolver to search `KRAKEN_LIB_PATH`, staged `ts/prebuilds/...`, and the local Cargo build. The approved target-state replaces that public install story with one public package (`tuvren-tui`) that consumes internal scoped native packages published under the new organization. Standalone release assets may still be published for provenance and manual acquisition, but after Epic P they are no longer part of the automatic resolver path unless a caller points `TUVREN_LIB_PATH` at them. Source-build fallback remains valid for repo-side development and verification.
+The repo-owned release workflow currently publishes **versioned GitHub release assets** with SHA-256 sidecars and relies on the public package resolver to search `KRAKEN_LIB_PATH`, staged `ts/prebuilds/...`, and the local Cargo build. The approved target-state replaces that public install story with one public package (`tuvren-tui`) that consumes auxiliary scoped native packages published under the new organization. Here "auxiliary" means they are not the documented direct install target; it does not imply a private-registry-only topology. Standalone release assets may still be published for provenance and manual acquisition, but after Epic P they are no longer part of the automatic resolver path unless a caller points `TUVREN_LIB_PATH` at them. Source-build fallback remains valid for repo-side development and verification.
 
 ## 2. Architecture Decision Records (ADRs)
 ### 2.1 Active Inherited Decisions
@@ -146,13 +146,13 @@ The repo-owned release workflow currently publishes **versioned GitHub release a
 ### ADR-T43 One Public Package Sits Above Internal Scoped Native Packages
 - **Status:** accepted
 - **Context:** The current Brownfield install story relies on GitHub native assets plus manual or staged prebuild placement. That is workable for source checkouts but falls short of the productized install experience needed for a competitive framework release.
-- **Decision:** Keep one public package as the only documented install target and move platform-native distribution behind internal scoped packages published under the new organization. `tuvren-tui` remains the public facade; internal packages such as `@tuvren/tuvren-tui-linux-x64` and `@tuvren/tuvren-tui-darwin-arm64` carry the shared libraries that the resolver loads automatically. If those native packages are skipped or unavailable, the resolver must fall through to `TUVREN_LIB_PATH`, then the local Cargo build in repo checkouts, and otherwise fail with a clear diagnostic instead of assuming the optional package exists. Source-build fallback remains part of repo-side development and verification.
-- **Consequences:** End-user install UX becomes simpler and less error-prone, while the release workflow and resolver gain packaging responsibilities that must stay aligned across CI, diagnostics, and test coverage. The project also accepts npm package-topology work as core productization scope rather than as release glue, including the need to handle optional native-package omission explicitly at runtime.
+- **Decision:** Keep one public package as the only documented install target and move platform-native distribution behind auxiliary scoped packages published under the new organization. `tuvren-tui` remains the public facade; auxiliary packages such as `@tuvren/tuvren-tui-linux-x64` and `@tuvren/tuvren-tui-darwin-arm64` carry the shared libraries that the resolver loads after it first checks `TUVREN_LIB_PATH`. If no override is provided and the platform-native package is skipped or unavailable, the resolver must fall through to the local Cargo build in repo checkouts and otherwise fail with a clear diagnostic instead of assuming the optional package exists. Source-build fallback remains part of repo-side development and verification.
+- **Consequences:** End-user install UX becomes simpler and less error-prone, while the release workflow and resolver gain packaging responsibilities that must stay aligned across CI, diagnostics, and test coverage. The project also accepts npm package-topology work as core productization scope rather than as release glue, including the need to handle optional native-package omission explicitly at runtime. "Auxiliary scoped package" here means a public distribution unit beneath `tuvren-tui`, not a separate documented install target.
 
 ### ADR-T44 Commands and Keymaps Are the First Framework-Level Host Services
 - **Status:** accepted
 - **Context:** The product direction is moving from a specialist library posture toward a general-purpose framework story, but the architectural invariant remains that Rust owns mutable UI state. The first framework moat should therefore add application ergonomics without creating a second source of truth in the host layer.
-- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the productization wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are explicitly deferred until the commands/keymap contract proves stable, and they are not part of the active implementation contract in this document yet.
+- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the productization wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are explicitly deferred until after `v1.0` and until the commands/keymap contract proves stable, and they are not part of the active implementation contract in this document yet.
 - **Consequences:** The framework can grow more competitive application ergonomics without weakening the native-state boundary, but the command dispatch, focus integration, and keybinding resolution APIs must be designed deliberately before a plugin story is added on top.
 
 ### ADR-T45 Effect Is the Sanctioned Declarative Integration Path
@@ -616,7 +616,7 @@ Brownfield note: the current source tree still exports `Kraken`, `KrakenError`, 
 ### 4.3 Install / Resolver Contract
 - **Style:** Runtime artifact-resolution contract
 - **Authentication / Authorization:** Not applicable
-- **Compatibility Strategy:** Resolver search order is deterministic and platform-aware so both published installs and source-built workflows remain valid. Brownfield source still searches the Kraken-era staged-prebuild path; the approved target-state preserves deterministic resolution but replaces the public install story with one public package and internal scoped native packages under the Tuvren organization.
+- **Compatibility Strategy:** Resolver search order is deterministic and platform-aware so both published installs and source-built workflows remain valid. Brownfield source still searches the Kraken-era staged-prebuild path; the approved target-state preserves deterministic resolution but replaces the public install story with one public package and auxiliary scoped native packages under the Tuvren organization.
 - **Error model:** Missing-artifact failures include searched paths and platform-specific remediation guidance. The approved hard cut replaces `KRAKEN_LIB_PATH` with `TUVREN_LIB_PATH`; no long-lived alias is planned.
 
 ```yaml
@@ -634,9 +634,9 @@ approved_target_state:
     - diagnostic_error
 notes:
   - "Current Brownfield source publishes versioned GitHub native assets and optionally stages them into ts/prebuilds/<platform>-<arch>/<libName>."
-  - "Approved target-state publishes one public package, tuvren-tui, that consumes internal scoped native packages under the new organization."
+  - "Approved target-state publishes one public package, tuvren-tui, that consumes auxiliary scoped native packages under the new organization."
   - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are no longer a first-class automatic resolver search path after Epic P."
-  - "If an internal native package is skipped or unavailable, the target-state resolver falls through to TUVREN_LIB_PATH and then the local Cargo build; otherwise it fails with an explicit diagnostic instead of assuming the package is present."
+  - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build in repo checkouts, and finally an explicit diagnostic failure."
   - "If the public package uses platform-native optional dependencies, the install contract must explicitly tolerate npm clients omitting them and surface the missing-native case through the documented diagnostic path."
   - "Repo-side verification that dlopen's directly must still validate the local Cargo-built artifact rather than a stale packaged binary."
   - "No long-lived KRAKEN_LIB_PATH compatibility alias is planned after the Tuvren hard cut."

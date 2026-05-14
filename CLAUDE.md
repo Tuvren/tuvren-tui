@@ -23,7 +23,7 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 ## Current Repo Status
 
 - The canonical docs chain is current and should be treated as the source of truth for planning work.
-- `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped; the next active wave is not selected yet.
+- `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped and activates **Epic P — Tuvren Identity, Packaging, and Release Migration** plus **Epic Q — Adoption and Framework Positioning** as the current wave.
 - `Tasks.md` now separates **active scope** from **archived completed scope**. Do not mistake the archived v6/v4 delivery wave for the current backlog.
 - The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
 

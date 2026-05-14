@@ -7,7 +7,7 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Target Archetype
-- **Target Archetype:** General-purpose terminal UI framework and SDK for TypeScript-first developers, with a productized imperative core and Bun-native ergonomics in the current public release posture.
+- **Target Archetype:** General-purpose terminal UI framework and SDK for TypeScript-first developers, with a productized imperative core as the approved public release direction and Bun-native ergonomics in the current runtime posture.
 - **Vision:** Terminal interface development becomes as productive as web UI development without sacrificing performance, inspectability, or the ability to ship demanding terminal products from a TypeScript workflow.
 - **Problem:** Developers building terminal applications in the TypeScript ecosystem still face a forced trade-off between ergonomic but resource-heavy solutions, performant but ergonomically hostile primitives, and toolkit surfaces that do not feel productized or extensible enough to trust for real application delivery.
 - **Jobs to Be Done:**

@@ -14,15 +14,15 @@
   - Epic M, Epic N, and Epic O are shipped; the current Brownfield source already includes the native text substrate, transcript and split-pane semantics, devtools, and terminal-capability hardening.
   - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
   - Bun remains the only supported runtime in the active contract. Node portability is deferred.
-  - The next active wave is productization plus adoption: hard-cut rename to `Tuvren`, one public package over internal native packages, install and release trust, and public positioning refresh.
-  - The following framework waves are intentionally sequenced behind that: commands and keymaps first, `Effect` after those foundations, and plugin-slot extensibility only after both contracts stabilize.
+  - The next active wave is productization plus adoption: hard-cut rename to `Tuvren`, one public package over auxiliary scoped native packages, install and release trust, and public positioning refresh.
+  - The following framework waves are intentionally sequenced behind that: commands and keymaps first, `Effect` after those foundations, and plugin-slot extensibility only after `v1.0` and after both contracts stabilize.
   - React and Solid parity are not roadmap goals in this planning wave.
 
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
 #### Epic P — Tuvren Identity, Packaging, and Release Migration
 - Execute the hard public rename from Kraken to Tuvren across package names, host facade names, native artifact naming, diagnostics, and release workflow outputs.
-- Replace the current staged-prebuild public install story with one public package backed by internal scoped native packages under the new organization.
+- Replace the current staged-prebuild public install story with one public package backed by auxiliary scoped native packages under the new organization.
 - Raise release trust by tightening resolver behavior, smoke verification, and migration diagnostics around the new naming and packaging contract.
 
 #### Epic Q — Adoption and Framework Positioning
@@ -40,12 +40,12 @@
 - Keep the imperative package canonical while offering a clear higher-level integration model for teams that want structured effects and composition after the command and keymap foundations are in place.
 
 #### Epic T — Plugin Slots and Extensibility
-- Explore plugin-slot boundaries only after commands, keymaps, and the `Effect` posture are stable enough to extend without locking in the wrong host/service contract.
+- Explore plugin-slot boundaries only after `v1.0` and after commands, keymaps, and the `Effect` posture are stable enough to extend without locking in the wrong host/service contract.
 
 #### Standing Deferrals Preserved
 - No Node runtime portability in the active wave.
 - No React or Solid parity work; the declarative strategy is `Effect`, not framework-adapter breadth.
-- No plugin-slot contract before commands/keymaps and `Effect` have proven their boundaries.
+- No plugin-slot contract before `v1.0` or before commands/keymaps and `Effect` have proven their boundaries.
 - No generic widget-breadth wave as a substitute for productization and framework ergonomics.
 - No default background-render promotion while synchronous semantics remain the canonical contract.
 - No clipboard read support, Kitty graphics, sixel, inline image protocols, or advanced MIME clipboard work in the active wave.
@@ -134,12 +134,12 @@ And diagnostics and tests describe only the new contract rather than a long-live
 - **Effort:** 5
 - **Dependencies:** PROD-P003
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §4.10 and §5, [Architecture](./Architecture.md) §2.2 and §5.4, [TechSpec](./TechSpec.md) ADR-T43, §1.3, §1.4, §4.3
-- **Description:** Introduce internal scoped native packages under the new organization for the supported platform matrix, wire release automation to publish them, and keep `tuvren-tui` as the only documented public install target.
+- **Description:** Introduce auxiliary scoped native packages under the new organization for the supported platform matrix, wire release automation to publish them, and keep `tuvren-tui` as the only documented public install target.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the approved one-public-package distribution model
 When native packaging automation runs for a release
-Then each supported platform target produces an internal scoped native package under the Tuvren organization
+Then each supported platform target produces an auxiliary scoped native package under the Tuvren organization
 And the public package remains the only documented install target
 And published package metadata is sufficient for the resolver to discover the correct native library automatically
 ```
@@ -149,7 +149,7 @@ And published package metadata is sufficient for the resolver to discover the co
 - **Effort:** 5
 - **Dependencies:** PROD-P002, PROD-P003, PROD-P004
 - **Capability / Contract Mapping:** [Architecture](./Architecture.md) §2.2, [TechSpec](./TechSpec.md) ADR-T43, §4.3, §5.2
-- **Description:** Update resolver logic, diagnostics, and install smoke coverage so the public package first consumes internal scoped native packages, still honors the explicit `TUVREN_LIB_PATH` override, and preserves local Cargo-build fallback for source checkouts and direct repo verification.
+- **Description:** Update resolver logic, diagnostics, and install smoke coverage so the public package checks `TUVREN_LIB_PATH` first, then resolves the auxiliary scoped native package for the current platform, and finally preserves local Cargo-build fallback for source checkouts and direct repo verification.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given a published tuvren-tui install on a supported platform
