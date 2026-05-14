@@ -26,7 +26,7 @@
 | **v0** | Core interaction surface | Widget composition, layout, styling, keyboard and mouse input, scrolling, cross-platform terminal handling, and rich text rendering |
 | **v1** | Product polish | Animation system and theming foundation |
 | **v2** | Hardening and advanced DX | Core hardening, tree operations for reconciler support, theme inheritance, TextArea, choreography, lightweight JSX reconciler, and foundational accessibility |
-| **v3** | Productization and framework foundations | Public rename to Tuvren, packaging and release trust, onboarding polish, general-purpose framework positioning, and first-class command/keymap foundations |
+| **v3** | Productization and framework foundations | Public rename to Tuvren, packaging and release trust, onboarding polish, general-purpose framework positioning, and the queued command/keymap foundation wave that follows the active productization pass |
 | **v4** | Declarative and extensibility expansion | Effect-based declarative integration over the same core runtime, followed by post-v1 plugin-slot exploration once framework foundations stabilize |
 
 ### 1.3 Brownfield Transition Note

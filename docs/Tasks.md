@@ -15,7 +15,7 @@
   - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
   - Bun remains the only supported runtime in the active contract. Node portability is deferred.
   - The next active wave is productization plus adoption: hard-cut rename to `Tuvren`, one public package over auxiliary scoped native packages, install and release trust, and public positioning refresh.
-  - The following framework waves are intentionally sequenced behind that: commands and keymaps first, `Effect` after those foundations, and plugin-slot extensibility only after `v1.0` and after both contracts stabilize.
+  - The following framework waves are intentionally sequenced behind that: the remaining planned `v3` foundation wave is commands and keymaps, `v4` then begins with `Effect`, and plugin-slot extensibility only follows after `v1.0` and after both contracts stabilize.
   - React and Solid parity are not roadmap goals in this planning wave.
 
 ## 2. Project Phasing & Iteration Strategy
@@ -61,20 +61,36 @@
 ```mermaid
 flowchart LR
     O[Epic O Terminal Capability Hardening - SHIPPED]:::done
-    P[Epic P Tuvren Identity, Packaging, and Release Migration]:::active
-    Q[Epic Q Adoption and Framework Positioning]:::active
+    P1[PROD-P001]:::active
+    P2[PROD-P002]:::active
+    P3[PROD-P003]:::active
+    P4[PROD-P004]:::active
+    P5[PROD-P005]:::active
+    P6[PROD-P006]:::active
+    Q1[ADOPT-Q001]:::active
+    Q2[ADOPT-Q002]:::active
+    Q3[ADOPT-Q003]:::active
     R[Epic R Commands and Keymap Foundations]:::future
     S[Epic S Effect Declarative Integration]:::future
     T[Epic T Plugin Slots and Extensibility]:::future
 
-    O --> P
-    P --> Q
-    Q --> R
+    O --> P1
+    P1 --> P2
+    P2 --> P3
+    P3 --> P4
+    P4 --> P5
+    P5 --> P6
+    P5 --> Q1
+    Q1 --> Q2
+    Q1 --> Q3
+    P6 --> R
+    Q2 --> R
+    Q3 --> R
     R --> S
     S --> T
 
     class O done;
-    class P,Q active;
+    class P1,P2,P3,P4,P5,P6,Q1,Q2,Q3 active;
     class R,S,T future;
     classDef done fill:#dff5dd,stroke:#3f9d3f,color:#1f4d1f;
     classDef active fill:#fff4d6,stroke:#d39b14,color:#5c4100;
@@ -118,7 +134,7 @@ And the imperative lifecycle surface remains shape-compatible apart from the app
 - **Type:** Feature
 - **Effort:** 8
 - **Dependencies:** PROD-P002
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3 and §5, [Architecture](./Architecture.md) §5.4 and Risk 9, [TechSpec](./TechSpec.md) ADR-T42, §1.3, §1.4, §4.3
+- **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3 and §5, [Architecture](./Architecture.md) §1.3, §1.4, and Risk 9, [TechSpec](./TechSpec.md) ADR-T42, §1.3, §1.4, §4.3
 - **Description:** Rename the native crate and shared-library identities to `tuvren_tui` / `libtuvren_tui.*`, replace `KRAKEN_LIB_PATH` with `TUVREN_LIB_PATH`, rename release assets to `tuvren-tui-*`, and update resolver diagnostics and install/load tests to reflect the hard cut. Preserve the `tui_*` ABI prefix.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -133,7 +149,7 @@ And diagnostics and tests describe only the new contract rather than a long-live
 - **Type:** Feature
 - **Effort:** 5
 - **Dependencies:** PROD-P003
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §4.10 and §5, [Architecture](./Architecture.md) §2.2 and §5.4, [TechSpec](./TechSpec.md) ADR-T43, §1.3, §1.4, §4.3
+- **Capability / Contract Mapping:** [PRD](./PRD.md) §4.10 and §5, [Architecture](./Architecture.md) §1.3, §1.4, §2.2, and Risk 9, [TechSpec](./TechSpec.md) ADR-T43, §1.3, §1.4, §4.3
 - **Description:** Introduce auxiliary scoped native packages under the new organization for the supported platform matrix, wire release automation to publish them, make the repository and package ownership move required for Tuvren publishing explicit, and keep `tuvren-tui` as the only documented public install target.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -143,7 +159,7 @@ Then each supported platform target produces an auxiliary scoped native package 
 And the repository and package ownership needed to publish under the Tuvren organization are in place
 And the public package remains the only documented install target
 And published package metadata is sufficient for the resolver to discover the correct native library automatically
-And Linux auxiliary packages declare the supported os, cpu, and libc metadata so glibc-only artifacts are not installed on unsupported musl hosts
+And Epic P records and verifies the Bun-first enforcement strategy that prevents glibc-only artifacts from silently installing on unsupported musl hosts
 And the chosen Bun package-manager strategy either proves the supported install path does not silently materialize unrelated platform payloads or records the supported fallback and diagnostic path if Bun's optional-dependency behavior would do so
 ```
 

@@ -8,6 +8,8 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 
 **Kraken TUI** is a Rust-native terminal UI engine with TypeScript/Bun bindings over FFI.
 
+**Brownfield note:** The current source tree still uses the Kraken name in code and artifacts; the active productization wave plans the future public rename to `Tuvren`.
+
 **Core invariant:** Rust owns all mutable UI state. TypeScript holds opaque `u32` Handles and issues commands. Control flow is unidirectional: the Host Layer calls into the Native Core; the Native Core never calls back into the Host Layer.
 
 **Canonical document chain** (read in order for design and planning questions):

@@ -23,7 +23,7 @@
 | What concrete interfaces, state, and tests exist | `TechSpec.md` | `1. Stack Specification`, `3. State & Data Modeling`, `4. Interface Contract`, `5. Implementation Guidelines` |
 | What should happen next | `Tasks.md` | `1. Executive Summary & Active Critical Path`, `4. Ticket List` |
 | What was already delivered in the previous wave | `Tasks.md` | `2. Project Phasing & Iteration Strategy`, `5. Ticket Summary Table`, `6. Archived Continuity Summary` |
-| How CI and release gates currently work | `reports/GatePolicy.md` | all sections |
+| How CI and release gates currently work | `docs/reports/GatePolicy.md` | all sections |
 
 ---
 
@@ -62,4 +62,4 @@
 
 - `TechSpec.md` is now a **current-state Brownfield spec**, not a future-phase memo.
 - `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped and activates **Epic P — Tuvren Identity, Packaging, and Release Migration** plus **Epic Q — Adoption and Framework Positioning** as the current backlog. Older v6/v4 material remains continuity context, not the active backlog.
-- `reports/GatePolicy.md` reflects the current CI host test surface, including install smoke and runner tests.
+- `docs/reports/GatePolicy.md` reflects the current CI host test surface, including install smoke and runner tests.
