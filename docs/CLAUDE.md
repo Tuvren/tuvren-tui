@@ -17,7 +17,7 @@
 
 | If you need to know... | Target File | Specific Section |
 | --- | --- | --- |
-| What product and scope Kraken serves | `PRD.md` | `1. Executive Summary`, `4. Functional Capabilities`, `6. Boundary Analysis` |
+| What product and scope Tuvren serves | `PRD.md` | `1. Executive Summary`, `4. Functional Capabilities`, `6. Boundary Analysis` |
 | Which term should be used consistently | `PRD.md` | `2. Ubiquitous Language (Glossary)` |
 | What the logical boundaries are | `Architecture.md` | `1. Architectural Strategy`, `2. System Containers`, `4. Critical Execution Flows` |
 | What concrete interfaces, state, and tests exist | `TechSpec.md` | `1. Stack Specification`, `3. State & Data Modeling`, `4. Interface Contract`, `5. Implementation Guidelines` |

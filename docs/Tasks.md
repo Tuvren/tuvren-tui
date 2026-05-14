@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Active Critical Path
 - **Total Active Story Points:** 41
-- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005 -> ADOPT-Q001 -> ADOPT-Q002`, with `PROD-P006` and `ADOPT-Q003` closing in parallel once their prerequisites are satisfied.
+- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005`, followed by three required closeout tracks: `PROD-P006`, `ADOPT-Q001 -> ADOPT-Q002`, and `ADOPT-Q001 -> ADOPT-Q003`. The active wave is complete only when all three closeout tracks land.
 - **Planning Assumptions:**
   - Epic M, Epic N, and Epic O are shipped; the current Brownfield source already includes the native text substrate, transcript and split-pane semantics, devtools, and terminal-capability hardening.
   - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
@@ -21,7 +21,7 @@
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
 #### Epic P — Tuvren Identity, Packaging, and Release Migration
-- Execute the hard public rename from Kraken to Tuvren across package names, host facade names, native artifact naming, diagnostics, and release workflow outputs.
+- Execute the hard public rename from Kraken to Tuvren across package names, host facade names, native artifact naming, diagnostics, release workflow outputs, and the repository and package ownership move into the new organization.
 - Replace the current staged-prebuild public install story with one public package backed by auxiliary scoped native packages under the new organization.
 - Raise release trust by tightening resolver behavior, smoke verification, and migration diagnostics around the new naming and packaging contract.
 
@@ -129,19 +129,21 @@ And the tui_* ABI prefix remains unchanged
 And diagnostics and tests describe only the new contract rather than a long-lived compatibility alias
 ```
 
-**PROD-P004 Add Internal Scoped Native Package Distribution**
+**PROD-P004 Add Auxiliary Scoped Native Package Distribution**
 - **Type:** Feature
 - **Effort:** 5
 - **Dependencies:** PROD-P003
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §4.10 and §5, [Architecture](./Architecture.md) §2.2 and §5.4, [TechSpec](./TechSpec.md) ADR-T43, §1.3, §1.4, §4.3
-- **Description:** Introduce auxiliary scoped native packages under the new organization for the supported platform matrix, wire release automation to publish them, and keep `tuvren-tui` as the only documented public install target.
+- **Description:** Introduce auxiliary scoped native packages under the new organization for the supported platform matrix, wire release automation to publish them, make the repository and package ownership move required for Tuvren publishing explicit, and keep `tuvren-tui` as the only documented public install target.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the approved one-public-package distribution model
 When native packaging automation runs for a release
 Then each supported platform target produces an auxiliary scoped native package under the Tuvren organization
+And the repository and package ownership needed to publish under the Tuvren organization are in place
 And the public package remains the only documented install target
 And published package metadata is sufficient for the resolver to discover the correct native library automatically
+And the chosen Bun package-manager strategy either proves the supported install path does not silently materialize unrelated platform payloads or records the supported fallback and diagnostic path if Bun's optional-dependency behavior would do so
 ```
 
 **PROD-P005 Update Resolver and Install UX for the New Package Topology**
@@ -155,7 +157,7 @@ And published package metadata is sufficient for the resolver to discover the co
 Given a published tuvren-tui install on a supported platform
 When the resolver loads the native library
 Then it searches TUVREN_LIB_PATH first
-And otherwise resolves the correct internal scoped native package artifact for the current platform
+And otherwise resolves the correct auxiliary scoped native package artifact for the current platform
 And source checkouts still fall back to the local Cargo-built artifact when packaged binaries are absent
 ```
 

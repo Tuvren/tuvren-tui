@@ -1,7 +1,7 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
-- v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward internal scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
+- v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
 - v7.4.1 - Landed Epic O Brownfield updates: native terminal capability state, diagnostic query APIs, write-only OSC52, OSC8 text-buffer link spans, Kitty keyboard disambiguation negotiation, and conservative multiplexer degradation are now implemented.
 - v7.4.0 - Activated the Epic O terminal-capability contract: capability discovery becomes detection-first, OSC52 is write-only, OSC8 hyperlinks are range-scoped, Kitty keyboard support is negotiated, and multiplexer variance is an explicit implementation concern.
 - ... [Older history truncated, refer to git logs]
@@ -37,7 +37,7 @@
 | Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` dependency belongs to the optional declarative subpath rather than the main surface. |
 | Public package contract | current Brownfield: `kraken-tui`; approved target-state: `tuvren-tui` | `ts/package.json`, source tree, approved roadmap | Execute a hard public rename in the productization wave while keeping one public package as the user-facing contract. |
 | Optional declarative subpath | current Brownfield: `kraken-tui/effect` stub; approved target-state: `tuvren-tui/effect` | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
-| Native package topology | current Brownfield: GitHub assets and manual staging; approved target-state: internal scoped platform packages | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through internal scoped packages published under the new organization, while keeping `tuvren-tui` as the only public package. |
+| Native package topology | current Brownfield: GitHub assets and manual staging; approved target-state: auxiliary scoped platform packages | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the new organization, while keeping `tuvren-tui` as the only public package. |
 
 ### 1.3 Build, Test, and Release Artifacts
 
@@ -45,14 +45,14 @@
 | --- | --- | --- |
 | Native Core | Shared library (`.so`, `.dylib`, `.dll`) | `native/target/release/` for source builds; versioned GitHub release assets for published native binaries |
 | Host Package | ESM TypeScript package (`kraken-tui` today, `tuvren-tui` after Epic P) | `ts/package.json`, `ts/src/` |
-| Native Package Set | Internal scoped npm packages carrying per-platform shared libraries | approved target-state under the next productization wave |
+| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries | approved target-state under the next productization wave |
 | Release Artifacts | Versioned platform builds with `.sha256` sidecars; current Brownfield names use `kraken-tui-*`, approved target-state uses `tuvren-tui-*` | `.github/workflows/release.yml` plus the approved migration contract in §4.3 |
 | Flagship Examples | Bun entrypoints | `examples/agent-console.ts`, `examples/ops-log-console.ts`, `examples/repo-inspector.ts` |
 | Replay Fixtures | JSON fixtures and headless assertions | `examples/fixtures/`, `ts/test-examples.test.ts` |
 
 ### 1.4 Release and Distribution Matrix
 
-| Platform | Architecture | Current Brownfield release asset | Approved target release asset | Approved internal native package |
+| Platform | Architecture | Current Brownfield release asset | Approved target release asset | Approved auxiliary native package |
 | --- | --- | --- | --- | --- |
 | Linux | x64 | `kraken-tui-<tag>-linux-x64.so` | `tuvren-tui-<tag>-linux-x64.so` | `@tuvren/tuvren-tui-linux-x64` |
 | Linux | arm64 | `kraken-tui-<tag>-linux-arm64.so` | `tuvren-tui-<tag>-linux-arm64.so` | `@tuvren/tuvren-tui-linux-arm64` |
