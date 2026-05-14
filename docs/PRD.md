@@ -228,7 +228,7 @@ C4Context
     Rel(developer, tuvren, "Composes Widgets, defines Layout Constraints, handles Events")
     Rel(enduser, terminal, "Provides keyboard and mouse input, reads visual output")
     Rel(tuvren, terminal, "Writes to Surface via terminal escape sequences")
-    Rel(kraken, runtime, "Exposes Widget API via foreign function interface")
+    Rel(tuvren, runtime, "Exposes Widget API via foreign function interface")
     Rel(terminal, os, "Terminal I/O")
 ```
 

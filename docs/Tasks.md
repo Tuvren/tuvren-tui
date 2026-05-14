@@ -9,13 +9,13 @@
 
 ## 1. Executive Summary & Active Critical Path
 - **Total Active Story Points:** 41
-- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005 -> PROD-P006`, with adoption work starting once the rename and install contracts are stable enough to document publicly.
+- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005 -> ADOPT-Q001 -> ADOPT-Q002`, with `PROD-P006` and `ADOPT-Q003` closing in parallel once their prerequisites are satisfied.
 - **Planning Assumptions:**
   - Epic M, Epic N, and Epic O are shipped; the current Brownfield source already includes the native text substrate, transcript and split-pane semantics, devtools, and terminal-capability hardening.
   - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
   - Bun remains the only supported runtime in the active contract. Node portability is deferred.
   - The next active wave is productization plus adoption: hard-cut rename to `Tuvren`, one public package over internal native packages, install and release trust, and public positioning refresh.
-  - The following framework wave is intentionally sequenced behind that: commands and keymaps plus `Effect` become the next framework-expansion focus, and plugin-slot extensibility stays deferred until those contracts stabilize.
+  - The following framework waves are intentionally sequenced behind that: commands and keymaps first, `Effect` after those foundations, and plugin-slot extensibility only after both contracts stabilize.
   - React and Solid parity are not roadmap goals in this planning wave.
 
 ## 2. Project Phasing & Iteration Strategy
@@ -37,7 +37,7 @@
 
 #### Epic S — Effect Declarative Integration
 - Turn the current `effect` stub into the sanctioned declarative path over the same Bun and FFI core.
-- Keep the imperative package canonical while offering a clear higher-level integration model for teams that want structured effects and composition.
+- Keep the imperative package canonical while offering a clear higher-level integration model for teams that want structured effects and composition after the command and keymap foundations are in place.
 
 #### Epic T — Plugin Slots and Extensibility
 - Explore plugin-slot boundaries only after commands, keymaps, and the `Effect` posture are stable enough to extend without locking in the wrong host/service contract.
@@ -69,11 +69,8 @@ flowchart LR
 
     O --> P
     P --> Q
-    P --> R
-    P --> S
     Q --> R
-    Q --> S
-    R --> T
+    R --> S
     S --> T
 
     class O done;
