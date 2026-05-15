@@ -9,7 +9,7 @@
 
 ## 1. Executive Summary & Active Critical Path
 - **Total Active Story Points:** 41
-- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005`, followed by three required closeout tracks: `PROD-P006`, `ADOPT-Q001 -> ADOPT-Q002`, and `ADOPT-Q001 -> ADOPT-Q003`. The active wave is complete only when all three closeout tracks land.
+- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005 -> PROD-P006 -> ADOPT-Q001 -> ADOPT-Q002`, with `ADOPT-Q003` closing in parallel after `ADOPT-Q001`. The active wave is complete only when both adoption closeout paths land after the release-trust gate.
 - **Planning Assumptions:**
   - Epic M, Epic N, and Epic O are shipped; the current Brownfield source already includes the native text substrate, transcript and split-pane semantics, devtools, and terminal-capability hardening.
   - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
@@ -80,7 +80,7 @@ flowchart LR
     P3 --> P4
     P4 --> P5
     P5 --> P6
-    P5 --> Q1
+    P6 --> Q1
     Q1 --> Q2
     Q1 --> Q3
     P6 --> R
@@ -106,12 +106,13 @@ flowchart LR
 - **Effort:** 3
 - **Dependencies:** Epic O shipped
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3, [Architecture](./Architecture.md) §1.4 and Risk 9, [TechSpec](./TechSpec.md) ADR-T42, ADR-T43, §1.4, §4.3
-- **Description:** Produce a committed migration inventory, for example under `docs/spikes/`, that enumerates every public-facing Kraken-era name and release/distribution touchpoint: npm package names, host facade and error types, resolver environment variables, native crate/library names, release asset names, install diagnostics, and CI/release workflow assumptions. If the inventory surfaces contradictions with the approved Tuvren contract, resolve the upstream doc conflict before implementation tickets begin.
+- **Description:** Produce a committed migration inventory, for example under `docs/spikes/`, that enumerates every public-facing Kraken-era name and release/distribution touchpoint: npm package names, public subpath exports, compiler-facing import-source settings, host facade and error types, resolver environment variables, native crate/library names, release asset names, install diagnostics, and CI/release workflow assumptions. If the inventory surfaces contradictions with the approved Tuvren contract, resolve the upstream doc conflict before implementation tickets begin.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the approved hard-cut move from Kraken to Tuvren
 When the repo's public naming, packaging, and release touchpoints are inventoried
 Then the inventory records every source, workflow, and user-facing contract that must change
+And the inventory explicitly covers public subpath exports and compiler-facing import-source settings in addition to the root package contract
 And the inventory is committed in a reviewable artifact that downstream rename tickets can reference directly
 And any contradiction with PRD, Architecture, or TechSpec is resolved upstream before PROD-P002 starts
 ```
@@ -194,6 +195,7 @@ When the supported public release matrix is validated
 Then each supported public target tuple receives an install and load smoke verification path
 And Linux remains the blocking benchmark environment for bundle, FFI, and render-budget enforcement
 And GatePolicy documents the new cross-platform trust posture and any release-time verification split from CI
+And any release-time smoke verification runs before publish or promotion rather than after broken artifacts are already live
 ```
 
 ### Epic Q — Adoption and Framework Positioning (ADOPT)
@@ -201,7 +203,7 @@ And GatePolicy documents the new cross-platform trust posture and any release-ti
 **ADOPT-Q001 Rewrite Public Onboarding Around Tuvren's Framework Story**
 - **Type:** Chore
 - **Effort:** 5
-- **Dependencies:** PROD-P002, PROD-P003, PROD-P005
+- **Dependencies:** PROD-P002, PROD-P003, PROD-P005, PROD-P006
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.1, §1.2, §3, §6, [Architecture](./Architecture.md) §1.3 and §1.4
 - **Description:** Rewrite the public getting-started and adoption narrative around Tuvren as a general-purpose framework with a productized imperative core, while preserving the repo's architectural invariant that Rust owns mutable UI state. Install instructions, naming, scope framing, README messaging, and developer expectations must match the new packaging contract and runtime posture.
 - **Acceptance Criteria (Gherkin):**
@@ -235,13 +237,13 @@ And example framing makes clear why those workloads are the harshest demonstrati
 - **Effort:** 2
 - **Dependencies:** ADOPT-Q001, PROD-P005
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3, [TechSpec](./TechSpec.md) ADR-T42, ADR-T43, §4.2, §4.3
-- **Description:** Publish concise migration guidance for pre-`1.0` adopters covering the Kraken-to-Tuvren rename, the new public package name, shared-library and release-asset renames, the `TUVREN_LIB_PATH` override, and the removal of long-lived compatibility aliases.
+- **Description:** Publish concise migration guidance for pre-`1.0` adopters covering the Kraken-to-Tuvren rename, the new public package name, public subpath and compiler-setting renames, shared-library and release-asset renames, the `TUVREN_LIB_PATH` override, and the removal of long-lived compatibility aliases.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given an adopter familiar with Kraken-era package and resolver names
 When they read the migration guidance
 Then they can translate the old package, facade, and environment-variable names to the new Tuvren contract
-And the guidance includes a concrete old-to-new mapping for package, facade, shared-library, release-asset, and environment-variable names
+And the guidance includes a concrete old-to-new mapping for package, subpath, compiler-setting, facade, shared-library, release-asset, and environment-variable names
 And the guidance explicitly states that the rename is a hard pre-1.0 cut rather than an alias-supported transition
 ```
 
@@ -257,7 +259,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | PROD-P004 | P | Feature | 5 | PROD-P003 | Active |
 | PROD-P005 | P | Feature | 5 | PROD-P002, PROD-P003, PROD-P004 | Active |
 | PROD-P006 | P | Chore | 3 | PROD-P005 | Active |
-| ADOPT-Q001 | Q | Chore | 5 | PROD-P002, PROD-P003, PROD-P005 | Active |
+| ADOPT-Q001 | Q | Chore | 5 | PROD-P002, PROD-P003, PROD-P005, PROD-P006 | Active |
 | ADOPT-Q002 | Q | Feature | 5 | ADOPT-Q001 | Active |
 | ADOPT-Q003 | Q | Chore | 2 | ADOPT-Q001, PROD-P005 | Active |
 |  |  | **TOTAL** | **41** |  |  |

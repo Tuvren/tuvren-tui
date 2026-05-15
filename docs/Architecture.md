@@ -208,6 +208,7 @@ sequenceDiagram
 ```
 
 ### 4.5 Command Dispatch from Keymap Resolution
+- **Status:** Planned future flow for Epic R after the active productization and adoption wave; not shipped Brownfield runtime behavior.
 - **Maps to PRD capability:** Epic 11 - Commands & Keymap Foundations
 ```mermaid
 sequenceDiagram
