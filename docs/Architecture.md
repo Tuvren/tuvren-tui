@@ -210,6 +210,7 @@ sequenceDiagram
 ### 4.5 Command Dispatch from Keymap Resolution
 - **Status:** Planned future flow for Epic R after the active productization and adoption wave; not shipped Brownfield runtime behavior.
 - **Maps to PRD capability:** Epic 11 - Commands & Keymap Foundations
+- **Focus-awareness note:** Epic R must obtain focused-context data from the Native Core through drained event payloads or an explicit query path; host-side framework services must not invent shadow focus state.
 ```mermaid
 sequenceDiagram
     actor EU as End User

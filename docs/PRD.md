@@ -27,7 +27,7 @@
 | **v1** | Product polish | Animation system and theming foundation |
 | **v2** | Hardening and advanced DX | Core hardening, tree operations for reconciler support, theme inheritance, TextArea, choreography, lightweight JSX reconciler, and foundational accessibility |
 | **v3** | Productization and framework foundations | Public rename to Tuvren, packaging and release trust, onboarding polish, general-purpose framework positioning, and the queued command/keymap foundation wave that follows the active productization pass |
-| **v4** | Declarative and extensibility expansion | Effect-based declarative integration over the same core runtime, followed by post-v1 plugin-slot exploration once framework foundations stabilize |
+| **v4** | Declarative and extensibility expansion | Effect-based declarative integration begins after the remaining v3 command/keymap wave, and post-v1 plugin-slot exploration only follows once those foundations stabilize |
 
 ### 1.3 Brownfield Transition Note
 - **Approved future public name:** `Tuvren`

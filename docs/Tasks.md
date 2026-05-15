@@ -122,13 +122,14 @@ And any contradiction with PRD, Architecture, or TechSpec is resolved upstream b
 - **Effort:** 5
 - **Dependencies:** PROD-P001
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3 and §4.10, [Architecture](./Architecture.md) §1.4, [TechSpec](./TechSpec.md) ADR-T42, §1.2, §4.2
-- **Description:** Rename the public TypeScript package contract from `kraken-tui` to `tuvren-tui`, rename the primary host facade from `Kraken` to `Tuvren`, rename the exported host error type and any remaining Kraken-prefixed public TypeScript symbols as part of the same hard cut, and update public imports and package metadata accordingly. Preserve the existing imperative lifecycle model and thin-wrapper rule while changing naming only.
+- **Description:** Rename the public TypeScript package contract from `kraken-tui` to `tuvren-tui`, rename the primary host facade from `Kraken` to `Tuvren`, rename the exported host error type, compiler-facing import surfaces, and any remaining Kraken-prefixed public TypeScript symbols as part of the same hard cut, and update public imports and package metadata accordingly. Preserve the existing imperative lifecycle model and thin-wrapper rule while changing naming only.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the host package and public facade still use Kraken-era naming
 When the rename wave lands
 Then the public package contract is tuvren-tui
 And the primary host facade and exported error type use Tuvren naming
+And public subpath exports plus compiler-facing import-source settings are renamed to the Tuvren package contract
 And no exported public TypeScript identifier retains Kraken-prefixed branding after the hard cut
 And the imperative lifecycle surface remains shape-compatible apart from the approved hard-cut rename
 ```
@@ -171,13 +172,14 @@ And the chosen Bun package-manager strategy either proves the supported install 
 - **Effort:** 5
 - **Dependencies:** PROD-P002, PROD-P003, PROD-P004
 - **Capability / Contract Mapping:** [Architecture](./Architecture.md) §2.2, [TechSpec](./TechSpec.md) ADR-T43, §4.3, §5.2
-- **Description:** Update resolver logic, diagnostics, and install smoke coverage so the public package checks `TUVREN_LIB_PATH` first, then resolves the auxiliary scoped native package for the current platform, and finally preserves local Cargo-build fallback for source checkouts and direct repo verification.
+- **Description:** Update resolver logic, diagnostics, and install smoke coverage so the public package checks `TUVREN_LIB_PATH` first, then resolves the auxiliary scoped native package by name for the current platform and derives the library path from the resolved package root, and finally preserves local Cargo-build fallback only for proven repo checkouts and direct repo verification.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given a published tuvren-tui install on a supported platform
 When the resolver loads the native library
 Then it searches TUVREN_LIB_PATH first
-And otherwise resolves the correct auxiliary scoped native package artifact for the current platform
+And otherwise resolves the correct auxiliary scoped native package by package name for the current platform and derives the shared-library path from the resolved package root
+And repo-side Cargo fallback activates only when the resolver can prove it is running inside a checked-out Kraken or Tuvren workspace
 And source checkouts still fall back to the local Cargo-built artifact when packaged binaries are absent
 And ordinary public installs fail with the documented diagnostic instead of source-building when neither the override nor the packaged native artifact is available
 ```
