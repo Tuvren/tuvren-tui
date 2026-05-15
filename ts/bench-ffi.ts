@@ -52,7 +52,7 @@ function bench(name: string, iterations: number, fn: () => void): void {
 
 // ── Init ────────────────────────────────────────────────────────────────────
 
-console.log("=== Kraken TUI — FFI Benchmarks ===\n");
+console.log("=== Tuvren TUI — FFI Benchmarks ===\n");
 
 const initResult = ffi.tui_init_headless(80, 24);
 if (initResult !== 0) {

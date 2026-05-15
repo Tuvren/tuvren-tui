@@ -36,7 +36,7 @@
 
 import { readFileSync, readdirSync } from "fs";
 import {
-	Kraken,
+	Tuvren,
 	Box,
 	Text,
 	Input,
@@ -51,7 +51,7 @@ import {
 	AccessibilityRole,
 	createLoop,
 } from "../ts/src/index";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 import { ffi } from "../ts/src/ffi";
 
 // ── System Data Readers ───────────────────────────────────────────────
@@ -346,7 +346,7 @@ const palettes: Palette[] = [
 
 // ── Application ───────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const termSize = app.getTerminalSize();
 let pal = palettes[0]!;
 let paletteIndex = 0;
@@ -1098,7 +1098,7 @@ const loop = createLoop({
 	app,
 	fps: 60,
 
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "change" && event.target === helpOverlay.handle) {
 			helpVisible = helpOverlay.isOpen();
 			if (!helpVisible) {

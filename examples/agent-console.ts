@@ -34,7 +34,7 @@
  */
 
 import {
-	Kraken,
+	Tuvren,
 	Box,
 	Text,
 	Tabs,
@@ -49,7 +49,7 @@ import {
 	applyReplayEvent,
 	createLoop,
 } from "../ts/src/index";
-import type { KrakenEvent, TranscriptReplayEvent, Command } from "../ts/src/index";
+import type { TuvrenEvent, TranscriptReplayEvent, Command } from "../ts/src/index";
 
 // ── AG-UI Replay Events ──────────────────────────────────────────────
 // Simulates a realistic agent session: user asks a question, assistant
@@ -204,7 +204,7 @@ const COLORS = {
 
 // ── Application ──────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const { width: termW, height: termH } = app.getTerminalSize();
 
 // Root container
@@ -512,7 +512,7 @@ const loop = createLoop({
 	mode: "continuous",
 	disableJsxDispatch: true,
 
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "resize") {
 			positionPalette(
 				event.width ?? app.getTerminalSize().width,

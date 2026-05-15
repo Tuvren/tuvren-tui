@@ -17,14 +17,14 @@
  */
 
 import {
-	Kraken,
+	Tuvren,
 	signal,
 	render,
 	createLoop,
 	KeyCode,
 } from "../ts/src/index";
 import { jsx, jsxs } from "../ts/src/jsx/jsx-runtime";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 import type { Widget } from "../ts/src/widget";
 import { ffi } from "../ts/src/ffi";
 
@@ -199,7 +199,7 @@ const tree = jsxs("Box", {
 
 // ── Mount and run ────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const root = render(tree, app);
 
 // Set initial focus
@@ -224,7 +224,7 @@ function getInputValue(handle: number): string {
 
 const loop = createLoop({
 	app,
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "key" && event.keyCode === KeyCode.Escape) {
 			loop.stop();
 			return;

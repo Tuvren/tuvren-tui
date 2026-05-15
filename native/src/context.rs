@@ -179,7 +179,7 @@ impl TuiContext {
 
     pub fn debug_log(&self, msg: &str) {
         if self.debug_mode {
-            eprintln!("[kraken-tui] {msg}");
+            eprintln!("[tuvren-tui] {msg}");
         }
     }
 

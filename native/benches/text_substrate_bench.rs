@@ -14,14 +14,14 @@ struct BenchSession;
 
 impl BenchSession {
     fn new() -> Self {
-        assert_eq!(kraken_tui::tui_init_headless(160, 60), 0);
+        assert_eq!(tuvren_tui::tui_init_headless(160, 60), 0);
         Self
     }
 }
 
 impl Drop for BenchSession {
     fn drop(&mut self) {
-        let _ = kraken_tui::tui_shutdown();
+        let _ = tuvren_tui::tui_shutdown();
     }
 }
 
@@ -37,26 +37,26 @@ fn make_seed_content(target_len: usize) -> String {
 }
 
 fn create_buffer_with_bytes(target_len: usize) -> u32 {
-    let handle = kraken_tui::tui_text_buffer_create();
+    let handle = tuvren_tui::tui_text_buffer_create();
     assert!(handle > 0);
     let content = make_seed_content(target_len);
     assert_eq!(
-        kraken_tui::tui_text_buffer_append(handle, content.as_ptr(), content.len() as u32),
+        tuvren_tui::tui_text_buffer_append(handle, content.as_ptr(), content.len() as u32),
         0
     );
     handle
 }
 
 fn destroy_buffer(handle: u32) {
-    assert_eq!(kraken_tui::tui_text_buffer_destroy(handle), 0);
+    assert_eq!(tuvren_tui::tui_text_buffer_destroy(handle), 0);
 }
 
 fn create_view_for_prefix_cost(target_len: usize) -> (u32, u32, u32) {
     let buffer = create_buffer_with_bytes(target_len);
-    let view = kraken_tui::tui_text_view_create(buffer);
+    let view = tuvren_tui::tui_text_view_create(buffer);
     assert!(view > 0);
     assert_eq!(
-        kraken_tui::tui_text_view_set_wrap(view, WRAP_WIDTH, 1, 4),
+        tuvren_tui::tui_text_view_set_wrap(view, WRAP_WIDTH, 1, 4),
         0
     );
     let offset = target_len.saturating_sub(APPEND_PAYLOAD.len()) as u32;
@@ -64,7 +64,7 @@ fn create_view_for_prefix_cost(target_len: usize) -> (u32, u32, u32) {
 }
 
 fn destroy_view_and_buffer(buffer: u32, view: u32) {
-    assert_eq!(kraken_tui::tui_text_view_destroy(view), 0);
+    assert_eq!(tuvren_tui::tui_text_view_destroy(view), 0);
     destroy_buffer(buffer);
 }
 
@@ -78,14 +78,14 @@ fn bench_append_cost(c: &mut Criterion) {
                 || create_buffer_with_bytes(size),
                 |buffer| {
                     assert_eq!(
-                        kraken_tui::tui_text_buffer_append(
+                        tuvren_tui::tui_text_buffer_append(
                             buffer,
                             black_box(APPEND_PAYLOAD.as_ptr()),
                             APPEND_PAYLOAD.len() as u32,
                         ),
                         0
                     );
-                    black_box(kraken_tui::tui_text_buffer_get_byte_len(buffer));
+                    black_box(tuvren_tui::tui_text_buffer_get_byte_len(buffer));
                     destroy_buffer(buffer);
                 },
                 BatchSize::SmallInput,
@@ -103,7 +103,7 @@ fn bench_set_cursor_prefix_cost(c: &mut Criterion) {
         c.bench_function(&name, |b| {
             b.iter(|| {
                 assert_eq!(
-                    kraken_tui::tui_text_view_set_cursor(view, black_box(offset)),
+                    tuvren_tui::tui_text_view_set_cursor(view, black_box(offset)),
                     0
                 );
             });
@@ -123,7 +123,7 @@ fn bench_byte_to_visual_prefix_cost(c: &mut Criterion) {
                 let mut row = 0u32;
                 let mut col = 0u32;
                 assert_eq!(
-                    kraken_tui::tui_text_view_byte_to_visual(
+                    tuvren_tui::tui_text_view_byte_to_visual(
                         view,
                         black_box(offset),
                         &mut row,

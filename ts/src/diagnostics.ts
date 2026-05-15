@@ -2,7 +2,7 @@
  * Load-failure diagnostics — actionable error messages for native library resolution.
  *
  * Provides platform-specific remediation steps when the native library cannot be found
- * or loaded. Part of Epic F (ADR-T29).
+ * or loaded. Part of Epic P (ADR-T42, ADR-T43).
  */
 
 /**
@@ -16,7 +16,7 @@ export function formatLoadError(
 	searchPaths: string[],
 ): string {
 	const lines: string[] = [
-		`Failed to load kraken-tui native library for ${platform}-${arch}.`,
+		`Failed to load tuvren-tui native library for ${platform}-${arch}.`,
 		"",
 		"Searched paths:",
 		...searchPaths.map((p) => `  - ${p}`),
@@ -28,6 +28,7 @@ export function formatLoadError(
 		lines.push(
 			"  - Ensure glibc is installed: sudo apt install libc6-dev (Debian/Ubuntu)",
 			"    or: sudo dnf install glibc-devel (Fedora/RHEL)",
+			"  - Note: musl/Alpine Linux is not supported in this release.",
 		);
 	} else if (platform === "darwin") {
 		lines.push(
@@ -43,7 +44,8 @@ export function formatLoadError(
 
 	lines.push(
 		"  - To build from source: cargo build --manifest-path native/Cargo.toml --release",
-		"  - To override the library path: set KRAKEN_LIB_PATH=/path/to/libkraken_tui.{so,dylib,dll}",
+		"  - To override the library path: set TUVREN_LIB_PATH=/path/to/libtuvren_tui.{so,dylib,dll}",
+		"  - To install via npm: npm install tuvren-tui  (installs platform native package automatically)",
 	);
 
 	return lines.join("\n");

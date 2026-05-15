@@ -1,5 +1,5 @@
 {
-  "name": "kraken-tui",
+  "name": "tuvren-tui",
   "version": "0.1.0",
   "type": "module",
   "exports": {
@@ -23,6 +23,13 @@
   },
   "dependencies": {
     "@preact/signals-core": "^1.8.0"
+  },
+  "optionalDependencies": {
+    "@tuvren/tuvren-tui-linux-x64": "0.1.0",
+    "@tuvren/tuvren-tui-linux-arm64": "0.1.0",
+    "@tuvren/tuvren-tui-darwin-arm64": "0.1.0",
+    "@tuvren/tuvren-tui-darwin-x64": "0.1.0",
+    "@tuvren/tuvren-tui-win32-x64": "0.1.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

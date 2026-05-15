@@ -1,119 +1,85 @@
 /**
  * Install smoke tests — verify artifact resolver and diagnostics.
  *
- * These tests validate the cross-platform distribution UX (Epic F, ADR-T29)
+ * These tests validate the cross-platform distribution UX (Epic P, ADR-T42, ADR-T43)
  * without requiring the native library to be loaded.
  *
  * Run:  bun test ts/test-install.test.ts
  */
 
 import { describe, test, expect, afterEach } from "bun:test";
-import { copyFileSync, existsSync, mkdirSync, renameSync, rmSync } from "fs";
+import { existsSync } from "fs";
 import { normalize, resolve } from "path";
-import { resolveLibraryPath, getLibraryName } from "./src/resolver";
+import { resolveLibraryPath, resolveSourceBuildPath, getLibraryName } from "./src/resolver";
 import { formatLoadError } from "./src/diagnostics";
 
 // ── Library name mapping ────────────────────────────────────────────────────
 
 describe("getLibraryName", () => {
 	test("returns .dylib for darwin", () => {
-		expect(getLibraryName("darwin")).toBe("libkraken_tui.dylib");
+		expect(getLibraryName("darwin")).toBe("libtuvren_tui.dylib");
 	});
 
 	test("returns .dll for win32", () => {
-		expect(getLibraryName("win32")).toBe("kraken_tui.dll");
+		expect(getLibraryName("win32")).toBe("tuvren_tui.dll");
 	});
 
 	test("returns .so for linux", () => {
-		expect(getLibraryName("linux")).toBe("libkraken_tui.so");
+		expect(getLibraryName("linux")).toBe("libtuvren_tui.so");
 	});
 
 	test("returns .so for unknown platforms", () => {
-		expect(getLibraryName("freebsd")).toBe("libkraken_tui.so");
+		expect(getLibraryName("freebsd")).toBe("libtuvren_tui.so");
 	});
 });
 
 // ── Resolver ────────────────────────────────────────────────────────────────
 
 describe("resolveLibraryPath", () => {
-	const originalEnv = process.env.KRAKEN_LIB_PATH;
-	const packageRoot = resolve(import.meta.dir, "src", "..");
-	const stagedDir = resolve(
-		packageRoot,
-		"prebuilds",
-		`${process.platform}-${process.arch}`,
-	);
-	const stagedLibPath = resolve(stagedDir, getLibraryName(process.platform));
+	const originalEnv = process.env.TUVREN_LIB_PATH;
 	const sourceBuild = resolve(
 		import.meta.dir,
 		`../native/target/release/${getLibraryName(process.platform)}`,
 	);
-	const hiddenStagedLibPath = `${stagedLibPath}.source-build-smoke-hidden-${process.pid}`;
-	let createdStagedDir = false;
-	let createdStagedLib = false;
-	let hidExistingStagedLib = false;
 
 	afterEach(() => {
 		if (originalEnv === undefined) {
-			delete process.env.KRAKEN_LIB_PATH;
+			delete process.env.TUVREN_LIB_PATH;
 		} else {
-			process.env.KRAKEN_LIB_PATH = originalEnv;
+			process.env.TUVREN_LIB_PATH = originalEnv;
 		}
-
-		if (createdStagedLib && existsSync(stagedLibPath)) {
-			rmSync(stagedLibPath, { force: true });
-		}
-		if (hidExistingStagedLib && existsSync(hiddenStagedLibPath)) {
-			renameSync(hiddenStagedLibPath, stagedLibPath);
-		}
-		if (createdStagedDir && existsSync(stagedDir)) {
-			rmSync(stagedDir, { recursive: true, force: true });
-		}
-		createdStagedDir = false;
-		createdStagedLib = false;
-		hidExistingStagedLib = false;
 	});
 
-	test("resolves source build path in development", () => {
-		delete process.env.KRAKEN_LIB_PATH;
-		if (existsSync(stagedLibPath)) {
-			renameSync(stagedLibPath, hiddenStagedLibPath);
-			hidExistingStagedLib = true;
-		}
-
+	test("resolves source build path in repo checkout", () => {
+		delete process.env.TUVREN_LIB_PATH;
+		// In a source checkout the resolver falls through to the Cargo build.
 		const libPath = resolveLibraryPath();
 		expect(normalize(libPath)).toBe(normalize(sourceBuild));
 	});
 
-	test("respects KRAKEN_LIB_PATH env override", () => {
+	test("respects TUVREN_LIB_PATH env override", () => {
 		// Point to the actual source build so it resolves (platform-aware)
-		process.env.KRAKEN_LIB_PATH = sourceBuild;
+		process.env.TUVREN_LIB_PATH = sourceBuild;
 		const libPath = resolveLibraryPath();
 		expect(libPath).toBe(sourceBuild);
 	});
 
-	test("prefers staged prebuild artifact when present", () => {
-		delete process.env.KRAKEN_LIB_PATH;
-		const hadStagedDir = existsSync(stagedDir);
-		const hadStagedLib = existsSync(stagedLibPath);
-		if (!hadStagedDir) {
-			mkdirSync(stagedDir, { recursive: true });
-			createdStagedDir = true;
-		}
-		if (!hadStagedLib) {
-			copyFileSync(sourceBuild, stagedLibPath);
-			createdStagedLib = true;
-		}
-
+	test("falls through to source build when TUVREN_LIB_PATH points to nonexistent file", () => {
+		process.env.TUVREN_LIB_PATH = "/nonexistent/path/libtuvren_tui.so";
+		// Should fall through to source build in a repo checkout
 		const libPath = resolveLibraryPath();
-		expect(libPath).toBe(stagedLibPath);
+		expect(normalize(libPath)).toBe(normalize(sourceBuild));
 	});
+});
 
-	test("throws when KRAKEN_LIB_PATH points to nonexistent file", () => {
-		process.env.KRAKEN_LIB_PATH = "/nonexistent/path/libkraken_tui.so";
-		const libPath = resolveLibraryPath();
-		const expectedPath = existsSync(stagedLibPath) ? stagedLibPath : sourceBuild;
-		expect(normalize(libPath)).toBe(normalize(expectedPath));
+// ── Source build path ───────────────────────────────────────────────────────
+
+describe("resolveSourceBuildPath", () => {
+	test("returns the local Cargo build artifact path", () => {
+		const libPath = resolveSourceBuildPath();
+		expect(existsSync(libPath)).toBe(true);
+		expect(libPath).toContain("native/target/release");
+		expect(libPath).toContain("tuvren_tui");
 	});
 });
 
@@ -139,6 +105,11 @@ describe("formatLoadError", () => {
 		expect(msg).toContain("apt install");
 	});
 
+	test("mentions musl is unsupported for linux", () => {
+		const msg = formatLoadError("linux", "x64", []);
+		expect(msg).toContain("musl");
+	});
+
 	test("includes darwin-specific remediation for darwin platform", () => {
 		const msg = formatLoadError("darwin", "arm64", []);
 		expect(msg).toContain("Apple Silicon");
@@ -154,8 +125,14 @@ describe("formatLoadError", () => {
 		expect(msg).toContain("cargo build --manifest-path native/Cargo.toml --release");
 	});
 
-	test("always includes KRAKEN_LIB_PATH override instruction", () => {
+	test("always includes TUVREN_LIB_PATH override instruction", () => {
 		const msg = formatLoadError("linux", "x64", []);
-		expect(msg).toContain("KRAKEN_LIB_PATH");
+		expect(msg).toContain("TUVREN_LIB_PATH");
+	});
+
+	test("uses tuvren naming in error message", () => {
+		const msg = formatLoadError("linux", "x64", []);
+		expect(msg).toContain("tuvren-tui");
+		expect(msg).not.toContain("kraken");
 	});
 });

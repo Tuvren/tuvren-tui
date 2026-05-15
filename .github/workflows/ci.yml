@@ -130,11 +130,118 @@ jobs:
       - name: Run render benchmarks
         run: bun run ts/bench-render.ts
 
+  # ── Cross-Platform Install and Load Smoke (PROD-P006) ─────────────────────
+  # Validates that the resolver and native library load correctly on each
+  # supported public release target. Benchmark-heavy gates remain Linux-only.
+  cross-platform-smoke:
+    name: Install Smoke — ${{ matrix.platform }}-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            target: aarch64-unknown-linux-gnu
+            cross: true
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+            target: aarch64-apple-darwin
+          - os: macos-latest
+            platform: darwin
+            arch: x64
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            platform: win32
+            arch: x64
+            target: x86_64-pc-windows-msvc
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install cross-compilation tools (linux-arm64)
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Configure cross-linker (linux-arm64)
+        if: matrix.cross
+        run: |
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
+      - name: Build native library
+        run: cargo build --manifest-path native/Cargo.toml --release --target ${{ matrix.target }}
+
+      - name: Copy native artifact to release directory (cross-compile only)
+        if: matrix.cross
+        shell: bash
+        run: |
+          mkdir -p native/target/release
+          cp "native/target/${{ matrix.target }}/release/libtuvren_tui.so" native/target/release/libtuvren_tui.so
+
+      - name: Install TS dependencies
+        run: bun install --cwd ts
+
+      - name: Run install smoke tests
+        run: bun test ts/test-install.test.ts
+
+      - name: Verify native library loads in headless mode (Unix)
+        if: matrix.platform != 'win32' && !matrix.cross
+        shell: bash
+        run: |
+          bun run - <<'EOF'
+          import { resolveSourceBuildPath } from "./ts/src/resolver.ts";
+          import { dlopen } from "bun:ffi";
+          const libPath = resolveSourceBuildPath();
+          const lib = dlopen(libPath, {
+            tui_init_headless: { args: ["u16", "u16"], returns: "i32" },
+            tui_shutdown: { args: [], returns: "i32" },
+          });
+          const init = lib.symbols.tui_init_headless(80, 24);
+          if (init !== 0) throw new Error("tui_init_headless failed: " + init);
+          const shutdown = lib.symbols.tui_shutdown();
+          if (shutdown !== 0) throw new Error("tui_shutdown failed: " + shutdown);
+          lib.close();
+          console.log("Native library load smoke: PASS");
+          EOF
+
+      - name: Verify native library loads in headless mode (Windows)
+        if: matrix.platform == 'win32'
+        shell: pwsh
+        run: |
+          bun run -e "
+          import { resolveSourceBuildPath } from './ts/src/resolver.ts';
+          import { dlopen } from 'bun:ffi';
+          const libPath = resolveSourceBuildPath();
+          const lib = dlopen(libPath, {
+            tui_init_headless: { args: ['u16', 'u16'], returns: 'i32' },
+            tui_shutdown: { args: [], returns: 'i32' },
+          });
+          const init = lib.symbols.tui_init_headless(80, 24);
+          if (init !== 0) throw new Error('tui_init_headless failed: ' + init);
+          const shutdown = lib.symbols.tui_shutdown();
+          if (shutdown !== 0) throw new Error('tui_shutdown failed: ' + shutdown);
+          lib.close();
+          console.log('Native library load smoke: PASS');
+          "
+
   # ── Quality Gate Summary ─────────────────────────────────────────────────
   quality-gate:
     runs-on: ubuntu-latest
     name: Quality Gate
-    needs: [native-tests, native-benchmarks, host-tests, host-benchmarks]
+    needs: [native-tests, native-benchmarks, host-tests, host-benchmarks, cross-platform-smoke]
     steps:
       - name: All gates passed
-        run: echo "All v4 quality gates passed."
+        run: echo "All quality gates passed (Epic P cross-platform smoke included)."

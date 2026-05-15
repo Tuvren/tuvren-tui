@@ -33,7 +33,7 @@
  */
 
 import {
-	Kraken,
+	Tuvren,
 	Box,
 	Text,
 	Input,
@@ -44,7 +44,7 @@ import {
 	OVERLAY_FLAGS,
 	createLoop,
 } from "../ts/src/index";
-import type { KrakenEvent, LogLevel, StructuredLogEntry } from "../ts/src/index";
+import type { TuvrenEvent, LogLevel, StructuredLogEntry } from "../ts/src/index";
 
 // ── Log Templates ────────────────────────────────────────────────────
 // Realistic log messages from a microservices application.
@@ -120,7 +120,7 @@ const COLORS = {
 
 // ── Application ──────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 
 // Root container
 const root = new Box({ width: "100%", height: "100%", bg: COLORS.bg, fg: COLORS.fg });
@@ -311,7 +311,7 @@ const loop = createLoop({
 	mode: "continuous",
 	disableJsxDispatch: true,
 
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "key") {
 			if (event.keyCode === KeyCode.Escape) {
 				loop.stop();

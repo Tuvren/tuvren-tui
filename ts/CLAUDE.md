@@ -45,13 +45,13 @@ bun run examples/accessibility-demo.tsx
 | --- | --- |
 | `ffi.ts` | `dlopen` bindings and symbol definitions for the supported FFI surface |
 | `ffi/structs.ts` | Manual `TuiEvent` struct pack/unpack and enum constants shared with the FFI layer |
-| `app.ts` | `Kraken` lifecycle API: init, shutdown, root management, event drain, render, run/stop, and devtools helpers |
+| `app.ts` | `Tuvren` lifecycle API: init, shutdown, root management, event drain, render, run/stop, and devtools helpers |
 | `widget.ts` | Base `Widget` API: layout/style setters, tree ops, animation hooks, accessibility metadata |
 | `events.ts` | Host-facing event types and decoding |
-| `errors.ts` | `KrakenError` and FFI result translation |
+| `errors.ts` | `TuvrenError` and FFI result translation |
 | `style.ts` | Host-side color and dimension parsing |
 | `theme.ts` | Theme wrapper API and built-in theme handles |
-| `resolver.ts` | Native artifact resolution for the current Brownfield contract: `KRAKEN_LIB_PATH` -> staged prebuilds -> source build |
+| `resolver.ts` | Native artifact resolution: `TUVREN_LIB_PATH` → aux scoped native package via `import.meta.resolve()` → Cargo source build (repo checkout only) |
 | `diagnostics.ts` | Human-readable native-load remediation messages |
 | `dev.ts` | Dev session helper, overlay flags, trace flags, deterministic shutdown behavior |
 | `devtools/inspector.ts` | Composition Tree and debug snapshot reader |
@@ -86,9 +86,9 @@ This layer translates developer intent into FFI calls or safe host composites. I
 ### Resolver Contract
 - Preserve the Brownfield resolver contract unless the changes are part of the Epic P productization migration defined in `docs/Tasks.md`; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
 - Brownfield search order is deterministic:
-  1. `KRAKEN_LIB_PATH`
-  2. staged `ts/prebuilds/<platform>-<arch>/`
-  3. `native/target/release/`
+  1. `TUVREN_LIB_PATH`
+  2. aux scoped package `@tuvren/tuvren-tui-<platform>-<arch>` via `import.meta.resolve()`
+  3. `native/target/release/` (only when `isRepoCheckout()` is true)
 - Repo-side FFI tests and benchmark harnesses that `dlopen` directly must bypass staged prebuilds and validate the local Cargo-built branch artifact.
 - Keep install and diagnostic messaging aligned with `resolver.ts` and `diagnostics.ts`.
 

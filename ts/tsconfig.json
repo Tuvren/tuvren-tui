@@ -5,7 +5,7 @@
     "module": "ESNext",
     "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "jsxImportSource": "kraken-tui",
+    "jsxImportSource": "tuvren-tui",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "noEmit": true,

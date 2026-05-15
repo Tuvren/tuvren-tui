@@ -12,7 +12,7 @@
 //! Run with: cargo bench --manifest-path native/Cargo.toml --bench devtools_bench
 
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
-use kraken_tui::devtools::bench_workloads::{
+use tuvren_tui::devtools::bench_workloads::{
     make_context, run_build_snapshot, run_push_traces, run_take_snapshot,
 };
 

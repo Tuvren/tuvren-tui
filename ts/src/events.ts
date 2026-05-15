@@ -15,7 +15,7 @@ import {
 } from "./ffi/structs";
 import { checkResult } from "./errors";
 
-export type KrakenEventType =
+export type TuvrenEventType =
 	| "key"
 	| "mouse"
 	| "resize"
@@ -24,8 +24,8 @@ export type KrakenEventType =
 	| "submit"
 	| "accessibility";
 
-export interface KrakenEvent {
-	type: KrakenEventType;
+export interface TuvrenEvent {
+	type: TuvrenEventType;
 	target: number;
 	keyCode?: number;
 	modifiers?: number;
@@ -41,7 +41,7 @@ export interface KrakenEvent {
 	roleCode?: number;
 }
 
-function mapEventType(raw: number): KrakenEventType | null {
+function mapEventType(raw: number): TuvrenEventType | null {
 	switch (raw) {
 		case EventType.Key:
 			return "key";
@@ -62,11 +62,11 @@ function mapEventType(raw: number): KrakenEventType | null {
 	}
 }
 
-function mapRawEvent(raw: TuiEvent): KrakenEvent | null {
+function mapRawEvent(raw: TuiEvent): TuvrenEvent | null {
 	const type = mapEventType(raw.eventType);
 	if (!type) return null;
 
-	const base: KrakenEvent = { type, target: raw.target };
+	const base: TuvrenEvent = { type, target: raw.target };
 
 	switch (type) {
 		case "key":
@@ -113,8 +113,8 @@ export function readInput(timeoutMs: number = 0): number {
 /**
  * Drain all buffered events.
  */
-export function drainEvents(): KrakenEvent[] {
-	const events: KrakenEvent[] = [];
+export function drainEvents(): TuvrenEvent[] {
+	const events: TuvrenEvent[] = [];
 	const buffer = allocEventBuffer();
 	const bufPtr = ptr(buffer);
 

@@ -1,16 +1,16 @@
 /**
- * Kraken TUI — Public API
+ * Tuvren TUI — Public API
  *
  * Usage (imperative):
- *   import { Kraken, Box, Text, Input, Select, ScrollBox } from "kraken-tui";
+ *   import { Tuvren, Box, Text, Input, Select, ScrollBox } from "tuvren-tui";
  *
  * Usage (JSX — v2):
- *   import { render, signal } from "kraken-tui";
- *   // with tsconfig: { "jsx": "react-jsx", "jsxImportSource": "kraken-tui" }
+ *   import { render, signal } from "tuvren-tui";
+ *   // with tsconfig: { "jsx": "react-jsx", "jsxImportSource": "tuvren-tui" }
  */
 
 // Imperative API
-export { Kraken } from "./app";
+export { Tuvren } from "./app";
 export type { RunOptions, TerminalCapabilities, TerminalInfo } from "./app";
 export { Widget } from "./widget";
 export { Box } from "./widgets/box";
@@ -30,11 +30,11 @@ export type { TranscriptOptions, BlockKind, FollowModeStr } from "./widgets/tran
 export { applyReplayEvent } from "./widgets/transcript-adapters";
 export type { TranscriptReplayEvent } from "./widgets/transcript-adapters";
 export { Theme, DARK_THEME, LIGHT_THEME } from "./theme";
-export { KrakenError, checkResult } from "./errors";
+export { TuvrenError, checkResult } from "./errors";
 export { parseColor, parseDimension } from "./style";
 export { AnimProp, Easing } from "./animation-constants";
 export { EventType, KeyCode, Modifier, NodeType, AccessibilityRole } from "./ffi/structs";
-export type { KrakenEvent, KrakenEventType } from "./events";
+export type { TuvrenEvent, TuvrenEventType } from "./events";
 
 // Dev Mode and Devtools (ADR-T34)
 export {
@@ -75,7 +75,7 @@ export type {
 export { jsx, jsxs, Fragment } from "./jsx/jsx-runtime";
 export { signal, computed, effect, batch } from "@preact/signals-core";
 export type { Signal, ReadonlySignal } from "@preact/signals-core";
-export { Fragment as KrakenFragment } from "./jsx/types";
+export { Fragment as TuvrenFragment } from "./jsx/types";
 export { render, mount, unmount, reconcileChildren, getEventHandlers } from "./jsx/reconciler";
 export { createLoop, dispatchToJsxHandlers } from "./loop";
 export type { LoopOptions, Loop } from "./loop";

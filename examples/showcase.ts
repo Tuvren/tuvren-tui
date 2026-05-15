@@ -24,7 +24,7 @@
 
 import { Buffer } from "buffer";
 import {
-  Kraken,
+  Tuvren,
   Theme,
   Box,
   Text,
@@ -37,7 +37,7 @@ import {
 } from "../ts/src/index";
 import { jsx, jsxs } from "../ts/src/jsx/jsx-runtime";
 import { ffi } from "../ts/src/ffi";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 import type { Widget } from "../ts/src/widget";
 
 interface ThemeMode {
@@ -146,7 +146,7 @@ function createSunsetTheme(): Theme {
   return theme;
 }
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const initialTerminalSize = app.getTerminalSize();
 const compactLayout =
   initialTerminalSize.width <= 80 || initialTerminalSize.height <= 24;
@@ -496,7 +496,7 @@ function runCommand(raw: string): void {
   }
 }
 
-function handleThemeSelection(event: KrakenEvent): void {
+function handleThemeSelection(event: TuvrenEvent): void {
   const fromEvent = event.selectedIndex;
   const selected =
     fromEvent ??
@@ -506,7 +506,7 @@ function handleThemeSelection(event: KrakenEvent): void {
   pushLog(`select changed to: ${getSelectOption(event.target, selected)}`);
 }
 
-function handleCommandSubmit(event: KrakenEvent): void {
+function handleCommandSubmit(event: TuvrenEvent): void {
   const value = getContent(event.target);
   runCommand(value);
   setContent(event.target, "");
@@ -796,7 +796,7 @@ runHeroChoreography();
 
 const loop = createLoop({
   app,
-  onEvent(event: KrakenEvent) {
+  onEvent(event: TuvrenEvent) {
     if (event.type === "key") {
       const focused = ffi.tui_get_focused();
       const editingText =

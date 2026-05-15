@@ -1,0 +1,15 @@
+{
+  "name": "@tuvren/tuvren-tui-linux-x64",
+  "version": "0.1.0",
+  "description": "Native library for tuvren-tui (linux, x64, glibc)",
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "libc": ["glibc"],
+  "type": "module",
+  "main": "./libtuvren_tui.so",
+  "files": [
+    "libtuvren_tui.so",
+    "package.json"
+  ],
+  "license": "MIT"
+}

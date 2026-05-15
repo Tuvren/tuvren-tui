@@ -10,7 +10,7 @@
 
 import { describe, test, expect, beforeAll, afterAll } from "bun:test";
 import { dlopen, CString, type FFIType } from "bun:ffi";
-import { Kraken } from "./src/app";
+import { Tuvren } from "./src/app";
 import { resolveSourceBuildPath } from "./src/resolver";
 
 // ── Load native library ─────────────────────────────────────────────────────
@@ -844,7 +844,7 @@ describe("FFI integration", () => {
 		});
 
 		test("terminal wrappers expose capabilities and unsupported clipboard no-op", () => {
-			const app = Object.create(Kraken.prototype) as Kraken;
+			const app = Object.create(Tuvren.prototype) as Tuvren;
 			const caps = app.getCapabilities();
 			expect(caps.flags).toBe(caps.raw);
 			expect(caps.utf8).toBe(true);
@@ -857,7 +857,7 @@ describe("FFI integration", () => {
 		});
 
 		test("terminal wrapper rejects invalid clipboard target strings", () => {
-			const app = Object.create(Kraken.prototype) as Kraken;
+			const app = Object.create(Tuvren.prototype) as Tuvren;
 			expect(() =>
 				app.writeClipboard("hello", "bogus" as unknown as "clipboard"),
 			).toThrow("Invalid clipboard target");
@@ -2424,7 +2424,7 @@ describe("FFI integration", () => {
 	describe("post-shutdown", () => {
 		test("terminal capability wrapper surfaces native lifecycle errors", () => {
 			ffi.tui_shutdown();
-			const app = Kraken.initHeadless(80, 24);
+			const app = Tuvren.initHeadless(80, 24);
 			app.shutdown();
 
 			expect(() => app.getCapabilities()).toThrow("getCapabilities");
