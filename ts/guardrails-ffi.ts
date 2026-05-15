@@ -328,7 +328,7 @@ function run(mode: "strict" | "report-only"): Report {
 }
 
 function printReport(report: Report): void {
-	console.log("=== Kraken TUI Guardrails ===");
+	console.log("=== Tuvren TUI Guardrails ===");
 	console.log(`timestamp: ${report.timestamp}`);
 	console.log(`artifact:  ${ARTIFACT_PATH}`);
 	for (const m of report.metrics) {

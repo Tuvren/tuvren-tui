@@ -145,7 +145,6 @@ jobs:
           if [ -n "${{ matrix.strip }}" ]; then
             ${{ matrix.strip }} "$PKG_DIR/${LIB_NAME}" 2>/dev/null || true
           fi
-          cp "packages/@tuvren/tuvren-tui-${{ matrix.platform }}-${{ matrix.arch }}/package.json" "$PKG_DIR/package.json" 2>/dev/null || true
 
       - name: Prepare auxiliary native package payload (Windows)
         if: matrix.platform == 'win32'

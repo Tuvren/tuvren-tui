@@ -1,4 +1,4 @@
-//! Kraken TUI — Native Core FFI Entry Points
+//! Tuvren TUI — Native Core FFI Entry Points
 //!
 //! This file contains ONLY `extern "C"` FFI functions. Each function:
 //! 1. Wraps its body in `catch_unwind` (ADR-T03)
@@ -69,7 +69,7 @@ fn refresh_terminal_capabilities(ctx: &mut TuiContext) {
 // function call without borrowing the context lock guard. We keep it in TLS so
 // each caller thread gets stable ownership of its latest snapshot.
 //
-// ADR-T16 keeps Kraken TUI on a single-threaded execution model. In a
+// ADR-T16 keeps Tuvren TUI on a single-threaded execution model. In a
 // multi-threaded host calling into FFI from different threads, errors set on
 // one thread are not guaranteed to be visible via `tui_get_last_error()` on
 // another thread.
