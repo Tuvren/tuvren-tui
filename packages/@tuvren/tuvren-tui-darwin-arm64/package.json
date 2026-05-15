@@ -8,5 +8,5 @@
     "libtuvren_tui.dylib",
     "package.json"
   ],
-  "license": "MIT"
+  "license": "Apache-2.0"
 }

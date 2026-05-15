@@ -8,5 +8,5 @@
     "tuvren_tui.dll",
     "package.json"
   ],
-  "license": "MIT"
+  "license": "Apache-2.0"
 }
