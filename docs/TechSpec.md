@@ -1,10 +1,9 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
+- v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
 - v7.4.1 - Landed Epic O Brownfield updates: native terminal capability state, diagnostic query APIs, write-only OSC52, OSC8 text-buffer link spans, Kitty keyboard disambiguation negotiation, and conservative multiplexer degradation are now implemented.
 - v7.4.0 - Activated the Epic O terminal-capability contract: capability discovery becomes detection-first, OSC52 is write-only, OSC8 hyperlinks are range-scoped, Kitty keyboard support is negotiated, and multiplexer variance is an explicit implementation concern.
-- v7.3.2 - Closed the last Epic N contract drift: `EditBuffer` coalescing and substrate-backed text surfaces are now documented as shipped Brownfield reality rather than pending target state.
-- v7.3.1 - Completed the substrate authority cut for Epic N: transcript blocks now store substrate handles instead of mirrored mutable strings, the substrate benchmark suite is a first-class native gate, and the pre-public contract no longer preserves backward compatibility for its own sake.
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Stack Specification (Bill of Materials)
@@ -13,7 +12,7 @@
 - **State Stores / Persistence:** All runtime UI state lives in the Native Core in memory. There is no external database or persisted state store in the canonical product contract.
 - **Infrastructure / Tooling:** Cargo, Bun, GitHub Actions CI, GitHub release artifacts with checksum sidecars, Criterion benchmarks, headless terminal backend, replay fixtures, and golden snapshot utilities.
 - **Testing / Quality Tooling:** `cargo test`, `cargo fmt`, `cargo clippy`, native benchmarks, Bun integration tests, example replay tests, install smoke tests, runner API tests, and bundle-budget checks.
-- **Version Pinning / Compatibility Policy:** Kraken is still pre-1.0 (`0.1.0` in both native and host packages), so breaking changes are allowed whenever they reduce duplication or remove design debt before public release. This file defines the current contract for the active branch; compatibility is owed to the documented contract, not to superseded interim shapes.
+- **Version Pinning / Compatibility Policy:** The framework remains pre-1.0 (`0.1.0` in both native and host packages), so breaking changes are allowed whenever they reduce duplication or remove design debt before public release. This file defines the current contract for the active branch; compatibility is owed to the documented contract, not to superseded interim shapes.
 
 ### 1.1 Native Core Bill of Materials
 
@@ -35,29 +34,35 @@
 | Language | TypeScript | `^5.0.0` | Keep strict typed wrappers and examples in TypeScript. |
 | FFI mechanism | `bun:ffi` | built-in | Preserve the direct native-library loading path rather than adding an alternate bridge. |
 | Reactivity | `@preact/signals-core` | `^1.8.0` | Preserve the lightweight JSX/signals path without promoting it to the primary lifecycle model. |
-| Additional runtime deps | none beyond signals | current package state | Keep the host bundle intentionally thin. |
+| Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` dependency belongs to the optional declarative subpath rather than the main surface. |
+| Public package contract | current Brownfield: `kraken-tui`; approved target-state: `tuvren-tui` | `ts/package.json`, source tree, approved roadmap | Execute a hard public rename in the productization wave while keeping one public package as the user-facing contract. |
+| Optional declarative subpath | current Brownfield: `kraken-tui/effect` stub; approved target-state: `tuvren-tui/effect` | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
+| Native package topology | current Brownfield: GitHub assets and manual staging; approved target-state: auxiliary scoped platform packages | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the new organization, while keeping `tuvren-tui` as the only public package. |
 
 ### 1.3 Build, Test, and Release Artifacts
 
 | Artifact | Format | Source of Truth |
 | --- | --- | --- |
 | Native Core | Shared library (`.so`, `.dylib`, `.dll`) | `native/target/release/` for source builds; versioned GitHub release assets for published native binaries |
-| Host Package | ESM TypeScript package | `ts/package.json`, `ts/src/` |
-| Release Artifacts | Versioned platform builds with `.sha256` sidecars | `.github/workflows/release.yml` |
+| Host Package | ESM TypeScript package (`kraken-tui` today, `tuvren-tui` after Epic P) | `ts/package.json`, `ts/src/` |
+| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries | approved target-state under the next productization wave |
+| Release Artifacts | Versioned platform builds with `.sha256` sidecars; current Brownfield names use `kraken-tui-*`, approved target-state uses `tuvren-tui-*` | `.github/workflows/release.yml` plus the approved migration contract in §4.3 |
 | Flagship Examples | Bun entrypoints | `examples/agent-console.ts`, `examples/ops-log-console.ts`, `examples/repo-inspector.ts` |
 | Replay Fixtures | JSON fixtures and headless assertions | `examples/fixtures/`, `ts/test-examples.test.ts` |
 
 ### 1.4 Release and Distribution Matrix
 
-| Platform | Architecture | Published release asset | Resolver target when a prebuild is staged locally |
-| --- | --- | --- | --- |
-| Linux | x64 | `kraken-tui-<tag>-linux-x64.so` | `ts/prebuilds/linux-x64/<libName>` |
-| Linux | arm64 | `kraken-tui-<tag>-linux-arm64.so` | `ts/prebuilds/linux-arm64/<libName>` |
-| macOS | arm64 | `kraken-tui-<tag>-darwin-arm64.dylib` | `ts/prebuilds/darwin-arm64/<libName>` |
-| macOS | x64 | `kraken-tui-<tag>-darwin-x64.dylib` | `ts/prebuilds/darwin-x64/<libName>` |
-| Windows | x64 | `kraken-tui-<tag>-win32-x64.dll` | `ts/prebuilds/win32-x64/<libName>` |
+| Platform | Architecture | Current Brownfield release asset | Approved target release asset | Approved auxiliary native package |
+| --- | --- | --- | --- | --- |
+| Linux | x64 | `kraken-tui-<tag>-linux-x64.so` | `tuvren-tui-<tag>-linux-x64.so` | `@tuvren/tuvren-tui-linux-x64` |
+| Linux | arm64 | `kraken-tui-<tag>-linux-arm64.so` | `tuvren-tui-<tag>-linux-arm64.so` | `@tuvren/tuvren-tui-linux-arm64` |
+| macOS | arm64 | `kraken-tui-<tag>-darwin-arm64.dylib` | `tuvren-tui-<tag>-darwin-arm64.dylib` | `@tuvren/tuvren-tui-darwin-arm64` |
+| macOS | x64 | `kraken-tui-<tag>-darwin-x64.dylib` | `tuvren-tui-<tag>-darwin-x64.dylib` | `@tuvren/tuvren-tui-darwin-x64` |
+| Windows | x64 | `kraken-tui-<tag>-win32-x64.dll` | `tuvren-tui-<tag>-win32-x64.dll` | `@tuvren/tuvren-tui-win32-x64` |
 
-The repo-owned release workflow currently publishes **versioned GitHub release assets** with SHA-256 sidecars. It does **not** populate `ts/prebuilds/` in-tree on its own. The resolver still supports `ts/prebuilds/...` as the expected layout for packaged or manually staged prebuilds after those published assets have been downloaded and renamed to the platform-specific `libName`.
+The repo-owned release workflow currently publishes **versioned GitHub release assets** with SHA-256 sidecars and relies on the public package resolver to search `KRAKEN_LIB_PATH`, staged `ts/prebuilds/...`, and the local Cargo build. It still does **not** populate `ts/prebuilds/` on its own; any staged-prebuild layout is a packaging or manual install step above the current repo-owned release workflow. The approved target-state replaces that public install story with one public package (`tuvren-tui`) that consumes auxiliary scoped native packages published under the new organization. Here "auxiliary" means they are not the documented direct install target; it does not imply a private-registry-only topology. Standalone release assets may still be published for provenance and manual acquisition, but after Epic P they are no longer part of the automatic resolver path unless a caller points `TUVREN_LIB_PATH` at them. Source-build fallback remains valid for repo-side development and verification.
+
+Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Because the active package-manager contract is Bun-first and Bun's documented package-manager guarantees currently cover `os`/`cpu` filtering and optional-dependency behavior rather than verified `libc` filtering, Epic P must validate a supported enforcement strategy that prevents musl-based systems such as Alpine from silently loading an incompatible `.so`. Candidate mechanisms include package metadata, installer behavior, or an explicit diagnostic fallback; until that validation lands, musl-targeted packages remain out of scope and unsupported installs must fail clearly rather than assume libc filtering is enforced.
 
 ## 2. Architecture Decision Records (ADRs)
 ### 2.1 Active Inherited Decisions
@@ -100,14 +105,14 @@ The repo-owned release workflow currently publishes **versioned GitHub release a
 
 ### ADR-T36 Flagship Examples Are Blocking Release Gates
 - **Status:** accepted
-- **Context:** Feature breadth alone does not prove product identity. Kraken needs example-driven proof under transcript, pane, and debugging pressure.
+- **Context:** Feature breadth alone does not prove product identity. The framework needs example-driven proof under transcript, pane, and debugging pressure.
 - **Decision:** Treat `agent-console` and `ops-log-console` as blocking proof examples for the transcript/devtools wave, and keep `repo-inspector` within the same flagship family once the underlying primitives are stable.
 - **Consequences:** Example behavior now constrains implementation choices. Replay fixtures, performance budgets, and example usability are part of release-readiness, not optional showcase material.
 
 ### ADR-T37 Native Text/Cell/View Substrate Is the Single Path for Substantial Text
 - **Status:** accepted
 - **Context:** Today's transcript path patches block strings in place, render code clones visible block content into temporary owned `String`s, row counts are recomputed from text width per widget, and `TextArea` undo/redo is snapshot-oriented. This is sufficient to prove the product model but is too shallow under large agent traces, streaming code output, multiline edits, mixed-width Unicode, nested scroll regions, and terminal resize churn.
-- **Decision:** Introduce a single native content/render substrate inside the Native Core composed of `TextBuffer` (canonical content storage with content epochs, line-start markers, dirty ranges, cached width metrics, grapheme boundaries, tab expansion policy, style spans, selection ranges, and highlights — v1 ships a flat `String` backing per the M0 spike memo, with rope/chunked storage available as a future option that does not change the public ABI), `TextView` (viewport/wrap projection over a `TextBuffer` with visual lines, soft-wrap cache, scroll row/col, cursor mapping, byte-grapheme-cell-visual-row conversions, and resize invalidation), and a unified text renderer that draws a `TextView` into Kraken's existing cell buffer with one implementation for clipping, wide chars, combining marks, ZWJ/emoji, CJK width, tabs, selections, highlights, cursor rendering, and style merging. Every Kraken surface that renders substantial text routes through this substrate.
+- **Decision:** Introduce a single native content/render substrate inside the Native Core composed of `TextBuffer` (canonical content storage with content epochs, line-start markers, dirty ranges, cached width metrics, grapheme boundaries, tab expansion policy, style spans, selection ranges, and highlights — v1 ships a flat `String` backing per the M0 spike memo, with rope/chunked storage available as a future option that does not change the public ABI), `TextView` (viewport/wrap projection over a `TextBuffer` with visual lines, soft-wrap cache, scroll row/col, cursor mapping, byte-grapheme-cell-visual-row conversions, and resize invalidation), and a unified text renderer that draws a `TextView` into the existing cell buffer with one implementation for clipping, wide chars, combining marks, ZWJ/emoji, CJK width, tabs, selections, highlights, cursor rendering, and style merging. Every substantial text surface routes through this substrate.
 - **Consequences:** Widget code stops re-implementing Unicode width, wrap row counting, and clipping. Streamed content append invalidates only affected buffer and view epochs. Resize invalidates view projections rather than content storage. The Native Core gains a sizable new module with its own invariants and ABI footprint, and existing surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks, `CodeView`, `DiffView`) must be migrated before the legacy text paths are removed. Migration is sequenced in `Tasks.md` Epic N.
 
 ### ADR-T38 Operation-Based Edit History Replaces Snapshot Undo for TextArea
@@ -126,7 +131,7 @@ The repo-owned release workflow currently publishes **versioned GitHub release a
 - **Status:** accepted
 - **Context:** Kitty keyboard protocol, OSC52, hyperlink emission, palette and capability detection, pixel and cell resolution, and terminal multiplexer variance hardening are real product needs, but the current bottleneck is the content substrate beneath the widgets. Hardening terminal capabilities while the substrate is being shaped would multiply migration risk and dilute focus.
 - **Decision:** Treat terminal capability hardening as the next implementation wave (Epic O in `Tasks.md`) now that Epic M (substrate foundation) and Epic N (surface rebase) are complete. Capability work stays inside the existing Native Core / Terminal Emulator boundary and must not change the host-driven event and render loop.
-- **Consequences:** Kraken can now improve terminal fidelity without destabilizing the text substrate. The wave remains bounded to backend capability detection, negotiated input improvements, safe escape-sequence emission, and reporting APIs; it does not authorize new widget breadth, default background rendering, or broad terminal-emulator abstraction replacement.
+- **Consequences:** The framework can now improve terminal fidelity without destabilizing the text substrate. The wave remains bounded to backend capability detection, negotiated input improvements, safe escape-sequence emission, and reporting APIs; it does not authorize new widget breadth, default background rendering, or broad terminal-emulator abstraction replacement.
 
 ### ADR-T41 Terminal Capabilities Are Detection-First and Gracefully Degraded
 - **Status:** accepted
@@ -134,11 +139,37 @@ The repo-owned release workflow currently publishes **versioned GitHub release a
 - **Decision:** Add a `TerminalCapabilityState` owned by the Native Core and populated by the active `TerminalBackend`. Detection combines conservative built-ins, environment and multiplexer hints, and protocol probes where a feature has a reliable query. Features that cannot be confirmed must degrade to no-op or legacy behavior. OSC52 support is write-only in Epic O; clipboard reads are explicitly out of scope. OSC8 hyperlink emission is range-scoped through the text substrate and must sanitize URI/control payloads before writing escape sequences. Kitty keyboard support must be negotiated and restored as part of terminal lifecycle, starting with the disambiguation enhancement before any release/repeat semantics are exposed.
 - **Consequences:** Capability-sensitive behavior becomes observable through FFI and host APIs instead of hidden in backend assumptions. The backend grows a small protocol layer, but the core invariant remains intact: Rust owns terminal state, Host code issues commands, and unsupported capabilities never require application-side terminal branching.
 
+### ADR-T42 Public Product and Package Naming Move to Tuvren
+- **Status:** accepted
+- **Context:** The current Brownfield source tree and release workflow still use the Kraken name across the public package, host facade, resolver environment variable, native crate/library names, and release asset names. The approved next wave moves the repo into a new organization and reintroduces the public product as Tuvren before `1.0`.
+- **Decision:** Execute a hard pre-`1.0` rename of the public surface from Kraken to Tuvren. The approved target-state uses `tuvren-tui` as the public package, `Tuvren` as the primary host facade, `TUVREN_LIB_PATH` as the resolver override, `tuvren_tui` as the native crate name, platform-correct shared-library names (`libtuvren_tui.so` / `libtuvren_tui.dylib` on Unix-like systems and `tuvren_tui.dll` on Windows), and `tuvren-tui-*` release artifact names. The C ABI prefix remains `tui_*` to avoid gratuitous ABI churn.
+- **Consequences:** Productization, install guidance, and diagnostics become consistent with the new organization and public identity, but the repo must treat the rename as first-wave release work rather than as a cosmetic follow-up. Because the rename is a hard cut, long-lived compatibility aliases are intentionally not part of the contract.
+
+### ADR-T43 One Public Package Sits Above Internal Scoped Native Packages
+- **Status:** accepted
+- **Context:** The current Brownfield install story relies on GitHub native assets plus manual or staged prebuild placement. That is workable for source checkouts but falls short of the productized install experience needed for a competitive framework release.
+- **Decision:** Keep one public package as the only documented install target and move platform-native distribution behind auxiliary scoped packages published under the new organization. `tuvren-tui` remains the public facade; auxiliary packages such as `@tuvren/tuvren-tui-linux-x64` and `@tuvren/tuvren-tui-darwin-arm64` carry the shared libraries that the resolver loads after it first checks `TUVREN_LIB_PATH`. If no override is provided and the platform-native package is skipped or unavailable, the resolver must fall through to the local Cargo build in repo checkouts and otherwise fail with a clear diagnostic instead of assuming the optional package exists. Source-build fallback remains part of repo-side development and verification.
+- **Consequences:** End-user install UX becomes simpler and less error-prone, while the release workflow and resolver gain packaging responsibilities that must stay aligned across CI, diagnostics, and test coverage. The project also accepts npm package-topology work as core productization scope rather than as release glue, including the need to handle optional native-package omission explicitly at runtime. "Auxiliary scoped package" here means a public distribution unit beneath `tuvren-tui`, not a separate documented install target.
+
+### ADR-T44 Commands and Keymaps Are the First Framework-Level Host Services
+- **Status:** accepted
+- **Context:** The product direction is moving from a specialist library posture toward a general-purpose framework story, but the architectural invariant remains that Rust owns mutable UI state. The first framework moat should therefore add application ergonomics without creating a second source of truth in the host layer.
+- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the active productization and adoption wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are explicitly deferred until after `v1.0` and until the commands/keymap contract proves stable, and they are not part of the active implementation contract in this document yet.
+- **Consequences:** The framework can grow more competitive application ergonomics without weakening the native-state boundary, but the command dispatch, focus integration, and keybinding resolution APIs must be designed deliberately before a plugin story is added on top.
+
+### ADR-T45 Effect Is the Sanctioned Declarative Integration Path
+- **Status:** accepted
+- **Context:** The current repo ships an imperative core and a lightweight JSX/signals overlay, while the strategic product direction explicitly rejects React/Solid parity as the main declarative roadmap. The team wants one blessed declarative story that still honors the same Rust-owned-state architecture.
+- **Decision:** Keep the imperative surface as the canonical model and reserve `tuvren-tui/effect` as the sanctioned declarative integration path over the same Bun and FFI runtime contract. The existing JSX/signals layer remains supported Brownfield reality, but it is not the strategic north star and should not pull the roadmap toward React or Solid parity.
+- **Consequences:** Declarative consumers get a clear future path without forcing the core package to absorb broad framework-adapter scope. The existing root-package JSX/signals exports remain supported Brownfield reality unless a later contract explicitly moves or deprecates them, but Epic S should stop positioning them as the strategic declarative story. The project must still define the exact `Effect` API through a later contract-setting wave before it can be treated as release-ready product surface.
+
 ### 2.2 Brownfield Reality Note
 - The prior v6 TechSpec described transcript, devtools, split-pane, and flagship examples as future work. The current source tree implements them.
 - This v7 artifact is therefore intentionally present-tense and canonical rather than future-tense and phase-only.
 - ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.4 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
 - ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
+- The current public source still exports `Kraken` from `kraken-tui`, resolves native libraries through `KRAKEN_LIB_PATH`, and names release assets and staged prebuilds after Kraken. ADR-T42 records the approved hard-cut rename to Tuvren, but that rename is future work until the first productization wave lands.
+- `kraken-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
 
 ## 3. State & Data Modeling
 ### 3.1 Native UI State Model
@@ -502,8 +533,8 @@ conventions:
 ### 4.2 Host Language Library API
 - **Style:** Library API
 - **Authentication / Authorization:** Not applicable
-- **Compatibility Strategy:** The host layer remains a thin wrapper over the C ABI plus a small set of higher-level composites. Developer-facing string IDs are resolved in the host layer and are not part of the native ABI.
-- **Error model:** FFI failures surface as host-language errors through `checkResult()` and `KrakenError`.
+- **Compatibility Strategy:** The host layer remains a thin wrapper over the C ABI plus a small set of higher-level composites. Developer-facing string IDs are resolved in the host layer and are not part of the native ABI. The current Brownfield source exports `Kraken` from `kraken-tui`; the approved next wave performs a hard rename to `Tuvren` from `tuvren-tui` while preserving the same imperative lifecycle model.
+- **Error model:** FFI failures surface as host-language errors through `checkResult()` and the exported app error type (`KrakenError` in Brownfield source, `TuvrenError` after the approved hard cut).
 
 ```ts
 interface TerminalCapabilities {
@@ -582,24 +613,41 @@ interface DevSessionOptions {
 function createDevSession(options: DevSessionOptions): Promise<void>;
 ```
 
+Brownfield note: the current source tree still exports `Kraken`, `KrakenError`, and a stub `kraken-tui/effect` path, so the concrete API examples above stay in Kraken-era naming until Epic P lands. The approved next-wave contract then renames that public surface to `Tuvren`, `TuvrenError`, and `tuvren-tui/effect` without changing the Native Core ownership model or introducing React/Solid parity work.
+
 ### 4.3 Install / Resolver Contract
 - **Style:** Runtime artifact-resolution contract
 - **Authentication / Authorization:** Not applicable
-- **Compatibility Strategy:** Resolver search order is deterministic and platform-aware so both prebuilt and source-built workflows remain valid.
-- **Error model:** Missing-artifact failures include searched paths and platform-specific remediation guidance.
+- **Compatibility Strategy:** Resolver search order is deterministic and platform-aware so both published installs and source-built workflows remain valid. Brownfield source still searches the Kraken-era staged-prebuild path; the approved target-state preserves deterministic resolution but replaces the public install story with one public package and auxiliary scoped native packages under the Tuvren organization.
+- **Error model:** Missing-artifact failures include searched paths and platform-specific remediation guidance. The approved hard cut replaces `KRAKEN_LIB_PATH` with `TUVREN_LIB_PATH`; no long-lived alias is planned.
 
 ```yaml
-resolver_search_order:
-  - KRAKEN_LIB_PATH
-  - ts/prebuilds/<platform>-<arch>/<libName>
-  - native/target/release/<libName>
-  - diagnostic_error
+current_brownfield:
+  resolver_search_order:
+    - KRAKEN_LIB_PATH
+    - ts/prebuilds/<platform>-<arch>/<libName>
+    - native/target/release/<libName>
+    - diagnostic_error
+approved_target_state:
+  resolver_search_order:
+    - TUVREN_LIB_PATH
+    - resolve @tuvren/tuvren-tui-<platform>-<arch> by package name for the current platform and derive <libName> from the resolved package root
+    - when_repo_checkout: native/target/release/<libName>
+    - diagnostic_error
 notes:
-  - "GitHub Releases publish versioned assets."
-  - "Staging or renaming those assets into ts/prebuilds/<platform>-<arch>/<libName> is currently a packaging or manual install step outside the repo-owned release workflow."
+  - "Current Brownfield source publishes versioned GitHub native assets and optionally stages them into ts/prebuilds/<platform>-<arch>/<libName>."
+  - "Approved target-state publishes one public package, tuvren-tui, that consumes auxiliary scoped native packages under the new organization."
+  - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are no longer a first-class automatic resolver search path after Epic P."
+  - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build only when running from a repo checkout or repo-side verification harness, and finally an explicit diagnostic failure."
+  - "Resolver lookup must be package-manager-layout agnostic: resolve the auxiliary package by name first, then derive the shared-library path from the resolved package root rather than assuming a nested node_modules filesystem layout."
+  - "Repo-checkout fallback is authorized only when the resolver can prove it was loaded from a checked-out Kraken/Tuvren workspace rooted at an ancestor that contains both the repo-owned host sources and native build metadata (`ts/package.json` plus `native/Cargo.toml`); published consumer installs and arbitrary linked directories must not probe native/target/release opportunistically."
+  - "If the public package uses platform-native optional dependencies, the install contract must explicitly tolerate npm clients omitting them and surface the missing-native case through the documented diagnostic path."
+  - "Repo-side verification that dlopen's directly must still validate the local Cargo-built artifact rather than a stale packaged binary."
+  - "No long-lived KRAKEN_LIB_PATH compatibility alias is planned after the Tuvren hard cut."
 release_assets:
   - versioned_native_artifact
   - sha256_sidecar
+  - scoped_native_package_payload
 supported_release_targets:
   - linux-x64
   - linux-arm64
@@ -868,6 +916,8 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to t
 | Substrate append and cursor prefix cost | benchmarked before transcript closeout | `native/benches/text_substrate_bench.rs`, `docs/reports/substrate-benchmarks.md` |
 
 Current CI validates the host benchmark and install surfaces on Linux. Cross-platform release artifacts are built in the release workflow, and the resolver path for staged prebuilds is covered by install smoke tests, but the full host benchmark matrix is not yet exercised on macOS and Windows in CI.
+
+The approved first productization wave extends CI and/or release verification with install and load smoke coverage for the full supported public target matrix while keeping the benchmark-heavy enforcement path Linux-blocking until cross-platform performance gates are proven stable.
 
 #### 5.4.1 Structural Substrate Gates (Epic M and N)
 

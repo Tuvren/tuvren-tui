@@ -6,7 +6,9 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 
 ## Project Overview
 
-**Kraken TUI** is a Rust-native terminal UI engine with TypeScript/Bun bindings over FFI.
+**Kraken TUI** is the current Brownfield repo/product name for a Rust-native terminal UI engine with TypeScript/Bun bindings over FFI.
+
+**Brownfield note:** The current source tree still uses the Kraken name in code and artifacts; the active productization wave plans the future public rename to `Tuvren`.
 
 **Core invariant:** Rust owns all mutable UI state. TypeScript holds opaque `u32` Handles and issues commands. Control flow is unidirectional: the Host Layer calls into the Native Core; the Native Core never calls back into the Host Layer.
 
@@ -23,8 +25,9 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 ## Current Repo Status
 
 - The canonical docs chain is current and should be treated as the source of truth for planning work.
-- `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped; the next active wave is not selected yet.
-- `Tasks.md` now separates **active scope** from **archived completed scope**. Do not mistake the archived v6/v4 delivery wave for the current backlog.
+- `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped and activates **Epic P — Tuvren Identity, Packaging, and Release Migration** plus **Epic Q — Adoption and Framework Positioning** as the current wave.
+- `Tasks.md` now separates **active scope** from **archived completed scope**. Do not mistake the archived v7 docs-maintenance and v6 delivery waves for the current backlog.
+- Until Epic Q lands, README and broader public onboarding materials may still reflect the older Kraken-era positioning; the canonical docs chain is authoritative for roadmap and scope.
 - The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
 
 ---
@@ -113,7 +116,7 @@ Rust cdylib (single mutable UI authority)
 ### When changing the host layer
 1. Keep wrappers thin. Rust still owns mutable UI state and performance-critical semantics.
 2. Prefer composites over new native widgets unless the TechSpec or active Tasks plan explicitly justifies native promotion.
-3. Preserve the native library resolver contract: `KRAKEN_LIB_PATH` -> staged prebuilds -> local Cargo release artifact.
+3. Preserve the Brownfield native library resolver contract (`KRAKEN_LIB_PATH` -> staged prebuilds -> local Cargo release artifact) unless the changes are part of the Epic P productization migration; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
 4. Repo-side verification entrypoints that `dlopen` directly should target the local Cargo build, not staged prebuilds, so branch validation cannot be shadowed by old packaged artifacts.
 
 ### When picking what to read
