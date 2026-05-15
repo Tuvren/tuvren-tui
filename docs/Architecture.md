@@ -225,7 +225,7 @@ sequenceDiagram
     Host->>Host: Resolve focused context, command binding, and dispatch policy
     Host-->>App: Invoke the selected command
     App->>Core: Apply resulting widget or state mutations through normal host wrappers
-    Core->>Core: Recompute dirty state and schedule the next render pass
+    Core->>Core: Recompute dirty state for the next host-driven render
 ```
 
 ## 5. Resilience & Cross-Cutting Concerns

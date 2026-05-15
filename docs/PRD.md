@@ -206,7 +206,7 @@
 - Widget state persistence through serialization and deserialization of the Composition Tree.
 - Background render threading as part of the default product contract unless later evidence justifies promotion.
 - React or Solid parity as the public declarative strategy for the current roadmap.
-- Plugin-slot extensibility before command/keymap foundations and the declarative integration layer stabilize.
+- Plugin-slot extensibility before `v1.0` and before command/keymap foundations plus the declarative integration layer stabilize.
 - Host runtime expansion beyond the current Bun-first public posture for the immediate roadmap wave.
 - Broad new widget breadth as a substitute for productization, release trust, and framework-level interaction foundations.
 - Public musl/Alpine Linux support until the Bun-first native-package enforcement strategy is proven.

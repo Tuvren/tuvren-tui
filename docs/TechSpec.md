@@ -640,6 +640,7 @@ notes:
   - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are no longer a first-class automatic resolver search path after Epic P."
   - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build only when running from a repo checkout or repo-side verification harness, and finally an explicit diagnostic failure."
   - "Resolver lookup must be package-manager-layout agnostic: resolve the auxiliary package by name first, then derive the shared-library path from the resolved package root rather than assuming a nested node_modules filesystem layout."
+  - "Repo-checkout fallback is authorized only when the resolver can prove it is running from a checked-out Kraken/Tuvren workspace, for example by finding the repo-owned host sources together with native build metadata such as native/Cargo.toml; published consumer installs must not probe native/target/release opportunistically."
   - "If the public package uses platform-native optional dependencies, the install contract must explicitly tolerate npm clients omitting them and surface the missing-native case through the documented diagnostic path."
   - "Repo-side verification that dlopen's directly must still validate the local Cargo-built artifact rather than a stale packaged binary."
   - "No long-lived KRAKEN_LIB_PATH compatibility alias is planned after the Tuvren hard cut."
@@ -916,7 +917,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to t
 
 Current CI validates the host benchmark and install surfaces on Linux. Cross-platform release artifacts are built in the release workflow, and the resolver path for staged prebuilds is covered by install smoke tests, but the full host benchmark matrix is not yet exercised on macOS and Windows in CI.
 
-The approved first productization wave extends CI with macOS and Windows host smoke verification for install, load, and basic host-surface confidence while keeping the benchmark-heavy enforcement path Linux-blocking until cross-platform performance gates are proven stable.
+The approved first productization wave extends CI and/or release verification with install and load smoke coverage for the full supported public target matrix while keeping the benchmark-heavy enforcement path Linux-blocking until cross-platform performance gates are proven stable.
 
 #### 5.4.1 Structural Substrate Gates (Epic M and N)
 

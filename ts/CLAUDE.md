@@ -51,7 +51,7 @@ bun run examples/accessibility-demo.tsx
 | `errors.ts` | `KrakenError` and FFI result translation |
 | `style.ts` | Host-side color and dimension parsing |
 | `theme.ts` | Theme wrapper API and built-in theme handles |
-| `resolver.ts` | Native artifact resolution: `KRAKEN_LIB_PATH` -> staged prebuilds -> source build |
+| `resolver.ts` | Native artifact resolution for the current Brownfield contract: `KRAKEN_LIB_PATH` -> staged prebuilds -> source build |
 | `diagnostics.ts` | Human-readable native-load remediation messages |
 | `dev.ts` | Dev session helper, overlay flags, trace flags, deterministic shutdown behavior |
 | `devtools/inspector.ts` | Widget tree and debug snapshot reader |
@@ -84,7 +84,8 @@ This layer translates developer intent into FFI calls or safe host composites. I
 - **Errors:** copy `tui_get_last_error()` immediately; never hold borrowed pointers.
 
 ### Resolver Contract
-- Search order is deterministic:
+- Preserve the Brownfield resolver contract unless the active task is the Epic P productization migration defined in `docs/Tasks.md`; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
+- Brownfield search order is deterministic:
   1. `KRAKEN_LIB_PATH`
   2. staged `ts/prebuilds/<platform>-<arch>/`
   3. `native/target/release/`
