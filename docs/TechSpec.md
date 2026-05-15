@@ -154,7 +154,7 @@ Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Be
 ### ADR-T44 Commands and Keymaps Are the First Framework-Level Host Services
 - **Status:** accepted
 - **Context:** The product direction is moving from a specialist library posture toward a general-purpose framework story, but the architectural invariant remains that Rust owns mutable UI state. The first framework moat should therefore add application ergonomics without creating a second source of truth in the host layer.
-- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the productization wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are explicitly deferred until after `v1.0` and until the commands/keymap contract proves stable, and they are not part of the active implementation contract in this document yet.
+- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the active productization and adoption wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are explicitly deferred until after `v1.0` and until the commands/keymap contract proves stable, and they are not part of the active implementation contract in this document yet.
 - **Consequences:** The framework can grow more competitive application ergonomics without weakening the native-state boundary, but the command dispatch, focus integration, and keybinding resolution APIs must be designed deliberately before a plugin story is added on top.
 
 ### ADR-T45 Effect Is the Sanctioned Declarative Integration Path

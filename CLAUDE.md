@@ -6,7 +6,7 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 
 ## Project Overview
 
-**Kraken TUI** is a Rust-native terminal UI engine with TypeScript/Bun bindings over FFI.
+**Kraken TUI** is the current Brownfield repo/product name for a Rust-native terminal UI engine with TypeScript/Bun bindings over FFI.
 
 **Brownfield note:** The current source tree still uses the Kraken name in code and artifacts; the active productization wave plans the future public rename to `Tuvren`.
 
@@ -27,6 +27,7 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 - The canonical docs chain is current and should be treated as the source of truth for planning work.
 - `Tasks.md` marks **Epic O — Terminal Capability Hardening** as shipped and activates **Epic P — Tuvren Identity, Packaging, and Release Migration** plus **Epic Q — Adoption and Framework Positioning** as the current wave.
 - `Tasks.md` now separates **active scope** from **archived completed scope**. Do not mistake the archived v7 docs-maintenance and v6 delivery waves for the current backlog.
+- Until Epic Q lands, README and broader public onboarding materials may still reflect the older Kraken-era positioning; the canonical docs chain is authoritative for roadmap and scope.
 - The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
 
 ---

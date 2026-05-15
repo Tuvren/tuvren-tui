@@ -172,14 +172,14 @@ And the chosen Bun package-manager strategy either proves the supported install 
 - **Effort:** 5
 - **Dependencies:** PROD-P002, PROD-P003, PROD-P004
 - **Capability / Contract Mapping:** [Architecture](./Architecture.md) §2.2, [TechSpec](./TechSpec.md) ADR-T43, §4.3, §5.2
-- **Description:** Update resolver logic, diagnostics, and install smoke coverage so the public package checks `TUVREN_LIB_PATH` first, then resolves the auxiliary scoped native package by name for the current platform and derives the library path from the resolved package root, and finally preserves local Cargo-build fallback only for proven repo checkouts and direct repo verification.
+- **Description:** Update resolver logic, diagnostics, and install smoke coverage so the public package checks `TUVREN_LIB_PATH` first, then resolves the auxiliary scoped native package by name for the current platform and derives the library path from the resolved package root, and finally preserves local Cargo-build fallback only for resolvers loaded from a proven checked-out Kraken/Tuvren workspace and direct repo verification.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given a published tuvren-tui install on a supported platform
 When the resolver loads the native library
 Then it searches TUVREN_LIB_PATH first
 And otherwise resolves the correct auxiliary scoped native package by package name for the current platform and derives the shared-library path from the resolved package root
-And repo-side Cargo fallback activates only when the resolver can prove it is running inside a checked-out Kraken or Tuvren workspace
+And repo-side Cargo fallback activates only when the resolver can prove it was loaded from a checked-out Kraken or Tuvren workspace rooted at repo-owned host and native build metadata
 And source checkouts still fall back to the local Cargo-built artifact when packaged binaries are absent
 And ordinary public installs fail with the documented diagnostic instead of source-building when neither the override nor the packaged native artifact is available
 ```
