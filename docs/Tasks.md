@@ -106,12 +106,13 @@ flowchart LR
 - **Effort:** 3
 - **Dependencies:** Epic O shipped
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3, [Architecture](./Architecture.md) §1.4 and Risk 9, [TechSpec](./TechSpec.md) ADR-T42, ADR-T43, §1.4, §4.3
-- **Description:** Produce a migration inventory that enumerates every public-facing Kraken-era name and release/distribution touchpoint: npm package names, host facade and error types, resolver environment variables, native crate/library names, release asset names, install diagnostics, and CI/release workflow assumptions. If the inventory surfaces contradictions with the approved Tuvren contract, resolve the upstream doc conflict before implementation tickets begin.
+- **Description:** Produce a committed migration inventory, for example under `docs/spikes/`, that enumerates every public-facing Kraken-era name and release/distribution touchpoint: npm package names, host facade and error types, resolver environment variables, native crate/library names, release asset names, install diagnostics, and CI/release workflow assumptions. If the inventory surfaces contradictions with the approved Tuvren contract, resolve the upstream doc conflict before implementation tickets begin.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the approved hard-cut move from Kraken to Tuvren
 When the repo's public naming, packaging, and release touchpoints are inventoried
 Then the inventory records every source, workflow, and user-facing contract that must change
+And the inventory is committed in a reviewable artifact that downstream rename tickets can reference directly
 And any contradiction with PRD, Architecture, or TechSpec is resolved upstream before PROD-P002 starts
 ```
 
@@ -185,14 +186,14 @@ And ordinary public installs fail with the documented diagnostic instead of sour
 - **Effort:** 3
 - **Dependencies:** PROD-P005
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §5, [TechSpec](./TechSpec.md) §5.4, [docs/reports/GatePolicy.md](./reports/GatePolicy.md)
-- **Description:** Extend CI with macOS and Windows host smoke verification for install, load, and basic host-surface confidence while keeping the benchmark-heavy gates Linux-blocking until cross-platform performance gates are intentionally promoted.
+- **Description:** Extend CI and/or release verification with install and load smoke coverage for the full supported public target matrix (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) while keeping the benchmark-heavy gates Linux-blocking until cross-platform performance gates are intentionally promoted.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the active productization wave
-When CI runs on Linux, macOS, and Windows
-Then macOS and Windows exercise install, load, and core host smoke coverage
+When the supported public release matrix is validated
+Then each supported public target tuple receives an install and load smoke verification path
 And Linux remains the blocking benchmark environment for bundle, FFI, and render-budget enforcement
-And GatePolicy documents the new cross-platform trust posture
+And GatePolicy documents the new cross-platform trust posture and any release-time verification split from CI
 ```
 
 ### Epic Q — Adoption and Framework Positioning (ADOPT)
@@ -211,6 +212,7 @@ Then the product is described as a general-purpose terminal framework
 And the docs present Bun as the active runtime contract
 And the install and naming guidance match the shipped Tuvren package and resolver behavior
 And README plus the primary onboarding entrypoints reflect the same framework story and install contract
+And the primary Hello World path is rehearsed against a clean setup and preserves the PRD under-15-minute onboarding target for a competent TypeScript developer
 ```
 
 **ADOPT-Q002 Refresh Showcase Framing Without Losing the Agentic Proof Point**

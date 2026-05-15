@@ -161,7 +161,7 @@ Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Be
 - **Status:** accepted
 - **Context:** The current repo ships an imperative core and a lightweight JSX/signals overlay, while the strategic product direction explicitly rejects React/Solid parity as the main declarative roadmap. The team wants one blessed declarative story that still honors the same Rust-owned-state architecture.
 - **Decision:** Keep the imperative surface as the canonical model and reserve `tuvren-tui/effect` as the sanctioned declarative integration path over the same Bun and FFI runtime contract. The existing JSX/signals layer remains supported Brownfield reality, but it is not the strategic north star and should not pull the roadmap toward React or Solid parity.
-- **Consequences:** Declarative consumers get a clear future path without forcing the core package to absorb broad framework-adapter scope. The project must still define the exact `Effect` API through a later contract-setting wave before it can be treated as release-ready product surface.
+- **Consequences:** Declarative consumers get a clear future path without forcing the core package to absorb broad framework-adapter scope. The existing root-package JSX/signals exports remain supported Brownfield reality unless a later contract explicitly moves or deprecates them, but Epic S should stop positioning them as the strategic declarative story. The project must still define the exact `Effect` API through a later contract-setting wave before it can be treated as release-ready product surface.
 
 ### 2.2 Brownfield Reality Note
 - The prior v6 TechSpec described transcript, devtools, split-pane, and flagship examples as future work. The current source tree implements them.
@@ -632,13 +632,13 @@ approved_target_state:
   resolver_search_order:
     - TUVREN_LIB_PATH
     - resolve @tuvren/tuvren-tui-<platform>-<arch> by package name for the current platform and derive <libName> from the resolved package root
-    - native/target/release/<libName>
+    - when_repo_checkout: native/target/release/<libName>
     - diagnostic_error
 notes:
   - "Current Brownfield source publishes versioned GitHub native assets and optionally stages them into ts/prebuilds/<platform>-<arch>/<libName>."
   - "Approved target-state publishes one public package, tuvren-tui, that consumes auxiliary scoped native packages under the new organization."
   - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are no longer a first-class automatic resolver search path after Epic P."
-  - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build in repo checkouts, and finally an explicit diagnostic failure."
+  - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build only when running from a repo checkout or repo-side verification harness, and finally an explicit diagnostic failure."
   - "Resolver lookup must be package-manager-layout agnostic: resolve the auxiliary package by name first, then derive the shared-library path from the resolved package root rather than assuming a nested node_modules filesystem layout."
   - "If the public package uses platform-native optional dependencies, the install contract must explicitly tolerate npm clients omitting them and surface the missing-native case through the documented diagnostic path."
   - "Repo-side verification that dlopen's directly must still validate the local Cargo-built artifact rather than a stale packaged binary."

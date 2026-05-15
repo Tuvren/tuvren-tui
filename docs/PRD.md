@@ -170,8 +170,8 @@
 | **Performance** | A Render Pass stays below 16ms when operating within the intended workload envelope. | Preserves 60fps-capable responsiveness for real-time dashboards and streaming workflows. |
 | **Performance** | Foreign-function overhead stays below 1ms per cross-boundary call. | Ensures the language boundary does not become the bottleneck. |
 | **Operability** | The host-language package stays below 75KB. | Keeps the TypeScript layer intentionally thin so the value remains in the Native Core. |
-| **Operability** | Supported public releases install and load on supported platforms without requiring a local source build in the ordinary path. | Productized adoption depends on a trustworthy install path, not just a strong source-checkout story. |
-| **Operability** | Linux, macOS, and Windows public install and load paths receive automated smoke verification before the productization wave is considered complete. | Cross-platform credibility is part of the framework promise, not an optional afterthought. |
+| **Operability** | Supported public releases install and load on the supported glibc-based Linux, macOS, and Windows targets without requiring a local source build in the ordinary path. | Productized adoption depends on a trustworthy install path, not just a strong source-checkout story. |
+| **Operability** | Every supported public release target in the published matrix receives install and load smoke verification before the productization wave is considered complete. | Cross-platform credibility is part of the framework promise, not an optional afterthought. |
 | **Adoption** | Time to Hello World stays below 15 minutes for a competent TypeScript Developer. | Reinforces the primary JTBD: shipping faster. |
 | **Adoption** | The public story must be understandable as a general-purpose framework without hiding the demanding agentic/operator workloads that prove the design under stress. | The framework needs broad appeal without losing the concrete workload that justifies its deeper architecture. |
 | **Stability** | Semantic versioning guarantees begin at public v1.0 GA; pre-GA releases may include breaking changes. | Sets realistic trust expectations for open source adoption. |
@@ -209,6 +209,7 @@
 - Plugin-slot extensibility before command/keymap foundations and the declarative integration layer stabilize.
 - Host runtime expansion beyond the current Bun-first public posture for the immediate roadmap wave.
 - Broad new widget breadth as a substitute for productization, release trust, and framework-level interaction foundations.
+- Public musl/Alpine Linux support until the Bun-first native-package enforcement strategy is proven.
 
 ## 7. Conceptual Diagrams (Mermaid)
 ### 7.1 System Context
