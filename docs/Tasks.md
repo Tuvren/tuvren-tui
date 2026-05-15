@@ -120,13 +120,14 @@ And any contradiction with PRD, Architecture, or TechSpec is resolved upstream b
 - **Effort:** 5
 - **Dependencies:** PROD-P001
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3 and §4.10, [Architecture](./Architecture.md) §1.4, [TechSpec](./TechSpec.md) ADR-T42, §1.2, §4.2
-- **Description:** Rename the public TypeScript package contract from `kraken-tui` to `tuvren-tui`, rename the primary host facade from `Kraken` to `Tuvren`, rename the exported host error type as part of the same hard cut, and update public imports and package metadata accordingly. Preserve the existing imperative lifecycle model and thin-wrapper rule while changing naming only.
+- **Description:** Rename the public TypeScript package contract from `kraken-tui` to `tuvren-tui`, rename the primary host facade from `Kraken` to `Tuvren`, rename the exported host error type and any remaining Kraken-prefixed public TypeScript symbols as part of the same hard cut, and update public imports and package metadata accordingly. Preserve the existing imperative lifecycle model and thin-wrapper rule while changing naming only.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the host package and public facade still use Kraken-era naming
 When the rename wave lands
 Then the public package contract is tuvren-tui
 And the primary host facade and exported error type use Tuvren naming
+And no exported public TypeScript identifier retains Kraken-prefixed branding after the hard cut
 And the imperative lifecycle surface remains shape-compatible apart from the approved hard-cut rename
 ```
 
@@ -135,7 +136,7 @@ And the imperative lifecycle surface remains shape-compatible apart from the app
 - **Effort:** 8
 - **Dependencies:** PROD-P002
 - **Capability / Contract Mapping:** [PRD](./PRD.md) §1.3 and §5, [Architecture](./Architecture.md) §1.3, §1.4, and Risk 9, [TechSpec](./TechSpec.md) ADR-T42, §1.3, §1.4, §4.3
-- **Description:** Rename the native crate and shared-library identities to `tuvren_tui` / `libtuvren_tui.*`, replace `KRAKEN_LIB_PATH` with `TUVREN_LIB_PATH`, rename release assets to `tuvren-tui-*`, and update resolver diagnostics and install/load tests to reflect the hard cut. Preserve the `tui_*` ABI prefix.
+- **Description:** Rename the native crate and shared-library identities to `tuvren_tui`, apply platform-correct shared-library names (`libtuvren_tui.*` on Unix-like systems and `tuvren_tui.dll` on Windows), replace `KRAKEN_LIB_PATH` with `TUVREN_LIB_PATH`, rename release assets to `tuvren-tui-*`, and update resolver diagnostics and install/load tests to reflect the hard cut. Preserve the `tui_*` ABI prefix.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the Brownfield native distribution contract still uses Kraken-era names
