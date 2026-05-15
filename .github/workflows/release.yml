@@ -206,15 +206,18 @@ jobs:
 
             Each artifact has a `.sha256` checksum sidecar for integrity verification.
 
-            ## npm Package
+            ## Manual Install
+
+            Until `tuvren-tui` is published to the npm registry, use the prebuilt artifact
+            directly by downloading the `.so`/`.dylib`/`.dll` for your platform above and
+            pointing the resolver at it:
 
             ```sh
-            # Install the public package (auxiliary native packages install automatically)
-            bun add tuvren-tui
+            export TUVREN_LIB_PATH=/path/to/libtuvren_tui.so   # adjust name per platform
             ```
 
-            The public `tuvren-tui` package automatically resolves the correct native library
-            for your platform via auxiliary scoped packages under `@tuvren/`.
+            npm publish support and the `bun add tuvren-tui` install path will follow in a
+            subsequent release once org registry access is in place (Epic Q).
           files: |
             tuvren-tui-*
           draft: false

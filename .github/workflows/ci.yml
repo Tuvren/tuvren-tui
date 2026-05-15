@@ -134,7 +134,8 @@ jobs:
   # Validates that the resolver and native library load correctly on each
   # supported public release target. Benchmark-heavy gates remain Linux-only.
   cross-platform-smoke:
-    name: Install Smoke — ${{ matrix.platform }}-${{ matrix.arch }}
+    # linux-arm64 is cross-compiled (build + install-smoke only; no load smoke — runner is x64)
+    name: ${{ matrix.cross && 'Cross-Build' || 'Install Smoke' }} — ${{ matrix.platform }}-${{ matrix.arch }}
     strategy:
       fail-fast: false
       matrix:

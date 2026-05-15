@@ -1,11 +1,9 @@
 {
   "name": "@tuvren/tuvren-tui-win32-x64",
   "version": "0.1.0",
-  "description": "Native library for tuvren-tui (Windows, x64)",
+  "description": "Native library for tuvren-tui (Windows, x64). Binary-only package — consumed by path derivation, not by require/import.",
   "os": ["win32"],
   "cpu": ["x64"],
-  "type": "module",
-  "main": "./tuvren_tui.dll",
   "files": [
     "tuvren_tui.dll",
     "package.json"

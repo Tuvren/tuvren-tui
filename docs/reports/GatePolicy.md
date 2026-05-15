@@ -13,7 +13,7 @@ This document defines the current quality gates for Tuvren TUI release readiness
 
 For reporting-only benchmark jobs, the benchmark commands themselves are still expected to compile and run successfully in CI. "Reporting-only" means the job does not currently parse the emitted numbers into an automatic regression threshold failure.
 
-Current CI executes the host test and benchmark surfaces on `ubuntu-latest`. Cross-platform install and load smoke verification now runs on all five supported public release targets (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) as a blocking gate per the Epic P productization contract. Benchmark-heavy gates (bundle, FFI overhead, render budget, substrate throughput) remain Linux-blocking until cross-platform performance gates are intentionally promoted.
+Current CI executes the host test and benchmark surfaces on `ubuntu-latest`. Cross-platform build and load smoke now runs on all five supported public release targets (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) as a blocking gate per the Epic P productization contract. `linux-arm64` is cross-compiled on an x64 runner and therefore receives build + install-smoke only (no headless `dlopen` load verification). Benchmark-heavy gates (bundle, FFI overhead, render budget, substrate throughput) remain Linux-blocking until cross-platform performance gates are intentionally promoted.
 
 Repo-side host verification entrypoints that `dlopen` directly are expected to validate the local Cargo-built artifact rather than a packaged binary, so branch verification is tied to the code under review.
 
@@ -108,7 +108,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to v
 | **CI Job** | `cross-platform-smoke` |
 | **CI Mode** | Blocking |
 | **Platform matrix** | `linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64` |
-| **Enforcement** | Each platform builds the native library from source and then runs `bun test ts/test-install.test.ts` plus a headless `dlopen` verification to confirm the library loads and `tui_init_headless` / `tui_shutdown` succeed. Linux-arm64 uses cross-compilation. |
+| **Enforcement** | Each platform builds the native library from source and runs `bun test ts/test-install.test.ts`. Native targets (`linux-x64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) also run a headless `dlopen` smoke confirming `tui_init_headless` / `tui_shutdown` succeed. `linux-arm64` is cross-compiled on an x64 runner and receives build + install-smoke only; load smoke requires a native arm64 runner and is tracked as a future gate upgrade. |
 | **Benchmark promotion** | Benchmark-heavy gates (Gates 3, 7, 8) remain Linux-only. Promoting any benchmark gate to a multi-platform blocking check requires an explicit decision tracked in `Tasks.md`. |
 | **Release timing** | This gate is pre-merge blocking in CI. No separate post-publish verification step exists at this time; the CI gate serves as the pre-release smoke before artifacts are published. |
 
@@ -123,7 +123,7 @@ CI Trigger
   |-- native-benchmarks ----- writer/text-cache reporting + substrate threshold gate
   |-- host-tests ------------ ffi + jsx + examples + install + runner + bundle
   |-- host-benchmarks ------- ffi bench + render bench (blocking)
-  |-- cross-platform-smoke -- install + load smoke on all 5 supported targets (PROD-P006)
+  |-- cross-platform-smoke -- build + install-smoke on all 5 targets; load smoke on 4 (linux-arm64 is cross-compile only) (PROD-P006)
   `-- quality-gate ---------- aggregate pass/fail result
 ```
 

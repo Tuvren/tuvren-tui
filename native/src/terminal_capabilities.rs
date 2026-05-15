@@ -74,7 +74,7 @@ impl TerminalCapabilityState {
         Self {
             flags: legacy_low_bits,
             terminal_name: Some("headless".to_string()),
-            terminal_program: Some("kraken-headless".to_string()),
+            terminal_program: Some("tuvren-headless".to_string()),
             multiplexer: TerminalMultiplexer::None,
             cell_width_px: 0,
             cell_height_px: 0,
@@ -368,7 +368,7 @@ pub fn validate_osc8_uri(uri: &str) -> Result<(), String> {
         "mailto:",
         "file://",
         "ssh://",
-        "kraken://",
+        "tuvren://",
     ];
     if !allowed.iter().any(|prefix| lower.starts_with(prefix)) {
         return Err(format!("Unsupported OSC8 URI scheme: {uri}"));

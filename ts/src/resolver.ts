@@ -15,6 +15,7 @@
 
 import { existsSync } from "fs";
 import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 import { formatLoadError } from "./diagnostics";
 
 /** Map process.platform to the native library filename. */
@@ -57,8 +58,9 @@ function getAuxPackageName(platform: string, arch: string): string | undefined {
 function resolveAuxPackage(packageName: string, libName: string): string | undefined {
 	try {
 		// Resolve the package.json of the aux package to find the package root.
+		// fileURLToPath handles Win32 drive letters (new URL().pathname breaks on Windows).
 		const packageJsonUrl = import.meta.resolve(`${packageName}/package.json`);
-		const packageJsonPath = new URL(packageJsonUrl).pathname;
+		const packageJsonPath = fileURLToPath(packageJsonUrl);
 		const packageRoot = dirname(packageJsonPath);
 		const libPath = resolve(packageRoot, libName);
 		if (existsSync(libPath)) {

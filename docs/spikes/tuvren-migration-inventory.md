@@ -122,12 +122,21 @@ The staged `ts/prebuilds/` path is removed from the default resolver order as pa
 
 | Old name | New name | File | Notes |
 |----------|----------|------|-------|
-| `KRAKEN_AUDIT_RENDER_ONCE` | `TUVREN_AUDIT_RENDER_ONCE` | `ts/src/loop.ts`, `examples/demo.ts` | Internal test/audit env var, not part of the public API contract |
-| `KRAKEN_AUDIT_TICKS` | `TUVREN_AUDIT_TICKS` | `ts/src/loop.ts` | Internal test/audit env var |
+| `KRAKEN_AUDIT_RENDER_ONCE` | `TUVREN_AUDIT_RENDER_ONCE` | `ts/src/loop.ts`, `examples/demo.ts`, `audit/run-example.ts` | Internal test/audit env var, not part of the public API contract |
+| `KRAKEN_AUDIT_TICKS` | `TUVREN_AUDIT_TICKS` | `ts/src/loop.ts`, `audit/run-example.ts` | Internal test/audit env var |
 
 ---
 
-## 11. Documentation and Onboarding Touchpoints
+## 11. Native Internal Strings
+
+| Old value | New value | File | Notes |
+|-----------|-----------|------|-------|
+| `"kraken-headless"` (terminal_program) | `"tuvren-headless"` | `native/src/terminal_capabilities.rs` | User-visible via `getTerminalInfo()` diagnostic copy-out; renamed for consistency. |
+| `"kraken://"` (OSC8 allowed scheme) | `"tuvren://"` | `native/src/terminal_capabilities.rs` | Part of the OSC8 link scheme allowlist; renamed as a hard cut with no compatibility window needed pre-1.0. |
+
+---
+
+## 12. Documentation and Onboarding Touchpoints
 
 | File | What changes | Ticket |
 |------|-------------|--------|
@@ -138,7 +147,7 @@ The staged `ts/prebuilds/` path is removed from the default resolver order as pa
 
 ---
 
-## 12. Upstream Document Contradiction Check
+## 13. Upstream Document Contradiction Check
 
 No contradictions found between PRD §1.3, Architecture §1.4, TechSpec ADR-T42/ADR-T43/§4.3, and this inventory. The approved target-state naming (`tuvren-tui`, `Tuvren`, `TUVREN_LIB_PATH`, `tuvren_tui`, `libtuvren_tui.*`, `@tuvren/*`) is consistent across all four upstream artifacts.
 
@@ -146,8 +155,11 @@ The `tui_*` ABI prefix is explicitly preserved by ADR-T42 and is not part of the
 
 ---
 
-## 13. Gaps and Deferred Items
+## 14. Gaps and Deferred Items
 
 - **Organization move**: The actual npm organization move to `@tuvren` and GitHub org transfer are operational prerequisites for publishing; this inventory records the naming contract but does not automate the org setup.
 - **Musl runtime detection fallback**: If Bun's `libc` optional-dependency filtering cannot be confirmed for the deployed Bun version, the resolver must add an explicit musl detection gate. This is validated in PROD-P005.
 - **npm registry publishing**: The CI workflow scaffolding for publishing auxiliary packages (PROD-P004) prepares the package manifests and workflow steps, but actual publishing requires the `@tuvren` npm organization and a publish token in GitHub Actions secrets.
+- **Aux-package resolver smoke test**: The cross-platform smoke gate (PROD-P006) validates the source-build path of the resolver. The auxiliary-package branch (`resolveAuxPackage` + `import.meta.resolve`) is not covered by the current smoke matrix because it requires a published or locally staged `@tuvren/*` package. A proper integration test for step 2 of the resolver is deferred until the first actual npm publish cycle; the unit behavior of `fileURLToPath` + `existsSync` is verified at the module level.
+- **User-visible Kraken strings in examples**: Example file titles, ARIA labels, and markdown headings (e.g., "# Kraken TUI Demo") are deferred to Epic Q (ADOPT-Q001/Q002) since they are part of the onboarding narrative refresh, not the code rename.
+- **`linux-arm64` load smoke**: The cross-platform CI gate cross-compiles `linux-arm64` on an x64 runner and therefore cannot run a native headless `dlopen` smoke. Upgrading this to a full load smoke requires a native arm64 CI runner and is tracked as a future gate upgrade.

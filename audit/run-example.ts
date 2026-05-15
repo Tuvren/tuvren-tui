@@ -1,6 +1,6 @@
 /**
- * Audit harness: loads an example with Kraken.init() intercepted into
- * Kraken.initHeadless(cols, rows). Sets KRAKEN_AUDIT_RENDER_ONCE so the
+ * Audit harness: loads an example with Tuvren.init() intercepted into
+ * Tuvren.initHeadless(cols, rows). Sets TUVREN_AUDIT_RENDER_ONCE so the
  * example's event loop renders a small deterministic number of ticks and
  * exits. Prints the layout tree and a list of detected issues.
  *
@@ -8,11 +8,11 @@
  */
 
 import { ptr } from "bun:ffi";
-import { Kraken } from "../ts/src/app";
+import { Tuvren } from "../ts/src/app";
 import { ffi } from "../ts/src/ffi";
 
-process.env.KRAKEN_AUDIT_RENDER_ONCE = "1";
-process.env.KRAKEN_AUDIT_TICKS ??= "8";
+process.env.TUVREN_AUDIT_RENDER_ONCE = "1";
+process.env.TUVREN_AUDIT_TICKS ??= "8";
 
 const rawPath = process.argv[2];
 const cols = parseInt(process.argv[3] ?? "100", 10);
@@ -27,10 +27,10 @@ if (!rawPath) {
 import { resolve, isAbsolute } from "path";
 const examplePath = isAbsolute(rawPath) ? rawPath : resolve(process.cwd(), rawPath);
 
-let activeApp: Kraken | null = null;
-(Kraken as any).init = () => {
-	console.log(`[audit] Kraken.init() → headless ${cols}x${rows}`);
-	const app = Kraken.initHeadless(cols, rows);
+let activeApp: Tuvren | null = null;
+(Tuvren as any).init = () => {
+	console.log(`[audit] Tuvren.init() → headless ${cols}x${rows}`);
+	const app = Tuvren.initHeadless(cols, rows);
 	// No-op shutdown so finally-blocks don't tear down before we can inspect
 	(app as any).shutdown = () => {};
 	activeApp = app;
