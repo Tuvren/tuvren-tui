@@ -45,7 +45,7 @@ export function formatLoadError(
 	lines.push(
 		"  - To build from source: cargo build --manifest-path native/Cargo.toml --release",
 		"  - To override the library path: set TUVREN_LIB_PATH=/path/to/libtuvren_tui.{so,dylib,dll}",
-		"  - To install via npm: npm install tuvren-tui  (installs platform native package automatically)",
+		"  - To download a prebuilt binary: see the GitHub Releases page for your platform asset.",
 	);
 
 	return lines.join("\n");

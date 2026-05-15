@@ -1,5 +1,5 @@
 /**
- * JSX type definitions for Kraken TUI (ADR-T20).
+ * JSX type definitions for Tuvren TUI (ADR-T20).
  *
  * Defines the VNode representation, component function signature,
  * and JSX.IntrinsicElements mapping for all widget types.

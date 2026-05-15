@@ -133,6 +133,14 @@ jobs:
   # ── Cross-Platform Install and Load Smoke (PROD-P006) ─────────────────────
   # Validates that the resolver and native library load correctly on each
   # supported public release target. Benchmark-heavy gates remain Linux-only.
+  #
+  # Native targets (linux-x64, darwin-arm64, darwin-x64, win32-x64) build
+  # without --target so cargo writes directly to native/target/release/, which
+  # is where resolveSourceBuildPath() and the install tests look. Cross-compiled
+  # linux-arm64 uses --target + an explicit artifact copy.
+  #
+  # darwin-x64 uses macos-13 (Intel runner) so it compiles and loads natively;
+  # macos-latest is now Apple Silicon and would require cross-compilation.
   cross-platform-smoke:
     # linux-arm64 is cross-compiled (build + install-smoke only; no load smoke — runner is x64)
     name: ${{ matrix.cross && 'Cross-Build' || 'Install Smoke' }} — ${{ matrix.platform }}-${{ matrix.arch }}
@@ -143,7 +151,6 @@ jobs:
           - os: ubuntu-latest
             platform: linux
             arch: x64
-            target: x86_64-unknown-linux-gnu
           - os: ubuntu-latest
             platform: linux
             arch: arm64
@@ -152,21 +159,18 @@ jobs:
           - os: macos-latest
             platform: darwin
             arch: arm64
-            target: aarch64-apple-darwin
-          - os: macos-latest
+          - os: macos-13
             platform: darwin
             arch: x64
-            target: x86_64-apple-darwin
           - os: windows-latest
             platform: win32
             arch: x64
-            target: x86_64-pc-windows-msvc
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.target }}
+          targets: ${{ matrix.target || '' }}
       - uses: oven-sh/setup-bun@v2
 
       - name: Install cross-compilation tools (linux-arm64)
@@ -183,7 +187,9 @@ jobs:
           echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
 
       - name: Build native library
-        run: cargo build --manifest-path native/Cargo.toml --release --target ${{ matrix.target }}
+        # Native targets omit --target so cargo writes to native/target/release/ directly.
+        # Cross-compiled linux-arm64 uses --target and copies the artifact below.
+        run: cargo build --manifest-path native/Cargo.toml --release ${{ matrix.cross && format('--target {0}', matrix.target) || '' }}
 
       - name: Copy native artifact to release directory (cross-compile only)
         if: matrix.cross
@@ -198,45 +204,9 @@ jobs:
       - name: Run install smoke tests
         run: bun test ts/test-install.test.ts
 
-      - name: Verify native library loads in headless mode (Unix)
-        if: matrix.platform != 'win32' && !matrix.cross
-        shell: bash
-        run: |
-          bun run - <<'EOF'
-          import { resolveSourceBuildPath } from "./ts/src/resolver.ts";
-          import { dlopen } from "bun:ffi";
-          const libPath = resolveSourceBuildPath();
-          const lib = dlopen(libPath, {
-            tui_init_headless: { args: ["u16", "u16"], returns: "i32" },
-            tui_shutdown: { args: [], returns: "i32" },
-          });
-          const init = lib.symbols.tui_init_headless(80, 24);
-          if (init !== 0) throw new Error("tui_init_headless failed: " + init);
-          const shutdown = lib.symbols.tui_shutdown();
-          if (shutdown !== 0) throw new Error("tui_shutdown failed: " + shutdown);
-          lib.close();
-          console.log("Native library load smoke: PASS");
-          EOF
-
-      - name: Verify native library loads in headless mode (Windows)
-        if: matrix.platform == 'win32'
-        shell: pwsh
-        run: |
-          bun run -e "
-          import { resolveSourceBuildPath } from './ts/src/resolver.ts';
-          import { dlopen } from 'bun:ffi';
-          const libPath = resolveSourceBuildPath();
-          const lib = dlopen(libPath, {
-            tui_init_headless: { args: ['u16', 'u16'], returns: 'i32' },
-            tui_shutdown: { args: [], returns: 'i32' },
-          });
-          const init = lib.symbols.tui_init_headless(80, 24);
-          if (init !== 0) throw new Error('tui_init_headless failed: ' + init);
-          const shutdown = lib.symbols.tui_shutdown();
-          if (shutdown !== 0) throw new Error('tui_shutdown failed: ' + shutdown);
-          lib.close();
-          console.log('Native library load smoke: PASS');
-          "
+      - name: Verify native library loads in headless mode
+        if: '!matrix.cross'
+        run: bun run audit/load-smoke.ts
 
   # ── Quality Gate Summary ─────────────────────────────────────────────────
   quality-gate:

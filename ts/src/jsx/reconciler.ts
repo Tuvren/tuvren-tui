@@ -1,5 +1,5 @@
 /**
- * Signal-driven reconciler for Kraken TUI (ADR-T20).
+ * Signal-driven reconciler for Tuvren TUI (ADR-T20).
  *
  * Lifecycle:
  *   render(vnode, app)  — mount a VNode tree, set as root
