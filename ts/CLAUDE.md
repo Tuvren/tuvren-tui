@@ -54,7 +54,7 @@ bun run examples/accessibility-demo.tsx
 | `resolver.ts` | Native artifact resolution for the current Brownfield contract: `KRAKEN_LIB_PATH` -> staged prebuilds -> source build |
 | `diagnostics.ts` | Human-readable native-load remediation messages |
 | `dev.ts` | Dev session helper, overlay flags, trace flags, deterministic shutdown behavior |
-| `devtools/inspector.ts` | Widget tree and debug snapshot reader |
+| `devtools/inspector.ts` | Composition Tree and debug snapshot reader |
 | `devtools/hud.ts` | Perf HUD formatting and counter naming |
 | `devtools/traces.ts` | Trace JSON reader and trace-kind helpers |
 | `composites/command-palette.ts` | Host composite over `Overlay`, `Input`, and `List` |
@@ -84,7 +84,7 @@ This layer translates developer intent into FFI calls or safe host composites. I
 - **Errors:** copy `tui_get_last_error()` immediately; never hold borrowed pointers.
 
 ### Resolver Contract
-- Preserve the Brownfield resolver contract unless the active task is the Epic P productization migration defined in `docs/Tasks.md`; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
+- Preserve the Brownfield resolver contract unless the changes are part of the Epic P productization migration defined in `docs/Tasks.md`; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
 - Brownfield search order is deterministic:
   1. `KRAKEN_LIB_PATH`
   2. staged `ts/prebuilds/<platform>-<arch>/`

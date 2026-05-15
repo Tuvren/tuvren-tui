@@ -115,7 +115,7 @@ Rust cdylib (single mutable UI authority)
 ### When changing the host layer
 1. Keep wrappers thin. Rust still owns mutable UI state and performance-critical semantics.
 2. Prefer composites over new native widgets unless the TechSpec or active Tasks plan explicitly justifies native promotion.
-3. Preserve the Brownfield native library resolver contract (`KRAKEN_LIB_PATH` -> staged prebuilds -> local Cargo release artifact) unless the active task is the Epic P productization migration; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
+3. Preserve the Brownfield native library resolver contract (`KRAKEN_LIB_PATH` -> staged prebuilds -> local Cargo release artifact) unless the changes are part of the Epic P productization migration; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
 4. Repo-side verification entrypoints that `dlopen` directly should target the local Cargo build, not staged prebuilds, so branch validation cannot be shadowed by old packaged artifacts.
 
 ### When picking what to read
