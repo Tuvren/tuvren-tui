@@ -143,6 +143,9 @@ jobs:
   # macos-latest is now Apple Silicon and would require cross-compilation.
   cross-platform-smoke:
     # linux-arm64 is cross-compiled (build + install-smoke only; no load smoke — runner is x64)
+    # NOTE: matrix entries that are NOT cross-compiled must omit the `cross` key entirely
+    # (not set it to false). GHA evaluates missing keys as null/falsy in expressions, while
+    # explicit `cross: false` is also falsy — but relying on that subtlety is fragile.
     name: ${{ matrix.cross && 'Cross-Build' || 'Install Smoke' }} — ${{ matrix.platform }}-${{ matrix.arch }}
     strategy:
       fail-fast: false

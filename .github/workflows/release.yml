@@ -45,7 +45,7 @@ jobs:
             lib_prefix: lib
             strip: strip
           - target: x86_64-apple-darwin
-            os: macos-latest
+            os: macos-13
             platform: darwin
             arch: x64
             ext: dylib

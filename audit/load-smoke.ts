@@ -9,7 +9,7 @@
  * Usage: bun run audit/load-smoke.ts
  */
 
-import { resolveSourceBuildPath } from "../ts/src/resolver.ts";
+import { resolveSourceBuildPath } from "../ts/src/resolver";
 import { dlopen } from "bun:ffi";
 
 const libPath = resolveSourceBuildPath();

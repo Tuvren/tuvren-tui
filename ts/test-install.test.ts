@@ -9,7 +9,7 @@
 
 import { describe, test, expect, afterEach } from "bun:test";
 import { existsSync } from "fs";
-import { normalize, resolve } from "path";
+import { join, normalize, resolve, sep } from "path";
 import { resolveLibraryPath, resolveSourceBuildPath, getLibraryName } from "./src/resolver";
 import { formatLoadError } from "./src/diagnostics";
 
@@ -65,7 +65,7 @@ describe("resolveLibraryPath", () => {
 	});
 
 	test("falls through to source build when TUVREN_LIB_PATH points to nonexistent file", () => {
-		process.env.TUVREN_LIB_PATH = "/nonexistent/path/libtuvren_tui.so";
+		process.env.TUVREN_LIB_PATH = join(sep, "nonexistent", "path", "libtuvren_tui.so");
 		// Should fall through to source build in a repo checkout
 		const libPath = resolveLibraryPath();
 		expect(normalize(libPath)).toBe(normalize(sourceBuild));
@@ -78,7 +78,7 @@ describe("resolveSourceBuildPath", () => {
 	test("returns the local Cargo build artifact path", () => {
 		const libPath = resolveSourceBuildPath();
 		expect(existsSync(libPath)).toBe(true);
-		expect(libPath).toContain("native/target/release");
+		expect(libPath).toContain(join("native", "target", "release"));
 		expect(libPath).toContain("tuvren_tui");
 	});
 });

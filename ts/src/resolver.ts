@@ -75,16 +75,15 @@ function resolveAuxPackage(packageName: string, libName: string): string | undef
 /**
  * Detect whether the resolver is running from a checked-out Tuvren/Kraken workspace.
  *
- * A workspace checkout is proven by the presence of both:
- *   - ts/package.json (at packageRoot/package.json)
- *   - native/Cargo.toml (at packageRoot/../native/Cargo.toml)
+ * A workspace checkout is proven by the presence of native/Cargo.toml as a sibling
+ * directory (packageRoot/../native/Cargo.toml). The package.json check is omitted —
+ * it always exists when resolver.ts loads and provides no discrimination signal.
  *
  * This guard prevents ordinary published installs from probing native/target/release.
  */
 function isRepoCheckout(packageRoot: string): boolean {
-	const pkgJson = resolve(packageRoot, "package.json");
 	const cargoToml = resolve(packageRoot, "..", "native", "Cargo.toml");
-	return existsSync(pkgJson) && existsSync(cargoToml);
+	return existsSync(cargoToml);
 }
 
 /**
