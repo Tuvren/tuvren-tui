@@ -38,7 +38,7 @@
     # Set up rustup default toolchain (needed for cargo fmt/clippy subcommands)
     rustup default stable
 
-    echo "Welcome to KrakenTUI dev environment"
+    echo "Welcome to Tuvren TUI dev environment"
     git --version
   '';
 }

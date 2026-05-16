@@ -254,7 +254,7 @@ describe("Agent Console Replay (TASK-L3)", () => {
 		applyReplayEvent(transcript, {
 			type: "MESSAGE_CHUNK",
 			messageId: "test-msg",
-			delta: "from Kraken!",
+			delta: "from Tuvren!",
 		});
 		applyReplayEvent(transcript, {
 			type: "MESSAGE_END",

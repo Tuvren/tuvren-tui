@@ -73,7 +73,7 @@ function resolveAuxPackage(packageName: string, libName: string): string | undef
 }
 
 /**
- * Detect whether the resolver is running from a checked-out Tuvren/Kraken workspace.
+ * Detect whether the resolver is running from a checked-out Tuvren workspace.
  *
  * A workspace checkout is proven by the presence of native/Cargo.toml as a sibling
  * directory (packageRoot/../native/Cargo.toml). The package.json check is omitted —

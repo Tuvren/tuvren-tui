@@ -504,9 +504,9 @@ describe("FFI integration", () => {
 	describe("content", () => {
 		test("set and get ASCII content", () => {
 			const h = ffi.tui_create_node(1);
-			expect(setContent(h, "Hello, Kraken!")).toBe(0);
+			expect(setContent(h, "Hello, Tuvren!")).toBe(0);
 			expect(ffi.tui_get_content_len(h)).toBe(14);
-			expect(getContent(h)).toBe("Hello, Kraken!");
+			expect(getContent(h)).toBe("Hello, Tuvren!");
 			ffi.tui_destroy_node(h);
 		});
 
