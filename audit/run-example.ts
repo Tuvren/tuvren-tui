@@ -7,6 +7,7 @@
  * Usage: bun run audit/run-example.ts <example-path> [cols] [rows]
  */
 
+import { resolve, isAbsolute } from "path";
 import { ptr } from "bun:ffi";
 import { Tuvren } from "../ts/src/app";
 import { ffi } from "../ts/src/ffi";
@@ -24,7 +25,6 @@ if (!rawPath) {
 }
 
 // Resolve relative paths against CWD, not this script's directory.
-import { resolve, isAbsolute } from "path";
 const examplePath = isAbsolute(rawPath) ? rawPath : resolve(process.cwd(), rawPath);
 
 let activeApp: Tuvren | null = null;

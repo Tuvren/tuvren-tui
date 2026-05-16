@@ -85,6 +85,10 @@ jobs:
           echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
 
       - name: Build native library
+        # Always uses --target (artifacts land in native/target/<triple>/release/).
+        # Unlike ci.yml's cross-platform-smoke job (which omits --target on native targets
+        # so resolveSourceBuildPath() finds the artifact at native/target/release/),
+        # the release workflow handles path derivation itself via the matrix.target variable.
         run: cargo build --manifest-path native/Cargo.toml --release --target ${{ matrix.target }}
 
       - name: Determine version tag

@@ -30,6 +30,10 @@ try {
 	if (shutdown !== 0) throw new Error("tui_shutdown failed: " + shutdown);
 
 	console.log("Native library load smoke: PASS");
+} catch (e) {
+	console.error("Native library load smoke: FAIL");
+	console.error(e);
+	process.exit(1);
 } finally {
 	lib?.close();
 }
