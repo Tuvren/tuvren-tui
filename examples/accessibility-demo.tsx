@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Accessibility Demo (TASK-M5)
+ * Tuvren TUI — Accessibility Demo (TASK-M5)
  *
  * Demonstrates the accessibility foundation (ADR-T23):
  * - Role annotations on widgets

@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — System Monitor Showcase
+ * Tuvren TUI — System Monitor Showcase
  *
  * A real system monitoring dashboard reading live data from /proc.
  * Demonstrates all 10 widget types in a practical, information-dense layout.
@@ -382,7 +382,7 @@ const headerBar = new Box({
 });
 headerBar.setHeight(1);
 
-const titleText = new Text({ content: " kraken-monitor ", bold: true, fg: pal.accent });
+const titleText = new Text({ content: " tuvren-monitor ", bold: true, fg: pal.accent });
 titleText.setWidth(18);
 titleText.setHeight(1);
 
@@ -820,7 +820,7 @@ helpOverlay.setDismissOnEscape(true);
 
 const helpContent = new Text({
 	content: [
-		"# Kraken System Monitor",
+		"# Tuvren System Monitor",
 		"",
 		"**Keyboard Shortcuts:**",
 		"",
@@ -833,7 +833,7 @@ const helpContent = new Text({
 		"  `/`       Focus filter",
 		"  `Esc`     Close / Quit",
 		"",
-		"*Built with Kraken TUI*",
+		"*Built with Tuvren TUI*",
 	].join("\n"),
 	format: "markdown",
 	fg: pal.fg,

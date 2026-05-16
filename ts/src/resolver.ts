@@ -106,11 +106,15 @@ export function resolveLibraryPath(): string {
 
 	// 1. Environment override
 	const envPath = process.env.TUVREN_LIB_PATH;
-	if (envPath) {
-		if (existsSync(envPath)) {
+	if (envPath !== undefined) {
+		if (envPath && existsSync(envPath)) {
 			return envPath;
 		}
-		searchPaths.push(`${envPath} (TUVREN_LIB_PATH — not found)`);
+		searchPaths.push(
+			envPath
+				? `${envPath} (TUVREN_LIB_PATH — not found)`
+				: "(TUVREN_LIB_PATH set to empty string — ignored)",
+		);
 	}
 
 	// 2. Auxiliary scoped native package

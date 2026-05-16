@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Agent Console (TASK-L1)
+ * Tuvren TUI — Agent Console (TASK-L1)
  *
  * Flagship example demonstrating transcript streaming, tool-call traces,
  * split panes, command palette, and dev-mode inspection.

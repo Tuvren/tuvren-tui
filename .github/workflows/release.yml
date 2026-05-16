@@ -134,6 +134,9 @@ jobs:
 
           echo "artifact=${artifact}" >> $env:GITHUB_ENV
 
+      # Scaffolding for Epic Q npm publish: assembles the binary into the aux-package directory
+      # so a future `npm publish packages/@tuvren/...` step can pick it up. The assembled
+      # payload is not attached to the GitHub Release or published anywhere in this workflow.
       - name: Prepare auxiliary native package payload (Unix)
         if: matrix.platform != 'win32'
         shell: bash

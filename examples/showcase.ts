@@ -1,5 +1,5 @@
 /**
- * Kraken TUI - v2 Capability Showcase
+ * Tuvren TUI - v2 Capability Showcase
  *
  * Representative sample of the current project surface:
  * - JSX + signal-driven reconciler
@@ -524,17 +524,17 @@ const tree = jsxs("Box", {
   gap: 1,
   bg: rootBackground,
   role: "region",
-  "aria-label": "Kraken v2 capability showcase",
+  "aria-label": "Tuvren v2 capability showcase",
   children: [
     jsx("Text", {
       key: "header",
       content:
-        "# Kraken TUI v2 Showcase\n\nSignals + JSX + native FFI engine in one interactive sample.",
+        "# Tuvren TUI v2 Showcase\n\nSignals + JSX + native FFI engine in one interactive sample.",
       format: "markdown",
       fg: accentColor,
       height: 4,
       role: "heading",
-      "aria-label": "Kraken showcase title",
+      "aria-label": "Tuvren showcase title",
     }),
     jsxs("Box", {
       key: "main",

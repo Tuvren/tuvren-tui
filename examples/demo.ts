@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Interactive Demo
+ * Tuvren TUI — Interactive Demo
  *
  * Demonstrates all five widget types (Box, Text, Input, Select, ScrollBox)
  * in a single interactive terminal application.
@@ -42,7 +42,7 @@ const root = new Box({
 // ── 1. Markdown header ─────────────────────────────────────────────────
 
 const header = new Text({
-	content: "# Kraken TUI Demo\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
+	content: "# Tuvren TUI Demo\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
 	format: "markdown",
 	fg: "cyan",
 });

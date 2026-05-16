@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Ops/Log Console (TASK-L2)
+ * Tuvren TUI — Ops/Log Console (TASK-L2)
  *
  * Flagship example demonstrating continuous log streaming with follow mode,
  * structured log filtering, and dev overlays.

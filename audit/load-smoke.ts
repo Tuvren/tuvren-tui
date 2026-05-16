@@ -13,6 +13,9 @@ import { resolveSourceBuildPath } from "../ts/src/resolver";
 import { dlopen } from "bun:ffi";
 
 const libPath = resolveSourceBuildPath();
+// Intentionally minimal: only two symbols to verify the binary loads and can
+// round-trip through FFI. Routing through ts/src/ffi.ts would validate all
+// 100+ symbols and make the smoke depend on the full symbol surface.
 const lib = dlopen(libPath, {
 	tui_init_headless: { args: ["u16", "u16"], returns: "i32" },
 	tui_shutdown: { args: [], returns: "i32" },

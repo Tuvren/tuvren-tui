@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Repo Inspector (TASK-L4)
+ * Tuvren TUI — Repo Inspector (TASK-L4)
  *
  * Flagship post-MVP example demonstrating file tree navigation,
  * syntax-highlighted code viewing, diff comparison, and command palette.

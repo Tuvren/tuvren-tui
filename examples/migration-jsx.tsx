@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — JSX Migration Demo (TASK-L6)
+ * Tuvren TUI — JSX Migration Demo (TASK-L6)
  *
  * This is the demo.ts example rewritten using the v2 JSX reconciler.
  * Demonstrates: JSX composition, signal-driven state, createLoop,
@@ -108,7 +108,7 @@ const tree = jsxs("Box", {
 		// Header
 		jsx("Text", {
 			key: "header",
-			content: "# Kraken TUI Demo (JSX)\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
+			content: "# Tuvren TUI Demo (JSX)\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
 			format: "markdown",
 			fg: headerColor,
 			width: "100%",
