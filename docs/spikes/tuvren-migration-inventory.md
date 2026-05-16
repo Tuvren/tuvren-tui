@@ -111,7 +111,7 @@ Each package carries a single shared library. The public package references all 
 |------|-----------|----------------------|
 | 1 | `KRAKEN_LIB_PATH` env override | `TUVREN_LIB_PATH` env override |
 | 2 | `ts/prebuilds/<platform>-<arch>/<libName>` (staged prebuild) | Resolve `@tuvren/tuvren-tui-<platform>-<arch>` by package name and derive `<libName>` from the resolved package root |
-| 3 | `native/target/release/<libName>` (always) | `native/target/release/<libName>` only in repo checkouts (proven by presence of both `ts/package.json` and `native/Cargo.toml` at the expected relative paths) |
+| 3 | `native/target/release/<libName>` (always) | `native/target/release/<libName>` only in repo checkouts (proven by `native/Cargo.toml` existing at `packageRoot/../native/Cargo.toml`; the `ts/package.json` check was dropped as it always exists when the resolver loads and provides no discrimination signal) |
 | 4 | Diagnostic error | Diagnostic error with new Tuvren naming |
 
 The staged `ts/prebuilds/` path is removed from the default resolver order as part of the package topology migration.
@@ -161,5 +161,5 @@ The `tui_*` ABI prefix is explicitly preserved by ADR-T42 and is not part of the
 - **Musl runtime detection fallback**: If Bun's `libc` optional-dependency filtering cannot be confirmed for the deployed Bun version, the resolver must add an explicit musl detection gate. This is validated in PROD-P005.
 - **npm registry publishing**: The CI workflow scaffolding for publishing auxiliary packages (PROD-P004) prepares the package manifests and workflow steps, but actual publishing requires the `@tuvren` npm organization and a publish token in GitHub Actions secrets.
 - **Aux-package resolver smoke test**: The cross-platform smoke gate (PROD-P006) validates the source-build path of the resolver. The auxiliary-package branch (`resolveAuxPackage` + `import.meta.resolve`) is not covered by the current smoke matrix because it requires a published or locally staged `@tuvren/*` package. A proper integration test for step 2 of the resolver is deferred until the first actual npm publish cycle; the unit behavior of `fileURLToPath` + `existsSync` is verified at the module level.
-- **User-visible Kraken strings in examples**: Example file titles, ARIA labels, and markdown headings (e.g., "# Kraken TUI Demo") are deferred to Epic Q (ADOPT-Q001/Q002) since they are part of the onboarding narrative refresh, not the code rename.
+- **User-visible Kraken strings in examples**: ~~Deferred to Epic Q~~ — completed in Epic P. All example titles, ARIA labels, markdown headings, and docstrings across `examples/*.{ts,tsx}` and `examples/AGENTS.md` now use Tuvren naming. Only historical and changelog references to "Kraken" remain in `docs/Tasks.md` and the migration inventory itself, which are intentionally kept for continuity context.
 - **`linux-arm64` load smoke**: The cross-platform CI gate cross-compiles `linux-arm64` on an x64 runner and therefore cannot run a native headless `dlopen` smoke. Upgrading this to a full load smoke requires a native arm64 CI runner and is tracked as a future gate upgrade.

@@ -130,7 +130,8 @@ export function resolveLibraryPath(): string {
 	}
 
 	// 3. Source build fallback — repo checkouts only
-	if (isRepoCheckout(packageRoot)) {
+	const repoCheckout = isRepoCheckout(packageRoot);
+	if (repoCheckout) {
 		const sourceBuildPath = resolve(packageRoot, "..", "native", "target", "release", libName);
 		searchPaths.push(sourceBuildPath);
 		if (existsSync(sourceBuildPath)) {
@@ -141,7 +142,7 @@ export function resolveLibraryPath(): string {
 	}
 
 	// 4. Failure with diagnostics
-	throw new Error(formatLoadError(platform, arch, searchPaths));
+	throw new Error(formatLoadError(platform, arch, searchPaths, { repoCheckout }));
 }
 
 /**

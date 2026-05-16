@@ -14,6 +14,7 @@ export function formatLoadError(
 	platform: string,
 	arch: string,
 	searchPaths: string[],
+	options?: { repoCheckout?: boolean },
 ): string {
 	const lines: string[] = [
 		`Failed to load tuvren-tui native library for ${platform}-${arch}.`,
@@ -42,8 +43,12 @@ export function formatLoadError(
 		);
 	}
 
+	if (options?.repoCheckout) {
+		lines.push(
+			"  - To build from source: cargo build --manifest-path native/Cargo.toml --release",
+		);
+	}
 	lines.push(
-		"  - To build from source: cargo build --manifest-path native/Cargo.toml --release",
 		"  - To override the library path: set TUVREN_LIB_PATH=/path/to/libtuvren_tui.{so,dylib,dll}",
 		"  - To download a prebuilt binary: see the GitHub Releases page for your platform asset.",
 	);

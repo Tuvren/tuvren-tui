@@ -124,9 +124,11 @@ describe("formatLoadError", () => {
 		expect(msg).toContain("Visual C++");
 	});
 
-	test("always includes source build instruction", () => {
-		const msg = formatLoadError("linux", "x64", []);
-		expect(msg).toContain("cargo build --manifest-path native/Cargo.toml --release");
+	test("includes source build instruction only when repoCheckout is true", () => {
+		const repoMsg = formatLoadError("linux", "x64", [], { repoCheckout: true });
+		expect(repoMsg).toContain("cargo build --manifest-path native/Cargo.toml --release");
+		const publishedMsg = formatLoadError("linux", "x64", []);
+		expect(publishedMsg).not.toContain("cargo build");
 	});
 
 	test("always includes TUVREN_LIB_PATH override instruction", () => {
