@@ -35,8 +35,8 @@
 | FFI mechanism | `bun:ffi` | built-in | Preserve the direct native-library loading path rather than adding an alternate bridge. |
 | Reactivity | `@preact/signals-core` | `^1.8.0` | Preserve the lightweight JSX/signals path without promoting it to the primary lifecycle model. |
 | Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` dependency belongs to the optional declarative subpath rather than the main surface. |
-| Public package contract | current Brownfield: `kraken-tui`; approved target-state: `tuvren-tui` | `ts/package.json`, source tree, approved roadmap | Execute a hard public rename in the productization wave while keeping one public package as the user-facing contract. |
-| Optional declarative subpath | current Brownfield: `kraken-tui/effect` stub; approved target-state: `tuvren-tui/effect` | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
+| Public package contract | `tuvren-tui` (Epic P shipped the rename from `kraken-tui`) | `ts/package.json`, source tree | One public package as the user-facing contract; the hard rename is complete. |
+| Optional declarative subpath | `tuvren-tui/effect` stub (Epic P shipped the rename from `kraken-tui/effect`) | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
 | Native package topology | current Brownfield: GitHub assets and manual staging; approved target-state: auxiliary scoped platform packages | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the new organization, while keeping `tuvren-tui` as the only public package. |
 
 ### 1.3 Build, Test, and Release Artifacts
@@ -44,25 +44,25 @@
 | Artifact | Format | Source of Truth |
 | --- | --- | --- |
 | Native Core | Shared library (`.so`, `.dylib`, `.dll`) | `native/target/release/` for source builds; versioned GitHub release assets for published native binaries |
-| Host Package | ESM TypeScript package (`kraken-tui` today, `tuvren-tui` after Epic P) | `ts/package.json`, `ts/src/` |
-| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries | approved target-state under the next productization wave |
-| Release Artifacts | Versioned platform builds with `.sha256` sidecars; current Brownfield names use `kraken-tui-*`, approved target-state uses `tuvren-tui-*` | `.github/workflows/release.yml` plus the approved migration contract in §4.3 |
+| Host Package | ESM TypeScript package (`tuvren-tui`, Epic P shipped the rename) | `ts/package.json`, `ts/src/` |
+| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries (`@tuvren/tuvren-tui-*`); stubs committed, publish follows in Epic Q | `packages/@tuvren/` |
+| Release Artifacts | Versioned platform builds with `.sha256` sidecars named `tuvren-tui-*` (Epic P renamed from `kraken-tui-*`) | `.github/workflows/release.yml` |
 | Flagship Examples | Bun entrypoints | `examples/agent-console.ts`, `examples/ops-log-console.ts`, `examples/repo-inspector.ts` |
 | Replay Fixtures | JSON fixtures and headless assertions | `examples/fixtures/`, `ts/test-examples.test.ts` |
 
 ### 1.4 Release and Distribution Matrix
 
-| Platform | Architecture | Current Brownfield release asset | Approved target release asset | Approved auxiliary native package |
-| --- | --- | --- | --- | --- |
-| Linux | x64 | `kraken-tui-<tag>-linux-x64.so` | `tuvren-tui-<tag>-linux-x64.so` | `@tuvren/tuvren-tui-linux-x64` |
-| Linux | arm64 | `kraken-tui-<tag>-linux-arm64.so` | `tuvren-tui-<tag>-linux-arm64.so` | `@tuvren/tuvren-tui-linux-arm64` |
-| macOS | arm64 | `kraken-tui-<tag>-darwin-arm64.dylib` | `tuvren-tui-<tag>-darwin-arm64.dylib` | `@tuvren/tuvren-tui-darwin-arm64` |
-| macOS | x64 | `kraken-tui-<tag>-darwin-x64.dylib` | `tuvren-tui-<tag>-darwin-x64.dylib` | `@tuvren/tuvren-tui-darwin-x64` |
-| Windows | x64 | `kraken-tui-<tag>-win32-x64.dll` | `tuvren-tui-<tag>-win32-x64.dll` | `@tuvren/tuvren-tui-win32-x64` |
+| Platform | Architecture | Release asset | Auxiliary native package |
+| --- | --- | --- | --- |
+| Linux | x64 | `tuvren-tui-<tag>-linux-x64.so` | `@tuvren/tuvren-tui-linux-x64` |
+| Linux | arm64 | `tuvren-tui-<tag>-linux-arm64.so` | `@tuvren/tuvren-tui-linux-arm64` |
+| macOS | arm64 | `tuvren-tui-<tag>-darwin-arm64.dylib` | `@tuvren/tuvren-tui-darwin-arm64` |
+| macOS | x64 | `tuvren-tui-<tag>-darwin-x64.dylib` | `@tuvren/tuvren-tui-darwin-x64` |
+| Windows | x64 | `tuvren-tui-<tag>-win32-x64.dll` | `@tuvren/tuvren-tui-win32-x64` |
 
-The repo-owned release workflow currently publishes **versioned GitHub release assets** with SHA-256 sidecars and relies on the public package resolver to search `KRAKEN_LIB_PATH`, staged `ts/prebuilds/...`, and the local Cargo build. It still does **not** populate `ts/prebuilds/` on its own; any staged-prebuild layout is a packaging or manual install step above the current repo-owned release workflow. The approved target-state replaces that public install story with one public package (`tuvren-tui`) that consumes auxiliary scoped native packages published under the new organization. Here "auxiliary" means they are not the documented direct install target; it does not imply a private-registry-only topology. Standalone release assets may still be published for provenance and manual acquisition, but after Epic P they are no longer part of the automatic resolver path unless a caller points `TUVREN_LIB_PATH` at them. Source-build fallback remains valid for repo-side development and verification.
+The repo-owned release workflow publishes **versioned GitHub release assets** with SHA-256 sidecars. The resolver searches `TUVREN_LIB_PATH`, then the auxiliary scoped native package, then the local Cargo build (repo-checkout only). Standalone release assets are available for manual acquisition via `TUVREN_LIB_PATH`; they are not part of the automatic resolver path. Source-build fallback remains valid for repo-side development and verification. npm publish of auxiliary packages follows in Epic Q.
 
-Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Because the active package-manager contract is Bun-first and Bun's documented package-manager guarantees currently cover `os`/`cpu` filtering and optional-dependency behavior rather than verified `libc` filtering, Epic P must validate a supported enforcement strategy that prevents musl-based systems such as Alpine from silently loading an incompatible `.so`. Candidate mechanisms include package metadata, installer behavior, or an explicit diagnostic fallback; until that validation lands, musl-targeted packages remain out of scope and unsupported installs must fail clearly rather than assume libc filtering is enforced.
+Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"libc": ["glibc"]` in each Linux aux `package.json` causes Bun ≥1.1 to filter them on musl hosts, so Alpine Linux installs will not silently load an incompatible `.so`. musl-targeted packages remain out of scope; unsupported installs fail with a clear diagnostic.
 
 ## 2. Architecture Decision Records (ADRs)
 ### 2.1 Active Inherited Decisions
@@ -141,7 +141,7 @@ Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Be
 
 ### ADR-T42 Public Product and Package Naming Move to Tuvren
 - **Status:** accepted
-- **Context:** The current Brownfield source tree and release workflow still use the Kraken name across the public package, host facade, resolver environment variable, native crate/library names, and release asset names. The approved next wave moves the repo into a new organization and reintroduces the public product as Tuvren before `1.0`.
+- **Context:** The Brownfield source tree and release workflow used the Kraken name across the public package, host facade, resolver environment variable, native crate/library names, and release asset names. Epic P executed the hard cut to Tuvren before `1.0`.
 - **Decision:** Execute a hard pre-`1.0` rename of the public surface from Kraken to Tuvren. The approved target-state uses `tuvren-tui` as the public package, `Tuvren` as the primary host facade, `TUVREN_LIB_PATH` as the resolver override, `tuvren_tui` as the native crate name, platform-correct shared-library names (`libtuvren_tui.so` / `libtuvren_tui.dylib` on Unix-like systems and `tuvren_tui.dll` on Windows), and `tuvren-tui-*` release artifact names. The C ABI prefix remains `tui_*` to avoid gratuitous ABI churn.
 - **Consequences:** Productization, install guidance, and diagnostics become consistent with the new organization and public identity, but the repo must treat the rename as first-wave release work rather than as a cosmetic follow-up. Because the rename is a hard cut, long-lived compatibility aliases are intentionally not part of the contract.
 
@@ -168,8 +168,8 @@ Approved Linux auxiliary packages remain glibc-targeted in this roadmap wave. Be
 - This v7 artifact is therefore intentionally present-tense and canonical rather than future-tense and phase-only.
 - ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.4 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
 - ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
-- The current public source still exports `Kraken` from `kraken-tui`, resolves native libraries through `KRAKEN_LIB_PATH`, and names release assets and staged prebuilds after Kraken. ADR-T42 records the approved hard-cut rename to Tuvren, but that rename is future work until the first productization wave lands.
-- `kraken-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
+- ADR-T42 is now shipped under Epic P. The source tree exports `Tuvren` from `tuvren-tui`, resolves native libraries through `TUVREN_LIB_PATH`, and names release assets after Tuvren. The staged-prebuild path is removed; the resolver now searches TUVREN_LIB_PATH → aux scoped package → source build (repo-checkout only).
+- `tuvren-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
 
 ## 3. State & Data Modeling
 ### 3.1 Native UI State Model
@@ -533,8 +533,8 @@ conventions:
 ### 4.2 Host Language Library API
 - **Style:** Library API
 - **Authentication / Authorization:** Not applicable
-- **Compatibility Strategy:** The host layer remains a thin wrapper over the C ABI plus a small set of higher-level composites. Developer-facing string IDs are resolved in the host layer and are not part of the native ABI. The current Brownfield source exports `Kraken` from `kraken-tui`; the approved next wave performs a hard rename to `Tuvren` from `tuvren-tui` while preserving the same imperative lifecycle model.
-- **Error model:** FFI failures surface as host-language errors through `checkResult()` and the exported app error type (`KrakenError` in Brownfield source, `TuvrenError` after the approved hard cut).
+- **Compatibility Strategy:** The host layer remains a thin wrapper over the C ABI plus a small set of higher-level composites. Developer-facing string IDs are resolved in the host layer and are not part of the native ABI. The source exports `Tuvren` from `tuvren-tui` (Epic P shipped the rename from `Kraken`/`kraken-tui`), preserving the same imperative lifecycle model.
+- **Error model:** FFI failures surface as host-language errors through `checkResult()` and the exported app error type (`TuvrenError`).
 
 ```ts
 interface TerminalCapabilities {
@@ -568,7 +568,7 @@ interface TerminalInfo {
   kittyKeyboardEnabled: boolean;
 }
 
-class Kraken {
+class Tuvren {
   getCapabilities(): TerminalCapabilities;
   getTerminalInfo(): TerminalInfo;
   writeClipboard(text: string, target?: "clipboard" | "primary"): boolean;
@@ -604,7 +604,7 @@ class TranscriptView extends Widget {
 
 ```ts
 interface DevSessionOptions {
-  createApp: () => Promise<{ app: Kraken; root: Widget }>;
+  createApp: () => Promise<{ app: Tuvren; root: Widget }>;
   overlay?: Array<"bounds" | "focus" | "dirty" | "anchors" | "perf">;
   traceSignals?: boolean;
   watch?: string[];
@@ -613,37 +613,29 @@ interface DevSessionOptions {
 function createDevSession(options: DevSessionOptions): Promise<void>;
 ```
 
-Brownfield note: the current source tree still exports `Kraken`, `KrakenError`, and a stub `kraken-tui/effect` path, so the concrete API examples above stay in Kraken-era naming until Epic P lands. The approved next-wave contract then renames that public surface to `Tuvren`, `TuvrenError`, and `tuvren-tui/effect` without changing the Native Core ownership model or introducing React/Solid parity work.
+Epic P shipped the rename: the source tree now exports `Tuvren`, `TuvrenError`, and a stub `tuvren-tui/effect` path. The API examples above reflect current Brownfield reality. The Native Core ownership model and the no-React/Solid-parity constraint are unchanged.
 
 ### 4.3 Install / Resolver Contract
 - **Style:** Runtime artifact-resolution contract
 - **Authentication / Authorization:** Not applicable
-- **Compatibility Strategy:** Resolver search order is deterministic and platform-aware so both published installs and source-built workflows remain valid. Brownfield source still searches the Kraken-era staged-prebuild path; the approved target-state preserves deterministic resolution but replaces the public install story with one public package and auxiliary scoped native packages under the Tuvren organization.
-- **Error model:** Missing-artifact failures include searched paths and platform-specific remediation guidance. The approved hard cut replaces `KRAKEN_LIB_PATH` with `TUVREN_LIB_PATH`; no long-lived alias is planned.
+- **Compatibility Strategy:** Resolver search order is deterministic and platform-aware so both published installs and source-built workflows remain valid. Epic P shipped the new resolver: `TUVREN_LIB_PATH` → auxiliary scoped native package → source build (repo-checkout only) → diagnostic error. The Kraken-era staged-prebuild path (`ts/prebuilds/`) is removed.
+- **Error model:** Missing-artifact failures include searched paths and platform-specific remediation guidance. `TUVREN_LIB_PATH` is the override env var; no `KRAKEN_LIB_PATH` compatibility alias exists.
 
 ```yaml
 current_brownfield:
-  resolver_search_order:
-    - KRAKEN_LIB_PATH
-    - ts/prebuilds/<platform>-<arch>/<libName>
-    - native/target/release/<libName>
-    - diagnostic_error
-approved_target_state:
   resolver_search_order:
     - TUVREN_LIB_PATH
     - resolve @tuvren/tuvren-tui-<platform>-<arch> by package name for the current platform and derive <libName> from the resolved package root
     - when_repo_checkout: native/target/release/<libName>
     - diagnostic_error
 notes:
-  - "Current Brownfield source publishes versioned GitHub native assets and optionally stages them into ts/prebuilds/<platform>-<arch>/<libName>."
-  - "Approved target-state publishes one public package, tuvren-tui, that consumes auxiliary scoped native packages under the new organization."
-  - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are no longer a first-class automatic resolver search path after Epic P."
-  - "Target-state resolver order is TUVREN_LIB_PATH first, then the auxiliary scoped native package for the current platform, then the local Cargo build only when running from a repo checkout or repo-side verification harness, and finally an explicit diagnostic failure."
+  - "Epic P shipped the resolver rewrite. Kraken-era KRAKEN_LIB_PATH and ts/prebuilds/ search paths are removed."
+  - "One public package, tuvren-tui, consumes auxiliary scoped native packages under the Tuvren organization. npm publish of those packages follows in Epic Q."
+  - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are not a first-class automatic resolver search path."
   - "Resolver lookup must be package-manager-layout agnostic: resolve the auxiliary package by name first, then derive the shared-library path from the resolved package root rather than assuming a nested node_modules filesystem layout."
-  - "Repo-checkout fallback is authorized only when the resolver can prove it was loaded from a checked-out Kraken/Tuvren workspace rooted at an ancestor that contains both the repo-owned host sources and native build metadata (`ts/package.json` plus `native/Cargo.toml`); published consumer installs and arbitrary linked directories must not probe native/target/release opportunistically."
+  - "Repo-checkout fallback is authorized only when the resolver can prove it was loaded from a Tuvren workspace (native/Cargo.toml sibling of the ts/ package root); published consumer installs and arbitrary linked directories must not probe native/target/release opportunistically."
   - "If the public package uses platform-native optional dependencies, the install contract must explicitly tolerate npm clients omitting them and surface the missing-native case through the documented diagnostic path."
   - "Repo-side verification that dlopen's directly must still validate the local Cargo-built artifact rather than a stale packaged binary."
-  - "No long-lived KRAKEN_LIB_PATH compatibility alias is planned after the Tuvren hard cut."
 release_assets:
   - versioned_native_artifact
   - sha256_sidecar

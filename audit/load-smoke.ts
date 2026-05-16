@@ -21,11 +21,14 @@ const lib = dlopen(libPath, {
 	tui_shutdown: { args: [], returns: "i32" },
 });
 
-const init = lib.symbols.tui_init_headless(80, 24);
-if (init !== 0) throw new Error("tui_init_headless failed: " + init);
+try {
+	const init = lib.symbols.tui_init_headless(80, 24);
+	if (init !== 0) throw new Error("tui_init_headless failed: " + init);
 
-const shutdown = lib.symbols.tui_shutdown();
-if (shutdown !== 0) throw new Error("tui_shutdown failed: " + shutdown);
+	const shutdown = lib.symbols.tui_shutdown();
+	if (shutdown !== 0) throw new Error("tui_shutdown failed: " + shutdown);
 
-lib.close();
-console.log("Native library load smoke: PASS");
+	console.log("Native library load smoke: PASS");
+} finally {
+	lib.close();
+}
