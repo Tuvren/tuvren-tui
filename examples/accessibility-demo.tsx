@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Accessibility Demo (TASK-M5)
+ * Tuvren TUI — Accessibility Demo (TASK-M5)
  *
  * Demonstrates the accessibility foundation (ADR-T23):
  * - Role annotations on widgets
@@ -17,7 +17,7 @@
  */
 
 import {
-	Kraken,
+	Tuvren,
 	signal,
 	render,
 	createLoop,
@@ -25,7 +25,7 @@ import {
 	AccessibilityRole,
 } from "../ts/src/index";
 import { jsx, jsxs } from "../ts/src/jsx/jsx-runtime";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 
 // ── State ─────────────────────────────────────────────────────────────
 
@@ -143,12 +143,12 @@ function App() {
 
 // ── Main ──────────────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const instance = render(App() as any, app);
 
 const loop = createLoop({
 	app,
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "key" && event.keyCode === KeyCode.Escape) {
 			loop.stop();
 		}

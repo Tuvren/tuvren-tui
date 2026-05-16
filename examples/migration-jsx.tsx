@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — JSX Migration Demo (TASK-L6)
+ * Tuvren TUI — JSX Migration Demo (TASK-L6)
  *
  * This is the demo.ts example rewritten using the v2 JSX reconciler.
  * Demonstrates: JSX composition, signal-driven state, createLoop,
@@ -17,14 +17,14 @@
  */
 
 import {
-	Kraken,
+	Tuvren,
 	signal,
 	render,
 	createLoop,
 	KeyCode,
 } from "../ts/src/index";
 import { jsx, jsxs } from "../ts/src/jsx/jsx-runtime";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 import type { Widget } from "../ts/src/widget";
 import { ffi } from "../ts/src/ffi";
 
@@ -108,7 +108,7 @@ const tree = jsxs("Box", {
 		// Header
 		jsx("Text", {
 			key: "header",
-			content: "# Kraken TUI Demo (JSX)\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
+			content: "# Tuvren TUI Demo (JSX)\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
 			format: "markdown",
 			fg: headerColor,
 			width: "100%",
@@ -199,7 +199,7 @@ const tree = jsxs("Box", {
 
 // ── Mount and run ────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const root = render(tree, app);
 
 // Set initial focus
@@ -224,7 +224,7 @@ function getInputValue(handle: number): string {
 
 const loop = createLoop({
 	app,
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "key" && event.keyCode === KeyCode.Escape) {
 			loop.stop();
 			return;

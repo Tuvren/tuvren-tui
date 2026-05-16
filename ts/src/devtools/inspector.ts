@@ -4,7 +4,7 @@
  * ADR-T34: Dev Mode Is Core Product Work
  */
 
-import type { Kraken } from "../app";
+import type { Tuvren } from "../app";
 
 /** Widget node as returned by the native snapshot (snake_case keys match JSON). */
 export interface WidgetNode {
@@ -46,7 +46,7 @@ export interface DebugSnapshot {
 }
 
 export class WidgetInspector {
-	constructor(private app: Kraken) {}
+	constructor(private app: Tuvren) {}
 
 	/** Fetch the current debug snapshot from native (parsed from JSON). */
 	fetchSnapshot(): DebugSnapshot {

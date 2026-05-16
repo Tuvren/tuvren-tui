@@ -27,7 +27,7 @@ bun run examples/<example>.ts
 
 1. Rust owns mutable UI state. TypeScript controls via handles/FFI.
 2. Handle `0` is invalid/sentinel.
-3. `Kraken.init()` must be called before creating any widgets or themes.
+3. `Tuvren.init()` must be called before creating any widgets or themes.
 4. Always call `app.shutdown()` on exit.
 
 ## Lessons Learned
@@ -52,7 +52,7 @@ bun run examples/<example>.ts
 
 ## Construction Pattern
 
-1. `const app = Kraken.init()`
+1. `const app = Tuvren.init()`
 2. Create custom themes and normalize defaults
 3. Build widget tree (imperative or JSX with signals)
 4. `app.setRoot(root)` or `render(tree, app)`

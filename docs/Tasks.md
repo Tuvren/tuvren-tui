@@ -1,6 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
+- v7.7.0 - Marked Epic P shipped after the full hard-cut Tuvren rename landed: package name, host facade, error type, native crate and library names, resolver env var, auxiliary scoped native package topology, release workflow, cross-platform CI smoke gate, and all bench, test, and example surfaces updated. Epic Q is now the only active wave.
 - v7.6.0 - Activated the first post-Epic-O roadmap wave: Epic P covers the hard-cut Tuvren rename plus packaging and release trust, Epic Q covers adoption and framework positioning, and future framework expansion is staged as commands/keymaps, Effect, and then deferred plugin-slot work.
 - v7.5.1 - Marked Epic O shipped after terminal capability state, multiplexer-aware degraded policy, Kitty keyboard disambiguation negotiation, OSC52 write-only clipboard, OSC8 link spans, and host diagnostics landed with native and Bun coverage.
 - v7.5.0 - Framed Epic O as the next work-ready wave, sequenced terminal capability hardening behind a protocol/multiplexer spike, and moved completed Epic N work into archived continuity.
@@ -8,8 +9,8 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Active Critical Path
-- **Total Active Story Points:** 41
-- **Critical Path:** `PROD-P001 -> PROD-P002 -> PROD-P003 -> PROD-P004 -> PROD-P005 -> PROD-P006 -> ADOPT-Q001 -> ADOPT-Q002`, with `ADOPT-Q003` closing in parallel after `ADOPT-Q001`. The active wave is complete only when both adoption closeout paths land after the release-trust gate.
+- **Total Active Story Points:** 12
+- **Critical Path:** `ADOPT-Q001 -> ADOPT-Q002`, with `ADOPT-Q003` closing in parallel after `ADOPT-Q001`. Epic P is shipped; the active wave is complete only when both adoption closeout paths land.
 - **Planning Assumptions:**
   - Epic M, Epic N, and Epic O are shipped; the current Brownfield source already includes the native text substrate, transcript and split-pane semantics, devtools, and terminal-capability hardening.
   - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
@@ -20,11 +21,6 @@
 
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
-#### Epic P — Tuvren Identity, Packaging, and Release Migration
-- Execute the hard public rename from Kraken to Tuvren across package names, host facade names, native artifact naming, diagnostics, release workflow outputs, and the repository and package ownership move into the new organization.
-- Replace the current staged-prebuild public install story with one public package backed by auxiliary scoped native packages under the new organization.
-- Raise release trust by tightening resolver behavior, smoke verification, and migration diagnostics around the new naming and packaging contract.
-
 #### Epic Q — Adoption and Framework Positioning
 - Rewrite onboarding and public messaging so the product reads as a general-purpose terminal framework rather than as a narrow specialist library.
 - Preserve agentic and transcript-heavy applications as the flagship showcase and proving ground rather than the sole public story.
@@ -51,6 +47,7 @@
 - No clipboard read support, Kitty graphics, sixel, inline image protocols, or advanced MIME clipboard work in the active wave.
 
 ### Archived or Already Completed Scope
+- Epic P (Tuvren Identity, Packaging, and Release Migration) delivered `PROD-P001` through `PROD-P006`: migration inventory spike, full TypeScript hard-cut rename (`kraken-tui` → `tuvren-tui`, `Kraken` → `Tuvren`, `KrakenError` → `TuvrenError`, `KrakenEvent` → `TuvrenEvent`), native crate rename (`tuvren_tui`), resolver update (`TUVREN_LIB_PATH`, aux-package topology, repo-checkout probe), auxiliary scoped native package stubs for all five supported targets, release workflow update, cross-platform smoke CI gate (Gate 9), and all bench/test/example surface updates.
 - Epic O (Terminal Capability Hardening) delivered `CORE-O0` through `CORE-O7`: protocol and multiplexer spike, capability state and query APIs, degraded multiplexer policy, Kitty keyboard disambiguation, write-only OSC52 clipboard writes, OSC8 hyperlink emission, runtime color and pixel reporting, and coverage/docs closeout.
 - Epic N (Substrate Surface Rebase) delivered `CORE-N0` through `CORE-N7`: contract sync, dirty-range expansion, substrate-backed text rendering, native `EditBuffer`, `TextArea` rebase, the substrate benchmark gate, transcript substrate migration, and post-substrate coverage/posture updates.
 - Epic M (Native Text Substrate) delivered `CORE-M0` through `CORE-M4`: the substrate contract memo, native `TextBuffer`, native `TextView`, the unified text renderer, and the §5.4.1 Unicode/wrapping native gate suite.
@@ -61,12 +58,12 @@
 ```mermaid
 flowchart LR
     O[Epic O Terminal Capability Hardening - SHIPPED]:::done
-    P1[PROD-P001]:::active
-    P2[PROD-P002]:::active
-    P3[PROD-P003]:::active
-    P4[PROD-P004]:::active
-    P5[PROD-P005]:::active
-    P6[PROD-P006]:::active
+    P1[PROD-P001 - SHIPPED]:::done
+    P2[PROD-P002 - SHIPPED]:::done
+    P3[PROD-P003 - SHIPPED]:::done
+    P4[PROD-P004 - SHIPPED]:::done
+    P5[PROD-P005 - SHIPPED]:::done
+    P6[PROD-P006 - SHIPPED]:::done
     Q1[ADOPT-Q001]:::active
     Q2[ADOPT-Q002]:::active
     Q3[ADOPT-Q003]:::active
@@ -89,8 +86,8 @@ flowchart LR
     R --> S
     S --> T
 
-    class O done;
-    class P1,P2,P3,P4,P5,P6,Q1,Q2,Q3 active;
+    class O,P1,P2,P3,P4,P5,P6 done;
+    class Q1,Q2,Q3 active;
     class R,S,T future;
     classDef done fill:#dff5dd,stroke:#3f9d3f,color:#1f4d1f;
     classDef active fill:#fff4d6,stroke:#d39b14,color:#5c4100;
@@ -251,22 +248,28 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 
 ## 5. Ticket Summary Table
 
-### 5.1 Active Epic P and Q Summary
+### 5.1 Active Epic Q Summary
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
-| PROD-P001 | P | Spike | 3 | Epic O shipped | Active |
-| PROD-P002 | P | Feature | 5 | PROD-P001 | Active |
-| PROD-P003 | P | Feature | 8 | PROD-P002 | Active |
-| PROD-P004 | P | Feature | 5 | PROD-P003 | Active |
-| PROD-P005 | P | Feature | 5 | PROD-P002, PROD-P003, PROD-P004 | Active |
-| PROD-P006 | P | Chore | 3 | PROD-P005 | Active |
 | ADOPT-Q001 | Q | Chore | 5 | PROD-P002, PROD-P003, PROD-P005, PROD-P006 | Active |
 | ADOPT-Q002 | Q | Feature | 5 | ADOPT-Q001 | Active |
 | ADOPT-Q003 | Q | Chore | 2 | ADOPT-Q001, PROD-P005 | Active |
-|  |  | **TOTAL** | **41** |  |  |
+|  |  | **TOTAL** | **12** |  |  |
 
-### 5.2 Archived Epic O Summary
+### 5.2 Archived Epic P Summary
+
+| ID | Epic | Type | SP | Dependencies | Phase |
+| --- | --- | --- | --- | --- | --- |
+| PROD-P001 | P | Spike | 3 | Epic O shipped | Done |
+| PROD-P002 | P | Feature | 5 | PROD-P001 | Done |
+| PROD-P003 | P | Feature | 8 | PROD-P002 | Done |
+| PROD-P004 | P | Feature | 5 | PROD-P003 | Done |
+| PROD-P005 | P | Feature | 5 | PROD-P002, PROD-P003, PROD-P004 | Done |
+| PROD-P006 | P | Chore | 3 | PROD-P005 | Done |
+|  |  | **TOTAL** | **29** |  |  |
+
+### 5.3 Archived Epic O Summary
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
@@ -280,7 +283,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | CORE-O7 | O | Chore | 3 | CORE-O3, CORE-O4, CORE-O5, CORE-O6 | Done |
 |  |  | **TOTAL** | **37** |  |  |
 
-### 5.3 Archived Epic N Summary
+### 5.4 Archived Epic N Summary
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
@@ -294,7 +297,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | CORE-N7 | N | Chore | 2 | N2, N4, N6 | Done |
 |  |  | **TOTAL** | **38** |  |  |
 
-### 5.4 Archived Epic M Summary
+### 5.5 Archived Epic M Summary
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
@@ -307,7 +310,19 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 
 ## 6. Archived Continuity Summary
 
-### 6.1 Archived v7 Docs-Maintenance Wave
+### 6.1 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
+
+| ID | Type | SP | Status | Outcome |
+| --- | --- | --- | --- | --- |
+| PROD-P001 | Spike | 3 | Done | Committed migration inventory at `docs/spikes/tuvren-migration-inventory.md` enumerating every Kraken-era public name and release touchpoint. |
+| PROD-P002 | Feature | 5 | Done | Hard-cut TypeScript rename: `kraken-tui` → `tuvren-tui`, `Kraken` → `Tuvren`, `KrakenError` → `TuvrenError`, `KrakenEvent` → `TuvrenEvent`, `KrakenFragment` → `TuvrenFragment`. `jsxImportSource` updated. All examples, tests, and bench harnesses updated. |
+| PROD-P003 | Feature | 8 | Done | Native crate renamed to `tuvren_tui` (produces `libtuvren_tui.so/.dylib`/`tuvren_tui.dll`). `KRAKEN_LIB_PATH` → `TUVREN_LIB_PATH`. `KRAKEN_AUDIT_*` env vars → `TUVREN_AUDIT_*`. Resolver, diagnostics, and install tests updated. All bench files updated. |
+| PROD-P004 | Feature | 5 | Done | Auxiliary scoped native packages created under `packages/@tuvren/tuvren-tui-<platform>-<arch>/` for all five targets. `tuvren-tui` `optionalDependencies` wired. Release workflow updated to produce and upload auxiliary package payloads. |
+| PROD-P005 | Feature | 5 | Done | Resolver rewritten for new 4-step order: `TUVREN_LIB_PATH` → aux-package via `import.meta.resolve()` → Cargo source build (repo-checkout only via `isRepoCheckout()`) → diagnostic error. Staged-prebuild path removed. |
+| PROD-P006 | Chore | 3 | Done | Cross-platform smoke CI job added (Gate 9): matrix of all 5 targets, runs install + headless dlopen smoke. `GatePolicy.md` updated to v3.0 with Gate 9 and Section 7 cross-platform notes. |
+|  |  | **29** |  |  |
+
+### 6.2 Archived v7 Docs-Maintenance Wave
 
 | ID | Type | SP | Status | Outcome |
 | --- | --- | --- | --- | --- |
@@ -316,7 +331,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | DOCS-A003 | Chore | 3 | Done | Reconciled the rewritten docs against source, tests, examples, and workflows. |
 |  |  | **8** |  |  |
 
-### 6.2 Archived v6 Delivery Wave
+### 6.3 Archived v6 Delivery Wave
 - **Total Archived Story Points:** 85
 - **Archived Critical Path:** `TASK-I0 -> TASK-I1 -> TASK-I2 -> TASK-I3 -> TASK-I4 -> TASK-I5 -> TASK-J0 -> TASK-J1 -> TASK-J2 -> TASK-J3 -> TASK-J4 -> TASK-L1 -> TASK-L3`
 - **Delivered outcomes preserved for continuity:** native transcript and anchor semantics, replay and benchmark gates, devtools APIs and inspector surfaces, native split-pane behavior, host composites (`CommandPalette`, `TracePanel`, `StructuredLogView`, `CodeView`, `DiffView`), and flagship examples (`agent-console`, `ops-log-console`, `repo-inspector`).

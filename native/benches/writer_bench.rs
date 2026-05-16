@@ -4,8 +4,8 @@
 //! densities: full (100%), medium (50%), and sparse (10%).
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use kraken_tui::writer::workloads::{full_diff, medium_diff, sparse_diff};
-use kraken_tui::writer::{baseline_metrics, compact_runs, emit_frame, WriterState};
+use tuvren_tui::writer::workloads::{full_diff, medium_diff, sparse_diff};
+use tuvren_tui::writer::{baseline_metrics, compact_runs, emit_frame, WriterState};
 
 fn bench_compact_runs(c: &mut Criterion) {
     let full = full_diff();

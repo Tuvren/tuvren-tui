@@ -10,18 +10,18 @@
  */
 
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
-import { Kraken } from "./src/app";
+import { Tuvren } from "./src/app";
 import type { RunOptions } from "./src/app";
 import { createLoop } from "./src/loop";
 import { Box } from "./src/widgets/box";
-import type { KrakenEvent } from "./src/events";
+import type { TuvrenEvent } from "./src/events";
 
 // ── Lifecycle ────────────────────────────────────────────────────────────────
 
-let app: Kraken;
+let app: Tuvren;
 
 beforeEach(() => {
-	app = Kraken.initHeadless(80, 24);
+	app = Tuvren.initHeadless(80, 24);
 	const root = new Box();
 	app.setRoot(root);
 });
@@ -97,7 +97,7 @@ describe("Runner API (TASK-C1)", () => {
 	});
 
 	test("onEvent callback fires for drained events", async () => {
-		const events: KrakenEvent[] = [];
+		const events: TuvrenEvent[] = [];
 
 		// In headless mode, readInput returns 0 events, so onEvent won't fire.
 		// This test verifies the callback plumbing doesn't throw.

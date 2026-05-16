@@ -1,23 +1,23 @@
 /**
- * Error handling — KrakenError + error code mapping.
+ * Error handling — TuvrenError + error code mapping.
  */
 
 import { ffi } from "./ffi";
 import { CString } from "bun:ffi";
 
-export class KrakenError extends Error {
+export class TuvrenError extends Error {
 	public readonly code: number;
 
 	constructor(message: string, code: number) {
 		super(message);
-		this.name = "KrakenError";
+		this.name = "TuvrenError";
 		this.code = code;
 	}
 }
 
 /**
  * Check a return code from an FFI call.
- * Throws KrakenError on failure (-1 or -2).
+ * Throws TuvrenError on failure (-1 or -2).
  */
 export function checkResult(code: number, context?: string): void {
 	if (code >= 0) return;
@@ -39,5 +39,5 @@ export function checkResult(code: number, context?: string): void {
 		message = `${context}: ${message}`;
 	}
 
-	throw new KrakenError(message, code);
+	throw new TuvrenError(message, code);
 }

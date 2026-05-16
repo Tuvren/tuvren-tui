@@ -9,8 +9,8 @@
 //! - Buffer diff throughput
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use kraken_tui::types::{Buffer, Cell, CellAttrs, CellUpdate};
-use kraken_tui::writer;
+use tuvren_tui::types::{Buffer, Cell, CellAttrs, CellUpdate};
+use tuvren_tui::writer;
 
 /// Create a synthetic diff workload of N changed cells.
 fn synthetic_diff(width: u16, height: u16, density_pct: u32) -> Vec<CellUpdate> {

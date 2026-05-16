@@ -1,0 +1,13 @@
+{
+  "name": "@tuvren/tuvren-tui-darwin-arm64",
+  "version": "0.1.0",
+  "description": "Native library for tuvren-tui (macOS, arm64). Binary-only package — consumed by path derivation, not by require/import.",
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "files": [
+    "libtuvren_tui.dylib",
+    "package.json"
+  ],
+  "license": "Apache-2.0",
+  "engines": { "bun": ">=1.1" }
+}

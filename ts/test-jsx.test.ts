@@ -21,8 +21,8 @@ import { jsx, jsxs, Fragment } from "./src/jsx/jsx-runtime";
 import { render, mount, unmount, reconcileChildren, getEventHandlers } from "./src/jsx/reconciler";
 import { dispatchToJsxHandlers } from "./src/loop";
 import type { VNode, Instance } from "./src/jsx/types";
-import type { Kraken } from "./src/app";
-import type { KrakenEvent } from "./src/events";
+import type { Tuvren } from "./src/app";
+import type { TuvrenEvent } from "./src/events";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -57,16 +57,16 @@ function getLayout(handle: number): { x: number; y: number; w: number; h: number
 }
 
 /**
- * Minimal mock Kraken for render() — only needs setRoot().
+ * Minimal mock Tuvren for render() — only needs setRoot().
  */
-function createMockApp(): Kraken & { rootHandle: number } {
+function createMockApp(): Tuvren & { rootHandle: number } {
 	const mock = {
 		rootHandle: 0,
 		setRoot(widget: { handle: number }) {
 			mock.rootHandle = widget.handle;
 			ffi.tui_set_root(widget.handle);
 		},
-	} as unknown as Kraken & { rootHandle: number };
+	} as unknown as Tuvren & { rootHandle: number };
 	return mock;
 }
 
@@ -752,7 +752,7 @@ describe("unmount", () => {
 
 describe("event handler props", () => {
 	test("onSubmit handler registered in event registry", () => {
-		const handler = (_e: KrakenEvent) => {};
+		const handler = (_e: TuvrenEvent) => {};
 		const vnode = jsx("Input", { onSubmit: handler });
 		const instance = mount(vnode, null);
 		const handle = instance.widget.handle;
@@ -765,8 +765,8 @@ describe("event handler props", () => {
 	});
 
 	test("multiple event handlers registered", () => {
-		const h1 = (_e: KrakenEvent) => {};
-		const h2 = (_e: KrakenEvent) => {};
+		const h1 = (_e: TuvrenEvent) => {};
+		const h2 = (_e: TuvrenEvent) => {};
 		const vnode = jsx("Select", { onChange: h1, onSubmit: h2 });
 		const instance = mount(vnode, null);
 		const handle = instance.widget.handle;
@@ -779,13 +779,13 @@ describe("event handler props", () => {
 	});
 
 	test("dispatchToJsxHandlers calls matching handler", () => {
-		let received: KrakenEvent | null = null;
-		const handler = (e: KrakenEvent) => { received = e; };
+		let received: TuvrenEvent | null = null;
+		const handler = (e: TuvrenEvent) => { received = e; };
 		const vnode = jsx("Input", { onSubmit: handler });
 		const instance = mount(vnode, null);
 		const handle = instance.widget.handle;
 
-		const event: KrakenEvent = { type: "submit", target: handle };
+		const event: TuvrenEvent = { type: "submit", target: handle };
 		dispatchToJsxHandlers(event);
 
 		expect(received).toBeTruthy();
@@ -797,13 +797,13 @@ describe("event handler props", () => {
 
 	test("dispatchToJsxHandlers ignores unmatched event types", () => {
 		let called = false;
-		const handler = (_e: KrakenEvent) => { called = true; };
+		const handler = (_e: TuvrenEvent) => { called = true; };
 		const vnode = jsx("Input", { onSubmit: handler });
 		const instance = mount(vnode, null);
 		const handle = instance.widget.handle;
 
 		// Send a "change" event — no onChange handler registered
-		const event: KrakenEvent = { type: "change", target: handle };
+		const event: TuvrenEvent = { type: "change", target: handle };
 		dispatchToJsxHandlers(event);
 
 		expect(called).toBe(false);
@@ -812,13 +812,13 @@ describe("event handler props", () => {
 	});
 
 	test("dispatchToJsxHandlers ignores unknown targets", () => {
-		const event: KrakenEvent = { type: "submit", target: 99999 };
+		const event: TuvrenEvent = { type: "submit", target: 99999 };
 		// Should not throw
 		dispatchToJsxHandlers(event);
 	});
 
 	test("event handlers cleared on unmount", () => {
-		const handler = (_e: KrakenEvent) => {};
+		const handler = (_e: TuvrenEvent) => {};
 		const vnode = jsx("Input", { onSubmit: handler });
 		const instance = mount(vnode, null);
 		const handle = instance.widget.handle;

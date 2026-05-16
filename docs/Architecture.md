@@ -32,9 +32,9 @@
 | **Productization as architecture work** | Distribution, install trust, onboarding, and release verification are treated as architecture-governed workstreams rather than afterthought chores. | A competitive framework needs a trustworthy delivery shape, not only a strong engine. |
 
 ### 1.4 Brownfield Transition Note
-- **Approved future public product name:** `Tuvren`
-- **Current source-tree reality:** The repo, package names, examples, and release workflow still carry `Kraken` naming today.
-- **Architectural interpretation:** The logical design is governed by the future public framework direction, while downstream implementation artifacts must continue to distinguish current Brownfield naming from approved target-state naming until the rename wave lands.
+- **Public product name:** `Tuvren` (Epic P shipped the hard-cut rename)
+- **Current source-tree reality:** The repo, package names, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P.
+- **Architectural interpretation:** The logical design is governed by the public framework direction. Downstream artifacts must distinguish current Brownfield naming from approved future-state naming where the two still differ.
 
 ## 2. System Containers
 ### 2.1 Native Core
@@ -296,4 +296,4 @@ sequenceDiagram
 
 ### Risk 9 - Hard-Cut Rename and Productization Work Can Fracture Delivery
 - **Why it matters:** The move from Kraken to Tuvren, combined with package and release-contract changes, creates a real chance of shipping a stronger architecture behind a weaker public install story if the cutover is partial or incoherent.
-- **Mitigation or follow-up:** Make rename, package topology, release automation, diagnostics, and onboarding part of the same productization wave rather than scattering them across unrelated technical chores.
+- **Mitigation or follow-up:** Make rename, package topology, release automation, diagnostics, and onboarding part of the same productization wave rather than scattering them across unrelated technical chores. Epic P shipped the rename; npm publish and full onboarding follow in Epic Q.

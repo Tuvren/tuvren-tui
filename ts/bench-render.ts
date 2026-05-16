@@ -57,7 +57,7 @@ function report(name: string, value: number, unit: string, target?: number): voi
 
 // ── Setup ──────────────────────────────────────────────────────────────────
 
-console.log("=== Kraken TUI — Host-Side Render Benchmarks ===\n");
+console.log("=== Tuvren TUI — Host-Side Render Benchmarks ===\n");
 
 const initResult = ffi.tui_init_headless(80, 24);
 if (initResult !== 0) {

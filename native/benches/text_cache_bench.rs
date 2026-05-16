@@ -3,8 +3,8 @@
 //! Measures parse throughput with and without caching, and eviction pressure.
 
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use kraken_tui::text_cache;
-use kraken_tui::types::{CellAttrs, ContentFormat, StyledSpan, TextCache, TextCacheKey};
+use tuvren_tui::text_cache;
+use tuvren_tui::types::{CellAttrs, ContentFormat, StyledSpan, TextCache, TextCacheKey};
 
 fn make_spans(text: &str) -> Vec<StyledSpan> {
     vec![StyledSpan {

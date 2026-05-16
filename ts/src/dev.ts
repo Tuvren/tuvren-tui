@@ -6,7 +6,7 @@
  * Usage:
  *   await createDevSession({
  *     createApp: async () => {
- *       const app = Kraken.initHeadless(80, 24);
+ *       const app = Tuvren.initHeadless(80, 24);
  *       const root = app.createNode(NodeType.Box);
  *       return { app, root };
  *     },
@@ -18,7 +18,7 @@
  * This module does not implement in-process code hot-swapping.
  */
 
-import type { Kraken } from "./app";
+import type { Tuvren } from "./app";
 import type { Widget } from "./widget";
 
 /** Overlay flag bits (TechSpec §4.3.3, types::overlay_flags). */
@@ -44,7 +44,7 @@ export type OverlayName = "bounds" | "focus" | "dirty" | "anchors" | "perf";
 /** Options for createDevSession (TechSpec §4.7). */
 export interface DevSessionOptions {
 	/** Factory that creates the app and root widget for this session. */
-	createApp: () => Promise<{ app: Kraken; root: Widget }>;
+	createApp: () => Promise<{ app: Tuvren; root: Widget }>;
 	/** Overlay types to enable. */
 	overlay?: OverlayName[];
 	/** If true, enable all trace flags and log trace summaries to stderr. */
@@ -67,7 +67,7 @@ export async function createDevSession(
 	// Convert overlay array to bitmask
 	const overlayFlags = overlayNamesToFlags(overlay ?? []);
 
-	let app: Kraken | undefined;
+	let app: Tuvren | undefined;
 
 	// SIGINT handler: ensure clean shutdown
 	const sigintHandler = () => {

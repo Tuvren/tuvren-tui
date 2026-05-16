@@ -1,5 +1,5 @@
 /**
- * JSX type definitions for Kraken TUI (ADR-T20).
+ * JSX type definitions for Tuvren TUI (ADR-T20).
  *
  * Defines the VNode representation, component function signature,
  * and JSX.IntrinsicElements mapping for all widget types.
@@ -7,7 +7,7 @@
 
 import type { Signal } from "@preact/signals-core";
 import type { Widget } from "../widget";
-import type { KrakenEvent } from "../events";
+import type { TuvrenEvent } from "../events";
 
 // ---------------------------------------------------------------------------
 // Prop value types — static or signal-wrapped
@@ -26,7 +26,7 @@ export type ContentFormat = "plain" | "markdown" | "code";
 // Event handler types
 // ---------------------------------------------------------------------------
 
-export type EventHandler = (event: KrakenEvent) => void;
+export type EventHandler = (event: TuvrenEvent) => void;
 
 export interface EventHandlerProps {
 	onKey?: EventHandler;

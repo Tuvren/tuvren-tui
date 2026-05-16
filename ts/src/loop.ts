@@ -1,19 +1,19 @@
 /**
- * Animation-aware async event loop for Kraken TUI (TechSpec §5.7).
+ * Animation-aware async event loop for Tuvren TUI (TechSpec §5.7).
  *
  * When animations are active: non-blocking input + ~60fps rendering.
  * When idle: blocks on input (saves CPU).
  */
 
-import type { Kraken } from "./app";
-import type { KrakenEvent } from "./events";
+import type { Tuvren } from "./app";
+import type { TuvrenEvent } from "./events";
 import { getEventHandlers } from "./jsx/reconciler";
 
 export interface LoopOptions {
-	/** The Kraken application instance. */
-	app: Kraken;
+	/** The Tuvren application instance. */
+	app: Tuvren;
 	/** Called for each event during drain. Fires before JSX handler dispatch. */
-	onEvent?: (event: KrakenEvent) => void;
+	onEvent?: (event: TuvrenEvent) => void;
 	/** Called each tick after events are drained, before render. */
 	onTick?: () => void;
 	/** FPS target when animating. Default: 60. */
@@ -50,7 +50,7 @@ const EVENT_TYPE_TO_PROP: Record<string, string> = {
  * Dispatch an event to JSX event handler props registered on the target widget.
  * Exported for users running custom event loops outside of createLoop.
  */
-export function dispatchToJsxHandlers(event: KrakenEvent): void {
+export function dispatchToJsxHandlers(event: TuvrenEvent): void {
 	const handlers = getEventHandlers(event.target);
 	if (!handlers) return;
 	const propName = EVENT_TYPE_TO_PROP[event.type];
@@ -80,8 +80,8 @@ export function createLoop(options: LoopOptions): Loop {
 		// Audit mode: run a small deterministic number of ticks and exit, so
 		// examples can populate replay/log state headlessly without requiring a
 		// real event loop or input source.
-		if (process.env.KRAKEN_AUDIT_RENDER_ONCE === "1") {
-			const rawAuditTicks = Number.parseInt(process.env.KRAKEN_AUDIT_TICKS ?? "6", 10);
+		if (process.env.TUVREN_AUDIT_RENDER_ONCE === "1") {
+			const rawAuditTicks = Number.parseInt(process.env.TUVREN_AUDIT_TICKS ?? "6", 10);
 			const auditTicks = Number.isFinite(rawAuditTicks) && rawAuditTicks > 0 ? rawAuditTicks : 6;
 			for (let tick = 0; tick < auditTicks; tick++) {
 				for (const event of app.drainEvents()) {

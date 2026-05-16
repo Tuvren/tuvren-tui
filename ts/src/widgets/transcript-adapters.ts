@@ -1,7 +1,7 @@
 import type { TranscriptView } from "./transcript";
 
 /**
- * Kraken-native replay event types for transcript streaming.
+ * Tuvren-native replay event types for transcript streaming.
  * These represent the standard event protocol for streaming conversational
  * content into a TranscriptView.
  */

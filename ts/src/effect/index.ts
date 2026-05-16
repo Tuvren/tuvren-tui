@@ -1,16 +1,16 @@
 /**
- * Optional Effect integration for Kraken TUI (ADR-T20).
+ * Optional Effect integration for Tuvren TUI (ADR-T20, ADR-T45).
  *
  * Provides adapter skeletons for mapping widget lifecycles to Effect Scope
  * and input buffers to Effect Stream.
  *
- * This is the optional `kraken-tui/effect` subpath export.
+ * This is the optional `tuvren-tui/effect` subpath export.
  * Full Effect integration is deferred — these are typed stubs
  * documenting the intended API surface.
  */
 
 import type { Instance } from "../jsx/types";
-import type { KrakenEvent } from "../events";
+import type { TuvrenEvent } from "../events";
 
 /**
  * ScopeAdapter — maps a widget Instance lifecycle to an Effect Scope.
@@ -28,7 +28,7 @@ export interface ScopeAdapter {
 }
 
 /**
- * StreamAdapter — maps the Kraken event drain to an Effect Stream.
+ * StreamAdapter — maps the Tuvren event drain to an Effect Stream.
  *
  * Intended usage (when Effect is integrated):
  * ```ts
@@ -37,8 +37,8 @@ export interface ScopeAdapter {
  * ```
  */
 export interface StreamAdapter {
-	/** Create an Effect Stream from the Kraken event loop. */
-	fromEvents(drainFn: () => KrakenEvent[]): unknown;
+	/** Create an Effect Stream from the Tuvren event loop. */
+	fromEvents(drainFn: () => TuvrenEvent[]): unknown;
 }
 
 /**

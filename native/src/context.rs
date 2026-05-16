@@ -88,7 +88,7 @@ pub struct TuiContext {
     pub frame_seq: u64,
 }
 
-// SAFETY: ADR-T16 preserves Kraken TUI's single-threaded execution model.
+// SAFETY: ADR-T16 preserves Tuvren TUI's single-threaded execution model.
 // The lock is used for aliasing safety at the FFI boundary, not to introduce
 // concurrent access. We never intentionally share mutable context access across
 // threads in production code paths.
@@ -179,7 +179,7 @@ impl TuiContext {
 
     pub fn debug_log(&self, msg: &str) {
         if self.debug_mode {
-            eprintln!("[kraken-tui] {msg}");
+            eprintln!("[tuvren-tui] {msg}");
         }
     }
 

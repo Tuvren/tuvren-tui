@@ -12,7 +12,7 @@ import { describe, test, expect, beforeEach, afterEach, mock } from "bun:test";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 import * as publicIndex from "./src/index";
-import { Kraken } from "./src/app";
+import { Tuvren } from "./src/app";
 import { Box } from "./src/widgets/box";
 import { TranscriptView } from "./src/widgets/transcript";
 import { SplitPane } from "./src/widgets/splitpane";
@@ -59,10 +59,10 @@ const ACTUAL_INDEX = { ...publicIndex };
 
 // ── Lifecycle ────────────────────────────────────────────────────────
 
-let app: Kraken;
+let app: Tuvren;
 
 beforeEach(() => {
-	app = Kraken.initHeadless(120, 40);
+	app = Tuvren.initHeadless(120, 40);
 });
 
 afterEach(() => {
@@ -125,13 +125,13 @@ async function importExampleWithMockedIndex(
 
 	const factory = () => ({
 		...actualIndex,
-		Kraken: {
-			...actualIndex.Kraken,
+		Tuvren: {
+			...actualIndex.Tuvren,
 			init: () => {
 				app.shutdown = () => {};
 				return app;
 			},
-			initHeadless: actualIndex.Kraken.initHeadless,
+			initHeadless: actualIndex.Tuvren.initHeadless,
 		},
 		List: RecordedList,
 		CommandPalette: RecordedCommandPalette,
@@ -254,7 +254,7 @@ describe("Agent Console Replay (TASK-L3)", () => {
 		applyReplayEvent(transcript, {
 			type: "MESSAGE_CHUNK",
 			messageId: "test-msg",
-			delta: "from Kraken!",
+			delta: "from Tuvren!",
 		});
 		applyReplayEvent(transcript, {
 			type: "MESSAGE_END",

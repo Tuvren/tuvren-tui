@@ -7,8 +7,8 @@
 
 import { ffi } from "./ffi";
 import { CString, ptr } from "bun:ffi";
-import { checkResult, KrakenError } from "./errors";
-import { readInput, drainEvents, type KrakenEvent } from "./events";
+import { checkResult, TuvrenError } from "./errors";
+import { readInput, drainEvents, type TuvrenEvent } from "./events";
 import { dispatchToJsxHandlers, PERF_ACTIVE_ANIMATIONS } from "./loop";
 import { Widget } from "./widget";
 import type { Theme } from "./theme";
@@ -22,7 +22,7 @@ export interface RunOptions {
 	/** Input poll timeout (ms) when idle in onChange mode. Default: 100. */
 	idleTimeout?: number;
 	/** Called for each drained event. */
-	onEvent?: (event: KrakenEvent) => void;
+	onEvent?: (event: TuvrenEvent) => void;
 	/** Called each tick after events are drained, before render. */
 	onTick?: () => void;
 	/** Enable debug overlay (wires setDebug). */
@@ -173,7 +173,7 @@ function terminalInfoRetrySize(message: string, currentSize: number): number | u
 	return nextSize;
 }
 
-export class Kraken {
+export class Tuvren {
 	private idMap: Map<string, number> = new Map();
 	private _running = false;
 
@@ -182,20 +182,20 @@ export class Kraken {
 	/**
 	 * Initialize the TUI system. Enters alternate screen, raw mode, mouse capture.
 	 */
-	static init(): Kraken {
+	static init(): Tuvren {
 		const result = ffi.tui_init();
-		checkResult(result, "Kraken.init");
-		return new Kraken();
+		checkResult(result, "Tuvren.init");
+		return new Tuvren();
 	}
 
 	/**
 	 * Initialize the TUI system in headless mode (no terminal needed).
 	 * Useful for testing.
 	 */
-	static initHeadless(width: number, height: number): Kraken {
+	static initHeadless(width: number, height: number): Tuvren {
 		const result = ffi.tui_init_headless(width, height);
-		checkResult(result, "Kraken.initHeadless");
-		return new Kraken();
+		checkResult(result, "Tuvren.initHeadless");
+		return new Tuvren();
 	}
 
 	/**
@@ -224,7 +224,7 @@ export class Kraken {
 	/**
 	 * Drain all buffered events.
 	 */
-	drainEvents(): KrakenEvent[] {
+	drainEvents(): TuvrenEvent[] {
 		return drainEvents();
 	}
 
@@ -291,9 +291,9 @@ export class Kraken {
 				size = retrySize;
 				continue;
 			}
-			throw new KrakenError(`getTerminalInfo: ${message}`, written);
+			throw new TuvrenError(`getTerminalInfo: ${message}`, written);
 		}
-		throw new KrakenError("getTerminalInfo: terminal info buffer retry exhausted", -1);
+		throw new TuvrenError("getTerminalInfo: terminal info buffer retry exhausted", -1);
 	}
 
 	writeClipboard(text: string, target: "clipboard" | "primary" = "clipboard"): boolean {

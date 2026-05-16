@@ -1,0 +1,14 @@
+{
+  "name": "@tuvren/tuvren-tui-linux-arm64",
+  "version": "0.1.0",
+  "description": "Native library for tuvren-tui (linux, arm64, glibc). Binary-only package — consumed by path derivation, not by require/import.",
+  "os": ["linux"],
+  "cpu": ["arm64"],
+  "libc": ["glibc"],
+  "files": [
+    "libtuvren_tui.so",
+    "package.json"
+  ],
+  "license": "Apache-2.0",
+  "engines": { "bun": ">=1.1" }
+}

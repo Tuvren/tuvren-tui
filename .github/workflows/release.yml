@@ -45,7 +45,7 @@ jobs:
             lib_prefix: lib
             strip: strip
           - target: x86_64-apple-darwin
-            os: macos-latest
+            os: macos-13
             platform: darwin
             arch: x64
             ext: dylib
@@ -85,6 +85,10 @@ jobs:
           echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
 
       - name: Build native library
+        # Always uses --target (artifacts land in native/target/<triple>/release/).
+        # Unlike ci.yml's cross-platform-smoke job (which omits --target on native targets
+        # so resolveSourceBuildPath() finds the artifact at native/target/release/),
+        # the release workflow handles path derivation itself via the matrix.target variable.
         run: cargo build --manifest-path native/Cargo.toml --release --target ${{ matrix.target }}
 
       - name: Determine version tag
@@ -104,8 +108,8 @@ jobs:
         if: matrix.platform != 'win32'
         shell: bash
         run: |
-          SRC="native/target/${{ matrix.target }}/release/${{ matrix.lib_prefix }}kraken_tui.${{ matrix.ext }}"
-          ARTIFACT="kraken-tui-${{ steps.version.outputs.tag }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}"
+          SRC="native/target/${{ matrix.target }}/release/${{ matrix.lib_prefix }}tuvren_tui.${{ matrix.ext }}"
+          ARTIFACT="tuvren-tui-${{ steps.version.outputs.tag }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}"
 
           cp "$SRC" "$ARTIFACT"
 
@@ -123,8 +127,8 @@ jobs:
         if: matrix.platform == 'win32'
         shell: pwsh
         run: |
-          $src = "native/target/${{ matrix.target }}/release/kraken_tui.${{ matrix.ext }}"
-          $artifact = "kraken-tui-${{ steps.version.outputs.tag }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}"
+          $src = "native/target/${{ matrix.target }}/release/tuvren_tui.${{ matrix.ext }}"
+          $artifact = "tuvren-tui-${{ steps.version.outputs.tag }}-${{ matrix.platform }}-${{ matrix.arch }}.${{ matrix.ext }}"
 
           Copy-Item $src $artifact
 
@@ -134,13 +138,38 @@ jobs:
 
           echo "artifact=${artifact}" >> $env:GITHUB_ENV
 
+      # Scaffolding for Epic Q npm publish: assembles the binary into the aux-package directory
+      # so a future `npm publish packages/@tuvren/...` step can pick it up. The assembled
+      # payload is not attached to the GitHub Release or published anywhere in this workflow.
+      - name: Prepare auxiliary native package payload (Unix)
+        if: matrix.platform != 'win32'
+        shell: bash
+        run: |
+          PKG_DIR="packages/@tuvren/tuvren-tui-${{ matrix.platform }}-${{ matrix.arch }}"
+          LIB_NAME="${{ matrix.lib_prefix }}tuvren_tui.${{ matrix.ext }}"
+          mkdir -p "$PKG_DIR"
+          cp "native/target/${{ matrix.target }}/release/${LIB_NAME}" "$PKG_DIR/${LIB_NAME}"
+          if [ -n "${{ matrix.strip }}" ]; then
+            ${{ matrix.strip }} "$PKG_DIR/${LIB_NAME}" 2>/dev/null || true
+          fi
+
+      - name: Prepare auxiliary native package payload (Windows)
+        if: matrix.platform == 'win32'
+        shell: pwsh
+        run: |
+          $pkgDir = "packages/@tuvren/tuvren-tui-${{ matrix.platform }}-${{ matrix.arch }}"
+          $libName = "tuvren_tui.${{ matrix.ext }}"
+          New-Item -ItemType Directory -Force -Path $pkgDir
+          Copy-Item "native/target/${{ matrix.target }}/release/$libName" "$pkgDir/$libName"
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kraken-tui-${{ matrix.platform }}-${{ matrix.arch }}
+          name: tuvren-tui-${{ matrix.platform }}-${{ matrix.arch }}
           path: |
-            kraken-tui-*.${{ matrix.ext }}
-            kraken-tui-*.${{ matrix.ext }}.sha256
+            tuvren-tui-*.${{ matrix.ext }}
+            tuvren-tui-*.${{ matrix.ext }}.sha256
+            packages/@tuvren/tuvren-tui-${{ matrix.platform }}-${{ matrix.arch }}/
 
   release:
     needs: build
@@ -169,20 +198,33 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: Kraken TUI ${{ steps.version.outputs.tag }}
+          name: Tuvren TUI ${{ steps.version.outputs.tag }}
           body: |
             ## Prebuilt Artifacts
 
             | Platform | Architecture | File |
             |----------|-------------|------|
-            | Linux | x64 | `kraken-tui-${{ steps.version.outputs.tag }}-linux-x64.so` |
-            | Linux | arm64 | `kraken-tui-${{ steps.version.outputs.tag }}-linux-arm64.so` |
-            | macOS | arm64 | `kraken-tui-${{ steps.version.outputs.tag }}-darwin-arm64.dylib` |
-            | macOS | x64 | `kraken-tui-${{ steps.version.outputs.tag }}-darwin-x64.dylib` |
-            | Windows | x64 | `kraken-tui-${{ steps.version.outputs.tag }}-win32-x64.dll` |
+            | Linux | x64 | `tuvren-tui-${{ steps.version.outputs.tag }}-linux-x64.so` |
+            | Linux | arm64 | `tuvren-tui-${{ steps.version.outputs.tag }}-linux-arm64.so` |
+            | macOS | arm64 | `tuvren-tui-${{ steps.version.outputs.tag }}-darwin-arm64.dylib` |
+            | macOS | x64 | `tuvren-tui-${{ steps.version.outputs.tag }}-darwin-x64.dylib` |
+            | Windows | x64 | `tuvren-tui-${{ steps.version.outputs.tag }}-win32-x64.dll` |
 
             Each artifact has a `.sha256` checksum sidecar for integrity verification.
+
+            ## Manual Install
+
+            Until `tuvren-tui` is published to the npm registry, use the prebuilt artifact
+            directly by downloading the `.so`/`.dylib`/`.dll` for your platform above and
+            pointing the resolver at it:
+
+            ```sh
+            export TUVREN_LIB_PATH=/path/to/libtuvren_tui.so   # adjust name per platform
+            ```
+
+            npm publish support and the `bun add tuvren-tui` install path will follow in a
+            subsequent release once org registry access is in place (Epic Q).
           files: |
-            kraken-tui-*
+            tuvren-tui-*
           draft: false
           prerelease: false

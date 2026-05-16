@@ -30,9 +30,9 @@
 | **v4** | Declarative and extensibility expansion | Effect-based declarative integration begins after the remaining v3 command/keymap wave, and post-v1 plugin-slot exploration only follows once those foundations stabilize |
 
 ### 1.3 Brownfield Transition Note
-- **Approved future public name:** `Tuvren`
-- **Current source-tree reality:** The repo, packages, examples, and release workflow still use `Kraken` / `kraken-tui` naming today.
-- **Planning rule:** This PRD governs the future public product direction. Downstream artifacts must keep the current Brownfield naming explicit anywhere implementation reality still differs until the productization wave executes the rename.
+- **Public name:** `Tuvren` / `tuvren-tui` (Epic P shipped the hard-cut rename)
+- **Current source-tree reality:** The repo, packages, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P.
+- **Planning rule:** This PRD governs the future public product direction. Downstream artifacts must keep the current Brownfield naming explicit anywhere implementation reality still differs.
 
 ## 2. Ubiquitous Language (Glossary)
 | Term | Definition | Do Not Use |

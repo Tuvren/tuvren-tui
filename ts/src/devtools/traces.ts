@@ -4,7 +4,7 @@
  * ADR-T34: Dev Mode Is Core Product Work
  */
 
-import type { Kraken } from "../app";
+import type { Tuvren } from "../app";
 
 /** Trace kind discriminants (TechSpec §4.3.3). */
 export const TRACE_KIND = {
@@ -24,7 +24,7 @@ export interface TraceEntry {
 }
 
 export class TraceViewer {
-	constructor(private app: Kraken) {}
+	constructor(private app: Tuvren) {}
 
 	/** Fetch all trace entries for a given kind. */
 	fetchTraces(kind: TraceKind): TraceEntry[] {

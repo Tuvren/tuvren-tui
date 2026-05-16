@@ -130,11 +130,92 @@ jobs:
       - name: Run render benchmarks
         run: bun run ts/bench-render.ts
 
+  # ── Cross-Platform Install and Load Smoke (PROD-P006) ─────────────────────
+  # Validates that the resolver and native library load correctly on each
+  # supported public release target. Benchmark-heavy gates remain Linux-only.
+  #
+  # Native targets (linux-x64, darwin-arm64, darwin-x64, win32-x64) build
+  # without --target so cargo writes directly to native/target/release/, which
+  # is where resolveSourceBuildPath() and the install tests look. Cross-compiled
+  # linux-arm64 uses --target + an explicit artifact copy.
+  #
+  # darwin-x64 uses macos-13 (Intel runner) so it compiles and loads natively;
+  # macos-latest is now Apple Silicon and would require cross-compilation.
+  cross-platform-smoke:
+    # linux-arm64 is cross-compiled (build + install-smoke only; no load smoke — runner is x64)
+    # NOTE: matrix entries that are NOT cross-compiled must omit the `cross` key entirely
+    # (not set it to false). GHA evaluates missing keys as null/falsy in expressions, while
+    # explicit `cross: false` is also falsy — but relying on that subtlety is fragile.
+    name: ${{ matrix.cross && 'Cross-Build' || 'Install Smoke' }} — ${{ matrix.platform }}-${{ matrix.arch }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            arch: x64
+          - os: ubuntu-latest
+            platform: linux
+            arch: arm64
+            target: aarch64-unknown-linux-gnu
+            cross: true
+          - os: macos-latest
+            platform: darwin
+            arch: arm64
+          - os: macos-13
+            platform: darwin
+            arch: x64
+          - os: windows-latest
+            platform: win32
+            arch: x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target || '' }}
+      - uses: oven-sh/setup-bun@v2
+
+      - name: Install cross-compilation tools (linux-arm64)
+        if: matrix.cross
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Configure cross-linker (linux-arm64)
+        if: matrix.cross
+        run: |
+          mkdir -p .cargo
+          echo '[target.aarch64-unknown-linux-gnu]' >> .cargo/config.toml
+          echo 'linker = "aarch64-linux-gnu-gcc"' >> .cargo/config.toml
+
+      - name: Build native library
+        # Native targets omit --target so cargo writes to native/target/release/ directly.
+        # Cross-compiled linux-arm64 uses --target and copies the artifact below.
+        run: cargo build --manifest-path native/Cargo.toml --release ${{ matrix.cross && format('--target {0}', matrix.target) || '' }}
+
+      - name: Copy native artifact to release directory (cross-compile only)
+        if: matrix.cross
+        shell: bash
+        run: |
+          mkdir -p native/target/release
+          cp "native/target/${{ matrix.target }}/release/libtuvren_tui.so" native/target/release/libtuvren_tui.so
+
+      - name: Install TS dependencies
+        run: bun install --cwd ts
+
+      - name: Run install smoke tests
+        run: bun test ts/test-install.test.ts
+
+      - name: Verify native library loads in headless mode
+        if: '!matrix.cross'
+        run: bun run audit/load-smoke.ts
+
   # ── Quality Gate Summary ─────────────────────────────────────────────────
   quality-gate:
     runs-on: ubuntu-latest
     name: Quality Gate
-    needs: [native-tests, native-benchmarks, host-tests, host-benchmarks]
+    needs: [native-tests, native-benchmarks, host-tests, host-benchmarks, cross-platform-smoke]
     steps:
       - name: All gates passed
-        run: echo "All v4 quality gates passed."
+        run: echo "All quality gates passed (Epic P cross-platform smoke included)."

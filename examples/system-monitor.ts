@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — System Monitor Showcase
+ * Tuvren TUI — System Monitor Showcase
  *
  * A real system monitoring dashboard reading live data from /proc.
  * Demonstrates all 10 widget types in a practical, information-dense layout.
@@ -36,7 +36,7 @@
 
 import { readFileSync, readdirSync } from "fs";
 import {
-	Kraken,
+	Tuvren,
 	Box,
 	Text,
 	Input,
@@ -51,7 +51,7 @@ import {
 	AccessibilityRole,
 	createLoop,
 } from "../ts/src/index";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 import { ffi } from "../ts/src/ffi";
 
 // ── System Data Readers ───────────────────────────────────────────────
@@ -346,7 +346,7 @@ const palettes: Palette[] = [
 
 // ── Application ───────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const termSize = app.getTerminalSize();
 let pal = palettes[0]!;
 let paletteIndex = 0;
@@ -382,7 +382,7 @@ const headerBar = new Box({
 });
 headerBar.setHeight(1);
 
-const titleText = new Text({ content: " kraken-monitor ", bold: true, fg: pal.accent });
+const titleText = new Text({ content: " tuvren-monitor ", bold: true, fg: pal.accent });
 titleText.setWidth(18);
 titleText.setHeight(1);
 
@@ -820,7 +820,7 @@ helpOverlay.setDismissOnEscape(true);
 
 const helpContent = new Text({
 	content: [
-		"# Kraken System Monitor",
+		"# Tuvren System Monitor",
 		"",
 		"**Keyboard Shortcuts:**",
 		"",
@@ -833,7 +833,7 @@ const helpContent = new Text({
 		"  `/`       Focus filter",
 		"  `Esc`     Close / Quit",
 		"",
-		"*Built with Kraken TUI*",
+		"*Built with Tuvren TUI*",
 	].join("\n"),
 	format: "markdown",
 	fg: pal.fg,
@@ -1098,7 +1098,7 @@ const loop = createLoop({
 	app,
 	fps: 60,
 
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "change" && event.target === helpOverlay.handle) {
 			helpVisible = helpOverlay.isOpen();
 			if (!helpVisible) {

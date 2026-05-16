@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Repo Inspector (TASK-L4)
+ * Tuvren TUI — Repo Inspector (TASK-L4)
  *
  * Flagship post-MVP example demonstrating file tree navigation,
  * syntax-highlighted code viewing, diff comparison, and command palette.
@@ -33,7 +33,7 @@
 import { readdirSync, readFileSync, statSync } from "fs";
 import { join, basename, extname, relative } from "path";
 import {
-	Kraken,
+	Tuvren,
 	Box,
 	Text,
 	List,
@@ -47,7 +47,7 @@ import {
 	OVERLAY_FLAGS,
 	createLoop,
 } from "../ts/src/index";
-import type { KrakenEvent, Command } from "../ts/src/index";
+import type { TuvrenEvent, Command } from "../ts/src/index";
 
 // ── File Tree ────────────────────────────────────────────────────────
 
@@ -205,7 +205,7 @@ const COLORS = {
 
 // ── Application ──────────────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 const repoRoot = process.cwd();
 const repoName = basename(repoRoot);
 
@@ -524,7 +524,7 @@ const loop = createLoop({
 	mode: "onChange",
 	disableJsxDispatch: true,
 
-	onEvent(event: KrakenEvent) {
+	onEvent(event: TuvrenEvent) {
 		if (event.type === "resize") {
 			positionPalette(
 				event.width ?? app.getTerminalSize().width,

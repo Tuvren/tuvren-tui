@@ -1,8 +1,8 @@
-# Kraken TUI
+# Tuvren TUI
 
 Rust-native terminal UI engine with TypeScript/Bun bindings for building fast, long-lived terminal applications.
 
-Kraken is aimed at developer tools, agent consoles, log viewers, and dense pane-based terminal workflows where stable scrolling, low overhead, and strong inspectability matter more than a browser-style framework stack.
+Tuvren is aimed at developer tools, agent consoles, log viewers, and dense pane-based terminal workflows where stable scrolling, low overhead, and strong inspectability matter more than a browser-style framework stack.
 
 ## Status
 
@@ -17,7 +17,7 @@ Kraken is aimed at developer tools, agent consoles, log viewers, and dense pane-
 - **Boundary invariant:** TypeScript holds opaque `u32` Handles, Rust owns the data
 - **FFI contract:** `0` success, `-1` explicit error via `tui_get_last_error()`, `-2` panic caught at the boundary
 
-## What Kraken Ships
+## What Tuvren Ships
 
 ### Native widgets
 - `Box`
@@ -51,7 +51,7 @@ Kraken is aimed at developer tools, agent consoles, log viewers, and dense pane-
 - Runner API with `app.run()` / `createLoop()`
 - Accessibility foundation: roles, labels, descriptions, accessibility events
 - Devtools: overlays, snapshots, traces, perf HUD helpers, and dev sessions
-- Native artifact resolver: `KRAKEN_LIB_PATH` -> staged prebuilds -> local Cargo build
+- Native artifact resolver: `TUVREN_LIB_PATH` → aux scoped package → local Cargo build (repo checkout)
 
 ## Quick Start (Source Checkout)
 
@@ -83,7 +83,7 @@ cargo build --manifest-path native/Cargo.toml --release && bun run examples/ops-
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/repo-inspector.ts
 ```
 
-These example entrypoints go through `Kraken.init()` and the normal runtime resolver. If you have staged `ts/prebuilds/...` artifacts and want example runs to validate the freshly built branch binary specifically, set `KRAKEN_LIB_PATH` to the matching file under `native/target/release/` before running them.
+These example entrypoints go through `Tuvren.init()` and the normal runtime resolver. If you want example runs to validate the freshly built branch binary specifically, set `TUVREN_LIB_PATH` to the matching file under `native/target/release/` before running them.
 
 Other examples:
 
@@ -97,9 +97,9 @@ cargo build --manifest-path native/Cargo.toml --release && bun run examples/acce
 ## Example: Imperative API
 
 ```ts
-import { Kraken, Box, Text, KeyCode } from "kraken-tui";
+import { Tuvren, Box, Text, KeyCode } from "tuvren-tui";
 
-const app = Kraken.init();
+const app = Tuvren.init();
 
 const root = new Box({
 	width: "100%",
@@ -108,7 +108,7 @@ const root = new Box({
 });
 
 const title = new Text({
-	content: "Hello, Kraken!",
+	content: "Hello, Tuvren!",
 	fg: "#00FF88",
 	bold: true,
 	height: 1,
@@ -134,11 +134,11 @@ app.shutdown();
 ## Example: JSX + Signals
 
 ```tsx
-import { Kraken, signal, render, createLoop, KeyCode } from "kraken-tui";
-import { jsx, jsxs } from "kraken-tui/jsx-runtime";
+import { Tuvren, signal, render, createLoop, KeyCode } from "tuvren-tui";
+import { jsx, jsxs } from "tuvren-tui/jsx-runtime";
 
 const count = signal(0);
-const app = Kraken.init();
+const app = Tuvren.init();
 
 const tree = jsxs("Box", {
 	width: "100%",

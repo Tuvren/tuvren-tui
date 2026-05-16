@@ -1,6 +1,7 @@
 {
-  "name": "kraken-tui",
+  "name": "tuvren-tui",
   "version": "0.1.0",
+  "license": "Apache-2.0",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -24,7 +25,17 @@
   "dependencies": {
     "@preact/signals-core": "^1.8.0"
   },
+  "optionalDependencies": {
+    "@tuvren/tuvren-tui-linux-x64": "0.1.0",
+    "@tuvren/tuvren-tui-linux-arm64": "0.1.0",
+    "@tuvren/tuvren-tui-darwin-arm64": "0.1.0",
+    "@tuvren/tuvren-tui-darwin-x64": "0.1.0",
+    "@tuvren/tuvren-tui-win32-x64": "0.1.0"
+  },
   "devDependencies": {
     "typescript": "^5.0.0"
+  },
+  "engines": {
+    "bun": ">=1.1"
   }
 }

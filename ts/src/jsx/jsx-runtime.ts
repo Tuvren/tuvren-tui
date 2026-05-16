@@ -1,5 +1,5 @@
 /**
- * Custom JSX runtime for Kraken TUI (ADR-T20).
+ * Custom JSX runtime for Tuvren TUI (ADR-T20).
  *
  * Implements the automatic JSX transform functions:
  *   jsx(type, props, key?)  — single child or no children

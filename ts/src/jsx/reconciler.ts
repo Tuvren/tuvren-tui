@@ -1,5 +1,5 @@
 /**
- * Signal-driven reconciler for Kraken TUI (ADR-T20).
+ * Signal-driven reconciler for Tuvren TUI (ADR-T20).
  *
  * Lifecycle:
  *   render(vnode, app)  — mount a VNode tree, set as root
@@ -19,7 +19,7 @@ import { parseColor, parseDimension, parseFlexDirection, parseJustifyContent, pa
 import { NodeType } from "../ffi/structs";
 import { Fragment } from "./types";
 import type { VNode, Instance, ComponentFunction, EventHandler } from "./types";
-import type { Kraken } from "../app";
+import type { Tuvren } from "../app";
 import { Buffer } from "buffer";
 
 // ---------------------------------------------------------------------------
@@ -76,7 +76,7 @@ function isSignal(value: unknown): value is { readonly value: unknown } {
 /**
  * Mount a VNode tree and set it as the application root.
  */
-export function render(element: VNode, app: Kraken): Instance {
+export function render(element: VNode, app: Tuvren): Instance {
 	const instance = mount(element, null);
 	if (!instance.widget) {
 		throw new Error(

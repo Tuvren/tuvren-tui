@@ -9,7 +9,7 @@ import { dlopen, ptr, CString, type FFIType } from "bun:ffi";
 import { resolveLibraryPath } from "./resolver";
 
 // Resolve the native library using the artifact resolver (ADR-T29).
-// Search order: KRAKEN_LIB_PATH env → prebuilds/ → source build → diagnostic error.
+// Search order: TUVREN_LIB_PATH env → aux scoped package → source build (repo checkout only) → diagnostic error.
 const LIB_PATH = resolveLibraryPath();
 
 const symbols = {

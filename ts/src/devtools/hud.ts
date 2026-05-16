@@ -4,7 +4,7 @@
  * ADR-T34: Dev Mode Is Core Product Work
  */
 
-import type { Kraken } from "../app";
+import type { Tuvren } from "../app";
 
 /** Names for all perf counters 0-18 (TechSpec §4.5). Indexed by counter ID. */
 export const PERF_COUNTER_NAMES: string[] = [
@@ -33,7 +33,7 @@ export const PERF_COUNTER_NAMES: string[] = [
 export const PERF_COUNTER_COUNT = 19;
 
 export class PerfHud {
-	constructor(private app: Kraken) {}
+	constructor(private app: Tuvren) {}
 
 	/** Read all perf counters and return them as "name: value" strings. */
 	formatAll(): string[] {

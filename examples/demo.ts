@@ -1,5 +1,5 @@
 /**
- * Kraken TUI — Interactive Demo
+ * Tuvren TUI — Interactive Demo
  *
  * Demonstrates all five widget types (Box, Text, Input, Select, ScrollBox)
  * in a single interactive terminal application.
@@ -16,7 +16,7 @@
  */
 
 import {
-	Kraken,
+	Tuvren,
 	Box,
 	Text,
 	Input,
@@ -24,11 +24,11 @@ import {
 	ScrollBox,
 	KeyCode,
 } from "../ts/src/index";
-import type { KrakenEvent } from "../ts/src/index";
+import type { TuvrenEvent } from "../ts/src/index";
 
 // ── Build the widget tree ──────────────────────────────────────────────
 
-const app = Kraken.init();
+const app = Tuvren.init();
 
 // Root container: full-width column layout with padding
 const root = new Box({
@@ -42,7 +42,7 @@ const root = new Box({
 // ── 1. Markdown header ─────────────────────────────────────────────────
 
 const header = new Text({
-	content: "# Kraken TUI Demo\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
+	content: "# Tuvren TUI Demo\n\n**Interactive dashboard** — press *Tab* to cycle focus, *Escape* to quit.",
 	format: "markdown",
 	fg: "cyan",
 });
@@ -251,14 +251,14 @@ applyTheme("Dark Mode");
 // ── Event loop at ~60fps ───────────────────────────────────────────────
 
 let running = true;
-const auditOnce = process.env.KRAKEN_AUDIT_RENDER_ONCE === "1";
+const auditOnce = process.env.TUVREN_AUDIT_RENDER_ONCE === "1";
 
 while (running) {
 	// Read terminal input with 16ms timeout (~60fps)
 	app.readInput(16);
 
 	// Drain and process all buffered events
-	const events: KrakenEvent[] = app.drainEvents();
+	const events: TuvrenEvent[] = app.drainEvents();
 	for (const event of events) {
 		if (event.type === "key" && event.keyCode === KeyCode.Escape) {
 			running = false;
