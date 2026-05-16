@@ -137,8 +137,11 @@ describe("formatLoadError", () => {
 	});
 
 	test("uses tuvren naming in error message", () => {
-		const msg = formatLoadError("linux", "x64", []);
+		// Pass non-empty searchPaths so the interpolation path is exercised.
+		const paths = ["/some/path/libtuvren_tui.so (TUVREN_LIB_PATH — not found)"];
+		const msg = formatLoadError("linux", "x64", paths);
 		expect(msg).toContain("tuvren-tui");
-		expect(msg).not.toContain("kraken");
+		expect(msg).toContain("TUVREN_LIB_PATH");
+		expect(msg.toLowerCase()).not.toContain("kraken");
 	});
 });
