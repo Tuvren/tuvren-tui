@@ -12,16 +12,17 @@
 import { resolveSourceBuildPath } from "../ts/src/resolver";
 import { dlopen } from "bun:ffi";
 
-const libPath = resolveSourceBuildPath();
 // Intentionally minimal: only two symbols to verify the binary loads and can
 // round-trip through FFI. Routing through ts/src/ffi.ts would validate all
 // 100+ symbols and make the smoke depend on the full symbol surface.
-const lib = dlopen(libPath, {
-	tui_init_headless: { args: ["u16", "u16"], returns: "i32" },
-	tui_shutdown: { args: [], returns: "i32" },
-});
-
+let lib: ReturnType<typeof dlopen> | undefined;
 try {
+	const libPath = resolveSourceBuildPath();
+	lib = dlopen(libPath, {
+		tui_init_headless: { args: ["u16", "u16"], returns: "i32" },
+		tui_shutdown: { args: [], returns: "i32" },
+	});
+
 	const init = lib.symbols.tui_init_headless(80, 24);
 	if (init !== 0) throw new Error("tui_init_headless failed: " + init);
 
@@ -30,5 +31,5 @@ try {
 
 	console.log("Native library load smoke: PASS");
 } finally {
-	lib.close();
+	lib?.close();
 }

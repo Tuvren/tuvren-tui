@@ -8,5 +8,6 @@
     "tuvren_tui.dll",
     "package.json"
   ],
-  "license": "Apache-2.0"
+  "license": "Apache-2.0",
+  "engines": { "bun": ">=1.1" }
 }
