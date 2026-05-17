@@ -2,6 +2,8 @@
 
 This guide covers the hard-cut rename from `kraken-tui` to `tuvren-tui` and all associated symbol, environment variable, and artifact changes.
 
+**Audience:** Early adopters consuming this repository as a git dependency, source checkout, or internal install. Neither `kraken-tui` nor `tuvren-tui` has been published to the public npm registry yet (binary publishing is staged for the first `@tuvren` release). If you have been importing from a local clone or git URL, this guide provides the complete migration map.
+
 **This is a pre-1.0 breaking change.** No compatibility aliases are provided. Old names are removed outright rather than deprecated. Update all usages at once before resuming development against the new package.
 
 ---
@@ -151,7 +153,9 @@ bunx tsc --noEmit
 
 # Search for any remaining old names
 grep -r "kraken" --include="*.ts" --include="*.tsx" --include="*.json" . \
-  --exclude-dir=node_modules --exclude-dir=".git"
+  --exclude-dir=node_modules --exclude-dir=".git" \
+  --exclude-dir=dist --exclude-dir=build \
+  --exclude="*.lock" --exclude="*.lockb"
 ```
 
 Any remaining `kraken` occurrences outside of historical documentation or changelog entries are migration gaps.
@@ -162,4 +166,4 @@ Any remaining `kraken` occurrences outside of historical documentation or change
 
 This rename is part of the Tuvren productization wave (Epic P). The project moved from the working name `kraken-tui` / `Kraken` to the public product name `tuvren-tui` / `Tuvren` as a pre-1.0 hard cut. Semantic versioning guarantees and long-lived compatibility aliases begin at public `v1.0 GA`. Pre-GA releases, including this rename, may include breaking changes without a deprecation window.
 
-See [TechSpec ADR-T42](../TechSpec.md) for the decision record and [TechSpec ADR-T43](../TechSpec.md) for the auxiliary native package distribution contract.
+See [TechSpec ADR-T42](../TechSpec.md#adr-t42-public-product-and-package-naming-move-to-tuvren) for the decision record and [TechSpec ADR-T43](../TechSpec.md#adr-t43-one-public-package-sits-above-internal-scoped-native-packages) for the auxiliary native package distribution contract.

@@ -172,7 +172,7 @@ bun install --cwd ts
 bun run examples/demo.ts                 # Box, Text, Input, Select, ScrollBox — imperative API
 bun run examples/migration-jsx.tsx       # Same app rewritten in JSX + signals
 bun run examples/showcase.ts            # Animations, themes, TextArea, runtime tree ops
-bun run examples/system-monitor.ts      # All 12 widgets including Tabs, Overlay, Table, List
+bun run examples/system-monitor.ts      # All 10 core widgets: Box, Text, Input, TextArea, Select, ScrollBox, Table, List, Tabs, Overlay
 bun run examples/accessibility-demo.tsx  # Roles, labels, descriptions, accessibility events
 ```
 
@@ -210,7 +210,7 @@ For contributors and branch validation:
 cargo build --manifest-path native/Cargo.toml --release
 
 # Install host dependencies (once after cloning)
-cd ts && bun install && cd ..
+bun install --cwd ts
 
 # Run the full host test surface
 bun test ts/test-ffi.test.ts
@@ -230,7 +230,7 @@ Repo-side FFI tests and benchmark harnesses target the local Cargo-built artifac
 ## Verification and Budgets
 
 ```bash
-# Bundle budget (enforced at < 75KB)
+# Bundle budget (enforced at ≤ 75KB)
 bun run ts/check-bundle.ts
 
 # FFI and render benchmarks

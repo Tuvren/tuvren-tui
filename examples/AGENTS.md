@@ -25,7 +25,7 @@ These show Tuvren doing what most TypeScript developers reach for first: dashboa
 | `demo.ts` | Imperative | Box, Text, Input, Select, ScrollBox — imperative composition, event loop, theme switching |
 | `migration-jsx.tsx` | JSX | Same application as `demo.ts` rewritten with JSX + signals |
 | `showcase.ts` | JSX | Signals, animations, choreography, runtime tree mutations, TextArea, multiple themes |
-| `system-monitor.ts` | Imperative | All 12 widgets (including Tabs, Overlay, Table, List), 4 themes, animations |
+| `system-monitor.ts` | Imperative | All 10 core widgets (Box, Text, Input, TextArea, Select, ScrollBox, Table, List, Tabs, Overlay), 4 themes, animations |
 | `accessibility-demo.tsx` | JSX | Roles, labels, descriptions, and accessibility event routing |
 
 ### Flagship workload demos

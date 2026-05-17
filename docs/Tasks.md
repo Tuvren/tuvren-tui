@@ -316,7 +316,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | ADOPT-Q003 | Chore | 2 | Done | Hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Covers package name, all subpath exports, `jsxImportSource`, host facade, error and event types, `KRAKEN_LIB_PATH` → `TUVREN_LIB_PATH`, shared-library names, and release-asset patterns. States explicitly that this is a pre-1.0 hard cut with no compatibility aliases. |
 |  |  | **12** |  |  |
 
-### 6.3 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
+### 6.2 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
 
 | ID | Type | SP | Status | Outcome |
 | --- | --- | --- | --- | --- |
@@ -328,7 +328,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | PROD-P006 | Chore | 3 | Done | Cross-platform smoke CI job added (Gate 9): matrix of all 5 targets, runs install + headless dlopen smoke. `GatePolicy.md` updated to v3.0 with Gate 9 and Section 7 cross-platform notes. |
 |  |  | **29** |  |  |
 
-### 6.4 Archived v7 Docs-Maintenance Wave
+### 6.3 Archived v7 Docs-Maintenance Wave
 
 | ID | Type | SP | Status | Outcome |
 | --- | --- | --- | --- | --- |
@@ -337,7 +337,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | DOCS-A003 | Chore | 3 | Done | Reconciled the rewritten docs against source, tests, examples, and workflows. |
 |  |  | **8** |  |  |
 
-### 6.5 Archived v6 Delivery Wave
+### 6.4 Archived v6 Delivery Wave
 - **Total Archived Story Points:** 85
 - **Archived Critical Path:** `TASK-I0 -> TASK-I1 -> TASK-I2 -> TASK-I3 -> TASK-I4 -> TASK-I5 -> TASK-J0 -> TASK-J1 -> TASK-J2 -> TASK-J3 -> TASK-J4 -> TASK-L1 -> TASK-L3`
 - **Delivered outcomes preserved for continuity:** native transcript and anchor semantics, replay and benchmark gates, devtools APIs and inspector surfaces, native split-pane behavior, host composites (`CommandPalette`, `TracePanel`, `StructuredLogView`, `CodeView`, `DiffView`), and flagship examples (`agent-console`, `ops-log-console`, `repo-inspector`).
