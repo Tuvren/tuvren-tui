@@ -24,6 +24,7 @@ Cargo.lock
 
 # Agent local state
 .codex
+.claude/
 
 # OS
 .DS_Store
