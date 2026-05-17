@@ -27,7 +27,7 @@ This guide covers the hard-cut rename from `kraken-tui` to `tuvren-tui` and all 
 | Shared library (Linux) | `libkraken_tui.so` | `libtuvren_tui.so` |
 | Shared library (macOS) | `libkraken_tui.dylib` | `libtuvren_tui.dylib` |
 | Shared library (Windows) | `kraken_tui.dll` | `tuvren_tui.dll` |
-| Release asset pattern | `kraken-tui-<tag>-<platform>.<ext>` | `tuvren-tui-<tag>-<platform>.<ext>` |
+| Release asset pattern | `kraken-tui-<tag>-<os>-<arch>.<ext>` | `tuvren-tui-<tag>-<os>-<arch>.<ext>` |
 | Aux native package scope | *(not in Brownfield)* | `@tuvren/*` (introduced in Epic P) |
 
 The `tui_*` C ABI prefix is **unchanged**. No ABI migration is required if you were calling FFI symbols directly.
@@ -38,23 +38,15 @@ The `tui_*` C ABI prefix is **unchanged**. No ABI migration is required if you w
 
 ### 1. Update your package dependency
 
-If you were consuming this repository as a **git dependency** in your `package.json`, update the reference:
+**Source checkout users (the current working path before npm publish):** Re-clone or pull from the updated repo. Import paths, symbol names, and environment variables are all that need to change inside your own source — no package-manager step is required if you reference `tuvren-tui` from a local checkout.
 
-```json
-{
-  "dependencies": {
-    "tuvren-tui": "github:openkraken-ai/kraken-tui"
-  }
-}
-```
-
-Then re-run `bun install`. There is no old `kraken-tui` entry on the npm registry to remove.
-
-Once `tuvren-tui` is published to the npm registry (first `@tuvren` release), the command will be:
+**Once `tuvren-tui` is published to the npm registry** (first `@tuvren` release), the install command will be:
 
 ```bash
 bun add tuvren-tui
 ```
+
+There is no old `kraken-tui` package on the npm registry to remove.
 
 ### 2. Update all import paths
 

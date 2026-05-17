@@ -14,11 +14,7 @@ bun add tuvren-tui
 
 The native library resolves automatically on supported platforms (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) through the platform-specific auxiliary package installed alongside `tuvren-tui`. If the native layer cannot be found, Tuvren emits an actionable diagnostic with remediation steps.
 
-> **Pre-1.0 note:** Neither `tuvren-tui` nor the `@tuvren` auxiliary packages are on the npm registry yet — binary publishing is staged for the first release. Until then, install via git dependency or use the [source checkout path](#development-source-checkout):
->
-> ```json
-> { "tuvren-tui": "github:openkraken-ai/kraken-tui" }
-> ```
+> **Pre-1.0 note:** Neither `tuvren-tui` nor the `@tuvren` auxiliary packages are on the npm registry yet — binary publishing is staged for the first release. Until then, use the [source checkout path](#development-source-checkout) to build and run Tuvren locally.
 
 ## Hello World
 
@@ -75,7 +71,7 @@ Tuvren also supports a JSX + `@preact/signals-core` reconciler for signal-driven
 
 ```tsx
 import { Tuvren, signal, computed, render, createLoop, KeyCode } from "tuvren-tui";
-import { jsx, jsxs } from "tuvren-tui/jsx-runtime";
+import { jsx } from "tuvren-tui/jsx-runtime";
 
 // tsconfig: { "jsx": "react-jsx", "jsxImportSource": "tuvren-tui" }
 
@@ -83,18 +79,17 @@ const count = signal(0);
 const label = computed(() => `Ticks: ${count.value}`);
 const app = Tuvren.init();
 
-const tree = jsxs("Box", {
+// jsx() for a single child; jsxs() is for multiple children
+const tree = jsx("Box", {
   width: "100%",
   height: "100%",
   flexDirection: "column",
-  children: [
-    jsx("Text", {
-      key: "label",
-      content: label,
-      fg: "#00FF88",
-      height: 1,
-    }),
-  ],
+  children: jsx("Text", {
+    key: "label",
+    content: label,
+    fg: "#00FF88",
+    height: 1,
+  }),
 });
 
 render(tree, app);
