@@ -79,7 +79,8 @@ const count = signal(0);
 const label = computed(() => `Ticks: ${count.value}`);
 const app = Tuvren.init();
 
-// jsx() for a single child; jsxs() is for multiple children
+// In .tsx files the compiler picks jsx/jsxs automatically.
+// When calling the factory directly: jsx() for one child, jsxs() for many.
 const tree = jsx("Box", {
   width: "100%",
   height: "100%",
@@ -174,7 +175,7 @@ bun install --cwd ts
 bun run examples/demo.ts                 # Box, Text, Input, Select, ScrollBox — imperative API
 bun run examples/migration-jsx.tsx       # Same app rewritten in JSX + signals
 bun run examples/showcase.ts             # Animations, themes, TextArea, runtime tree ops
-bun run examples/system-monitor.ts       # 10 core widgets (TranscriptView/SplitPane in flagship demos below)
+bun run examples/system-monitor.ts       # 9 core widgets: Box, Text, Input, TextArea, Select, Table, List, Tabs, Overlay
 bun run examples/accessibility-demo.tsx  # Roles, labels, descriptions, accessibility events
 ```
 

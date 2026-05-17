@@ -156,7 +156,7 @@ bunx tsc --noEmit
 grep -r "kraken" --include="*.ts" --include="*.tsx" --include="*.json" . \
   --exclude-dir=node_modules --exclude-dir=".git" \
   --exclude-dir=dist --exclude-dir=build \
-  --exclude="*.lock" --exclude="*.lockb"
+  --exclude="*.lock" --exclude="*.lockb" --exclude="bun.lock"
 ```
 
 Any remaining `kraken` occurrences outside of historical documentation or changelog entries are migration gaps.
