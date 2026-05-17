@@ -60,6 +60,6 @@
 
 ## Current Repo-Specific Notes
 
-- `TechSpec.md` is a Brownfield-first implementation spec. Its Brownfield notes now reflect Epic P as shipped; read them as current reality rather than future-state intent.
-- `Tasks.md` marks **Epic O** (Terminal Capability Hardening) and **Epic P** (Tuvren Identity, Packaging, and Release Migration) as shipped and activates **Epic Q — Adoption and Framework Positioning** as the current backlog. Older v7 docs-maintenance and v6 delivery material remain continuity context, not the active backlog.
+- `TechSpec.md` is a Brownfield-first implementation spec. Its Brownfield notes reflect Epic P as shipped; read them as current reality rather than future-state intent.
+- `Tasks.md` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), and **Epic Q** (Adoption and Framework Positioning) as shipped. **Epic R — Commands & Keymap Foundations** is the next queued wave; it requires a planning pass before execution. Older v7 docs-maintenance and v6 delivery material remain continuity context, not the active backlog.
 - `reports/GatePolicy.md` reflects the current CI host test surface, including install smoke and runner tests.

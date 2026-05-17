@@ -28,7 +28,7 @@ This guide covers the hard-cut rename from `kraken-tui` to `tuvren-tui` and all 
 | Shared library (macOS) | `libkraken_tui.dylib` | `libtuvren_tui.dylib` |
 | Shared library (Windows) | `kraken_tui.dll` | `tuvren_tui.dll` |
 | Release asset pattern | `kraken-tui-<tag>-<platform>.<ext>` | `tuvren-tui-<tag>-<platform>.<ext>` |
-| Aux native package scope | `@kraken/*` | `@tuvren/*` |
+| Aux native package scope | *(not in Brownfield)* | `@tuvren/*` (introduced in Epic P) |
 
 The `tui_*` C ABI prefix is **unchanged**. No ABI migration is required if you were calling FFI symbols directly.
 
@@ -38,11 +38,21 @@ The `tui_*` C ABI prefix is **unchanged**. No ABI migration is required if you w
 
 ### 1. Update your package dependency
 
-```bash
-# Remove the old package
-bun remove kraken-tui
+If you were consuming this repository as a **git dependency** in your `package.json`, update the reference:
 
-# Add the new package
+```json
+{
+  "dependencies": {
+    "tuvren-tui": "github:openkraken-ai/kraken-tui"
+  }
+}
+```
+
+Then re-run `bun install`. There is no old `kraken-tui` entry on the npm registry to remove.
+
+Once `tuvren-tui` is published to the npm registry (first `@tuvren` release), the command will be:
+
+```bash
 bun add tuvren-tui
 ```
 
@@ -116,19 +126,17 @@ If you vendor or manually place the native shared library:
 
 Most users do not manage the native library manually — it resolves through the auxiliary scoped package installed by `bun add tuvren-tui`.
 
-### 7. Update release asset references
+### 7. Update release asset references (forward-looking)
 
-If you download release assets directly (for example in a custom installer or CI cache):
+No `kraken-tui` release assets were published to GitHub Releases. Once `tuvren-tui` publishes its first release, the asset naming convention will follow `tuvren-tui-<tag>-<platform>.<ext>`. If you have automation that downloads native binaries directly, use that pattern:
 
-```diff
--kraken-tui-v0.1.0-linux-x64.so
-+tuvren-tui-v0.1.0-linux-x64.so
-
--kraken-tui-v0.1.0-darwin-arm64.dylib
-+tuvren-tui-v0.1.0-darwin-arm64.dylib
 ```
-
-The full pattern changes from `kraken-tui-<tag>-<platform>.<ext>` to `tuvren-tui-<tag>-<platform>.<ext>`.
+tuvren-tui-v0.1.0-linux-x64.so
+tuvren-tui-v0.1.0-linux-arm64.so
+tuvren-tui-v0.1.0-darwin-arm64.dylib
+tuvren-tui-v0.1.0-darwin-x64.dylib
+tuvren-tui-v0.1.0-win32-x64.dll
+```
 
 ---
 

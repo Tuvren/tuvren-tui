@@ -68,12 +68,13 @@ Press **Esc** to exit. From install to a running terminal app in under 15 minute
 Tuvren also supports a JSX + `@preact/signals-core` reconciler for signal-driven interfaces:
 
 ```tsx
-import { Tuvren, signal, render, createLoop, KeyCode } from "tuvren-tui";
+import { Tuvren, signal, computed, render, createLoop, KeyCode } from "tuvren-tui";
 import { jsx, jsxs } from "tuvren-tui/jsx-runtime";
 
 // tsconfig: { "jsx": "react-jsx", "jsxImportSource": "tuvren-tui" }
 
 const count = signal(0);
+const label = computed(() => `Ticks: ${count.value}`);
 const app = Tuvren.init();
 
 const tree = jsxs("Box", {
@@ -83,7 +84,7 @@ const tree = jsxs("Box", {
   children: [
     jsx("Text", {
       key: "label",
-      content: count,
+      content: label,
       fg: "#00FF88",
       height: 1,
     }),
@@ -171,8 +172,8 @@ bun install --cwd ts
 ```bash
 bun run examples/demo.ts                 # Box, Text, Input, Select, ScrollBox — imperative API
 bun run examples/migration-jsx.tsx       # Same app rewritten in JSX + signals
-bun run examples/showcase.ts            # Animations, themes, TextArea, runtime tree ops
-bun run examples/system-monitor.ts      # All 10 core widgets: Box, Text, Input, TextArea, Select, ScrollBox, Table, List, Tabs, Overlay
+bun run examples/showcase.ts             # Animations, themes, TextArea, runtime tree ops
+bun run examples/system-monitor.ts       # 10 core widgets (TranscriptView/SplitPane in flagship demos below)
 bun run examples/accessibility-demo.tsx  # Roles, labels, descriptions, accessibility events
 ```
 
