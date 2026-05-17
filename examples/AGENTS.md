@@ -1,44 +1,59 @@
 # AGENTS.md — Examples Usage Guide
 
-Practical lessons from building examples. Follow these when creating or modifying examples.
+Practical lessons from building Tuvren examples. Follow these when creating or modifying examples.
 
 ## Quick Start
 
 ```bash
+# Build the native core first (source checkout)
 cargo build --manifest-path native/Cargo.toml --release
 bun install --cwd ts  # once after clone
+
 bun run examples/<example>.ts
 ```
 
-## Available Examples
+## Example Tiers
+
+Tuvren ships two tiers of examples. Both use the same framework and the same public API — the distinction is workload intensity, not capability category.
+
+### General-purpose framework demos
+
+These show Tuvren doing what most TypeScript developers reach for first: dashboards, editors, inspectors, and interactive CLI surfaces. A good starting point for evaluating the framework.
 
 | File | API | Demonstrates |
 |------|-----|-------------|
-| `demo.ts` | Imperative | Box, Text, Input, Select, ScrollBox, theme switching, event loop |
-| `migration-jsx.tsx` | JSX | Same app as demo.ts rewritten with JSX + signals |
-| `accessibility-demo.tsx` | JSX | Roles, labels, descriptions, accessibility events |
-| `showcase.ts` | JSX | Signals, animations, choreography, runtime tree ops, TextArea, themes |
-| `system-monitor.ts` | Imperative | All 10 widgets, tabs, overlay, table, list, animations, 4 themes |
-| `agent-console.ts` | Imperative | TranscriptView, SplitPane, TracePanel, CommandPalette, AG-UI replay, devtools |
-| `ops-log-console.ts` | Imperative | StructuredLogView, follow mode, level/search filtering, dev overlays |
-| `repo-inspector.ts` | Imperative | CodeView, DiffView, nested SplitPane, List, CommandPalette, filesystem |
+| `demo.ts` | Imperative | Box, Text, Input, Select, ScrollBox — imperative composition, event loop, theme switching |
+| `migration-jsx.tsx` | JSX | Same application as `demo.ts` rewritten with JSX + signals |
+| `showcase.ts` | JSX | Signals, animations, choreography, runtime tree mutations, TextArea, multiple themes |
+| `system-monitor.ts` | Imperative | 9 core widgets (Box, Text, Input, TextArea, Select, Table, List, Tabs, Overlay), 4 themes, animations |
+| `accessibility-demo.tsx` | JSX | Roles, labels, descriptions, and accessibility event routing |
+
+### Flagship workload demos
+
+These run Tuvren at its most demanding: continuous streaming output, long-lived transcripts, dense multi-pane layouts, real-time devtools inspection, and CommandPalette navigation — all active simultaneously. They are not a narrow special-case category. They are the most complete proof that the general-purpose framework holds up under the conditions that typically break lightweight terminal UI toolkits: host-side tree churn, viewport stability under streaming, and multi-pane interaction surfaces.
+
+| File | API | Demonstrates |
+|------|-----|-------------|
+| `agent-console.ts` | Imperative | TranscriptView, SplitPane, TracePanel, CommandPalette, AG-UI replay, devtools overlays |
+| `ops-log-console.ts` | Imperative | StructuredLogView, follow mode, level and search filtering, dev overlays |
+| `repo-inspector.ts` | Imperative | CodeView, DiffView, nested SplitPane, List navigation, CommandPalette, filesystem integration |
 
 ## Core Invariants
 
-1. Rust owns mutable UI state. TypeScript controls via handles/FFI.
+1. Rust owns mutable UI state. TypeScript controls via handles and FFI.
 2. Handle `0` is invalid/sentinel.
 3. `Tuvren.init()` must be called before creating any widgets or themes.
 4. Always call `app.shutdown()` on exit.
 
 ## Lessons Learned
 
-1. **Init before resources** — `Theme.create()`, widget constructors, etc. all require initialized context.
+1. **Init before resources** — `Theme.create()`, widget constructors, etc. all require an initialized context.
 
-2. **Normalize built-in themes for demos** — Built-in themes can over-apply defaults (especially borders). Explicitly set `theme.setTypeBorderStyle(nodeType, "none")` and add borders only where intentional.
+2. **Normalize built-in themes for demos** — Built-in themes can over-apply defaults (especially borders). Set `theme.setTypeBorderStyle(nodeType, "none")` explicitly and add borders only where intentional.
 
-3. **Give Text nodes explicit heights** — Status/header/label rows can collapse without explicit `height: 1`.
+3. **Give Text nodes explicit heights** — Status, header, and label rows can collapse without explicit `height: 1`.
 
-4. **Keep animations structural vs. decorative** — Use `positionX/Y` only for intentional movement. Prefer `opacity`, `fgColor`, `borderColor` for subtle feedback.
+4. **Keep animations structural vs. decorative** — Use `positionX/Y` only for intentional movement. Prefer `opacity`, `fgColor`, and `borderColor` for subtle interactive feedback.
 
 5. **Use ASCII spinners for portability** — Unicode spinner glyphs degrade on some fonts. Use `|`, `/`, `-`, `\\` driven by `onTick`.
 
@@ -57,9 +72,9 @@ bun run examples/<example>.ts
 3. Build widget tree (imperative or JSX with signals)
 4. `app.setRoot(root)` or `render(tree, app)`
 5. Create event loop: `createLoop()` or `app.run()` or manual `while` loop
-6. Handle events, update state in `onTick`
+6. Handle events and update state in `onTick`
 7. Cleanup and `app.shutdown()`
 
 ## When To Use Low-Level FFI
 
-Use wrapper API first. Use `ffi.*` directly only when wrappers don't expose a needed operation (e.g., querying selected option text). Isolate FFI helpers and keep state changes through high-level APIs.
+Use the wrapper API first. Use `ffi.*` directly only when the wrappers do not expose a needed operation (for example, querying selected option text). Isolate FFI helpers and route state changes through the high-level API whenever possible.

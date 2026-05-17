@@ -23,9 +23,9 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 ## Current Repo Status
 
 - The canonical docs chain is current and should be treated as the source of truth for planning work.
-- `Tasks.md` marks **Epic O** (Terminal Capability Hardening) and **Epic P** (Tuvren Identity, Packaging, and Release Migration) as shipped. **Epic Q — Adoption and Framework Positioning** is the active wave.
+- `Tasks.md` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), and **Epic Q** (Adoption and Framework Positioning) as shipped. **Epic R — Commands & Keymap Foundations** is the next queued wave (requires planning before execution).
 - `Tasks.md` separates **active scope** from **archived completed scope**. Do not mistake archived waves for the current backlog.
-- README and public onboarding materials will be refreshed in Epic Q; the canonical docs chain is authoritative for roadmap and scope.
+- README, onboarding materials, and public positioning were refreshed in Epic Q. The canonical docs chain is authoritative for roadmap and scope.
 - The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
 
 ---

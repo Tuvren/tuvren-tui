@@ -1,6 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
+- v7.8.0 - Marked Epic Q shipped after the adoption and framework positioning wave landed: README rewritten as a general-purpose framework with public install path and Hello World, example framing updated into two tiers (general-purpose demos and flagship workload proofs), and Kraken-to-Tuvren hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Epic R is now the next queued wave.
 - v7.7.0 - Marked Epic P shipped after the full hard-cut Tuvren rename landed: package name, host facade, error type, native crate and library names, resolver env var, auxiliary scoped native package topology, release workflow, cross-platform CI smoke gate, and all bench, test, and example surfaces updated. Epic Q is now the only active wave.
 - v7.6.0 - Activated the first post-Epic-O roadmap wave: Epic P covers the hard-cut Tuvren rename plus packaging and release trust, Epic Q covers adoption and framework positioning, and future framework expansion is staged as commands/keymaps, Effect, and then deferred plugin-slot work.
 - v7.5.1 - Marked Epic O shipped after terminal capability state, multiplexer-aware degraded policy, Kitty keyboard disambiguation negotiation, OSC52 write-only clipboard, OSC8 link spans, and host diagnostics landed with native and Bun coverage.
@@ -9,22 +10,19 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Active Critical Path
-- **Total Active Story Points:** 12
-- **Critical Path:** `ADOPT-Q001 -> ADOPT-Q002`, with `ADOPT-Q003` closing in parallel after `ADOPT-Q001`. Epic P is shipped; the active wave is complete only when both adoption closeout paths land.
+- **Total Active Story Points:** 0 (Epic Q shipped; Epic R is the next queued wave)
+- **Critical Path:** Epic Q is complete. Epic R (Commands & Keymap Foundations) is the next active wave once planning is ready.
 - **Planning Assumptions:**
-  - Epic M, Epic N, and Epic O are shipped; the current Brownfield source already includes the native text substrate, transcript and split-pane semantics, devtools, and terminal-capability hardening.
-  - The product story is now **general-purpose framework first**, while agentic and transcript-heavy products remain the flagship showcase and the harshest proof workload.
+  - Epic M, Epic N, Epic O, Epic P, and Epic Q are all shipped. The Brownfield source now includes the native text substrate, transcript and split-pane semantics, devtools, terminal-capability hardening, the full Tuvren hard-cut rename, and the general-purpose framework onboarding and migration story.
+  - The product story is **general-purpose framework first**, with agentic and transcript-heavy products as the flagship showcase and harshest proof workload. This positioning is now reflected in the README and example framing.
   - Bun remains the only supported runtime in the active contract. Node portability is deferred.
-  - The next active wave is productization plus adoption: hard-cut rename to `Tuvren`, one public package over auxiliary scoped native packages, install and release trust, and public positioning refresh.
-  - The following framework waves are intentionally sequenced behind that: the remaining planned `v3` foundation wave is commands and keymaps, `v4` then begins with `Effect`, and plugin-slot extensibility only follows after `v1.0` and after both contracts stabilize.
+  - The following framework waves are intentionally sequenced: the remaining planned `v3` foundation wave is commands and keymaps (Epic R), `v4` then begins with `Effect` (Epic S), and plugin-slot extensibility only follows after `v1.0` and after both contracts stabilize (Epic T).
   - React and Solid parity are not roadmap goals in this planning wave.
 
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
-#### Epic Q — Adoption and Framework Positioning
-- Rewrite onboarding and public messaging so the product reads as a general-purpose terminal framework rather than as a narrow specialist library.
-- Preserve agentic and transcript-heavy applications as the flagship showcase and proving ground rather than the sole public story.
-- Publish clear pre-`1.0` migration guidance for the hard-cut rename and the new install contract.
+
+No tickets are currently active. Epic R is the next queued wave; it requires planning before execution begins.
 
 ### Future / Deferred Scope
 #### Epic R — Commands & Keymap Foundations
@@ -64,9 +62,9 @@ flowchart LR
     P4[PROD-P004 - SHIPPED]:::done
     P5[PROD-P005 - SHIPPED]:::done
     P6[PROD-P006 - SHIPPED]:::done
-    Q1[ADOPT-Q001]:::active
-    Q2[ADOPT-Q002]:::active
-    Q3[ADOPT-Q003]:::active
+    Q1[ADOPT-Q001 - SHIPPED]:::done
+    Q2[ADOPT-Q002 - SHIPPED]:::done
+    Q3[ADOPT-Q003 - SHIPPED]:::done
     R[Epic R Commands and Keymap Foundations]:::future
     S[Epic S Effect Declarative Integration]:::future
     T[Epic T Plugin Slots and Extensibility]:::future
@@ -86,8 +84,7 @@ flowchart LR
     R --> S
     S --> T
 
-    class O,P1,P2,P3,P4,P5,P6 done;
-    class Q1,Q2,Q3 active;
+    class O,P1,P2,P3,P4,P5,P6,Q1,Q2,Q3 done;
     class R,S,T future;
     classDef done fill:#dff5dd,stroke:#3f9d3f,color:#1f4d1f;
     classDef active fill:#fff4d6,stroke:#d39b14,color:#5c4100;
@@ -248,13 +245,13 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 
 ## 5. Ticket Summary Table
 
-### 5.1 Active Epic Q Summary
+### 5.1 Archived Epic Q Summary
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
-| ADOPT-Q001 | Q | Chore | 5 | PROD-P002, PROD-P003, PROD-P005, PROD-P006 | Active |
-| ADOPT-Q002 | Q | Feature | 5 | ADOPT-Q001 | Active |
-| ADOPT-Q003 | Q | Chore | 2 | ADOPT-Q001, PROD-P005 | Active |
+| ADOPT-Q001 | Q | Chore | 5 | PROD-P002, PROD-P003, PROD-P005, PROD-P006 | Done |
+| ADOPT-Q002 | Q | Feature | 5 | ADOPT-Q001 | Done |
+| ADOPT-Q003 | Q | Chore | 2 | ADOPT-Q001, PROD-P005 | Done |
 |  |  | **TOTAL** | **12** |  |  |
 
 ### 5.2 Archived Epic P Summary
@@ -310,7 +307,16 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 
 ## 6. Archived Continuity Summary
 
-### 6.1 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
+### 6.1 Archived Epic Q — Adoption and Framework Positioning
+
+| ID | Type | SP | Status | Outcome |
+| --- | --- | --- | --- | --- |
+| ADOPT-Q001 | Chore | 5 | Done | README rewritten as a general-purpose terminal UI framework: public install path (`bun add tuvren-tui`), Hello World under 15 minutes, Bun runtime posture, resolver behavior, and framework capability summary. Source checkout retained for contributors. |
+| ADOPT-Q002 | Feature | 5 | Done | Example framing updated in `examples/AGENTS.md` into two explicit tiers: general-purpose framework demos and flagship workload demos. Added context explaining why the agentic/developer-facing examples represent the harshest test of the architecture rather than a narrow special case. |
+| ADOPT-Q003 | Chore | 2 | Done | Hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Covers package name, all subpath exports, `jsxImportSource`, host facade, error and event types, `KRAKEN_LIB_PATH` → `TUVREN_LIB_PATH`, shared-library names, and release-asset patterns. States explicitly that this is a pre-1.0 hard cut with no compatibility aliases. |
+|  |  | **12** |  |  |
+
+### 6.2 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
 
 | ID | Type | SP | Status | Outcome |
 | --- | --- | --- | --- | --- |
@@ -322,7 +328,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | PROD-P006 | Chore | 3 | Done | Cross-platform smoke CI job added (Gate 9): matrix of all 5 targets, runs install + headless dlopen smoke. `GatePolicy.md` updated to v3.0 with Gate 9 and Section 7 cross-platform notes. |
 |  |  | **29** |  |  |
 
-### 6.2 Archived v7 Docs-Maintenance Wave
+### 6.3 Archived v7 Docs-Maintenance Wave
 
 | ID | Type | SP | Status | Outcome |
 | --- | --- | --- | --- | --- |
@@ -331,7 +337,7 @@ And the guidance explicitly states that the rename is a hard pre-1.0 cut rather 
 | DOCS-A003 | Chore | 3 | Done | Reconciled the rewritten docs against source, tests, examples, and workflows. |
 |  |  | **8** |  |  |
 
-### 6.3 Archived v6 Delivery Wave
+### 6.4 Archived v6 Delivery Wave
 - **Total Archived Story Points:** 85
 - **Archived Critical Path:** `TASK-I0 -> TASK-I1 -> TASK-I2 -> TASK-I3 -> TASK-I4 -> TASK-I5 -> TASK-J0 -> TASK-J1 -> TASK-J2 -> TASK-J3 -> TASK-J4 -> TASK-L1 -> TASK-L3`
 - **Delivered outcomes preserved for continuity:** native transcript and anchor semantics, replay and benchmark gates, devtools APIs and inspector surfaces, native split-pane behavior, host composites (`CommandPalette`, `TracePanel`, `StructuredLogView`, `CodeView`, `DiffView`), and flagship examples (`agent-console`, `ops-log-console`, `repo-inspector`).
