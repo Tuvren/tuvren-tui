@@ -156,7 +156,8 @@ tuvren-tui-v0.1.0-win32-x64.dll
 After applying changes:
 
 ```bash
-# TypeScript compiler check (should find no remaining kraken-tui references)
+# TypeScript compiler check on your application (run from your project root,
+# not from the tuvren-tui source repo which has its own tsconfig)
 bunx tsc --noEmit
 
 # Search for any remaining old names

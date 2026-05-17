@@ -6,13 +6,19 @@ General-purpose terminal UI framework for TypeScript/Bun. Native Rust performanc
 
 ## Install
 
+Once `tuvren-tui` is published to the npm registry (first `@tuvren` release, Bun ≥ 1.1 required):
+
 ```bash
 bun add tuvren-tui
 ```
 
-Requires **Bun ≥ 1.1**. On supported platforms (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`), the native library resolves automatically through the platform-specific auxiliary package installed alongside `tuvren-tui`. If the native layer cannot be found, Tuvren emits an actionable diagnostic with remediation steps.
+The native library resolves automatically on supported platforms (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) through the platform-specific auxiliary package installed alongside `tuvren-tui`. If the native layer cannot be found, Tuvren emits an actionable diagnostic with remediation steps.
 
-> **Pre-1.0 note:** Binary packages for the `@tuvren` npm scope are staged for the first public release. If you are working from a source checkout of this repository, use the [source checkout path](#development-source-checkout) below.
+> **Pre-1.0 note:** Neither `tuvren-tui` nor the `@tuvren` auxiliary packages are on the npm registry yet — binary publishing is staged for the first release. Until then, install via git dependency or use the [source checkout path](#development-source-checkout):
+>
+> ```json
+> { "tuvren-tui": "github:openkraken-ai/kraken-tui" }
+> ```
 
 ## Hello World
 
@@ -185,7 +191,7 @@ bun run examples/ops-log-console.ts  # StructuredLogView, follow mode, level and
 bun run examples/repo-inspector.ts   # CodeView, DiffView, nested SplitPane, List, CommandPalette
 ```
 
-To validate a specific branch binary rather than whatever the resolver finds, set `TUVREN_LIB_PATH` before running:
+To validate a specific branch binary rather than whatever the resolver finds, set `TUVREN_LIB_PATH` before running (use `.so` on Linux, `.dylib` on macOS, `.dll` on Windows):
 
 ```bash
 TUVREN_LIB_PATH=native/target/release/libtuvren_tui.so bun run examples/agent-console.ts
