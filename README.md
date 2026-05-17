@@ -1,65 +1,215 @@
 # Tuvren TUI
 
-Rust-native terminal UI engine with TypeScript/Bun bindings for building fast, long-lived terminal applications.
+General-purpose terminal UI framework for TypeScript/Bun. Native Rust performance, Flexbox layout, and productized ergonomics for building polished terminal applications without a systems-language workflow.
 
-Tuvren is aimed at developer tools, agent consoles, log viewers, and dense pane-based terminal workflows where stable scrolling, low overhead, and strong inspectability matter more than a browser-style framework stack.
+**Status:** Pre-1.0 (`0.1.0`) — actively evolving; breaking changes are possible before `v1.0`.
 
-## Status
+## Install
 
-- Pre-1.0 (`0.1.0`) and still evolving
-- Canonical planning chain lives in [`docs/`](./docs/)
-- Current flagship surfaces are already implemented in source: transcript workflows, split panes, devtools, and app-shaped composites
+```bash
+bun add tuvren-tui
+```
 
-## Core Model
+Requires **Bun ≥ 1.1**. On supported platforms (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`), the native library resolves automatically through the platform-specific auxiliary package installed alongside `tuvren-tui`. If the native layer cannot be found, Tuvren emits an actionable diagnostic with remediation steps.
 
-- **Native Core:** Rust `cdylib` owns all mutable UI state and performance-critical work
-- **Host Layer:** TypeScript/Bun wrapper over `bun:ffi`
-- **Boundary invariant:** TypeScript holds opaque `u32` Handles, Rust owns the data
-- **FFI contract:** `0` success, `-1` explicit error via `tui_get_last_error()`, `-2` panic caught at the boundary
+> **Pre-1.0 note:** Binary packages for the `@tuvren` npm scope are staged for the first public release. If you are working from a source checkout of this repository, use the [source checkout path](#development-source-checkout) below.
+
+## Hello World
+
+Create `hello.ts`:
+
+```ts
+import { Tuvren, Box, Text, KeyCode } from "tuvren-tui";
+
+const app = Tuvren.init();
+
+const root = new Box({
+  width: "100%",
+  height: "100%",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+const label = new Text({
+  content: "Hello, Tuvren!",
+  fg: "#00FF88",
+  bold: true,
+  height: 1,
+});
+
+root.append(label);
+app.setRoot(root);
+
+let running = true;
+while (running) {
+  app.readInput(16);
+  for (const event of app.drainEvents()) {
+    if (event.type === "key" && event.keyCode === KeyCode.Escape) {
+      running = false;
+    }
+  }
+  app.render();
+}
+
+app.shutdown();
+```
+
+Run it:
+
+```bash
+bun run hello.ts
+```
+
+Press **Esc** to exit. From install to a running terminal app in under 15 minutes.
+
+## JSX + Signals
+
+Tuvren also supports a JSX + `@preact/signals-core` reconciler for signal-driven interfaces:
+
+```tsx
+import { Tuvren, signal, render, createLoop, KeyCode } from "tuvren-tui";
+import { jsx, jsxs } from "tuvren-tui/jsx-runtime";
+
+// tsconfig: { "jsx": "react-jsx", "jsxImportSource": "tuvren-tui" }
+
+const count = signal(0);
+const app = Tuvren.init();
+
+const tree = jsxs("Box", {
+  width: "100%",
+  height: "100%",
+  flexDirection: "column",
+  children: [
+    jsx("Text", {
+      key: "label",
+      content: count,
+      fg: "#00FF88",
+      height: 1,
+    }),
+  ],
+});
+
+render(tree, app);
+
+const loop = createLoop({
+  app,
+  onEvent(event) {
+    if (event.type === "key" && event.keyCode === KeyCode.Escape) {
+      loop.stop();
+    }
+  },
+  onTick() {
+    count.value++;
+  },
+});
+
+await loop.start();
+app.shutdown();
+```
 
 ## What Tuvren Ships
 
 ### Native widgets
-- `Box`
-- `Text`
-- `Input`
-- `Select`
-- `ScrollBox`
-- `TextArea`
-- `Table`
-- `List`
-- `Tabs`
-- `Overlay`
-- `TranscriptView`
-- `SplitPane`
+
+| Widget | Description |
+|--------|-------------|
+| `Box` | Layout container with Flexbox semantics |
+| `Text` | Rich text: plain, Markdown, and syntax-highlighted code |
+| `Input` | Single-line keyboard input |
+| `TextArea` | Multiline editable buffer with wrap control |
+| `Select` | Arrow-key option selector |
+| `ScrollBox` | Scrollable content viewport |
+| `Table` | Tabular data display |
+| `List` | Navigable item list |
+| `Tabs` | Tab bar with switchable panels |
+| `Overlay` | Floating layer over the main composition |
+| `TranscriptView` | Long-lived streaming log with anchor-based viewport semantics |
+| `SplitPane` | Resizable pane pairs for dense multi-panel layouts |
 
 ### Host composites
-- `CommandPalette`
-- `TracePanel`
-- `StructuredLogView`
-- `CodeView`
-- `DiffView`
+
+| Composite | Description |
+|-----------|-------------|
+| `CommandPalette` | Floating command search built from `Overlay`, `Input`, and `List` |
+| `TracePanel` | Structured trace viewer over `TranscriptView` |
+| `StructuredLogView` | Log-stream surface with follow mode and level filtering |
+| `CodeView` | Scrollable syntax-highlighted code display |
+| `DiffView` | Side-by-side or inline diff surface |
 
 ### Platform and DX features
-- Flexbox layout via Taffy
-- Incremental double-buffered render with dirty diffing
-- Keyboard focus traversal plus mouse hit-testing and scroll routing
-- Rich text: Markdown and syntax highlighting
-- Theming with built-in dark/light themes and per-NodeType defaults
-- Animation with easing, chaining, choreography, and position offsets
-- JSX plus `@preact/signals-core` reconciler
-- Runner API with `app.run()` / `createLoop()`
-- Accessibility foundation: roles, labels, descriptions, accessibility events
-- Devtools: overlays, snapshots, traces, perf HUD helpers, and dev sessions
-- Native artifact resolver: `TUVREN_LIB_PATH` → aux scoped package → local Cargo build (repo checkout)
 
-## Quick Start (Source Checkout)
+- **Flexbox layout** via Taffy — directional, aligned, justified, with gap support
+- **Incremental rendering** with double-buffered dirty-region diffing
+- **Keyboard and mouse** — focus traversal, hit-testing, scroll routing
+- **Rich text** — Markdown and syntax highlighting out of the box
+- **Theming** — built-in dark/light themes, per-node-type style defaults, runtime switching
+- **Animation** — easing, chaining, choreography groups, position offsets
+- **JSX reconciler** — `@preact/signals-core` signals drive the composition tree
+- **Runner API** — `app.run()` and `createLoop()` manage the event loop for you
+- **Accessibility foundation** — roles, labels, descriptions, accessibility events
+- **Devtools** — layout overlays, snapshots, traces, perf counters, dev sessions
+- **Native artifact resolver** — `TUVREN_LIB_PATH` → aux scoped package → local Cargo build
+
+## Examples
+
+Two tiers of examples ship with the repo.
+
+**General-purpose framework demos** show how Tuvren handles dashboards, inspectors, editors, and interactive CLI surfaces — the use cases most TypeScript developers reach for first.
+
+**Flagship workload demos** push Tuvren at its most demanding: continuous streaming output, long-lived transcripts, dense multi-pane layouts, and real-time inspection surfaces. They are not a narrow special case — they are proof that the same general-purpose framework holds up under the harshest real workloads.
+
+All examples require a native build first (source checkout path):
+
+```bash
+cargo build --manifest-path native/Cargo.toml --release
+bun install --cwd ts
+```
+
+### General-purpose framework demos
+
+```bash
+bun run examples/demo.ts                 # Box, Text, Input, Select, ScrollBox — imperative API
+bun run examples/migration-jsx.tsx       # Same app rewritten in JSX + signals
+bun run examples/showcase.ts            # Animations, themes, TextArea, runtime tree ops
+bun run examples/system-monitor.ts      # All 12 widgets including Tabs, Overlay, Table, List
+bun run examples/accessibility-demo.tsx  # Roles, labels, descriptions, accessibility events
+```
+
+### Flagship workload demos
+
+```bash
+bun run examples/agent-console.ts    # TranscriptView, SplitPane, TracePanel, CommandPalette, AG-UI replay
+bun run examples/ops-log-console.ts  # StructuredLogView, follow mode, level and search filtering
+bun run examples/repo-inspector.ts   # CodeView, DiffView, nested SplitPane, List, CommandPalette
+```
+
+To validate a specific branch binary rather than whatever the resolver finds, set `TUVREN_LIB_PATH` before running:
+
+```bash
+TUVREN_LIB_PATH=native/target/release/libtuvren_tui.so bun run examples/agent-console.ts
+```
+
+## Core Model
+
+| Layer | Responsibility |
+|-------|---------------|
+| **Native Core** | Rust `cdylib` — owns all mutable UI state, layout resolution, and rendering |
+| **Host Layer** | TypeScript/Bun — thin wrapper over `bun:ffi`, stateless, ergonomic |
+
+**Boundary invariant:** TypeScript holds opaque `u32` Handles; Rust owns the tree and all mutable state. Control flows one direction: the host calls into the native core; the native core never calls back.
+
+**FFI contract:** `0` success, `-1` explicit error via `tui_get_last_error()`, `-2` panic caught at the boundary. `Handle(0)` is the invalid sentinel.
+
+## Development (Source Checkout)
+
+For contributors and branch validation:
 
 ```bash
 # Build native core
 cargo build --manifest-path native/Cargo.toml --release
 
-# Install host dependencies
+# Install host dependencies (once after cloning)
 cd ts && bun install && cd ..
 
 # Run the full host test surface
@@ -69,133 +219,35 @@ bun test ts/test-examples.test.ts
 bun test ts/test-install.test.ts
 bun test ts/test-runner.test.ts
 
-# Run native tests
+# Native tests and quality checks
 cargo test --manifest-path native/Cargo.toml
+cargo fmt --manifest-path native/Cargo.toml -- --check
+cargo clippy --manifest-path native/Cargo.toml -- -D warnings
 ```
 
-Repo-side FFI tests and benchmark harnesses intentionally target the local Cargo-built native artifact under `native/target/release/` so they validate the branch under review rather than any staged prebuild.
-
-## Flagship Examples
-
-```bash
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/agent-console.ts
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/ops-log-console.ts
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/repo-inspector.ts
-```
-
-These example entrypoints go through `Tuvren.init()` and the normal runtime resolver. If you want example runs to validate the freshly built branch binary specifically, set `TUVREN_LIB_PATH` to the matching file under `native/target/release/` before running them.
-
-Other examples:
-
-```bash
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/demo.ts
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/migration-jsx.tsx
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/system-monitor.ts
-cargo build --manifest-path native/Cargo.toml --release && bun run examples/accessibility-demo.tsx
-```
-
-## Example: Imperative API
-
-```ts
-import { Tuvren, Box, Text, KeyCode } from "tuvren-tui";
-
-const app = Tuvren.init();
-
-const root = new Box({
-	width: "100%",
-	height: "100%",
-	flexDirection: "column",
-});
-
-const title = new Text({
-	content: "Hello, Tuvren!",
-	fg: "#00FF88",
-	bold: true,
-	height: 1,
-});
-
-root.append(title);
-app.setRoot(root);
-
-let running = true;
-while (running) {
-	app.readInput(16);
-	for (const event of app.drainEvents()) {
-		if (event.type === "key" && event.keyCode === KeyCode.Escape) {
-			running = false;
-		}
-	}
-	app.render();
-}
-
-app.shutdown();
-```
-
-## Example: JSX + Signals
-
-```tsx
-import { Tuvren, signal, render, createLoop, KeyCode } from "tuvren-tui";
-import { jsx, jsxs } from "tuvren-tui/jsx-runtime";
-
-const count = signal(0);
-const app = Tuvren.init();
-
-const tree = jsxs("Box", {
-	width: "100%",
-	height: "100%",
-	flexDirection: "column",
-	children: [
-		jsx("Text", {
-			key: "label",
-			content: count,
-			fg: "#00FF88",
-			height: 1,
-		}),
-	],
-});
-
-render(tree, app);
-
-const loop = createLoop({
-	app,
-	onEvent(event) {
-		if (event.type === "key" && event.keyCode === KeyCode.Escape) {
-			loop.stop();
-		}
-	},
-	onTick() {
-		count.value++;
-	},
-});
-
-await loop.start();
-app.shutdown();
-```
+Repo-side FFI tests and benchmark harnesses target the local Cargo-built artifact under `native/target/release/` so branch validation is never shadowed by a staged prebuild.
 
 ## Verification and Budgets
 
 ```bash
-# Bundle budget
+# Bundle budget (enforced at < 75KB)
 bun run ts/check-bundle.ts
 
 # FFI and render benchmarks
 bun run ts/bench-ffi.ts
 bun run ts/bench-render.ts
-
-# Native quality
-cargo fmt --manifest-path native/Cargo.toml -- --check
-cargo clippy --manifest-path native/Cargo.toml -- -D warnings
 ```
-
-The host package is currently under the 75KB bundle budget; use `bun run ts/check-bundle.ts` for the exact measurement in the current checkout.
 
 ## Documentation
 
-- [PRD](./docs/PRD.md) — product intent, glossary, scope, constraints
-- [Architecture](./docs/Architecture.md) — logical boundaries, flows, risks
-- [TechSpec](./docs/TechSpec.md) — ABI, state model, interfaces, verification contract
-- [Tasks](./docs/Tasks.md) — active plan plus archived completed execution scope
-- [GatePolicy](./docs/reports/GatePolicy.md) — current CI quality gates
+| Document | What it covers |
+|----------|---------------|
+| [PRD](./docs/PRD.md) | Product intent, actors, glossary, capabilities, scope |
+| [Architecture](./docs/Architecture.md) | Logical boundaries, container flows, resilience, risks |
+| [TechSpec](./docs/TechSpec.md) | ABI, state model, interface contracts, verification surface |
+| [Tasks](./docs/Tasks.md) | Active execution plan plus archived completed scope |
+| [GatePolicy](./docs/reports/GatePolicy.md) | CI quality gates and release verification policy |
+| [Migration Guide](./docs/migration/kraken-to-tuvren.md) | Kraken → Tuvren hard-cut migration reference |
 
 ## License
 
