@@ -1,5 +1,5 @@
 import { signal } from "@preact/signals-core";
-import type { Signal } from "@preact/signals-core";
+import type { ReadonlySignal, Signal } from "@preact/signals-core";
 import { CommandDispatcher, CommandRegistry, type Disposable } from "../commands";
 import type { TuvrenEvent } from "../events";
 import { KeymapRegistry } from "../keymap";
@@ -29,7 +29,7 @@ export interface TuvrenEffectRuntime {
 	readonly keymaps: KeymapRegistry;
 	readonly dispatcher: CommandDispatcher;
 	readonly commandService: DispatchingEffectCommandService;
-	readonly terminalSize: Signal<TerminalSizeState>;
+	readonly terminalSize: ReadonlySignal<TerminalSizeState>;
 	addKeyboardListener(
 		handler: (event: TuvrenEvent) => void,
 		options?: KeyboardListenerOptions,

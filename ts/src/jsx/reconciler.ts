@@ -690,19 +690,26 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 	// Component function — re-invoke and reconcile the returned tree
 	if (typeof newVNode.type === "function") {
 		const resultVNode = resolveComponentOutput(instance, newVNode, 0);
-		assertRenderedTypeIsStable(instance, resultVNode);
+		try {
+			assertRenderedTypeIsStable(instance, resultVNode);
+		} catch (cause: unknown) {
+			rollbackFailedComponentUpdate(instance);
+			throw cause;
+		}
 		updateResolvedInstance(instance, resultVNode);
 		instance.vnode = newVNode;
 		instance.key = newVNode.key;
 		return;
 	}
 
-	disposeComponentFrames(instance);
-
 	// Fragment — reconcile the fragment's own children.
 	// Fragment children are native children of the nearest widget-bearing ancestor,
 	// so we look up the ancestor widget for mount/append operations.
 	if (newVNode.type === Fragment) {
+		if (instance.widget) {
+			throw new Error("Changing a widget-bearing child into Fragment is not supported during reconciliation");
+		}
+		disposeComponentFrames(instance);
 		updateResolvedInstance(instance, newVNode);
 		instance.vnode = newVNode;
 		instance.key = newVNode.key;
@@ -710,6 +717,7 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 	}
 
 	assertIntrinsicTypeIsStable(instance, newVNode);
+	disposeComponentFrames(instance);
 	updateResolvedInstance(instance, newVNode);
 	instance.vnode = newVNode;
 	instance.key = newVNode.key;
@@ -851,17 +859,30 @@ function resolveComponentOutput(
 
 function assertIntrinsicTypeIsStable(instance: Instance, newVNode: VNode): void {
 	if (!instance.widget) {
-		return;
+		throw new Error(
+			`Changing Fragment child to widget type "${String(newVNode.type)}" is not supported during reconciliation`,
+		);
 	}
 
-	const previousType = instance.vnode.type;
-	if (typeof previousType !== "string" || previousType === newVNode.type) {
+	const expectedNodeType = WIDGET_MAP[newVNode.type as string];
+	const currentNodeType = ffi.tui_get_node_type(instance.widget.handle);
+	if (expectedNodeType === currentNodeType) {
 		return;
 	}
 
 	throw new Error(
-		`Changing intrinsic widget type from "${String(previousType)}" to "${String(newVNode.type)}" is not supported during reconciliation`,
+		`Changing intrinsic widget type to "${String(newVNode.type)}" is not supported during reconciliation`,
 	);
+}
+
+function rollbackFailedComponentUpdate(instance: Instance): void {
+	const previousVNode = instance.vnode;
+	if (typeof previousVNode.type === "function") {
+		resolveComponentOutput(instance, previousVNode, 0);
+		return;
+	}
+
+	disposeComponentFrames(instance);
 }
 
 function assertRenderedTypeIsStable(instance: Instance, vnode: VNode): void {

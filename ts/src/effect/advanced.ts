@@ -254,8 +254,8 @@ export function createCommandService(
 	): Effect.Effect<boolean, TuvrenEffectError> =>
 		tryPromise("effect.commands.execute", () =>
 			options.registry.execute(id, {
-				app: context.app ?? options.dispatcher?.app,
 				...context,
+				app: context.app ?? options.dispatcher?.app,
 				source: context.source ?? "programmatic",
 			}),
 		);

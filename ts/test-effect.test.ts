@@ -211,7 +211,9 @@ describe("High-level Effect authoring", () => {
 				throw new Error("Expected command service to be captured during render");
 			}
 
-			const executed = await Effect.runPromise(service.execute("capture.app"));
+			const executed = await Effect.runPromise(
+				service.execute("capture.app", { app: undefined }),
+			);
 			expect(executed).toBe(true);
 			expect(seenApp).toBe(harness.app);
 		} finally {
@@ -253,6 +255,96 @@ describe("High-level Effect authoring", () => {
 			]);
 
 			expect(harness.runtime.commands.list().map((command) => command.id)).not.toContain("component.bound");
+		} finally {
+			harness.shutdown();
+		}
+	});
+
+	test("reconcileChildren rejects keyed component replacement with a different intrinsic type", () => {
+		function CommandChild() {
+			useCommand({
+				id: "component.text",
+				title: "Component text",
+				run: () => {},
+			});
+
+			return jsx(EffectText, {
+				content: "component child",
+			});
+		}
+
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+					children: jsx(CommandChild, { key: "same" }),
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		try {
+			expect(() =>
+				reconcileChildren(harness.instance, [
+					jsx(EffectBox, {
+						key: "same",
+						width: "100%",
+						height: "100%",
+					}),
+				]),
+			).toThrow('Changing intrinsic widget type to "box"');
+			expect(harness.runtime.commands.list().map((command) => command.id)).toContain("component.text");
+		} finally {
+			harness.shutdown();
+		}
+	});
+
+	test("failed component output validation rolls back component hook side effects", () => {
+		function StableChild() {
+			useCommand({
+				id: "component.old",
+				title: "Component old",
+				run: () => {},
+			});
+
+			return jsx(EffectText, {
+				content: "stable child",
+			});
+		}
+
+		function InvalidChild() {
+			useCommand({
+				id: "component.new",
+				title: "Component new",
+				run: () => {},
+			});
+
+			return jsx(EffectBox, {
+				width: "100%",
+				height: "100%",
+			});
+		}
+
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+					children: jsx(StableChild, { key: "same" }),
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		try {
+			expect(harness.runtime.commands.list().map((command) => command.id)).toEqual(["component.old"]);
+
+			expect(() =>
+				reconcileChildren(harness.instance, [
+					jsx(InvalidChild, { key: "same" }),
+				]),
+			).toThrow('Changing component output widget type to "box"');
+
+			expect(harness.runtime.commands.list().map((command) => command.id)).toEqual(["component.old"]);
 		} finally {
 			harness.shutdown();
 		}
