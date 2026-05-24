@@ -689,17 +689,17 @@ function reconcileWithWidget(
 function updateInstance(instance: Instance, newVNode: VNode): void {
 	// Component function — re-invoke and reconcile the returned tree
 	if (typeof newVNode.type === "function") {
-		const resultVNode = resolveComponentOutput(instance, newVNode, 0);
 		try {
+			const resultVNode = resolveComponentOutput(instance, newVNode, 0);
 			assertRenderedTypeIsStable(instance, resultVNode);
+			updateResolvedInstance(instance, resultVNode);
+			instance.vnode = newVNode;
+			instance.key = newVNode.key;
+			return;
 		} catch (cause: unknown) {
 			rollbackFailedComponentUpdate(instance);
 			throw cause;
 		}
-		updateResolvedInstance(instance, resultVNode);
-		instance.vnode = newVNode;
-		instance.key = newVNode.key;
-		return;
 	}
 
 	// Fragment — reconcile the fragment's own children.
@@ -878,11 +878,21 @@ function assertIntrinsicTypeIsStable(instance: Instance, newVNode: VNode): void 
 function rollbackFailedComponentUpdate(instance: Instance): void {
 	const previousVNode = instance.vnode;
 	if (typeof previousVNode.type === "function") {
-		resolveComponentOutput(instance, previousVNode, 0);
+		const resultVNode = resolveComponentOutput(instance, previousVNode, 0);
+		assertRenderedTypeIsStable(instance, resultVNode);
+		updateResolvedInstance(instance, resultVNode);
 		return;
 	}
 
 	disposeComponentFrames(instance);
+
+	if (previousVNode.type === Fragment) {
+		updateResolvedInstance(instance, previousVNode);
+		return;
+	}
+
+	assertIntrinsicTypeIsStable(instance, previousVNode);
+	updateResolvedInstance(instance, previousVNode);
 }
 
 function assertRenderedTypeIsStable(instance: Instance, vnode: VNode): void {

@@ -350,6 +350,54 @@ describe("High-level Effect authoring", () => {
 		}
 	});
 
+	test("failed component resolution rolls back component hook side effects", () => {
+		function StableChild() {
+			useCommand({
+				id: "component.old",
+				title: "Component old",
+				run: () => {},
+			});
+
+			return jsx(EffectText, {
+				content: "stable child",
+			});
+		}
+
+		function ThrowingChild() {
+			useCommand({
+				id: "component.new",
+				title: "Component new",
+				run: () => {},
+			});
+
+			throw new Error("component boom");
+		}
+
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+					children: jsx(StableChild, { key: "same" }),
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		try {
+			expect(harness.runtime.commands.list().map((command) => command.id)).toEqual(["component.old"]);
+
+			expect(() =>
+				reconcileChildren(harness.instance, [
+					jsx(ThrowingChild, { key: "same" }),
+				]),
+			).toThrow("component boom");
+
+			expect(harness.runtime.commands.list().map((command) => command.id)).toEqual(["component.old"]);
+		} finally {
+			harness.shutdown();
+		}
+	});
+
 	test("keyboard listeners dispatch against a stable snapshot", () => {
 		const harness = testRender(
 			() =>
