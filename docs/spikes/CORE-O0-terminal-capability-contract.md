@@ -17,7 +17,7 @@ color/pixel reporting, and terminal multiplexer behavior.
 
 ## Capability Flags
 
-The TechSpec §4.5 flag layout remains valid. `tui_get_capabilities()` returns
+The TechSpec §4.9 flag layout remains valid. `tui_get_capabilities()` returns
 the low 32 bits for compatibility; `tui_terminal_get_capabilities()` returns
 the full `u64` state.
 
@@ -84,6 +84,6 @@ layout.
 
 ## TechSpec Reconciliation
 
-No contradiction with TechSpec §4.5 was found. This memo narrows multiplexer
+No contradiction with TechSpec §4.9 was found. This memo narrows multiplexer
 passthrough to conservative disabled behavior for OSC52 under tmux/screen/Zellij
 until a later ticket validates explicit passthrough wrappers.

@@ -19,9 +19,9 @@
 - **Current Product Emphasis:** Tuvren tells a general-purpose framework story. Its showcase and proving grounds remain demanding agentic and developer-facing products because those workloads stress the performance, viewport, and inspectability requirements that motivated the project in the first place.
 - **JTBD Priority Order:** Ship Faster > Productized Trust > Framework Foundations > Bun-native DX > Own the Full Stack
 
-### 1.2 Version Roadmap Context
+### 1.2 Capability Roadmap Context
 
-| Version | Scope Emphasis | Summary |
+| Wave | Scope Emphasis | Summary |
 | --- | --- | --- |
 | **v0** | Core interaction surface | Widget composition, layout, styling, keyboard and mouse input, scrolling, cross-platform terminal handling, and rich text rendering |
 | **v1** | Product polish | Animation system and theming foundation |

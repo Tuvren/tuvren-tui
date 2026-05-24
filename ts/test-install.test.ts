@@ -68,7 +68,7 @@ describe("resolveLibraryPath", () => {
 		process.env.TUVREN_LIB_PATH = join(sep, "nonexistent", "path", "libtuvren_tui.so");
 		// Falls through to source build because the env path does not exist.
 		// NOTE: this test also implicitly relies on @tuvren/* aux packages NOT being installed
-		// in node_modules (they aren't on the registry yet). Once Epic Q publishes them, the
+		// in node_modules (they aren't on the registry yet). Once Epic V publishes them, the
 		// resolver will return the aux-package path instead of the source build, and this test
 		// will need to be updated to mock resolveAuxPackage or to assert the aux-package path.
 		const libPath = resolveLibraryPath();

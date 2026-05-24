@@ -239,18 +239,19 @@ Then dependency placement, scope lifecycle, event streams, command bindings, and
 And the root imperative package remains the canonical surface
 ```
 
-**EFF-S002 Add Optional Effect Dependency and Subpath Wiring**
+**EFF-S002 Add Optional Effect Peer and Subpath Wiring**
 - **Type:** Feature
 - **Effort:** 3
 - **Dependencies:** EFF-S001
 - **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §1.2 and §4.5
-- **Description:** Add the Effect dependency and wire the optional subpath so Effect usage is explicit and isolated from ordinary imperative imports.
+- **Description:** Add the official `effect` package as an optional peer relationship for the `tuvren-tui/effect` subpath, keep any direct dependency usage limited to dev/test surfaces, and wire the optional subpath so Effect usage is explicit and isolated from ordinary imperative imports.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given a Developer imports from tuvren-tui/effect
 When the module loads
 Then the Effect integration APIs are available
 And ordinary imports from tuvren-tui do not require Effect-specific setup
+And root tuvren-tui installs do not gain a mandatory Effect runtime dependency
 ```
 
 **EFF-S003 Implement Effect Scope and Resource Lifecycle Adapters**

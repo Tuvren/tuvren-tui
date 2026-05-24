@@ -34,7 +34,7 @@
 | Language | TypeScript | `^5.0.0` | Keep strict typed wrappers and examples in TypeScript. |
 | FFI mechanism | `bun:ffi` | built-in | Preserve the direct native-library loading path rather than adding an alternate bridge. |
 | Reactivity | `@preact/signals-core` | `^1.8.0` | Preserve the lightweight JSX/signals path without promoting it to the primary lifecycle model. |
-| Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` dependency belongs to the optional declarative subpath rather than the main surface. |
+| Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` package relationship belongs to the optional declarative subpath as an optional peer/dev dependency rather than a root-package runtime dependency. |
 | Public package contract | `tuvren-tui` (Epic P shipped the rename from `kraken-tui`) | `ts/package.json`, source tree | One public package as the user-facing contract; the hard rename is complete. |
 | Optional declarative subpath | `tuvren-tui/effect` stub (Epic P shipped the rename from `kraken-tui/effect`) | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
 | Native package topology | current Brownfield: GitHub assets plus auxiliary scoped package stubs; approved public publish follows in Epic V | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the Tuvren organization, while keeping `tuvren-tui` as the only public package. |
@@ -147,7 +147,7 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 
 ### ADR-T43 One Public Package Sits Above Internal Scoped Native Packages
 - **Status:** accepted
-- **Context:** The current Brownfield install story relies on GitHub native assets plus manual or staged prebuild placement. That is workable for source checkouts but falls short of the productized install experience needed for a competitive framework release.
+- **Context:** The current Brownfield install story relies on GitHub native assets, `TUVREN_LIB_PATH`, auxiliary package stubs, and source-checkout fallback. That is workable for source checkouts but falls short of the productized install experience needed for a competitive framework release.
 - **Decision:** Keep one public package as the only documented install target and move platform-native distribution behind auxiliary scoped packages published under the new organization. `tuvren-tui` remains the public facade; auxiliary packages such as `@tuvren/tuvren-tui-linux-x64` and `@tuvren/tuvren-tui-darwin-arm64` carry the shared libraries that the resolver loads after it first checks `TUVREN_LIB_PATH`. If no override is provided and the platform-native package is skipped or unavailable, the resolver must fall through to the local Cargo build in repo checkouts and otherwise fail with a clear diagnostic instead of assuming the optional package exists. Source-build fallback remains part of repo-side development and verification.
 - **Consequences:** End-user install UX becomes simpler and less error-prone, while the release workflow and resolver gain packaging responsibilities that must stay aligned across CI, diagnostics, and test coverage. The project also accepts npm package-topology work as core productization scope rather than as release glue, including the need to handle optional native-package omission explicitly at runtime. "Auxiliary scoped package" here means a public distribution unit beneath `tuvren-tui`, not a separate documented install target.
 
@@ -184,7 +184,7 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 ### 2.2 Brownfield Reality Note
 - The prior v6 TechSpec described transcript, devtools, split-pane, and flagship examples as future work. The current source tree implements them.
 - This v7 artifact is therefore intentionally present-tense and canonical rather than future-tense and phase-only.
-- ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.4 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
+- ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.8 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
 - ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
 - ADR-T42 is now shipped under Epic P. The source tree exports `Tuvren` from `tuvren-tui`, resolves native libraries through `TUVREN_LIB_PATH`, and names release assets after Tuvren. The staged-prebuild path is removed; the resolver now searches TUVREN_LIB_PATH → aux scoped package → source build (repo-checkout only).
 - `tuvren-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
@@ -672,6 +672,7 @@ supported_release_targets:
 - **Authentication / Authorization:** Not applicable
 - **Compatibility Strategy:** Commands, keymaps, Effect bindings, and plugin slots remain pre-GA APIs. They must not add native mutable state authorities or require new Native Core callbacks.
 - **Error model:** Invalid registrations, duplicate command IDs, malformed keybindings, and rejected plugin contributions fail synchronously with `TuvrenError` or typed host errors before runtime dispatch.
+- **Plugin source status:** `source: "plugin"` is reserved for Epic T contributions. Epic R must preserve the discriminant shape but does not need to implement plugin registration or plugin-specific dispatch semantics.
 
 ```ts
 interface Command {
@@ -1012,7 +1013,7 @@ cargo build --manifest-path native/Cargo.toml --release && bun run examples/ops-
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/repo-inspector.ts
 ```
 
-Repo-side host verification entrypoints that `dlopen` directly are expected to target the local Cargo-built native artifact under `native/target/release/`. The general runtime resolver still supports staged prebuilds for package/install flows, but branch validation must not be shadowed by stale packaged assets.
+Repo-side host verification entrypoints that `dlopen` directly are expected to target the local Cargo-built native artifact under `native/target/release/`. The general runtime resolver no longer supports staged prebuilds; package/install verification must exercise the documented order of `TUVREN_LIB_PATH`, auxiliary scoped package, then source build.
 
 ### 5.4 Performance and Quality Gates
 
@@ -1026,7 +1027,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to t
 | Debug-off overhead | bounded and benchmarked | `native/benches/devtools_bench.rs` |
 | Substrate append and cursor prefix cost | benchmarked before transcript closeout | `native/benches/text_substrate_bench.rs`, `docs/reports/substrate-benchmarks.md` |
 
-Current CI validates the host benchmark and install surfaces on Linux. Cross-platform release artifacts are built in the release workflow, and the resolver path for staged prebuilds is covered by install smoke tests, but the full host benchmark matrix is not yet exercised on macOS and Windows in CI.
+Current CI validates the host benchmark and install surfaces on Linux. Cross-platform release artifacts are built in the release workflow, and the source-build resolver fallback is covered by install smoke tests, but the full host benchmark matrix is not yet exercised on macOS and Windows in CI. Epic V owns packed/registry smoke coverage for the auxiliary scoped package resolver branch.
 
 The approved first productization wave extends CI and/or release verification with install and load smoke coverage for the full supported public target matrix while keeping the benchmark-heavy enforcement path Linux-blocking until cross-platform performance gates are proven stable.
 
