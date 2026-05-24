@@ -1,8 +1,11 @@
 /**
- * CommandPalette — Host composite over Overlay + Input + List (TASK-K2).
+ * CommandPalette — Host composite over Overlay + Input + List.
  *
- * Dense, keyboard-driven command filtering suitable for developer tools.
- * No native APIs required; composed entirely from existing widgets.
+ * Accepts either a CommandRegistry (preferred, Epic R) or a static array of
+ * Command objects for cases where a full registry is not yet wired.
+ *
+ * When a CommandRegistry is provided, command execution goes through the
+ * registry so dispatch logic is not duplicated in application code.
  */
 
 import { ffi } from "../ffi";
@@ -14,15 +17,21 @@ import { Input } from "../widgets/input";
 import { List } from "../widgets/list";
 import { Box } from "../widgets/box";
 import { Buffer } from "buffer";
+import type { Command, CommandContext, CommandRegistry } from "../commands";
+import type { Tuvren } from "../app";
 
-export interface Command {
-	id: string;
-	label: string;
-	action: () => void;
-}
+export type { Command };
 
 export interface CommandPaletteOptions {
+	/** Preferred: a CommandRegistry whose list() drives the palette display. */
+	registry?: CommandRegistry;
+	/**
+	 * Static command array. Used when no registry is provided.
+	 * Accepts Command objects (title + run) for forward-compatibility.
+	 */
 	commands?: Command[];
+	/** Tuvren app instance, required for registry-backed execute with full context. */
+	app?: Tuvren;
 	width?: string | number;
 	height?: string | number;
 	fg?: string | number;
@@ -34,12 +43,18 @@ export class CommandPalette {
 	private container: Box;
 	private input: Input;
 	private list: List;
-	private commands: Command[] = [];
+	private _registry?: CommandRegistry;
+	private _staticCommands: Command[] = [];
+	private _app?: Tuvren;
 	private filteredCommands: Command[] = [];
 	private restoreFocusHandle = 0;
 	private wasOpen = false;
 
 	constructor(options: CommandPaletteOptions = {}) {
+		this._registry = options.registry;
+		this._staticCommands = options.commands ? [...options.commands] : [];
+		this._app = options.app;
+
 		this.overlay = new Overlay({
 			modal: true,
 			clearUnder: true,
@@ -61,10 +76,6 @@ export class CommandPalette {
 		this.container.append(this.input);
 		this.container.append(this.list);
 		this.overlay.append(this.container);
-
-		if (options.commands) {
-			this.setCommands(options.commands);
-		}
 	}
 
 	/** Get the root widget (Overlay) for attaching to the tree. */
@@ -72,11 +83,22 @@ export class CommandPalette {
 		return this.overlay;
 	}
 
-	/** Replace the full command list. */
+	/**
+	 * Replace the static command list.
+	 * Has no effect on the displayed list when a registry is attached, because
+	 * _sourceCommands() returns registry.list() in that case.
+	 */
 	setCommands(commands: Command[]): void {
-		this.commands = [...commands];
-		this.filteredCommands = [...commands];
-		this.syncListItems();
+		this._staticCommands = [...commands];
+		this.filteredCommands = [...this._sourceCommands()];
+		this._syncListItems();
+	}
+
+	/** Replace or attach the registry. */
+	setRegistry(registry: CommandRegistry): void {
+		this._registry = registry;
+		this.filteredCommands = [...this._sourceCommands()];
+		this._syncListItems();
 	}
 
 	/** Open the palette. Clears filter, resets selection, and focuses input. */
@@ -86,9 +108,8 @@ export class CommandPalette {
 		}
 		this.overlay.setOpen(true);
 		this.wasOpen = true;
-		this.filteredCommands = [...this.commands];
-		this.syncListItems();
-		// Clear filter input
+		this.filteredCommands = [...this._sourceCommands()];
+		this._syncListItems();
 		const encoded = new TextEncoder().encode("");
 		checkResult(
 			ffi.tui_set_content(this.input.handle, Buffer.from(encoded), 0),
@@ -101,18 +122,17 @@ export class CommandPalette {
 		if (this.overlay.isOpen()) {
 			this.overlay.setOpen(false);
 		}
-		this.syncClosedState(false);
+		this._syncClosedState(false);
 	}
 
 	/** Check if the palette is currently open. */
 	isOpen(): boolean {
-		return this.syncClosedState(this.overlay.isOpen());
+		return this._syncClosedState(this.overlay.isOpen());
 	}
 
 	/**
 	 * Read the current value of the embedded Input widget and apply it as
-	 * the filter query.  Call this from your event loop after the Input
-	 * receives keystrokes so visible commands update automatically.
+	 * the filter query.
 	 */
 	handleInput(): void {
 		const query = this.input.getValue();
@@ -130,20 +150,19 @@ export class CommandPalette {
 	}
 
 	/**
-	 * Apply a text filter to the command list.
-	 * Can be called directly with an explicit query string, or use
-	 * handleInput() to read the embedded Input widget automatically.
+	 * Apply a text filter to the command list (matches against `title`).
 	 */
 	applyFilter(query: string): void {
 		const q = query.toLowerCase();
+		const source = this._sourceCommands();
 		if (q.length === 0) {
-			this.filteredCommands = [...this.commands];
+			this.filteredCommands = [...source];
 		} else {
-			this.filteredCommands = this.commands.filter((cmd) =>
-				cmd.label.toLowerCase().includes(q),
+			this.filteredCommands = source.filter((cmd) =>
+				cmd.title.toLowerCase().includes(q),
 			);
 		}
-		this.syncListItems();
+		this._syncListItems();
 		if (this.filteredCommands.length > 0) {
 			this.list.setSelected(0);
 		}
@@ -151,17 +170,42 @@ export class CommandPalette {
 
 	/**
 	 * Execute the currently selected command and close the palette.
+	 * When a registry is attached, runs through registry.execute() so dispatch
+	 * logic is not duplicated in application code.
 	 * Returns true if a command was executed, false if no selection.
 	 */
-	executeSelected(): boolean {
+	async executeSelected(): Promise<boolean> {
 		const idx = this.list.getSelected();
-		if (idx >= 0 && idx < this.filteredCommands.length) {
-			const cmd = this.filteredCommands[idx];
-			this.close();
-			cmd.action();
-			return true;
+		if (idx < 0 || idx >= this.filteredCommands.length) return false;
+
+		const cmd = this.filteredCommands[idx]!;
+		// Capture the widget that was focused before the palette opened.
+		// close() zeroes restoreFocusHandle, so it must be read first.
+		const priorFocusHandle = this.restoreFocusHandle;
+		this.close();
+
+		const focused = priorFocusHandle > 0 ? { handle: priorFocusHandle } : undefined;
+
+		if (this._registry) {
+			const ctx: Partial<CommandContext> = {
+				source: "palette",
+				focused,
+				...(this._app ? { app: this._app } : {}),
+			};
+			// Propagate the registry's result: returns false if the command was
+			// disposed or its when-predicate rejected between open() and execute.
+			return this._registry.execute(cmd.id, ctx);
+		} else {
+			// Static command path — app may be absent if palette was created without one
+			const ctx: CommandContext = {
+				app: this._app,
+				source: "palette",
+				focused,
+			};
+			await cmd.run(ctx);
 		}
-		return false;
+
+		return true;
 	}
 
 	/** Move selection up in the filtered list. */
@@ -185,22 +229,24 @@ export class CommandPalette {
 		return this.filteredCommands.length;
 	}
 
-	private syncListItems(): void {
+	private _sourceCommands(): Command[] {
+		return this._registry ? this._registry.list() : this._staticCommands;
+	}
+
+	private _syncListItems(): void {
 		this.list.clearItems();
 		for (const cmd of this.filteredCommands) {
-			this.list.addItem(cmd.label);
+			this.list.addItem(cmd.title);
 		}
 		if (this.filteredCommands.length > 0) {
 			this.list.setSelected(0);
 		}
 	}
 
-	private isEffectivelyVisible(handle: number): boolean {
+	private _isEffectivelyVisible(handle: number): boolean {
 		let current = handle;
 		while (current !== 0) {
-			if (ffi.tui_get_visible(current) !== 1) {
-				return false;
-			}
+			if (ffi.tui_get_visible(current) !== 1) return false;
 			if (
 				ffi.tui_get_node_type(current) === NodeType.Overlay &&
 				ffi.tui_overlay_get_open(current) !== 1
@@ -212,20 +258,20 @@ export class CommandPalette {
 		return true;
 	}
 
-	private canRestoreFocus(handle: number): boolean {
+	private _canRestoreFocus(handle: number): boolean {
 		return handle !== 0 &&
-			this.isEffectivelyVisible(handle) &&
+			this._isEffectivelyVisible(handle) &&
 			ffi.tui_is_focusable(handle) === 1;
 	}
 
-	private syncClosedState(open: boolean): boolean {
+	private _syncClosedState(open: boolean): boolean {
 		if (!open && this.wasOpen) {
 			this.wasOpen = false;
 			const restoreFocusHandle = this.restoreFocusHandle;
 			this.restoreFocusHandle = 0;
 			if (
 				ffi.tui_get_focused() === 0 &&
-				this.canRestoreFocus(restoreFocusHandle)
+				this._canRestoreFocus(restoreFocusHandle)
 			) {
 				checkResult(ffi.tui_focus(restoreFocusHandle));
 			}

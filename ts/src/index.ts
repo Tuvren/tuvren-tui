@@ -53,9 +53,22 @@ export { PerfHud, PERF_COUNTER_NAMES, PERF_COUNTER_COUNT } from "./devtools/hud"
 export { TraceViewer, TRACE_KIND } from "./devtools/traces";
 export type { TraceEntry, TraceKind } from "./devtools/traces";
 
+// Commands & Keymap Foundations (Epic R, ADR-T44)
+export { CommandRegistry, CommandDispatcher } from "./commands";
+export type {
+	Command,
+	CommandContext,
+	CommandPredicate,
+	CommandSource,
+	Disposable,
+	WidgetRef,
+} from "./commands";
+export { KeymapRegistry } from "./keymap";
+export type { KeyBinding } from "./keymap";
+
 // App-Shaped Surface Composites (Epic K, ADR-T35)
 export { CommandPalette } from "./composites/command-palette";
-export type { Command, CommandPaletteOptions } from "./composites/command-palette";
+export type { CommandPaletteOptions } from "./composites/command-palette";
 export { TracePanel, StructuredLogView } from "./composites/trace-panel";
 export type {
 	TraceKind as TracePanelKind,

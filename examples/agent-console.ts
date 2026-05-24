@@ -396,21 +396,21 @@ function cycleTraceFilter(): void {
 }
 
 const commands: Command[] = [
-	{ id: "restart", label: "Restart Replay", action: restartReplay },
-	{ id: "speed-fast", label: "Speed: Fast (30 evt/s)", action: () => setSpeed(2) },
-	{ id: "speed-normal", label: "Speed: Normal (20 evt/s)", action: () => setSpeed(3) },
-	{ id: "speed-slow", label: "Speed: Slow (5 evt/s)", action: () => setSpeed(12) },
-	{ id: "follow-tail", label: "Follow: Tail Locked", action: () => { followModeIndex = 0; transcript.setFollowMode("tailLocked"); } },
-	{ id: "follow-near", label: "Follow: Near Bottom", action: () => { followModeIndex = 1; transcript.setFollowMode("tailWhileNearBottom"); } },
-	{ id: "follow-manual", label: "Follow: Manual", action: () => { followModeIndex = 2; transcript.setFollowMode("manual"); } },
-	{ id: "jump-unread", label: "Jump to Unread", action: () => transcript.jumpToUnread() },
-	{ id: "mark-read", label: "Mark All Read", action: () => transcript.markRead() },
-	{ id: "trace-all", label: "Trace Filter: All", action: () => { traceFilterIndex = 0; tracePanel.setFilter("all"); } },
-	{ id: "trace-event", label: "Trace Filter: Events", action: () => { traceFilterIndex = 1; tracePanel.setFilter("event"); } },
-	{ id: "trace-focus", label: "Trace Filter: Focus", action: () => { traceFilterIndex = 2; tracePanel.setFilter("focus"); } },
-	{ id: "toggle-dev", label: "Toggle Dev Overlays", action: toggleDevOverlays },
-	{ id: "toggle-pane", label: "Toggle Side Panel", action: () => switchSideTab(activeSideTab === 0 ? 1 : 0) },
-	{ id: "quit", label: "Quit", action: () => loop.stop() },
+	{ id: "restart", title: "Restart Replay", run: restartReplay },
+	{ id: "speed-fast", title: "Speed: Fast (30 evt/s)", run: () => setSpeed(2) },
+	{ id: "speed-normal", title: "Speed: Normal (20 evt/s)", run: () => setSpeed(3) },
+	{ id: "speed-slow", title: "Speed: Slow (5 evt/s)", run: () => setSpeed(12) },
+	{ id: "follow-tail", title: "Follow: Tail Locked", run: () => { followModeIndex = 0; transcript.setFollowMode("tailLocked"); } },
+	{ id: "follow-near", title: "Follow: Near Bottom", run: () => { followModeIndex = 1; transcript.setFollowMode("tailWhileNearBottom"); } },
+	{ id: "follow-manual", title: "Follow: Manual", run: () => { followModeIndex = 2; transcript.setFollowMode("manual"); } },
+	{ id: "jump-unread", title: "Jump to Unread", run: () => transcript.jumpToUnread() },
+	{ id: "mark-read", title: "Mark All Read", run: () => transcript.markRead() },
+	{ id: "trace-all", title: "Trace Filter: All", run: () => { traceFilterIndex = 0; tracePanel.setFilter("all"); } },
+	{ id: "trace-event", title: "Trace Filter: Events", run: () => { traceFilterIndex = 1; tracePanel.setFilter("event"); } },
+	{ id: "trace-focus", title: "Trace Filter: Focus", run: () => { traceFilterIndex = 2; tracePanel.setFilter("focus"); } },
+	{ id: "toggle-dev", title: "Toggle Dev Overlays", run: toggleDevOverlays },
+	{ id: "toggle-pane", title: "Toggle Side Panel", run: () => switchSideTab(activeSideTab === 0 ? 1 : 0) },
+	{ id: "quit", title: "Quit", run: () => loop.stop() },
 ];
 
 const palette = new CommandPalette({
@@ -524,7 +524,7 @@ const loop = createLoop({
 		// Palette input handling
 		if (palette.isOpen()) {
 			if (event.type === "submit") {
-				palette.executeSelected();
+				void palette.executeSelected();
 				return;
 			}
 			if (event.type === "key") {

@@ -12,6 +12,7 @@ import { readInput, drainEvents, type TuvrenEvent } from "./events";
 import { dispatchToJsxHandlers, PERF_ACTIVE_ANIMATIONS } from "./loop";
 import { Widget } from "./widget";
 import type { Theme } from "./theme";
+import type { CommandDispatcher } from "./commands";
 
 /** Options for the `app.run()` event loop (ADR-T26). */
 export interface RunOptions {
@@ -29,6 +30,12 @@ export interface RunOptions {
 	debugOverlay?: boolean;
 	/** Disable automatic dispatch to JSX event handler props. Default: false. */
 	disableJsxDispatch?: boolean;
+	/**
+	 * Optional command dispatcher for automatic keymap resolution.
+	 * When provided, each drained key event is passed through the dispatcher
+	 * before onTick and render. Omit to opt out of command dispatch.
+	 */
+	commandDispatcher?: CommandDispatcher;
 }
 
 const TERMINAL_CAPABILITY_FLAGS = {
@@ -514,7 +521,16 @@ export class Tuvren {
 
 				for (const event of this.drainEvents()) {
 					options.onEvent?.(event);
+					// JSX handlers fire first; the command dispatcher sees the same event
+					// after. Keys consumed by native widgets (Input, TextArea) are typically
+					// converted to Submit/Change events by the native core and do not reach
+					// here as Key events (e.g. Enter→Submit, Backspace). Edge cases such as
+					// Input-at-max-length let the raw Key event escape, so a command binding
+					// on a printable char may fire when a full Input is focused.
 					if (jsxDispatch) dispatchToJsxHandlers(event);
+					if (options.commandDispatcher) {
+						await options.commandDispatcher.dispatch(event);
+					}
 				}
 
 				options.onTick?.();

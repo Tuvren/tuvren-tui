@@ -1,6 +1,7 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
+- v7.8.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to consume the registry; `commandDispatcher` option wired into `app.run()` and `createLoop()`; 46 focused command/keymap tests added. Next active wave is Epic S (Effect Declarative Integration).
 - v7.7.0 - Extended the implementation contract through Epics R-V: command/keymap services, Effect integration, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
 - v7.4.1 - Landed Epic O Brownfield updates: native terminal capability state, diagnostic query APIs, write-only OSC52, OSC8 text-buffer link spans, Kitty keyboard disambiguation negotiation, and conservative multiplexer degradation are now implemented.
@@ -187,6 +188,7 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 - ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.8 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
 - ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
 - ADR-T42 is now shipped under Epic P. The source tree exports `Tuvren` from `tuvren-tui`, resolves native libraries through `TUVREN_LIB_PATH`, and names release assets after Tuvren. The staged-prebuild path is removed; the resolver now searches TUVREN_LIB_PATH → aux scoped package → source build (repo-checkout only).
+- ADR-T44 is now shipped under Epic R. The Host Layer exposes `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` in `ts/src/commands.ts` and `ts/src/keymap.ts`. `CommandPalette` consumes a `CommandRegistry`. The `commandDispatcher` option is wired into `app.run()` and `createLoop()`. Key binding syntax is `[modifier+]*key`; duplicate command IDs throw; multiple bindings to the same key resolve first-registered-wins. The `source: "plugin"` discriminant is reserved for Epic T.
 - `tuvren-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
 - The GitHub repository now lives at `Tuvren/tuvren-tui`. npm package publication is not shipped Brownfield behavior yet; Epic V owns the first public `0.1.0` publish after Epic U SDK productization.
 

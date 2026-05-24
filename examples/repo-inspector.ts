@@ -397,14 +397,14 @@ function closeDiff(): void {
 }
 
 const commands: Command[] = [
-	{ id: "toggle-lines", label: "Toggle Line Numbers", action: toggleLineNumbers },
-	{ id: "toggle-dev", label: "Toggle Dev Overlays", action: toggleDevOverlays },
-	{ id: "collapse-all", label: "Collapse All Directories", action: collapseAll },
-	{ id: "expand-top", label: "Expand Top-Level", action: expandTopLevel },
-	{ id: "diff-left", label: "Set Current File as Diff Left", action: startDiffLeft },
-	{ id: "diff-show", label: "Show Diff (compare with left)", action: showDiff },
-	{ id: "diff-close", label: "Close Diff View", action: closeDiff },
-	{ id: "quit", label: "Quit", action: () => loop.stop() },
+	{ id: "toggle-lines", title: "Toggle Line Numbers", run: toggleLineNumbers },
+	{ id: "toggle-dev", title: "Toggle Dev Overlays", run: toggleDevOverlays },
+	{ id: "collapse-all", title: "Collapse All Directories", run: collapseAll },
+	{ id: "expand-top", title: "Expand Top-Level", run: expandTopLevel },
+	{ id: "diff-left", title: "Set Current File as Diff Left", run: startDiffLeft },
+	{ id: "diff-show", title: "Show Diff (compare with left)", run: showDiff },
+	{ id: "diff-close", title: "Close Diff View", run: closeDiff },
+	{ id: "quit", title: "Quit", run: () => loop.stop() },
 ];
 
 const palette = new CommandPalette({
@@ -535,7 +535,7 @@ const loop = createLoop({
 
 		// Palette handling
 		if (palette.isOpen()) {
-			if (event.type === "submit") { palette.executeSelected(); return; }
+			if (event.type === "submit") { void palette.executeSelected(); return; }
 			if (event.type === "key") {
 				const cp = event.codepoint ?? 0;
 				const mods = event.modifiers ?? 0;

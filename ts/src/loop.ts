@@ -7,6 +7,7 @@
 
 import type { Tuvren } from "./app";
 import type { TuvrenEvent } from "./events";
+import type { CommandDispatcher } from "./commands";
 import { getEventHandlers } from "./jsx/reconciler";
 
 export interface LoopOptions {
@@ -24,6 +25,12 @@ export interface LoopOptions {
 	disableJsxDispatch?: boolean;
 	/** Loop mode. "onChange" (default) auto-detects animations; "continuous" forces fixed-fps. */
 	mode?: "onChange" | "continuous";
+	/**
+	 * Optional command dispatcher for automatic keymap resolution.
+	 * When provided, each drained key event is passed through the dispatcher
+	 * before onTick and render. Omit to opt out of command dispatch.
+	 */
+	commandDispatcher?: CommandDispatcher;
 }
 
 export interface Loop {
@@ -86,7 +93,14 @@ export function createLoop(options: LoopOptions): Loop {
 			for (let tick = 0; tick < auditTicks; tick++) {
 				for (const event of app.drainEvents()) {
 					onEvent?.(event);
+					// JSX handlers fire first; the command dispatcher sees the same event
+					// after. Keys consumed by native widgets (Input, TextArea) are converted
+					// to Submit/Change events by the native core and never reach here as Key
+					// events, so there is no double-dispatch for widget-owned keys.
 					if (jsxDispatch) dispatchToJsxHandlers(event);
+					if (options.commandDispatcher) {
+						await options.commandDispatcher.dispatch(event);
+					}
 				}
 				onTick?.();
 				app.render();
@@ -108,7 +122,16 @@ export function createLoop(options: LoopOptions): Loop {
 
 			for (const event of app.drainEvents()) {
 				onEvent?.(event);
+				// JSX handlers fire first; the command dispatcher sees the same event
+				// after. Keys consumed by native widgets (Input, TextArea) are typically
+				// converted to Submit/Change events by the native core and do not reach
+				// here as Key events (e.g. Enter→Submit, Backspace). Edge cases such as
+				// Input-at-max-length let the raw Key event escape, so a command binding
+				// on a printable char may fire when a full Input is focused.
 				if (jsxDispatch) dispatchToJsxHandlers(event);
+				if (options.commandDispatcher) {
+					await options.commandDispatcher.dispatch(event);
+				}
 			}
 
 			onTick?.();
