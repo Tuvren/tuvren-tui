@@ -184,9 +184,9 @@ export class CommandPalette {
 			};
 			await this._registry.execute(cmd.id, ctx);
 		} else {
-			// Static command path
+			// Static command path — app may be absent if palette was created without one
 			const ctx: CommandContext = {
-				app: this._app!,
+				app: this._app,
 				source: "palette",
 			};
 			await cmd.run(ctx);

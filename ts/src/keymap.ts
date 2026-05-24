@@ -118,19 +118,30 @@ function parseKeyString(key: string): ParsedKey {
 	return { keyCode: 0, codepoint, modifiers };
 }
 
+const SHIFT_BIT = MODIFIER_BITS.shift!;
+
 function matchesEvent(binding: ParsedKey, event: TuvrenEvent): boolean {
 	if (event.type !== "key") return false;
 	const eventMods = event.modifiers ?? 0;
-	if (eventMods !== binding.modifiers) return false;
 
 	if (binding.keyCode > 0) {
+		// Named special key: require exact modifier match.
+		if (eventMods !== binding.modifiers) return false;
 		return (event.keyCode ?? 0) === binding.keyCode;
 	}
 
 	if (binding.codepoint > 0) {
+		// Printable char: the native core sets the Shift modifier when an uppercase
+		// character is typed (e.g. Shift+Q → modifiers=Shift, codepoint='Q'). When
+		// the binding itself does not require Shift (e.g. key="q"), strip Shift from
+		// the event before comparing so case-insensitive resolution still works.
+		// When the binding explicitly requires Shift (e.g. key="shift+something"),
+		// require the exact modifier set.
+		const requiresShift = (binding.modifiers & SHIFT_BIT) !== 0;
+		const effectiveEventMods = requiresShift ? eventMods : (eventMods & ~SHIFT_BIT);
+		if (effectiveEventMods !== binding.modifiers) return false;
 		const eventCp = event.codepoint ?? 0;
 		if (eventCp === 0) return false;
-		// Normalize event codepoint to lowercase for case-insensitive char matching
 		const normalizedCp =
 			String.fromCodePoint(eventCp).toLowerCase().codePointAt(0) ?? 0;
 		return normalizedCp === binding.codepoint;
@@ -203,24 +214,13 @@ export class KeymapRegistry {
 			if (!matchesEvent(binding.parsed, event)) continue;
 			if (binding.when && !binding.when(context)) continue;
 
-			// Look up the command in the attached registry if available
-			if (this._registry) {
-				const commands = this._registry.list();
-				const cmd = commands.find(c => c.id === binding.command);
-				if (cmd) {
-					// Respect the command's own `when` predicate as well
-					if (cmd.when && !cmd.when(context)) continue;
-					return cmd;
-				}
-			} else {
-				// Without a registry, return a minimal stub so callers can at least
-				// see which command id was resolved. Callers using a full dispatcher
-				// will always attach a registry.
-				return {
-					id: binding.command,
-					title: binding.command,
-					run: () => {},
-				};
+			if (!this._registry) continue;
+			const commands = this._registry.list();
+			const cmd = commands.find(c => c.id === binding.command);
+			if (cmd) {
+				// Respect the command's own `when` predicate as well
+				if (cmd.when && !cmd.when(context)) continue;
+				return cmd;
 			}
 		}
 

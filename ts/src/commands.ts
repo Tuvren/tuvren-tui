@@ -25,7 +25,8 @@ export interface Disposable {
 export type CommandSource = "keymap" | "palette" | "programmatic" | "plugin";
 
 export interface CommandContext {
-	app: Tuvren;
+	/** App instance. Always present when dispatched through CommandDispatcher; may be absent in the static-array palette path. */
+	app?: Tuvren;
 	event?: TuvrenEvent;
 	focused?: WidgetRef;
 	source: CommandSource;
@@ -109,7 +110,11 @@ export class CommandDispatcher {
 		private readonly _commands: CommandRegistry,
 		private readonly _keymaps: KeymapRegistry,
 		private readonly _app: Tuvren,
-	) {}
+	) {
+		// Wire the registry into the keymap resolver so callers don't need to
+		// call keymaps.setRegistry() separately — the two cannot drift.
+		this._keymaps.setRegistry(_commands);
+	}
 
 	/**
 	 * Attempt to dispatch a single event through the keymap resolver.

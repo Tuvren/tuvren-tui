@@ -262,6 +262,7 @@ describe("KeymapRegistry — resolve special keys", () => {
 		app = Tuvren.initHeadless(80, 24);
 		registry = new CommandRegistry();
 		keymaps = new KeymapRegistry();
+		keymaps.setRegistry(registry);
 	});
 	afterEach(() => { app.shutdown(); });
 
@@ -277,8 +278,6 @@ describe("KeymapRegistry — resolve special keys", () => {
 	test("resolves 'enter' to enter key event", () => {
 		registry.register({ id: "confirm", title: "Confirm", run: () => {} });
 		keymaps.register({ command: "confirm", key: "enter" });
-		// Provide registry so resolve can look up the command
-		keymaps.setRegistry(registry);
 		const cmd = keymaps.resolve(keyEvent(KeyCode.Enter), ctx());
 		expect(cmd?.id).toBe("confirm");
 	});
@@ -286,7 +285,6 @@ describe("KeymapRegistry — resolve special keys", () => {
 	test("resolves 'up' arrow key", () => {
 		registry.register({ id: "prev", title: "Prev", run: () => {} });
 		keymaps.register({ command: "prev", key: "up" });
-		keymaps.setRegistry(registry);
 		const cmd = keymaps.resolve(keyEvent(KeyCode.Up), ctx());
 		expect(cmd?.id).toBe("prev");
 	});
@@ -294,7 +292,6 @@ describe("KeymapRegistry — resolve special keys", () => {
 	test("resolves 'f5' function key", () => {
 		registry.register({ id: "refresh", title: "Refresh", run: () => {} });
 		keymaps.register({ command: "refresh", key: "f5" });
-		keymaps.setRegistry(registry);
 		const cmd = keymaps.resolve(keyEvent(0x0114 /* F5 */), ctx());
 		expect(cmd?.id).toBe("refresh");
 	});
@@ -302,7 +299,6 @@ describe("KeymapRegistry — resolve special keys", () => {
 	test("does not resolve non-matching key", () => {
 		registry.register({ id: "x", title: "X", run: () => {} });
 		keymaps.register({ command: "x", key: "enter" });
-		keymaps.setRegistry(registry);
 		const cmd = keymaps.resolve(keyEvent(KeyCode.Escape), ctx());
 		expect(cmd).toBeUndefined();
 	});
@@ -310,7 +306,6 @@ describe("KeymapRegistry — resolve special keys", () => {
 	test("does not resolve non-key events", () => {
 		registry.register({ id: "y", title: "Y", run: () => {} });
 		keymaps.register({ command: "y", key: "enter" });
-		keymaps.setRegistry(registry);
 		const mouseEvent: TuvrenEvent = { type: "mouse", target: 0, x: 0, y: 0 };
 		const cmd = keymaps.resolve(mouseEvent, ctx());
 		expect(cmd).toBeUndefined();
@@ -342,9 +337,18 @@ describe("KeymapRegistry — resolve character keys", () => {
 	test("char binding is case-insensitive (upper-case event codepoint)", () => {
 		registry.register({ id: "q2", title: "Q2", run: () => {} });
 		keymaps.register({ command: "q2", key: "q" });
-		// Some terminals send uppercase Q for the 'q' key
-		const cmd = keymaps.resolve(charEvent("Q"), ctx());
+		// Native core sends Shift modifier + uppercase codepoint for Shift+Q keystrokes;
+		// SHIFT is stripped before the modifier comparison for non-shift bindings.
+		const cmd = keymaps.resolve(charEvent("Q", Modifier.Shift), ctx());
 		expect(cmd?.id).toBe("q2");
+	});
+
+	test("case-insensitive binding does not match when non-shift modifiers differ", () => {
+		registry.register({ id: "q3", title: "Q3", run: () => {} });
+		keymaps.register({ command: "q3", key: "q" });
+		// ctrl+Q should not match a bare "q" binding
+		const cmd = keymaps.resolve(charEvent("Q", Modifier.Ctrl | Modifier.Shift), ctx());
+		expect(cmd).toBeUndefined();
 	});
 
 	test("resolves ctrl+c combination", () => {
@@ -366,6 +370,13 @@ describe("KeymapRegistry — resolve character keys", () => {
 		keymaps.register({ command: "action", key: "ctrl+shift+k" });
 		const cmd = keymaps.resolve(charEvent("k", Modifier.Ctrl | Modifier.Shift), ctx());
 		expect(cmd?.id).toBe("action");
+	});
+
+	test("ctrl+shift+k does not match ctrl+k (explicit shift binding requires shift)", () => {
+		registry.register({ id: "action2", title: "Action2", run: () => {} });
+		keymaps.register({ command: "action2", key: "ctrl+shift+k" });
+		const cmd = keymaps.resolve(charEvent("k", Modifier.Ctrl), ctx());
+		expect(cmd).toBeUndefined();
 	});
 });
 
