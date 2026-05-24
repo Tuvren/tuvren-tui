@@ -110,7 +110,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to v
 | **Platform matrix** | `linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64` |
 | **Enforcement** | Each platform builds the native library from source and runs `bun test ts/test-install.test.ts`. Native targets (`linux-x64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) also run a headless `dlopen` smoke confirming `tui_init_headless` / `tui_shutdown` succeed. `linux-arm64` is cross-compiled on an x64 runner and receives build + install-smoke only; load smoke requires a native arm64 runner and is tracked as a future gate upgrade. |
 | **Benchmark promotion** | Benchmark-heavy gates (Gates 3, 7, 8) remain Linux-only. Promoting any benchmark gate to a multi-platform blocking check requires an explicit decision tracked in `Tasks.md`. |
-| **Release timing** | This gate is pre-merge blocking in CI. No separate post-publish verification step exists at this time; the CI gate serves as the pre-release smoke before artifacts are published. |
+| **Release timing** | This gate is pre-merge blocking in CI. No separate post-publish verification step exists at this time; Epic V will add packed/registry install smoke before the first public npm publish. |
 
 ---
 
@@ -167,7 +167,7 @@ When intentional render changes cause golden mismatches:
 
 ## 7. Cross-Platform Verification Notes (Epic P)
 
-The `cross-platform-smoke` job was introduced in Epic P (PROD-P006) to satisfy the PRD §5 requirement that every supported public release target receives install and load verification before the productization wave is considered complete.
+The `cross-platform-smoke` job was introduced in Epic P (PROD-P006) to satisfy the PRD §5 requirement that every supported public release target receives install and load verification before the productization wave is considered complete. Epic V will extend release verification with package-manager install smoke against packed or published `tuvren-tui@0.1.0` and auxiliary native packages.
 
 **Benchmark promotion policy:** Benchmark-heavy gates (Gates 3, 7, 8) remain Linux-blocking because:
 - Native benchmark variance across CI runners is harder to interpret across OS families without establishing stable cross-platform baselines.

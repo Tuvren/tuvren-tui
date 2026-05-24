@@ -1,9 +1,9 @@
 # Solution Architecture
 
 ## 0. Version History & Changelog
+- v3.4.0 - Extended the roadmap architecture through Epics R-V: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm release as `0.1.0`.
 - v3.3.0 - Rebalanced the architecture around a general-purpose Tuvren framework posture, elevated productization to an architectural concern, and added host-side framework-service direction with explicit Brownfield transition notes.
 - v3.2.1 - Clarified the Text and Transcript bounded-context responsibilities so the substrate work ratified downstream is recognized as a deepening of existing logical contexts rather than a new container.
-- v3.2.0 - Reformatted to the current stage-2 framework skeleton and clarified logical boundaries without changing the approved cross-language architecture.
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Architectural Strategy & Archetype Alignment
@@ -28,12 +28,13 @@
 | **Flagship demanding workloads** | Continue treating long-lived transcript, log, trace, and pane-heavy surfaces as the proving grounds that validate the broader framework design. | Agentic and operator-style products still justify the hardest architectural requirements. |
 | **Anchor-aware viewports** | Prefer logical viewport anchors, unread markers, and nested-scroll handoff over raw row-offset management where streaming surfaces require it. | The general-purpose story must still survive demanding update churn in flagship workloads. |
 | **Developer tooling as product work** | Treat overlays, snapshots, traces, and inspection surfaces as architecture-level concerns. | The framework must be inspectable before it can be dependable. |
-| **Host-layer framework services** | Commands, keymaps, and future declarative integration surfaces belong in the Host Layer over the same native authority rather than as parallel mutable runtimes. | The framework needs application-level ergonomics without weakening the native-state invariant. |
-| **Productization as architecture work** | Distribution, install trust, onboarding, and release verification are treated as architecture-governed workstreams rather than afterthought chores. | A competitive framework needs a trustworthy delivery shape, not only a strong engine. |
+| **Host-layer framework services** | Commands, keymaps, Effect integration, and pre-GA plugin slots belong in the Host Layer over the same native authority rather than as parallel mutable runtimes. | The framework needs application-level ergonomics without weakening the native-state invariant. |
+| **SDK productization as architecture work** | Handle-safe event ergonomics, lifecycle clarity, wrapper completeness, examples, diagnostics, and devtools polish are treated as architectural adoption work before public npm publish. | A competitive framework needs a trustworthy developer surface, not only a strong engine. |
+| **Productization as release work** | Distribution, install trust, release verification, and feedback intake remain architecture-governed workstreams, but first npm publish is deferred until after SDK productization. | Public `0.1.0` should expose a credible pre-GA framework while preserving pre-`1.0` flexibility. |
 
 ### 1.4 Brownfield Transition Note
 - **Public product name:** `Tuvren` (Epic P shipped the hard-cut rename)
-- **Current source-tree reality:** The repo, package names, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P.
+- **Current source-tree reality:** The repo now lives at `Tuvren/tuvren-tui`; package names, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P, and the GitHub organization move is complete as pre-Epic-R operational cleanup.
 - **Architectural interpretation:** The logical design is governed by the public framework direction. Downstream artifacts must distinguish current Brownfield naming from approved future-state naming where the two still differ.
 
 ## 2. System Containers
@@ -46,7 +47,7 @@
 
 ### 2.2 Host Language Bindings
 - **Logical Type:** Host SDK / developer facade
-- **Responsibility:** Provide an ergonomic typed API for Developers, translate host-language intent into command calls, own loop policy, maintain developer-assigned ID maps, assemble higher-level composites and examples, and host future framework services such as commands, keymaps, and declarative integrations without becoming a second source of UI truth.
+- **Responsibility:** Provide an ergonomic typed API for Developers, translate host-language intent into command calls, own loop policy, maintain developer-assigned ID maps, assemble higher-level composites and examples, and host framework services such as commands, keymaps, Effect integration, and pre-GA plugin slots without becoming a second source of UI truth.
 - **Inputs:** Developer code, application state changes, optional replay streams, userland commands
 - **Outputs:** Native command calls, host-facing Widget abstractions, developer-friendly diagnostics, example and composite surfaces
 - **Depends on:** Native Core, Script Runtime
@@ -208,7 +209,7 @@ sequenceDiagram
 ```
 
 ### 4.5 Command Dispatch from Keymap Resolution
-- **Status:** Planned future flow for Epic R after the active productization and adoption wave; not shipped Brownfield runtime behavior.
+- **Status:** Planned future flow for Epic R after the shipped productization and adoption waves; not shipped Brownfield runtime behavior.
 - **Maps to PRD capability:** Epic 11 - Commands & Keymap Foundations
 - **Focus-awareness note:** Epic R must obtain focused-context data from the Native Core through drained event payloads or an explicit query path; host-side framework services must not invent shadow focus state.
 ```mermaid
@@ -228,6 +229,45 @@ sequenceDiagram
     Host-->>App: Invoke the selected command
     App->>Core: Apply resulting widget or state mutations through normal host wrappers
     Core->>Core: Recompute dirty state for the next host-driven render
+```
+
+### 4.6 Extension Contribution Registration
+- **Status:** Planned future flow for Epic T after commands/keymaps and Effect stabilize; not shipped Brownfield runtime behavior.
+- **Maps to PRD capability:** Epic 13 - Extension Slots and Framework Contributions
+- **Authority note:** Extensions may contribute host-layer services and UI composites, but all Widget mutation still flows through ordinary Host-to-Core commands.
+```mermaid
+sequenceDiagram
+    participant Plugin as Extension Package
+    participant Host as Host Framework Services
+    participant App as Developer Application
+    participant Core as Native Core
+
+    App->>Host: Register extension during application setup
+    Host->>Plugin: Provide bounded ExtensionContext
+    Plugin-->>Host: Contribute commands, keymaps, palette items, devtools panels, themes, or examples
+    Host->>Host: Validate contributions and attach them to registries
+    App->>Host: Invoke contributed service through normal framework APIs
+    Host->>Core: Apply resulting Widget mutations through ordinary wrappers
+```
+
+### 4.7 First Public Package Install
+- **Status:** Planned future flow for Epic V after SDK productization; not shipped Brownfield npm behavior.
+- **Maps to PRD capability:** Epic 10 - Productized Installation & Release Trust and Epic 14 - Expert-Level SDK Developer Experience
+```mermaid
+sequenceDiagram
+    actor Dev as Developer
+    participant PM as Package Manager
+    participant Public as tuvren-tui Package
+    participant Aux as @tuvren Native Package
+    participant Host as Host Resolver
+    participant Core as Native Core
+
+    Dev->>PM: Install tuvren-tui@0.1.0
+    PM->>Public: Fetch public package
+    PM->>Aux: Fetch matching optional native package when supported
+    Dev->>Host: Run application
+    Host->>Aux: Resolve native library by package name
+    Host->>Core: Load native library and initialize runtime
 ```
 
 ## 5. Resilience & Cross-Cutting Concerns
@@ -291,9 +331,9 @@ sequenceDiagram
 - **Mitigation or follow-up:** Preserve synchronous rendering as the default contract and require benchmark, semantic, and shutdown parity before any promotion of experimental threading.
 
 ### Risk 8 - Host-Layer Framework Growth Can Reintroduce Split-Brain State
-- **Why it matters:** Commands, keymaps, and future declarative integration layers increase framework ergonomics, but they also increase the risk that host-side orchestration quietly starts owning mutable UI semantics that the architecture reserves for the Native Core.
-- **Mitigation or follow-up:** Treat host-side framework services as orchestration over the existing command protocol only, and defer plugin-slot architecture until after `v1.0` and until the command/keymap and declarative contracts prove stable without duplicating native state.
+- **Why it matters:** Commands, keymaps, Effect integration, and plugin slots increase framework ergonomics, but they also increase the risk that host-side orchestration quietly starts owning mutable UI semantics that the architecture reserves for the Native Core.
+- **Mitigation or follow-up:** Treat host-side framework services as orchestration over the existing command protocol only. Plugin slots are allowed pre-GA after commands/keymaps and Effect stabilize, but they must remain bounded contribution points rather than alternate Widget state authorities.
 
 ### Risk 9 - Hard-Cut Rename and Productization Work Can Fracture Delivery
 - **Why it matters:** The move from Kraken to Tuvren, combined with package and release-contract changes, creates a real chance of shipping a stronger architecture behind a weaker public install story if the cutover is partial or incoherent.
-- **Mitigation or follow-up:** Make rename, package topology, release automation, diagnostics, and onboarding part of the same productization wave rather than scattering them across unrelated technical chores. Epic P shipped the rename; npm publish and full onboarding follow in Epic Q.
+- **Mitigation or follow-up:** Keep identity, package topology, SDK productization, release automation, diagnostics, and onboarding aligned across the canonical document chain. Epic P shipped the rename and package topology, Epic Q shipped adoption positioning, Epic U owns expert-level SDK productization, and Epic V owns first public npm publish plus feedback.

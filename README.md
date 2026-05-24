@@ -6,7 +6,7 @@ General-purpose terminal UI framework for TypeScript/Bun. Native Rust performanc
 
 ## Install
 
-Once `tuvren-tui` is published to the npm registry (first `@tuvren` release, Bun ≥ 1.1 required):
+Once `tuvren-tui` is published to the npm registry (Epic V first public pre-GA release, Bun ≥ 1.1 required):
 
 ```bash
 bun add tuvren-tui
@@ -14,7 +14,7 @@ bun add tuvren-tui
 
 The native library resolves automatically on supported platforms (`linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) through the platform-specific auxiliary package installed alongside `tuvren-tui`. If the native layer cannot be found, Tuvren emits an actionable diagnostic with remediation steps.
 
-> **Pre-1.0 note:** Neither `tuvren-tui` nor the `@tuvren` auxiliary packages are on the npm registry yet — binary publishing is staged for the first release. Until then, use the [source checkout path](#development-source-checkout) to build and run Tuvren locally.
+> **Pre-1.0 note:** Neither `tuvren-tui` nor the `@tuvren` auxiliary packages are on the npm registry yet — binary publishing is deferred until after the SDK productization pass and is planned as `0.1.0` pre-GA. Until then, use the [source checkout path](#development-source-checkout) to build and run Tuvren locally.
 
 ## Hello World
 

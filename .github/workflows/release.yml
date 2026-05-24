@@ -138,7 +138,7 @@ jobs:
 
           echo "artifact=${artifact}" >> $env:GITHUB_ENV
 
-      # Scaffolding for Epic Q npm publish: assembles the binary into the aux-package directory
+      # Scaffolding for Epic V npm publish: assembles the binary into the aux-package directory
       # so a future `npm publish packages/@tuvren/...` step can pick it up. The assembled
       # payload is not attached to the GitHub Release or published anywhere in this workflow.
       - name: Prepare auxiliary native package payload (Unix)
@@ -222,8 +222,9 @@ jobs:
             export TUVREN_LIB_PATH=/path/to/libtuvren_tui.so   # adjust name per platform
             ```
 
-            npm publish support and the `bun add tuvren-tui` install path will follow in a
-            subsequent release once org registry access is in place (Epic Q).
+            npm publish support and the `bun add tuvren-tui` install path are deferred to
+            Epic V after the SDK productization pass. The planned first public npm release
+            is `0.1.0` and remains pre-GA.
           files: |
             tuvren-tui-*
           draft: false
