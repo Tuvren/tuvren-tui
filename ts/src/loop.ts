@@ -123,9 +123,11 @@ export function createLoop(options: LoopOptions): Loop {
 			for (const event of app.drainEvents()) {
 				onEvent?.(event);
 				// JSX handlers fire first; the command dispatcher sees the same event
-				// after. Keys consumed by native widgets (Input, TextArea) are converted
-				// to Submit/Change events by the native core and never reach here as Key
-				// events, so there is no double-dispatch for widget-owned keys.
+				// after. Keys consumed by native widgets (Input, TextArea) are typically
+				// converted to Submit/Change events by the native core and do not reach
+				// here as Key events (e.g. Enter→Submit, Backspace). Edge cases such as
+				// Input-at-max-length let the raw Key event escape, so a command binding
+				// on a printable char may fire when a full Input is focused.
 				if (jsxDispatch) dispatchToJsxHandlers(event);
 				if (options.commandDispatcher) {
 					await options.commandDispatcher.dispatch(event);

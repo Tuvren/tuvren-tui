@@ -37,6 +37,12 @@ export type CommandPredicate = (context: CommandContext) => boolean;
 export interface Command {
 	id: string;
 	title: string;
+	/**
+	 * Execute the command. When dispatched through CommandDispatcher, this is
+	 * awaited inside the event-drain loop, so a slow async handler will stall
+	 * input processing and rendering for its duration. Keep run() non-blocking:
+	 * kick off async work and return, rather than awaiting long I/O inline.
+	 */
 	run(context: CommandContext): void | Promise<void>;
 	category?: string;
 	when?: CommandPredicate;
