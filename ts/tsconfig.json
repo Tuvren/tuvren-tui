@@ -11,5 +11,11 @@
     "noEmit": true,
     "types": ["bun-types"]
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "effect/**/*.ts",
+    "fixtures/**/*.ts",
+    "fixtures/**/*.tsx"
+  ]
 }

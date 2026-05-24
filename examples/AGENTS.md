@@ -23,6 +23,7 @@ These show Tuvren doing what most TypeScript developers reach for first: dashboa
 | File | API | Demonstrates |
 |------|-----|-------------|
 | `demo.ts` | Imperative | Box, Text, Input, Select, ScrollBox — imperative composition, event loop, theme switching |
+| `effect-counter.tsx` | Effect | Package-first Effect JSX, package-owned commands/keybindings, keyboard hooks, and terminal-size state over the native runtime |
 | `migration-jsx.tsx` | JSX | Same application as `demo.ts` rewritten with JSX + signals |
 | `showcase.ts` | JSX | Signals, animations, choreography, runtime tree mutations, TextArea, multiple themes |
 | `system-monitor.ts` | Imperative | 9 core widgets (Box, Text, Input, TextArea, Select, Table, List, Tabs, Overlay), 4 themes, animations |
@@ -69,7 +70,7 @@ These run Tuvren at its most demanding: continuous streaming output, long-lived 
 
 1. `const app = Tuvren.init()`
 2. Create custom themes and normalize defaults
-3. Build widget tree (imperative or JSX with signals)
+3. Build widget tree (imperative, Effect-managed imperative, or JSX with signals)
 4. `app.setRoot(root)` or `render(tree, app)`
 5. Create event loop: `createLoop()` or `app.run()` or manual `while` loop
 6. Handle events and update state in `onTick`

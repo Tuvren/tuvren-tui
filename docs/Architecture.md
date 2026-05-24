@@ -1,6 +1,7 @@
 # Solution Architecture
 
 ## 0. Version History & Changelog
+- v3.5.0 - Reframed Epic S at the architectural layer: `tuvren-tui/effect` is now the package-first Effect application surface over the same native runtime authority, with JSX authoring, package-owned commands/keybindings, testing helpers, and advanced escape hatches instead of an adapter-like orchestration stub.
 - v3.4.0 - Extended the roadmap architecture through Epics R-V: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm release as `0.1.0`.
 - v3.3.0 - Rebalanced the architecture around a general-purpose Tuvren framework posture, elevated productization to an architectural concern, and added host-side framework-service direction with explicit Brownfield transition notes.
 - v3.2.1 - Clarified the Text and Transcript bounded-context responsibilities so the substrate work ratified downstream is recognized as a deepening of existing logical contexts rather than a new container.
@@ -35,6 +36,7 @@
 ### 1.4 Brownfield Transition Note
 - **Public product name:** `Tuvren` (Epic P shipped the hard-cut rename)
 - **Current source-tree reality:** The repo now lives at `Tuvren/tuvren-tui`; package names, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P, and the GitHub organization move is complete as pre-Epic-R operational cleanup.
+- **Current framework-service reality:** Epic R and Epic S are both shipped. Commands/keymaps already live in the Host Layer, and `tuvren-tui/effect` now provides the real package-first authoring surface over the same native authority rather than an adapter-like helper layer.
 - **Architectural interpretation:** The logical design is governed by the public framework direction. Downstream artifacts must distinguish current Brownfield naming from approved future-state naming where the two still differ.
 
 ## 2. System Containers
@@ -47,7 +49,7 @@
 
 ### 2.2 Host Language Bindings
 - **Logical Type:** Host SDK / developer facade
-- **Responsibility:** Provide an ergonomic typed API for Developers, translate host-language intent into command calls, own loop policy, maintain developer-assigned ID maps, assemble higher-level composites and examples, and host framework services such as commands, keymaps, Effect integration, and pre-GA plugin slots without becoming a second source of UI truth.
+- **Responsibility:** Provide an ergonomic typed API for Developers, translate host-language intent into command calls, own loop policy, maintain developer-assigned ID maps, assemble higher-level composites and examples, and host framework services such as commands, keymaps, the package-first Effect surface, and pre-GA plugin slots without becoming a second source of UI truth.
 - **Inputs:** Developer code, application state changes, optional replay streams, userland commands
 - **Outputs:** Native command calls, host-facing Widget abstractions, developer-friendly diagnostics, example and composite surfaces
 - **Depends on:** Native Core, Script Runtime

@@ -21,6 +21,14 @@ import { Fragment } from "./types";
 import type { VNode, Instance, ComponentFunction, EventHandler } from "./types";
 import type { Tuvren } from "../app";
 import { Buffer } from "buffer";
+import {
+	createComponentFrame,
+	disposeComponentFrame,
+	disposeComponentFrames,
+	disposeComponentFramesFrom,
+	resolveInstanceContexts,
+	runComponentFrame,
+} from "./component-runtime";
 
 // ---------------------------------------------------------------------------
 // Widget constructor map
@@ -39,6 +47,18 @@ const WIDGET_MAP: Record<string, number> = {
 	Overlay: NodeType.Overlay,
 	Transcript: NodeType.Transcript,
 	SplitPane: NodeType.SplitPane,
+	box: NodeType.Box,
+	text: NodeType.Text,
+	input: NodeType.Input,
+	select: NodeType.Select,
+	scrollbox: NodeType.ScrollBox,
+	textarea: NodeType.TextArea,
+	table: NodeType.Table,
+	list: NodeType.List,
+	tabs: NodeType.Tabs,
+	overlay: NodeType.Overlay,
+	transcript: NodeType.Transcript,
+	splitpane: NodeType.SplitPane,
 };
 
 // ---------------------------------------------------------------------------
@@ -73,11 +93,19 @@ function isSignal(value: unknown): value is { readonly value: unknown } {
 // Top-level API
 // ---------------------------------------------------------------------------
 
+export interface RenderMountOptions {
+	contexts?: ReadonlyMap<symbol, unknown>;
+}
+
 /**
  * Mount a VNode tree and set it as the application root.
  */
-export function render(element: VNode, app: Tuvren): Instance {
-	const instance = mount(element, null);
+export function render(
+	element: VNode,
+	app: Tuvren,
+	options: RenderMountOptions = {},
+): Instance {
+	const instance = mount(element, null, options);
 	if (!instance.widget) {
 		throw new Error(
 			"render() requires a root element with a native widget. " +
@@ -92,7 +120,13 @@ export function render(element: VNode, app: Tuvren): Instance {
  * Mount a VNode, creating the native widget and binding props.
  * Children are mounted recursively in declaration order.
  */
-export function mount(vnode: VNode, parentInstance: Instance | null): Instance {
+export function mount(
+	vnode: VNode,
+	parentInstance: Instance | null,
+	options: RenderMountOptions = {},
+): Instance {
+	const contexts = resolveInstanceContexts(parentInstance, options.contexts);
+
 	// Fragment — flatten children into parent (no native node).
 	// Children are mounted with parentInstance (not fragmentInstance) as their
 	// parent. This is intentional: Fragments have no widget, so children must
@@ -107,9 +141,10 @@ export function mount(vnode: VNode, parentInstance: Instance | null): Instance {
 			key: vnode.key,
 			parent: parentInstance,
 			eventHandlers: new Map(),
+			contexts,
 		};
 		for (const childVNode of vnode.children) {
-			const childInstance = mount(childVNode, parentInstance);
+			const childInstance = mount(childVNode, parentInstance, { contexts });
 			fragmentInstance.children.push(childInstance);
 			if (parentInstance?.widget && childInstance.widget) {
 				parentInstance.widget.append(childInstance.widget);
@@ -120,16 +155,7 @@ export function mount(vnode: VNode, parentInstance: Instance | null): Instance {
 
 	// Component function — call and mount the returned tree
 	if (typeof vnode.type === "function") {
-		const fn = vnode.type as ComponentFunction;
-		const childrenProp = vnode.children.length > 0 ? vnode.children : undefined;
-		const propsWithChildren = childrenProp
-			? { ...vnode.props, children: childrenProp }
-			: vnode.props;
-		const resultVNode = fn(propsWithChildren);
-		const instance = mount(resultVNode, parentInstance);
-		instance.key = vnode.key;
-		instance.vnode = vnode;
-		return instance;
+		return mountComponent(vnode, parentInstance, contexts);
 	}
 
 	// Intrinsic element — create native widget
@@ -147,6 +173,7 @@ export function mount(vnode: VNode, parentInstance: Instance | null): Instance {
 		key: vnode.key,
 		parent: parentInstance,
 		eventHandlers: new Map(),
+		contexts,
 	};
 
 	// Apply props (static and signal)
@@ -159,7 +186,7 @@ export function mount(vnode: VNode, parentInstance: Instance | null): Instance {
 
 	// Mount children in declaration order
 	for (const childVNode of vnode.children) {
-		const childInstance = mount(childVNode, instance);
+		const childInstance = mount(childVNode, instance, { contexts });
 		instance.children.push(childInstance);
 		if (childInstance.widget) {
 			widget.append(childInstance.widget);
@@ -167,6 +194,28 @@ export function mount(vnode: VNode, parentInstance: Instance | null): Instance {
 	}
 
 	return instance;
+}
+
+function mountComponent(
+	vnode: VNode,
+	parentInstance: Instance | null,
+	contexts: ReadonlyMap<symbol, unknown>,
+): Instance {
+	const frame = createComponentFrame(vnode);
+	try {
+		const fn = vnode.type as ComponentFunction;
+		const propsWithChildren = withChildrenProp(vnode);
+		const resultVNode = runComponentFrame(frame, contexts, () => fn(propsWithChildren));
+		const instance = mount(resultVNode, parentInstance, { contexts });
+		instance.componentFrames = [frame, ...(instance.componentFrames ?? [])];
+		instance.key = vnode.key;
+		instance.vnode = vnode;
+		instance.contexts = contexts;
+		return instance;
+	} catch (cause: unknown) {
+		disposeComponentFrame(frame);
+		throw cause;
+	}
 }
 
 /**
@@ -610,7 +659,9 @@ function reconcileWithWidget(
 			updateInstance(existing, newVNode);
 			newChildren.push(existing);
 		} else {
-			const newInstance = mount(newVNode, parentInstance);
+			const newInstance = mount(newVNode, parentInstance, {
+				contexts: parentInstance.contexts,
+			});
 			if (newInstance.widget) {
 				parentWidget.append(newInstance.widget);
 			}
@@ -644,42 +695,41 @@ function reconcileWithWidget(
 function updateInstance(instance: Instance, newVNode: VNode): void {
 	// Component function — re-invoke and reconcile the returned tree
 	if (typeof newVNode.type === "function") {
-		const fn = newVNode.type as ComponentFunction;
-		const childrenProp = newVNode.children.length > 0 ? newVNode.children : undefined;
-		const propsWithChildren = childrenProp
-			? { ...newVNode.props, children: childrenProp }
-			: newVNode.props;
-		let resultVNode = fn(propsWithChildren);
-		// Resolve nested component functions until we reach an intrinsic element
-		while (typeof resultVNode.type === "function") {
-			const nestedFn = resultVNode.type as ComponentFunction;
-			const nestedChildren = resultVNode.children.length > 0 ? resultVNode.children : undefined;
-			const nestedProps = nestedChildren
-				? { ...resultVNode.props, children: nestedChildren }
-				: resultVNode.props;
-			resultVNode = nestedFn(nestedProps);
-		}
-		// The instance's widget came from the previous render of this component.
-		// Update it in place by reconciling its children.
-		if (instance.widget) {
-			disposeEffects(instance);
-			eventRegistry.delete(instance.widget.handle);
-			instance.eventHandlers.clear();
-			// Re-apply props from the resolved VNode to the widget
-			if (typeof resultVNode.type === "string") {
-				applyProps(instance, resultVNode.type, resultVNode.props);
-			}
+		try {
+			const resultVNode = resolveComponentOutput(instance, newVNode, 0);
+			assertRenderedTypeIsStable(instance, resultVNode);
+			updateResolvedInstance(instance, resultVNode);
 			instance.vnode = newVNode;
-			if (resultVNode.children.length > 0 || instance.children.length > 0) {
-				reconcileChildren(instance, resultVNode.children);
-			}
+			instance.key = newVNode.key;
+			return;
+		} catch (cause: unknown) {
+			rollbackFailedComponentUpdate(instance);
+			throw cause;
 		}
-		return;
 	}
 
 	// Fragment — reconcile the fragment's own children.
 	// Fragment children are native children of the nearest widget-bearing ancestor,
 	// so we look up the ancestor widget for mount/append operations.
+	if (newVNode.type === Fragment) {
+		if (instance.widget) {
+			throw new Error("Changing a widget-bearing child into Fragment is not supported during reconciliation");
+		}
+		disposeComponentFrames(instance);
+		updateResolvedInstance(instance, newVNode);
+		instance.vnode = newVNode;
+		instance.key = newVNode.key;
+		return;
+	}
+
+	assertIntrinsicTypeIsStable(instance, newVNode);
+	disposeComponentFrames(instance);
+	updateResolvedInstance(instance, newVNode);
+	instance.vnode = newVNode;
+	instance.key = newVNode.key;
+}
+
+function updateResolvedInstance(instance: Instance, newVNode: VNode): void {
 	if (newVNode.type === Fragment) {
 		const oldKeyMap = new Map<string | number, Instance>();
 		for (let i = 0; i < instance.children.length; i++) {
@@ -701,7 +751,9 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 				updateInstance(existing, childVNode);
 				newChildren.push(existing);
 			} else {
-				const newInstance = mount(childVNode, instance.parent);
+				const newInstance = mount(childVNode, instance.parent, {
+					contexts: instance.contexts,
+				});
 				if (ancestorWidget && newInstance.widget) {
 					ancestorWidget.append(newInstance.widget);
 				}
@@ -714,7 +766,6 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 		}
 
 		instance.children = newChildren;
-		instance.vnode = newVNode;
 		return;
 	}
 
@@ -723,7 +774,7 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 	if (!instance.widget) return;
 
 	// Dispose old effects
-	disposeEffects(instance);
+	disposePropEffects(instance);
 
 	// Clear old event handlers and remove stale registry entry
 	eventRegistry.delete(instance.widget.handle);
@@ -731,9 +782,6 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 
 	// Re-apply all new props (rebinds signals)
 	applyProps(instance, type, newVNode.props);
-
-	// Update vnode reference
-	instance.vnode = newVNode;
 
 	// Recursively reconcile children
 	if (newVNode.children.length > 0 || instance.children.length > 0) {
@@ -776,7 +824,102 @@ class RawWidget extends Widget {
 	}
 }
 
-function disposeEffects(instance: Instance): void {
+function withChildrenProp(vnode: VNode): Record<string, unknown> {
+	const childrenProp = vnode.children.length > 0 ? vnode.children : undefined;
+	return childrenProp
+		? { ...vnode.props, children: childrenProp }
+		: vnode.props;
+}
+
+function resolveComponentOutput(
+	instance: Instance,
+	vnode: VNode,
+	frameIndex: number,
+): VNode {
+	if (typeof vnode.type !== "function") {
+		disposeComponentFramesFrom(instance, frameIndex);
+		return vnode;
+	}
+
+	if (instance.componentFrames == null) {
+		instance.componentFrames = [];
+	}
+
+	const fn = vnode.type as ComponentFunction;
+	const existingFrame = instance.componentFrames[frameIndex];
+	if (existingFrame == null || existingFrame.fn !== fn) {
+		disposeComponentFramesFrom(instance, frameIndex);
+		instance.componentFrames[frameIndex] = createComponentFrame(vnode);
+	}
+
+	const frame = instance.componentFrames[frameIndex]!;
+	frame.fn = fn;
+	frame.vnode = vnode;
+
+	const resultVNode = runComponentFrame(frame, instance.contexts, () => fn(withChildrenProp(vnode)));
+	return resolveComponentOutput(instance, resultVNode, frameIndex + 1);
+}
+
+function assertIntrinsicTypeIsStable(instance: Instance, newVNode: VNode): void {
+	if (!instance.widget) {
+		throw new Error(
+			`Changing Fragment child to widget type "${String(newVNode.type)}" is not supported during reconciliation`,
+		);
+	}
+
+	const expectedNodeType = WIDGET_MAP[newVNode.type as string];
+	const currentNodeType = ffi.tui_get_node_type(instance.widget.handle);
+	if (expectedNodeType === currentNodeType) {
+		return;
+	}
+
+	throw new Error(
+		`Changing intrinsic widget type to "${String(newVNode.type)}" is not supported during reconciliation`,
+	);
+}
+
+function rollbackFailedComponentUpdate(instance: Instance): void {
+	const previousVNode = instance.vnode;
+	if (typeof previousVNode.type === "function") {
+		const resultVNode = resolveComponentOutput(instance, previousVNode, 0);
+		assertRenderedTypeIsStable(instance, resultVNode);
+		updateResolvedInstance(instance, resultVNode);
+		return;
+	}
+
+	disposeComponentFrames(instance);
+
+	if (previousVNode.type === Fragment) {
+		updateResolvedInstance(instance, previousVNode);
+		return;
+	}
+
+	assertIntrinsicTypeIsStable(instance, previousVNode);
+	updateResolvedInstance(instance, previousVNode);
+}
+
+function assertRenderedTypeIsStable(instance: Instance, vnode: VNode): void {
+	if (!instance.widget) {
+		if (vnode.type !== Fragment) {
+			throw new Error("Component output cannot change from Fragment to a native widget during reconciliation");
+		}
+		return;
+	}
+
+	if (vnode.type === Fragment) {
+		throw new Error("Component output cannot change from a native widget to Fragment during reconciliation");
+	}
+
+	const expectedNodeType = WIDGET_MAP[vnode.type as string];
+	const currentNodeType = ffi.tui_get_node_type(instance.widget.handle);
+	if (expectedNodeType !== currentNodeType) {
+		throw new Error(
+			`Changing component output widget type to "${String(vnode.type)}" is not supported during reconciliation`,
+		);
+	}
+}
+
+function disposePropEffects(instance: Instance): void {
 	for (const cleanup of instance.cleanups) {
 		cleanup();
 	}
@@ -788,7 +931,8 @@ function disposeEffects(instance: Instance): void {
  * Used before destroySubtree (which handles native cleanup in one FFI call).
  */
 function unmountEffectsOnly(instance: Instance): void {
-	disposeEffects(instance);
+	disposePropEffects(instance);
+	disposeComponentFrames(instance);
 	if (instance.widget) {
 		eventRegistry.delete(instance.widget.handle);
 	}

@@ -1,6 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
+- v8.1.0 - Executed Epic S with the clarified package-first scope: `tuvren-tui/effect` now exposes package-first `render()` / `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, retained advanced lifecycle helpers, an updated `effect-counter.tsx` example, and focused package coverage in `ts/test-effect.test.ts`.
 - v8.0.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to the registry; `commandDispatcher` wired into `app.run()` and `createLoop()`; 46 focused tests in `test-commands.test.ts`; all 433 host tests pass; bundle at 72.2 KB under 75 KB budget. Epic S is now the active wave.
 - v7.9.0 - Planned the full Epics R-V sequence: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.8.0 - Marked Epic Q shipped after the adoption and framework positioning wave landed: README rewritten as a general-purpose framework with public install path and Hello World, example framing updated into two tiers (general-purpose demos and flagship workload proofs), and Kraken-to-Tuvren hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Epic R is now the next queued wave.
@@ -9,21 +10,20 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Active Critical Path
-- **Total Active Story Points:** 99 (Epic R shipped; 24 SP removed)
-- **Critical Path:** `EFF-S001 -> EFF-S002 -> EFF-S003 -> EFF-S004 -> EFF-S005 -> EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
+- **Total Active Story Points:** 80 (Epic R and Epic S shipped)
+- **Critical Path:** `EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
 - **Planning Assumptions:**
   - Epic M, Epic N, Epic O, Epic P, and Epic Q are all shipped. The Brownfield source now includes the native text substrate, transcript and split-pane semantics, devtools, terminal-capability hardening, the full Tuvren hard-cut rename, and the general-purpose framework onboarding and migration story.
   - The GitHub repository move is complete; the canonical remote is `Tuvren/tuvren-tui`. The local checkout directory may still be named `KrakenTUI` until the operator renames it.
   - The product story is **general-purpose framework first**, with agentic and transcript-heavy products as the flagship showcase and harshest proof workload. This positioning is now reflected in the README and example framing.
   - Bun remains the only supported runtime in the active contract. Node portability is deferred.
-  - The following framework waves are intentionally sequenced: commands and keymaps (Epic R), real optional Effect integration (Epic S), pre-GA plugin slots (Epic T), expert-level SDK DX productization (Epic U), and first public npm publish plus feedback loop (Epic V).
+  - The following framework waves are intentionally sequenced: commands and keymaps (Epic R), the package-first Effect execution (Epic S), pre-GA plugin slots (Epic T), expert-level SDK DX productization (Epic U), and first public npm publish plus feedback loop (Epic V).
   - First public npm publish is planned as `0.1.0` pre-GA, not `v1.0`; breaking changes remain allowed before public `v1.0 GA`.
   - React and Solid parity are not roadmap goals in this planning wave.
 
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
 
-- **Epic S — Effect Declarative Integration:** A real optional `tuvren-tui/effect` integration using the official `effect` package while keeping the root package imperative-first.
 - **Epic T — Plugin Slots and Extensibility:** Pre-GA contribution points for commands, keymaps, palettes, devtools panels, themes, and showcase/example integrations.
 - **Epic U — SDK Productization / Expert-Level DX:** Productize all public SDK surfaces before npm publish: imperative, JSX, Effect, plugins, composites, examples, and devtools.
 - **Epic V — First Public npm Publish and Feedback Loop:** Publish `tuvren-tui@0.1.0` plus auxiliary native packages and establish post-publish feedback triage.
@@ -38,6 +38,7 @@
 - No public musl/Alpine support before a separate release-matrix decision.
 
 ### Archived or Already Completed Scope
+- Epic S (Effect Declarative Integration) shipped as the package-first Effect execution. It clarified the intended product scope after the repo Q&A, kept the native runtime boundary intact, and turned `tuvren-tui/effect` into the real package surface rather than an adapter-like helper layer.
 - Epic R (Commands & Keymap Foundations) shipped `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` as Host Layer services; rebased `CommandPalette` to the registry; wired `commandDispatcher` into `app.run()` and `createLoop()`; 46 focused tests added in `test-commands.test.ts`; all 433 host tests passing with bundle at 72.2 KB.
 - Epic Q (Adoption and Framework Positioning) shipped the general-purpose framework README, two-tier example framing, and Kraken-to-Tuvren migration guide.
 - Epic P (Tuvren Identity, Packaging, and Release Migration) shipped the hard-cut Tuvren rename, package topology, resolver contract, release workflow, cross-platform smoke gate, and surface-wide bench/test/example updates.
@@ -113,8 +114,8 @@ flowchart LR
     V5 --> V6
     V6 --> V7
 
-    class O,P,Q,R done;
-    class S1,S2,S3,S4,S5,T1,T2,T3,T4,T5,T6,U1,U2,U3,U4,U5,U6,U7,V1,V2,V3,V4,V5,V6,V7 active;
+    class O,P,Q,R,S1,S2,S3,S4,S5 done;
+    class T1,T2,T3,T4,T5,T6,U1,U2,U3,U4,U5,U6,U7,V1,V2,V3,V4,V5,V6,V7 active;
     classDef done fill:#dff5dd,stroke:#3f9d3f,color:#1f4d1f;
     classDef active fill:#fff4d6,stroke:#d39b14,color:#5c4100;
     classDef future fill:#e6eefc,stroke:#4c78d0,color:#14315f;
@@ -126,78 +127,9 @@ flowchart LR
 
 See archived summary in §6. All six tickets (CMD-R001 through CMD-R006) are complete.
 
-### Epic S — Effect Declarative Integration (EFF)
+### Epic S — Effect Declarative Integration (EFF) — SHIPPED
 
-**EFF-S001 Ratify Effect Integration Contract**
-- **Type:** Spike
-- **Effort:** 3
-- **Dependencies:** Epic R shipped
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §4 Epic 12, [TechSpec](./TechSpec.md) ADR-T45 and §4.5
-- **Description:** Finalize the optional `tuvren-tui/effect` contract over the official `effect` package.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given the approved Effect direction
-When the contract spike is complete
-Then dependency placement, scope lifecycle, event streams, command bindings, and examples are documented
-And the root imperative package remains the canonical surface
-```
-
-**EFF-S002 Add Optional Effect Peer and Subpath Wiring**
-- **Type:** Feature
-- **Effort:** 3
-- **Dependencies:** EFF-S001
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §1.2 and §4.5
-- **Description:** Add the official `effect` package as an optional peer relationship for the `tuvren-tui/effect` subpath, keep any direct dependency usage limited to dev/test surfaces, and wire the optional subpath so Effect usage is explicit and isolated from ordinary imperative imports.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given a Developer imports from tuvren-tui/effect
-When the module loads
-Then the Effect integration APIs are available
-And ordinary imports from tuvren-tui do not require Effect-specific setup
-And root tuvren-tui installs do not gain a mandatory Effect runtime dependency
-```
-
-**EFF-S003 Implement Effect Scope and Resource Lifecycle Adapters**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** EFF-S002
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §4.5
-- **Description:** Map Tuvren app/widget lifecycle cleanup into Effect scopes and resources.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given a Tuvren app or widget is managed through Effect
-When its scope exits
-Then registered cleanup for widgets, themes, loops, and subscriptions runs deterministically
-And cleanup failures surface through the Effect error channel
-```
-
-**EFF-S004 Add Effect Event Streams and Command Dispatch Bindings**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** EFF-S003, CMD-R004
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §4.4 and §4.5
-- **Description:** Expose drained Tuvren events and command dispatch through Effect-friendly stream and service adapters.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given an Effect-based Tuvren application
-When input events are drained or commands are dispatched
-Then the Effect adapters expose those flows without bypassing the host runner contract
-And command failures are observable through Effect failure handling
-```
-
-**EFF-S005 Add Effect Examples, Tests, and Docs**
-- **Type:** Chore
-- **Effort:** 3
-- **Dependencies:** EFF-S004
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §5.3
-- **Description:** Add coverage and public examples for the Effect happy path.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given the Effect integration is implemented
-When examples and tests run
-Then scope cleanup, event streaming, command dispatch, and docs snippets are covered
-And docs clearly present Effect as optional rather than replacing the imperative core
-```
+See archived summary in §6. All five tickets (EFF-S001 through EFF-S005) are complete.
 
 ### Epic T — Plugin Slots and Extensibility (EXT)
 
@@ -491,15 +423,10 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 ## 5. Active Ticket Summary Table
 
-### 5.1 Active Epics S-V
+### 5.1 Active Epics T-V
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
-| EFF-S001 | S | Spike | 3 | Epic R shipped | Active |
-| EFF-S002 | S | Feature | 3 | EFF-S001 | Active |
-| EFF-S003 | S | Feature | 5 | EFF-S002 | Active |
-| EFF-S004 | S | Feature | 5 | EFF-S003, Epic R shipped | Active |
-| EFF-S005 | S | Chore | 3 | EFF-S004 | Active |
 | EXT-T001 | T | Spike | 3 | Epic S shipped | Active |
 | EXT-T002 | T | Feature | 5 | EXT-T001 | Active |
 | EXT-T003 | T | Feature | 5 | EXT-T002, Epic R shipped | Active |
@@ -520,7 +447,7 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 | PUB-V005 | V | Chore | 5 | PUB-V004 | Active |
 | PUB-V006 | V | Chore | 3 | PUB-V005 | Active |
 | PUB-V007 | V | Chore | 3 | PUB-V006 | Active |
-|  |  | **TOTAL** | **99** |  |  |
+|  |  | **TOTAL** | **80** |  |  |
 
 ## 6. Archived Continuity Summary
 
@@ -528,17 +455,21 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 Epic R is archived as a shipped framework-services wave. It added `CommandRegistry` (typed command definitions, disposable registration, programmatic execution, `when` predicates), `KeymapRegistry` (key string normalization for `[modifier+]*key` syntax, `when` predicates, first-registered-wins resolution), and `CommandDispatcher` (bridges registry + keymap into the event drain; focus context read from `app.getFocused()`). The `CommandPalette` composite was rebased to consume a `CommandRegistry`. A `commandDispatcher` option was added to both `app.run()` and `createLoop()`. The old `Command{label, action}` shape was replaced with `Command{title, run, category?, when?}` across all examples. 46 focused tests in `ts/test-commands.test.ts` cover registration, disposal, execution, key normalization, event resolution, dispatch, and palette integration. All 433 host tests pass; bundle at 72.2 KB under 75 KB budget.
 
-### 6.2 Archived Epic Q — Adoption and Framework Positioning
+### 6.2 Archived Epic S — Effect Declarative Integration
+
+Epic S is archived as a shipped framework-services wave. After the repo Q&A clarified that the docs had underspecified the intended scope, Epic S was executed as a package-first Effect surface rather than an adapter pass. The shipped-and-retained advanced API includes `acquireApp()`, `acquireHeadlessApp()`, `makeTuvrenScope()`, `renderScoped()`, `streamEvents()`, and `createCommandService()`. The shipped package layer now also includes `render()`, `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, keyboard and terminal-size hooks, and the package-first `examples/effect-counter.tsx`. The manifest declares `effect` as an optional peer with local dev/test wiring, while Rust remains the single mutable runtime authority underneath.
+
+### 6.3 Archived Epic Q — Adoption and Framework Positioning
 
 Epic Q is archived as a shipped adoption wave. It repositioned Tuvren as a general-purpose terminal UI framework, refreshed README onboarding, organized examples into general-purpose and flagship workload tiers, and published the hard-cut Kraken-to-Tuvren migration guide.
 
-### 6.3 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
+### 6.4 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
 
 Epic P is archived as a shipped identity and packaging wave. It completed the hard-cut Tuvren rename across TypeScript, Rust, environment variables, shared-library names, resolver diagnostics, release assets, auxiliary native package stubs, and cross-platform smoke verification.
 
-### 6.4 Archived v7 Docs-Maintenance Wave
+### 6.5 Archived v7 Docs-Maintenance Wave
 
 The archived docs-maintenance wave normalized the canonical PRD, Architecture, TechSpec, and Tasks chain, preserved historical context, and reconciled source-truth drift against code, examples, tests, and workflow state.
 
-### 6.5 Archived v6 Delivery Wave
+### 6.6 Archived v6 Delivery Wave
 The archived v6 delivery wave shipped native transcript and anchor semantics, replay and benchmark gates, devtools APIs and inspector surfaces, native split-pane behavior, host composites (`CommandPalette`, `TracePanel`, `StructuredLogView`, `CodeView`, `DiffView`), and flagship examples (`agent-console`, `ops-log-console`, `repo-inspector`).

@@ -18,6 +18,8 @@ bun install --cwd ts
 # Host tests
 bun test ts/test-ffi.test.ts
 bun test ts/test-jsx.test.ts
+bun test ts/test-commands.test.ts
+bun test ts/test-effect.test.ts
 bun test ts/test-examples.test.ts
 bun test ts/test-install.test.ts
 bun test ts/test-runner.test.ts
@@ -32,6 +34,7 @@ bun run examples/agent-console.ts
 bun run examples/ops-log-console.ts
 bun run examples/repo-inspector.ts
 bun run examples/demo.ts
+bun run examples/effect-counter.tsx
 bun run examples/migration-jsx.tsx
 bun run examples/system-monitor.ts
 bun run examples/accessibility-demo.tsx
@@ -69,7 +72,8 @@ bun run examples/accessibility-demo.tsx
 | `jsx/types.ts` | JSX props, VNode types, and widget prop typing |
 | `loop.ts` | `createLoop()` and JSX dispatch bridge |
 | `index.ts` | Public API re-exports |
-| `effect/index.ts` | Optional Effect-oriented integration stubs |
+| `effect/` | Package-first Effect surface: `render()` / `testRender()`, hooks, component tokens, JSX runtime exports, and advanced lifecycle helpers |
+| `src/effect/` | Internal Effect implementation modules backing the public `effect/` package wrapper |
 
 ---
 
@@ -120,7 +124,7 @@ app.render();
 
 ## Constraints
 
-- Runtime dependencies stay effectively minimal: `bun:ffi` plus `@preact/signals-core`
+- Runtime dependencies stay effectively minimal in the root package: `bun:ffi` plus `@preact/signals-core`; the optional `tuvren-tui/effect` subpath carries `effect` as an optional peer with a local dev/test dependency
 - Bundle budget: `< 75KB`
 - `strict: true` TypeScript remains required
 - Host wrappers stay thin even when examples and composites become more ambitious

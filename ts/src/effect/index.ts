@@ -1,49 +1,108 @@
 /**
- * Optional Effect integration for Tuvren TUI (ADR-T20, ADR-T45).
+ * Tuvren TUI — Effect Package
  *
- * Provides adapter skeletons for mapping widget lifecycles to Effect Scope
- * and input buffers to Effect Stream.
- *
- * This is the optional `tuvren-tui/effect` subpath export.
- * Full Effect integration is deferred — these are typed stubs
- * documenting the intended API surface.
+ * Primary package-first authoring surface for Effect applications. Normal apps
+ * can stay within this entrypoint for JSX authoring, package-owned commands and
+ * keybindings, keyboard hooks, and lifecycle bootstrapping. Lower-level Effect
+ * helpers remain available as advanced exports.
  */
 
-import type { Instance } from "../jsx/types";
-import type { TuvrenEvent } from "../events";
+export { render, testRender } from "./render";
+export type {
+	EffectRenderOptions,
+	EffectTestHarness,
+	EffectTestRenderOptions,
+} from "./render";
 
-/**
- * ScopeAdapter — maps a widget Instance lifecycle to an Effect Scope.
- *
- * Intended usage (when Effect is integrated):
- * ```ts
- * const scope = ScopeAdapter.fromInstance(instance);
- * // scope.run(() => { ... }) — runs in the instance's lifecycle
- * // scope is disposed when the instance is unmounted
- * ```
- */
-export interface ScopeAdapter {
-	/** Bind an Effect Scope to an Instance lifecycle. */
-	fromInstance(instance: Instance): unknown;
-}
+export {
+	Box,
+	Text,
+	Input,
+	Select,
+	ScrollBox,
+	TextArea,
+	Table,
+	List,
+	Tabs,
+	Overlay,
+	Transcript,
+	SplitPane,
+} from "./components";
 
-/**
- * StreamAdapter — maps the Tuvren event drain to an Effect Stream.
- *
- * Intended usage (when Effect is integrated):
- * ```ts
- * const events$ = StreamAdapter.fromEvents(app);
- * // events$.pipe(filter(...), map(...))
- * ```
- */
-export interface StreamAdapter {
-	/** Create an Effect Stream from the Tuvren event loop. */
-	fromEvents(drainFn: () => TuvrenEvent[]): unknown;
-}
+export {
+	useTuvren,
+	useCommands,
+	useCommand,
+	useKeybinding,
+	useKeyboard,
+	useTerminalSize,
+	useSignal,
+} from "./hooks";
 
-/**
- * Placeholder — will be implemented when Effect dependency is added.
- */
-export const EffectIntegration = {
-	available: false as const,
-} as const;
+export type {
+	KeyboardListenerOptions,
+	TerminalSizeState,
+	TuvrenEffectRuntime,
+} from "./runtime";
+
+export { jsx, jsxs, Fragment } from "./jsx-runtime";
+export type { JSX } from "./jsx-runtime";
+export { signal, computed, effect, batch } from "@preact/signals-core";
+export type { Signal, ReadonlySignal } from "@preact/signals-core";
+
+export type {
+	VNode,
+	Instance,
+	ComponentFunction,
+	BoxProps,
+	TextProps,
+	InputProps,
+	SelectProps,
+	ScrollBoxProps,
+	TextAreaProps,
+	TableProps,
+	ListProps,
+	TabsProps,
+	OverlayProps,
+	TranscriptProps,
+	SplitPaneProps,
+} from "../jsx/types";
+
+export { Tuvren } from "../app";
+export type { RunOptions, TerminalCapabilities, TerminalInfo } from "../app";
+export { TuvrenError, checkResult } from "../errors";
+export type { TuvrenEvent, TuvrenEventType } from "../events";
+export { Theme, DARK_THEME, LIGHT_THEME } from "../theme";
+export { EventType, KeyCode, Modifier, AccessibilityRole } from "../ffi/structs";
+
+export { CommandRegistry, CommandDispatcher } from "../commands";
+export type {
+	Command,
+	CommandContext,
+	CommandPredicate,
+	CommandSource,
+	Disposable,
+	WidgetRef,
+} from "../commands";
+export { KeymapRegistry } from "../keymap";
+export type { KeyBinding } from "../keymap";
+
+export {
+	acquireApp,
+	acquireHeadlessApp,
+	createCommandService,
+	makeTuvrenScope,
+	renderScoped,
+	streamEvents,
+	TuvrenEffectError,
+} from "./advanced";
+export type {
+	DispatchingEffectCommandService,
+	EffectCommandOptions,
+	EffectCommandService,
+	EffectEventStreamOptions,
+	ManagedWidgetOptions,
+	TuvrenEffectScope,
+	TuvrenEffectScopeOptions,
+	TuvrenFinalizer,
+} from "./advanced";

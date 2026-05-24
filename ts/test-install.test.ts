@@ -8,7 +8,7 @@
  */
 
 import { describe, test, expect, afterEach } from "bun:test";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { join, normalize, resolve, sep } from "path";
 import { resolveLibraryPath, resolveSourceBuildPath, getLibraryName } from "./src/resolver";
 import { formatLoadError } from "./src/diagnostics";
@@ -73,6 +73,46 @@ describe("resolveLibraryPath", () => {
 		// will need to be updated to mock resolveAuxPackage or to assert the aux-package path.
 		const libPath = resolveLibraryPath();
 		expect(normalize(libPath)).toBe(normalize(sourceBuild));
+	});
+});
+
+// ── Manifest wiring ─────────────────────────────────────────────────────────
+
+describe("package manifest", () => {
+	test("declares effect as an optional peer for the effect subpath", () => {
+		const manifest = JSON.parse(
+			readFileSync(resolve(import.meta.dir, "./package.json"), "utf-8"),
+		) as {
+			exports?: Record<string, string>;
+			peerDependencies?: Record<string, string>;
+			peerDependenciesMeta?: Record<string, { optional?: boolean }>;
+		};
+
+		expect(manifest.exports?.["./effect"]).toBe("./effect/index.ts");
+		expect(manifest.exports?.["./effect/jsx-runtime"]).toBe("./effect/jsx-runtime.ts");
+		expect(manifest.exports?.["./effect/jsx-dev-runtime"]).toBe("./effect/jsx-dev-runtime.ts");
+		expect(manifest.peerDependencies?.effect).toBe("^3.21.2");
+		expect(manifest.peerDependenciesMeta?.effect?.optional).toBe(true);
+	});
+
+	test("ships a physical effect package manifest for source-checkout tooling", () => {
+		const effectManifest = JSON.parse(
+			readFileSync(resolve(import.meta.dir, "./effect/package.json"), "utf-8"),
+		) as {
+			private?: boolean;
+			type?: string;
+			exports?: Record<string, string>;
+			peerDependencies?: Record<string, string>;
+			peerDependenciesMeta?: Record<string, { optional?: boolean }>;
+		};
+
+		expect(effectManifest.private).toBe(true);
+		expect(effectManifest.type).toBe("module");
+		expect(effectManifest.exports?.["."]).toBe("./index.ts");
+		expect(effectManifest.exports?.["./jsx-runtime"]).toBe("./jsx-runtime.ts");
+		expect(effectManifest.exports?.["./jsx-dev-runtime"]).toBe("./jsx-dev-runtime.ts");
+		expect(effectManifest.peerDependencies?.effect).toBe("^3.21.2");
+		expect(effectManifest.peerDependenciesMeta?.effect?.optional).toBe(true);
 	});
 });
 

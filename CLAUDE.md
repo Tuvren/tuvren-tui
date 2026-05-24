@@ -23,7 +23,7 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 ## Current Repo Status
 
 - The canonical docs chain is current and should be treated as the source of truth for planning work.
-- `Tasks.md` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), and **Epic Q** (Adoption and Framework Positioning) as shipped. Active scope is now planned through **Epic R** (Commands & Keymap Foundations), **Epic S** (Effect Declarative Integration), **Epic T** (Plugin Slots and Extensibility), **Epic U** (SDK Productization / Expert-Level DX), and **Epic V** (First Public npm Publish and Feedback Loop).
+- `Tasks.md` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), **Epic Q** (Adoption and Framework Positioning), **Epic R** (Commands & Keymap Foundations), and **Epic S** (Effect Declarative Integration) as shipped. Active scope is now planned through **Epic T** (Plugin Slots and Extensibility), **Epic U** (SDK Productization / Expert-Level DX), and **Epic V** (First Public npm Publish and Feedback Loop).
 - `Tasks.md` separates **active scope** from **archived completed scope**. Do not mistake archived waves for the current backlog.
 - README, onboarding materials, and public positioning were refreshed in Epic Q. First public npm publishing is deferred to Epic V as a pre-GA `0.1.0` release after SDK productization. The canonical docs chain is authoritative for roadmap and scope.
 - The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
@@ -47,6 +47,8 @@ cargo clippy --manifest-path native/Cargo.toml -- -D warnings
 # Host tests
 bun test ts/test-ffi.test.ts
 bun test ts/test-jsx.test.ts
+bun test ts/test-commands.test.ts
+bun test ts/test-effect.test.ts
 bun test ts/test-examples.test.ts
 bun test ts/test-install.test.ts
 bun test ts/test-runner.test.ts
@@ -63,6 +65,7 @@ cargo build --manifest-path native/Cargo.toml --release && bun run examples/repo
 
 # Broader showcase examples
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/demo.ts
+cargo build --manifest-path native/Cargo.toml --release && bun run examples/effect-counter.tsx
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/migration-jsx.tsx
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/system-monitor.ts
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/accessibility-demo.tsx

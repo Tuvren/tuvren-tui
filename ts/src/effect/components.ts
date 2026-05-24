@@ -1,0 +1,12 @@
+export const Box = "box" as const;
+export const Text = "text" as const;
+export const Input = "input" as const;
+export const Select = "select" as const;
+export const ScrollBox = "scrollbox" as const;
+export const TextArea = "textarea" as const;
+export const Table = "table" as const;
+export const List = "list" as const;
+export const Tabs = "tabs" as const;
+export const Overlay = "overlay" as const;
+export const Transcript = "transcript" as const;
+export const SplitPane = "splitpane" as const;
