@@ -4314,9 +4314,9 @@ describe("FFI integration", () => {
 			let executed = false;
 			const palette = new CommandPalette({
 				commands: [
-					{ id: "a", label: "Open File", action: () => { executed = true; } },
-					{ id: "b", label: "Close Tab", action: () => {} },
-					{ id: "c", label: "Toggle Theme", action: () => {} },
+					{ id: "a", title: "Open File", run: () => { executed = true; } },
+					{ id: "b", title: "Close Tab", run: () => {} },
+					{ id: "c", title: "Toggle Theme", run: () => {} },
 				],
 			});
 			expect(palette.isOpen()).toBe(false);
@@ -4330,7 +4330,7 @@ describe("FFI integration", () => {
 			// Navigate and execute
 			palette.selectNext();
 			palette.selectPrevious();
-			expect(palette.executeSelected()).toBe(true);
+			expect(await palette.executeSelected()).toBe(true);
 			expect(executed).toBe(true);
 			expect(palette.isOpen()).toBe(false);
 
@@ -4345,9 +4345,9 @@ describe("FFI integration", () => {
 			const { CommandPalette } = await import("./src/composites/command-palette");
 			const palette = new CommandPalette({
 				commands: [
-					{ id: "a", label: "Open File", action: () => {} },
-					{ id: "b", label: "Close Tab", action: () => {} },
-					{ id: "c", label: "Open Terminal", action: () => {} },
+					{ id: "a", title: "Open File", run: () => {} },
+					{ id: "b", title: "Close Tab", run: () => {} },
+					{ id: "c", title: "Open Terminal", run: () => {} },
 				],
 			});
 			palette.open();

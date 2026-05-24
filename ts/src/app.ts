@@ -12,6 +12,7 @@ import { readInput, drainEvents, type TuvrenEvent } from "./events";
 import { dispatchToJsxHandlers, PERF_ACTIVE_ANIMATIONS } from "./loop";
 import { Widget } from "./widget";
 import type { Theme } from "./theme";
+import type { CommandDispatcher } from "./commands";
 
 /** Options for the `app.run()` event loop (ADR-T26). */
 export interface RunOptions {
@@ -29,6 +30,12 @@ export interface RunOptions {
 	debugOverlay?: boolean;
 	/** Disable automatic dispatch to JSX event handler props. Default: false. */
 	disableJsxDispatch?: boolean;
+	/**
+	 * Optional command dispatcher for automatic keymap resolution.
+	 * When provided, each drained key event is passed through the dispatcher
+	 * before onTick and render. Omit to opt out of command dispatch.
+	 */
+	commandDispatcher?: CommandDispatcher;
 }
 
 const TERMINAL_CAPABILITY_FLAGS = {
@@ -515,6 +522,9 @@ export class Tuvren {
 				for (const event of this.drainEvents()) {
 					options.onEvent?.(event);
 					if (jsxDispatch) dispatchToJsxHandlers(event);
+					if (options.commandDispatcher) {
+						await options.commandDispatcher.dispatch(event);
+					}
 				}
 
 				options.onTick?.();

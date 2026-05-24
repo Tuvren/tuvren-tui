@@ -140,6 +140,42 @@ app.shutdown();
 | `CodeView` | Scrollable syntax-highlighted code display |
 | `DiffView` | Side-by-side or inline diff surface |
 
+### Framework services
+
+| Service | Description |
+|---------|-------------|
+| `CommandRegistry` | Register typed commands with IDs, titles, run handlers, categories, and `when` predicates |
+| `KeymapRegistry` | Bind key strings (`ctrl+c`, `escape`, `f5`, `q`) to command IDs; first-registered wins |
+| `CommandDispatcher` | Wire a registry + keymap into `app.run()` or `createLoop()` for automatic dispatch |
+
+**Commands & keymap quick start:**
+
+```ts
+import { Tuvren, CommandRegistry, KeymapRegistry, CommandDispatcher, Box, KeyCode } from "tuvren-tui";
+
+const app = Tuvren.init();
+const root = new Box();
+app.setRoot(root);
+
+const registry = new CommandRegistry();
+const keymaps = new KeymapRegistry();
+keymaps.setRegistry(registry);
+
+registry.register({ id: "app.quit", title: "Quit", run: () => app.stop() });
+keymaps.register({ command: "app.quit", key: "q" });
+
+const dispatcher = new CommandDispatcher(registry, keymaps, app);
+await app.run({ commandDispatcher: dispatcher });
+app.shutdown();
+```
+
+The `CommandPalette` composite connects to a `CommandRegistry` directly:
+
+```ts
+const palette = new CommandPalette({ registry, app });
+// Open the palette from a key event; executeSelected() routes through the registry.
+```
+
 ### Platform and DX features
 
 - **Flexbox layout** via Taffy — directional, aligned, justified, with gap support
@@ -150,6 +186,7 @@ app.shutdown();
 - **Animation** — easing, chaining, choreography groups, position offsets
 - **JSX reconciler** — `@preact/signals-core` signals drive the composition tree
 - **Runner API** — `app.run()` and `createLoop()` manage the event loop for you
+- **Commands & keymaps** — typed command registry, key binding resolver, and auto-dispatch in the runner loop
 - **Accessibility foundation** — roles, labels, descriptions, accessibility events
 - **Devtools** — layout overlays, snapshots, traces, perf counters, dev sessions
 - **Native artifact resolver** — `TUVREN_LIB_PATH` → aux scoped package → local Cargo build
@@ -221,6 +258,7 @@ bun test ts/test-jsx.test.ts
 bun test ts/test-examples.test.ts
 bun test ts/test-install.test.ts
 bun test ts/test-runner.test.ts
+bun test ts/test-commands.test.ts
 
 # Native tests and quality checks
 cargo test --manifest-path native/Cargo.toml

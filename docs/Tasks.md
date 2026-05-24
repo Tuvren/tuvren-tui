@@ -1,6 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
+- v8.0.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to the registry; `commandDispatcher` wired into `app.run()` and `createLoop()`; 44 focused tests in `test-commands.test.ts`; all 433 host tests pass; bundle at 72.2 KB under 75 KB budget. Epic S is now the active wave.
 - v7.9.0 - Planned the full Epics R-V sequence: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.8.0 - Marked Epic Q shipped after the adoption and framework positioning wave landed: README rewritten as a general-purpose framework with public install path and Hello World, example framing updated into two tiers (general-purpose demos and flagship workload proofs), and Kraken-to-Tuvren hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Epic R is now the next queued wave.
 - v7.7.0 - Marked Epic P shipped after the full hard-cut Tuvren rename landed: package name, host facade, error type, native crate and library names, resolver env var, auxiliary scoped native package topology, release workflow, cross-platform CI smoke gate, and all bench, test, and example surfaces updated. Epic Q is now the only active wave.
@@ -8,8 +9,8 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Active Critical Path
-- **Total Active Story Points:** 123
-- **Critical Path:** `CMD-R001 -> CMD-R002 -> CMD-R003 -> CMD-R004 -> CMD-R005 -> CMD-R006 -> EFF-S001 -> EFF-S002 -> EFF-S003 -> EFF-S004 -> EFF-S005 -> EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
+- **Total Active Story Points:** 99 (Epic R shipped; 24 SP removed)
+- **Critical Path:** `EFF-S001 -> EFF-S002 -> EFF-S003 -> EFF-S004 -> EFF-S005 -> EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
 - **Planning Assumptions:**
   - Epic M, Epic N, Epic O, Epic P, and Epic Q are all shipped. The Brownfield source now includes the native text substrate, transcript and split-pane semantics, devtools, terminal-capability hardening, the full Tuvren hard-cut rename, and the general-purpose framework onboarding and migration story.
   - The GitHub repository move is complete; the canonical remote is `Tuvren/tuvren-tui`. The local checkout directory may still be named `KrakenTUI` until the operator renames it.
@@ -22,7 +23,6 @@
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
 
-- **Epic R — Commands & Keymap Foundations:** First framework-level host services over the imperative core and native event stream.
 - **Epic S — Effect Declarative Integration:** A real optional `tuvren-tui/effect` integration using the official `effect` package while keeping the root package imperative-first.
 - **Epic T — Plugin Slots and Extensibility:** Pre-GA contribution points for commands, keymaps, palettes, devtools panels, themes, and showcase/example integrations.
 - **Epic U — SDK Productization / Expert-Level DX:** Productize all public SDK surfaces before npm publish: imperative, JSX, Effect, plugins, composites, examples, and devtools.
@@ -38,6 +38,7 @@
 - No public musl/Alpine support before a separate release-matrix decision.
 
 ### Archived or Already Completed Scope
+- Epic R (Commands & Keymap Foundations) shipped `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` as Host Layer services; rebased `CommandPalette` to the registry; wired `commandDispatcher` into `app.run()` and `createLoop()`; 44 focused tests added in `test-commands.test.ts`; all 433 host tests passing with bundle at 72.2 KB.
 - Epic Q (Adoption and Framework Positioning) shipped the general-purpose framework README, two-tier example framing, and Kraken-to-Tuvren migration guide.
 - Epic P (Tuvren Identity, Packaging, and Release Migration) shipped the hard-cut Tuvren rename, package topology, resolver contract, release workflow, cross-platform smoke gate, and surface-wide bench/test/example updates.
 - Epic O (Terminal Capability Hardening) shipped terminal protocol detection, degraded multiplexer policy, Kitty keyboard negotiation, OSC52 writes, OSC8 links, runtime capability reporting, and terminal-hardening coverage.
@@ -51,12 +52,7 @@ flowchart LR
     O[Epic O Terminal Capability Hardening - SHIPPED]:::done
     P[Epic P Tuvren Identity and Release Migration - SHIPPED]:::done
     Q[Epic Q Adoption and Framework Positioning - SHIPPED]:::done
-    R1[CMD-R001]
-    R2[CMD-R002]
-    R3[CMD-R003]
-    R4[CMD-R004]
-    R5[CMD-R005]
-    R6[CMD-R006]
+    R[Epic R Commands and Keymap Foundations - SHIPPED]:::done
     S1[EFF-S001]
     S2[EFF-S002]
     S3[EFF-S003]
@@ -85,15 +81,8 @@ flowchart LR
 
     O --> P
     P --> Q
-    Q --> R1
-    R1 --> R2
-    R1 --> R3
-    R2 --> R3
-    R2 --> R4
-    R3 --> R4
-    R4 --> R5
-    R5 --> R6
-    R6 --> S1
+    Q --> R
+    R --> S1
     S1 --> S2
     S2 --> S3
     S3 --> S4
@@ -124,8 +113,8 @@ flowchart LR
     V5 --> V6
     V6 --> V7
 
-    class O,P,Q done;
-    class R1,R2,R3,R4,R5,R6,S1,S2,S3,S4,S5,T1,T2,T3,T4,T5,T6,U1,U2,U3,U4,U5,U6,U7,V1,V2,V3,V4,V5,V6,V7 active;
+    class O,P,Q,R done;
+    class S1,S2,S3,S4,S5,T1,T2,T3,T4,T5,T6,U1,U2,U3,U4,U5,U6,U7,V1,V2,V3,V4,V5,V6,V7 active;
     classDef done fill:#dff5dd,stroke:#3f9d3f,color:#1f4d1f;
     classDef active fill:#fff4d6,stroke:#d39b14,color:#5c4100;
     classDef future fill:#e6eefc,stroke:#4c78d0,color:#14315f;
@@ -133,95 +122,9 @@ flowchart LR
 
 ## 4. Ticket List
 
-### Epic R — Commands & Keymap Foundations (CMD)
+### Epic R — Commands & Keymap Foundations (CMD) — SHIPPED
 
-**CMD-R001 Ratify Commands and Keymap Contract**
-- **Type:** Spike
-- **Effort:** 3
-- **Dependencies:** Epic Q shipped
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §4 Epic 11, [Architecture](./Architecture.md) §4.5, [TechSpec](./TechSpec.md) ADR-T44 and §4.4
-- **Description:** Finalize the host-layer command, keymap, context, and dispatch contract before implementation.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given the approved Commands and Keymaps scope
-When the contract spike is complete
-Then command IDs, command context, keybinding syntax, conflict behavior, and focus-context requirements are documented
-And the contract preserves the Native Core as the single mutable UI authority
-And no plugin-slot work is required before CMD-R002 begins
-```
-
-**CMD-R002 Add Command Registry and Typed Command Model**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** CMD-R001
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §4.4
-- **Description:** Add a host-side command registry with typed command definitions, disposable registration, listing, and programmatic execution.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given a Developer registers commands through the public SDK
-When commands are listed or executed by ID
-Then registered commands run with a typed CommandContext
-And duplicate or malformed command registrations fail with actionable errors
-And unregistering a command removes it from later dispatch
-```
-
-**CMD-R003 Add Keymap Resolver and Binding Normalization**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** CMD-R001, CMD-R002
-- **Capability / Contract Mapping:** [Architecture](./Architecture.md) §4.5, [TechSpec](./TechSpec.md) §4.4
-- **Description:** Add keybinding registration and normalized resolution for key events, modifiers, focus predicates, and command lookup.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given registered keybindings and drained key events
-When the resolver evaluates an event
-Then the matching command is selected only when its binding and predicate match
-And unsupported or ambiguous binding strings fail during registration
-And resolution does not invent host-owned focus state
-```
-
-**CMD-R004 Integrate Command Dispatch with Event Loops**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** CMD-R002, CMD-R003
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §4.4
-- **Description:** Wire command dispatch into `app.run()`, `createLoop()`, and manual-loop helper APIs without changing the native event delivery model.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given an application uses the runner loop
-When a registered keybinding event is drained
-Then the bound command executes before the next render pass
-And applications can opt out or override command dispatch
-And manual event loops can call the same dispatcher explicitly
-```
-
-**CMD-R005 Rebase CommandPalette on Command Registry**
-- **Type:** Feature
-- **Effort:** 3
-- **Dependencies:** CMD-R004
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §4 Epic 11, [TechSpec](./TechSpec.md) §4.4
-- **Description:** Make `CommandPalette` consume the command registry rather than requiring examples to maintain separate command arrays and manual shortcut handling.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given a CommandPalette is connected to a command registry
-When it opens and filters commands
-Then it displays registered commands and executes the selected command through the registry
-And existing palette examples no longer duplicate command dispatch logic
-```
-
-**CMD-R006 Add Commands/Keymaps Tests, Examples, and Docs**
-- **Type:** Chore
-- **Effort:** 3
-- **Dependencies:** CMD-R005
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §5.3 and §5.4
-- **Description:** Add focused coverage and examples for registry behavior, keymap resolution, loop dispatch, palette integration, and docs.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given the Commands and Keymaps epic is complete
-When the host test suite and examples run
-Then command registration, keybinding resolution, dispatch ordering, and palette integration are covered
-And the README and examples show the command/keymap happy path
-```
+See archived summary in §6. All six tickets (CMD-R001 through CMD-R006) are complete.
 
 ### Epic S — Effect Declarative Integration (EFF)
 
@@ -588,24 +491,18 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 ## 5. Active Ticket Summary Table
 
-### 5.1 Active Epics R-V
+### 5.1 Active Epics S-V
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
-| CMD-R001 | R | Spike | 3 | Epic Q shipped | Active |
-| CMD-R002 | R | Feature | 5 | CMD-R001 | Active |
-| CMD-R003 | R | Feature | 5 | CMD-R001, CMD-R002 | Active |
-| CMD-R004 | R | Feature | 5 | CMD-R002, CMD-R003 | Active |
-| CMD-R005 | R | Feature | 3 | CMD-R004 | Active |
-| CMD-R006 | R | Chore | 3 | CMD-R005 | Active |
 | EFF-S001 | S | Spike | 3 | Epic R shipped | Active |
 | EFF-S002 | S | Feature | 3 | EFF-S001 | Active |
 | EFF-S003 | S | Feature | 5 | EFF-S002 | Active |
-| EFF-S004 | S | Feature | 5 | EFF-S003, CMD-R004 | Active |
+| EFF-S004 | S | Feature | 5 | EFF-S003, Epic R shipped | Active |
 | EFF-S005 | S | Chore | 3 | EFF-S004 | Active |
 | EXT-T001 | T | Spike | 3 | Epic S shipped | Active |
 | EXT-T002 | T | Feature | 5 | EXT-T001 | Active |
-| EXT-T003 | T | Feature | 5 | EXT-T002, CMD-R005 | Active |
+| EXT-T003 | T | Feature | 5 | EXT-T002, Epic R shipped | Active |
 | EXT-T004 | T | Feature | 5 | EXT-T002 | Active |
 | EXT-T005 | T | Chore | 3 | EXT-T003, EXT-T004 | Active |
 | EXT-T006 | T | Chore | 3 | EXT-T005 | Active |
@@ -623,21 +520,25 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 | PUB-V005 | V | Chore | 5 | PUB-V004 | Active |
 | PUB-V006 | V | Chore | 3 | PUB-V005 | Active |
 | PUB-V007 | V | Chore | 3 | PUB-V006 | Active |
-|  |  | **TOTAL** | **123** |  |  |
+|  |  | **TOTAL** | **99** |  |  |
 
 ## 6. Archived Continuity Summary
 
-### 6.1 Archived Epic Q — Adoption and Framework Positioning
+### 6.1 Archived Epic R — Commands & Keymap Foundations
+
+Epic R is archived as a shipped framework-services wave. It added `CommandRegistry` (typed command definitions, disposable registration, programmatic execution, `when` predicates), `KeymapRegistry` (key string normalization for `[modifier+]*key` syntax, `when` predicates, first-registered-wins resolution), and `CommandDispatcher` (bridges registry + keymap into the event drain; focus context read from `app.getFocused()`). The `CommandPalette` composite was rebased to consume a `CommandRegistry`. A `commandDispatcher` option was added to both `app.run()` and `createLoop()`. The old `Command{label, action}` shape was replaced with `Command{title, run, category?, when?}` across all examples. 44 focused tests in `ts/test-commands.test.ts` cover registration, disposal, execution, key normalization, event resolution, dispatch, and palette integration. All 433 host tests pass; bundle at 72.2 KB under 75 KB budget.
+
+### 6.2 Archived Epic Q — Adoption and Framework Positioning
 
 Epic Q is archived as a shipped adoption wave. It repositioned Tuvren as a general-purpose terminal UI framework, refreshed README onboarding, organized examples into general-purpose and flagship workload tiers, and published the hard-cut Kraken-to-Tuvren migration guide.
 
-### 6.2 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
+### 6.3 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
 
 Epic P is archived as a shipped identity and packaging wave. It completed the hard-cut Tuvren rename across TypeScript, Rust, environment variables, shared-library names, resolver diagnostics, release assets, auxiliary native package stubs, and cross-platform smoke verification.
 
-### 6.3 Archived v7 Docs-Maintenance Wave
+### 6.4 Archived v7 Docs-Maintenance Wave
 
 The archived docs-maintenance wave normalized the canonical PRD, Architecture, TechSpec, and Tasks chain, preserved historical context, and reconciled source-truth drift against code, examples, tests, and workflow state.
 
-### 6.4 Archived v6 Delivery Wave
+### 6.5 Archived v6 Delivery Wave
 The archived v6 delivery wave shipped native transcript and anchor semantics, replay and benchmark gates, devtools APIs and inspector surfaces, native split-pane behavior, host composites (`CommandPalette`, `TracePanel`, `StructuredLogView`, `CodeView`, `DiffView`), and flagship examples (`agent-console`, `ops-log-console`, `repo-inspector`).

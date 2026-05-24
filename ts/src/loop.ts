@@ -7,6 +7,7 @@
 
 import type { Tuvren } from "./app";
 import type { TuvrenEvent } from "./events";
+import type { CommandDispatcher } from "./commands";
 import { getEventHandlers } from "./jsx/reconciler";
 
 export interface LoopOptions {
@@ -24,6 +25,12 @@ export interface LoopOptions {
 	disableJsxDispatch?: boolean;
 	/** Loop mode. "onChange" (default) auto-detects animations; "continuous" forces fixed-fps. */
 	mode?: "onChange" | "continuous";
+	/**
+	 * Optional command dispatcher for automatic keymap resolution.
+	 * When provided, each drained key event is passed through the dispatcher
+	 * before onTick and render. Omit to opt out of command dispatch.
+	 */
+	commandDispatcher?: CommandDispatcher;
 }
 
 export interface Loop {
@@ -87,6 +94,9 @@ export function createLoop(options: LoopOptions): Loop {
 				for (const event of app.drainEvents()) {
 					onEvent?.(event);
 					if (jsxDispatch) dispatchToJsxHandlers(event);
+					if (options.commandDispatcher) {
+						await options.commandDispatcher.dispatch(event);
+					}
 				}
 				onTick?.();
 				app.render();
@@ -109,6 +119,9 @@ export function createLoop(options: LoopOptions): Loop {
 			for (const event of app.drainEvents()) {
 				onEvent?.(event);
 				if (jsxDispatch) dispatchToJsxHandlers(event);
+				if (options.commandDispatcher) {
+					await options.commandDispatcher.dispatch(event);
+				}
 			}
 
 			onTick?.();
