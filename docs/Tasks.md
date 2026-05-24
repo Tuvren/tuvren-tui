@@ -1,7 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
-- v8.0.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to the registry; `commandDispatcher` wired into `app.run()` and `createLoop()`; 44 focused tests in `test-commands.test.ts`; all 433 host tests pass; bundle at 72.2 KB under 75 KB budget. Epic S is now the active wave.
+- v8.0.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to the registry; `commandDispatcher` wired into `app.run()` and `createLoop()`; 46 focused tests in `test-commands.test.ts`; all 433 host tests pass; bundle at 72.2 KB under 75 KB budget. Epic S is now the active wave.
 - v7.9.0 - Planned the full Epics R-V sequence: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.8.0 - Marked Epic Q shipped after the adoption and framework positioning wave landed: README rewritten as a general-purpose framework with public install path and Hello World, example framing updated into two tiers (general-purpose demos and flagship workload proofs), and Kraken-to-Tuvren hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Epic R is now the next queued wave.
 - v7.7.0 - Marked Epic P shipped after the full hard-cut Tuvren rename landed: package name, host facade, error type, native crate and library names, resolver env var, auxiliary scoped native package topology, release workflow, cross-platform CI smoke gate, and all bench, test, and example surfaces updated. Epic Q is now the only active wave.
@@ -38,7 +38,7 @@
 - No public musl/Alpine support before a separate release-matrix decision.
 
 ### Archived or Already Completed Scope
-- Epic R (Commands & Keymap Foundations) shipped `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` as Host Layer services; rebased `CommandPalette` to the registry; wired `commandDispatcher` into `app.run()` and `createLoop()`; 44 focused tests added in `test-commands.test.ts`; all 433 host tests passing with bundle at 72.2 KB.
+- Epic R (Commands & Keymap Foundations) shipped `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` as Host Layer services; rebased `CommandPalette` to the registry; wired `commandDispatcher` into `app.run()` and `createLoop()`; 46 focused tests added in `test-commands.test.ts`; all 433 host tests passing with bundle at 72.2 KB.
 - Epic Q (Adoption and Framework Positioning) shipped the general-purpose framework README, two-tier example framing, and Kraken-to-Tuvren migration guide.
 - Epic P (Tuvren Identity, Packaging, and Release Migration) shipped the hard-cut Tuvren rename, package topology, resolver contract, release workflow, cross-platform smoke gate, and surface-wide bench/test/example updates.
 - Epic O (Terminal Capability Hardening) shipped terminal protocol detection, degraded multiplexer policy, Kitty keyboard negotiation, OSC52 writes, OSC8 links, runtime capability reporting, and terminal-hardening coverage.
@@ -526,7 +526,7 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 ### 6.1 Archived Epic R — Commands & Keymap Foundations
 
-Epic R is archived as a shipped framework-services wave. It added `CommandRegistry` (typed command definitions, disposable registration, programmatic execution, `when` predicates), `KeymapRegistry` (key string normalization for `[modifier+]*key` syntax, `when` predicates, first-registered-wins resolution), and `CommandDispatcher` (bridges registry + keymap into the event drain; focus context read from `app.getFocused()`). The `CommandPalette` composite was rebased to consume a `CommandRegistry`. A `commandDispatcher` option was added to both `app.run()` and `createLoop()`. The old `Command{label, action}` shape was replaced with `Command{title, run, category?, when?}` across all examples. 44 focused tests in `ts/test-commands.test.ts` cover registration, disposal, execution, key normalization, event resolution, dispatch, and palette integration. All 433 host tests pass; bundle at 72.2 KB under 75 KB budget.
+Epic R is archived as a shipped framework-services wave. It added `CommandRegistry` (typed command definitions, disposable registration, programmatic execution, `when` predicates), `KeymapRegistry` (key string normalization for `[modifier+]*key` syntax, `when` predicates, first-registered-wins resolution), and `CommandDispatcher` (bridges registry + keymap into the event drain; focus context read from `app.getFocused()`). The `CommandPalette` composite was rebased to consume a `CommandRegistry`. A `commandDispatcher` option was added to both `app.run()` and `createLoop()`. The old `Command{label, action}` shape was replaced with `Command{title, run, category?, when?}` across all examples. 46 focused tests in `ts/test-commands.test.ts` cover registration, disposal, execution, key normalization, event resolution, dispatch, and palette integration. All 433 host tests pass; bundle at 72.2 KB under 75 KB budget.
 
 ### 6.2 Archived Epic Q — Adoption and Framework Positioning
 

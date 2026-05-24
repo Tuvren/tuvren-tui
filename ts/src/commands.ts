@@ -138,6 +138,10 @@ export class CommandDispatcher {
 
 		const command = this._keymaps.resolve(event, context);
 		if (command) {
+			// Run directly rather than through registry.execute() — the keymap
+			// resolver already evaluated both the binding-level and command-level
+			// `when` predicates. No return value is intentional: fire-and-forget
+			// from the event loop's perspective.
 			await command.run(context);
 		}
 	}

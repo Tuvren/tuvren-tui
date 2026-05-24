@@ -182,7 +182,9 @@ export class CommandPalette {
 				source: "palette",
 				...(this._app ? { app: this._app } : {}),
 			};
-			await this._registry.execute(cmd.id, ctx);
+			// Propagate the registry's result: returns false if the command was
+			// disposed or its when-predicate rejected between open() and execute.
+			return this._registry.execute(cmd.id, ctx);
 		} else {
 			// Static command path — app may be absent if palette was created without one
 			const ctx: CommandContext = {

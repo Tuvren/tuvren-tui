@@ -93,6 +93,10 @@ export function createLoop(options: LoopOptions): Loop {
 			for (let tick = 0; tick < auditTicks; tick++) {
 				for (const event of app.drainEvents()) {
 					onEvent?.(event);
+					// JSX handlers fire first; the command dispatcher sees the same event
+					// after. Keys consumed by native widgets (Input, TextArea) are converted
+					// to Submit/Change events by the native core and never reach here as Key
+					// events, so there is no double-dispatch for widget-owned keys.
 					if (jsxDispatch) dispatchToJsxHandlers(event);
 					if (options.commandDispatcher) {
 						await options.commandDispatcher.dispatch(event);
