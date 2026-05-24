@@ -10,6 +10,13 @@ import type { Tuvren } from "./app";
 import type { TuvrenEvent } from "./events";
 import type { KeymapRegistry } from "./keymap";
 import { TuvrenError } from "./errors";
+import { ffi } from "./ffi";
+import { NodeType } from "./ffi/structs";
+
+// Reverse mapping: NodeType numeric value → lowercase widget kind string
+const NODE_KIND_NAMES: Record<number, string> = Object.fromEntries(
+	Object.entries(NodeType).map(([name, id]) => [id, name.toLowerCase()]),
+);
 
 // ── Public types ──────────────────────────────────────────────────────────────
 
@@ -135,10 +142,15 @@ export class CommandDispatcher {
 		if (event.type !== "key") return;
 
 		const focusedHandle = this._app.getFocused();
+		let focused: WidgetRef | undefined;
+		if (focusedHandle > 0) {
+			const nodeTypeId = ffi.tui_get_node_type(focusedHandle);
+			focused = { handle: focusedHandle, kind: NODE_KIND_NAMES[nodeTypeId] };
+		}
 		const context: CommandContext = {
 			app: this._app,
 			event,
-			focused: focusedHandle > 0 ? { handle: focusedHandle } : undefined,
+			focused,
 			source: "keymap",
 		};
 

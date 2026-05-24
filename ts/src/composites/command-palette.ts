@@ -83,7 +83,11 @@ export class CommandPalette {
 		return this.overlay;
 	}
 
-	/** Replace the static command list (used when no registry is attached). */
+	/**
+	 * Replace the static command list.
+	 * Has no effect on the displayed list when a registry is attached, because
+	 * _sourceCommands() returns registry.list() in that case.
+	 */
 	setCommands(commands: Command[]): void {
 		this._staticCommands = [...commands];
 		this.filteredCommands = [...this._sourceCommands()];
@@ -175,11 +179,17 @@ export class CommandPalette {
 		if (idx < 0 || idx >= this.filteredCommands.length) return false;
 
 		const cmd = this.filteredCommands[idx]!;
+		// Capture the widget that was focused before the palette opened.
+		// close() zeroes restoreFocusHandle, so it must be read first.
+		const priorFocusHandle = this.restoreFocusHandle;
 		this.close();
+
+		const focused = priorFocusHandle > 0 ? { handle: priorFocusHandle } : undefined;
 
 		if (this._registry) {
 			const ctx: Partial<CommandContext> = {
 				source: "palette",
+				focused,
 				...(this._app ? { app: this._app } : {}),
 			};
 			// Propagate the registry's result: returns false if the command was
@@ -190,6 +200,7 @@ export class CommandPalette {
 			const ctx: CommandContext = {
 				app: this._app,
 				source: "palette",
+				focused,
 			};
 			await cmd.run(ctx);
 		}

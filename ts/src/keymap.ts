@@ -21,44 +21,48 @@ import type { TuvrenEvent } from "./events";
 import type { Command, CommandContext, CommandPredicate, Disposable } from "./commands";
 import type { CommandRegistry } from "./commands";
 import { TuvrenError } from "./errors";
+import { KeyCode, Modifier } from "./ffi/structs";
 
 // ── Key name tables ───────────────────────────────────────────────────────────
+// Lowercase parse-time names → canonical ABI codes from ffi/structs.ts.
+// Keeping the string-keyed table here (rather than in structs.ts) so the
+// parser can use a single flat lookup without branching on special vs char.
 
 const SPECIAL_KEYS: Readonly<Record<string, number>> = {
-	backspace: 0x0100,
-	enter: 0x0101,
-	left: 0x0102,
-	right: 0x0103,
-	up: 0x0104,
-	down: 0x0105,
-	home: 0x0106,
-	end: 0x0107,
-	pageup: 0x0108,
-	pagedown: 0x0109,
-	tab: 0x010a,
-	backtab: 0x010b,
-	delete: 0x010c,
-	insert: 0x010d,
-	escape: 0x010e,
-	f1: 0x0110,
-	f2: 0x0111,
-	f3: 0x0112,
-	f4: 0x0113,
-	f5: 0x0114,
-	f6: 0x0115,
-	f7: 0x0116,
-	f8: 0x0117,
-	f9: 0x0118,
-	f10: 0x0119,
-	f11: 0x011a,
-	f12: 0x011b,
+	backspace: KeyCode.Backspace,
+	enter:     KeyCode.Enter,
+	left:      KeyCode.Left,
+	right:     KeyCode.Right,
+	up:        KeyCode.Up,
+	down:      KeyCode.Down,
+	home:      KeyCode.Home,
+	end:       KeyCode.End,
+	pageup:    KeyCode.PageUp,
+	pagedown:  KeyCode.PageDown,
+	tab:       KeyCode.Tab,
+	backtab:   KeyCode.BackTab,
+	delete:    KeyCode.Delete,
+	insert:    KeyCode.Insert,
+	escape:    KeyCode.Escape,
+	f1:  KeyCode.F1,
+	f2:  KeyCode.F2,
+	f3:  KeyCode.F3,
+	f4:  KeyCode.F4,
+	f5:  KeyCode.F5,
+	f6:  KeyCode.F6,
+	f7:  KeyCode.F7,
+	f8:  KeyCode.F8,
+	f9:  KeyCode.F9,
+	f10: KeyCode.F10,
+	f11: KeyCode.F11,
+	f12: KeyCode.F12,
 } as const;
 
 const MODIFIER_BITS: Readonly<Record<string, number>> = {
-	ctrl: 0x02,
-	shift: 0x01,
-	alt: 0x04,
-	super: 0x08,
+	ctrl:  Modifier.Ctrl,
+	shift: Modifier.Shift,
+	alt:   Modifier.Alt,
+	super: Modifier.Super,
 } as const;
 
 // ── Internal types ────────────────────────────────────────────────────────────
@@ -125,7 +129,7 @@ function parseKeyString(key: string): ParsedKey {
 	return { keyCode: 0, codepoint, modifiers };
 }
 
-const SHIFT_BIT = MODIFIER_BITS.shift!;
+const SHIFT_BIT = Modifier.Shift;
 
 function matchesEvent(binding: ParsedKey, event: TuvrenEvent): boolean {
 	if (event.type !== "key") return false;
