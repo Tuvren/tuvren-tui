@@ -141,7 +141,7 @@ CI Trigger
 | Gate 6 | Host bundle-size constraint | `docs/PRD.md`, `docs/TechSpec.md`, `ts/check-bundle.ts` |
 | Gate 7 | Interactive render budget target | `docs/PRD.md`, `docs/TechSpec.md`, render bench |
 | Gate 8 | Foreign-function overhead target | `docs/PRD.md`, `docs/TechSpec.md`, FFI bench |
-| Gate 9 | Cross-platform install and load trust | `docs/PRD.md` §5, `docs/TechSpec.md` §5.4, `docs/Tasks.md` PROD-P006 |
+| Gate 9 | Cross-platform install and load trust | `docs/PRD.md` §5, `docs/TechSpec.md` §5.4, `docs/Tasks.md` archived Epic P summary |
 
 ---
 

@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-This document enumerates every public-facing Kraken-era name and release/distribution touchpoint that must change as part of the hard-cut rename from Kraken to Tuvren. Downstream rename tickets (PROD-P002 through PROD-P006) reference this inventory directly. No compatibility aliases are planned — the rename is a pre-1.0 hard cut per ADR-T42.
+This document enumerates every public-facing Kraken-era name and release/distribution touchpoint that had to change as part of the hard-cut rename from Kraken to Tuvren. Historical downstream rename ticket labels (PROD-P002 through PROD-P006) referenced this inventory directly; their detailed ticket bodies are now archived out of `docs/Tasks.md`. No compatibility aliases were planned — the rename was a pre-1.0 hard cut per ADR-T42.
 
 ---
 

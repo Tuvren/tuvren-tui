@@ -620,7 +620,7 @@ const symbols = {
 		returns: "i32" as const,
 	},
 
-	// Debug and Devtools (ADR-T34, TechSpec §4.3.3)
+	// Debug and Devtools (ADR-T34)
 	tui_debug_set_overlay: {
 		args: ["u32"] as FFIType[],
 		returns: "i32" as const,

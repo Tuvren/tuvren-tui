@@ -1013,8 +1013,8 @@ multiplexer_policy:
   - Perf counters, debug overlays, trace rings, and frame snapshots are maintained as first-class diagnostics.
   - Dev-session helpers must preserve deterministic teardown and re-init.
 - **Migration / Deployment Notes:**
-  - Releases build prebuilt native artifacts for five platform/arch targets with checksum sidecars.
-  - The host resolver must continue to support both prebuilt and source-build workflows.
+  - Releases build GitHub-native artifacts for five platform/arch targets with checksum sidecars; manual consumers load them through `TUVREN_LIB_PATH`.
+  - The host resolver must continue to support auxiliary scoped native packages for published installs and source-build fallback for repo checkouts.
   - Background rendering remains experimental and must not silently alter default lifecycle semantics.
   - Terminal protocol enhancements must be opt-in by capability and must restore terminal state during `tui_shutdown()` even when intermediate feature setup fails.
 - **Performance / Capacity Notes:**

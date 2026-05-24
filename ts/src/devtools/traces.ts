@@ -6,7 +6,7 @@
 
 import type { Tuvren } from "../app";
 
-/** Trace kind discriminants (TechSpec §4.3.3). */
+/** Trace kind discriminants. */
 export const TRACE_KIND = {
 	EVENT: 0,
 	FOCUS: 1,

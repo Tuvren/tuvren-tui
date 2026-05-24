@@ -14,14 +14,14 @@
  *     traceSignals: true,
  *   });
  *
- * Watch mode: run `bun --watch <entrypoint>` externally (TechSpec §4.7).
+ * Watch mode: run `bun --watch <entrypoint>` externally.
  * This module does not implement in-process code hot-swapping.
  */
 
 import type { Tuvren } from "./app";
 import type { Widget } from "./widget";
 
-/** Overlay flag bits (TechSpec §4.3.3, types::overlay_flags). */
+/** Overlay flag bits (`types::overlay_flags`). */
 export const OVERLAY_FLAGS = {
 	BOUNDS: 0x01,
 	FOCUS: 0x02,
@@ -30,7 +30,7 @@ export const OVERLAY_FLAGS = {
 	PERF: 0x10,
 } as const;
 
-/** Trace flag bits (TechSpec §4.3.3, types::trace_kind). */
+/** Trace flag bits (`types::trace_kind`). */
 export const TRACE_FLAGS = {
 	EVENTS: 0x01,
 	FOCUS: 0x02,
@@ -41,7 +41,7 @@ export const TRACE_FLAGS = {
 
 export type OverlayName = "bounds" | "focus" | "dirty" | "anchors" | "perf";
 
-/** Options for createDevSession (TechSpec §4.7). */
+/** Options for createDevSession. */
 export interface DevSessionOptions {
 	/** Factory that creates the app and root widget for this session. */
 	createApp: () => Promise<{ app: Tuvren; root: Widget }>;
