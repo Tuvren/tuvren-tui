@@ -39,6 +39,7 @@ export function jsx(
  * Identical to jsx() — children are already an array in props.
  */
 export const jsxs = jsx;
+export const jsxDEV = jsx;
 
 // ---------------------------------------------------------------------------
 // Internal helpers

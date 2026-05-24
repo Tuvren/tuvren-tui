@@ -1,6 +1,7 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
+- v7.9.0 - Reopened Epic S as a package-shaping wave: `tuvren-tui/effect` now exposes a package-first authoring surface with `render()` / `testRender()`, JSX runtime exports, package-owned commands and keybindings, keyboard and terminal-size hooks, component tokens, retained advanced lifecycle helpers, updated package coverage, and a package-first `effect-counter.tsx` example over the same native runtime authority.
 - v7.8.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to consume the registry; `commandDispatcher` option wired into `app.run()` and `createLoop()`; 46 focused command/keymap tests added. Next active wave is Epic S (Effect Declarative Integration).
 - v7.7.0 - Extended the implementation contract through Epics R-V: command/keymap services, Effect integration, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
@@ -35,9 +36,9 @@
 | Language | TypeScript | `^5.0.0` | Keep strict typed wrappers and examples in TypeScript. |
 | FFI mechanism | `bun:ffi` | built-in | Preserve the direct native-library loading path rather than adding an alternate bridge. |
 | Reactivity | `@preact/signals-core` | `^1.8.0` | Preserve the lightweight JSX/signals path without promoting it to the primary lifecycle model. |
-| Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` package relationship belongs to the optional declarative subpath as an optional peer/dev dependency rather than a root-package runtime dependency. |
+| Additional runtime deps | none beyond signals in the root package; `effect@^3.21.2` as optional peer + local dev dependency for `tuvren-tui/effect` | current package state | Keep the host bundle intentionally thin in the imperative core; Effect belongs only to the optional subpath and must not become a mandatory root-package runtime dependency. |
 | Public package contract | `tuvren-tui` (Epic P shipped the rename from `kraken-tui`) | `ts/package.json`, source tree | One public package as the user-facing contract; the hard rename is complete. |
-| Optional declarative subpath | `tuvren-tui/effect` stub (Epic P shipped the rename from `kraken-tui/effect`) | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
+| Optional declarative subpath | `tuvren-tui/effect` over the official `effect` package | `ts/package.json`, `ts/effect/index.ts`, `ts/src/effect/` | Provide one sanctioned package-first Effect application surface over the same core runtime, with JSX authoring, package-owned command/keybinding services, testing helpers, and advanced escape hatches without introducing a second mutable runtime. |
 | Native package topology | current Brownfield: GitHub assets plus auxiliary scoped package stubs; approved public publish follows in Epic V | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the Tuvren organization, while keeping `tuvren-tui` as the only public package. |
 
 ### 1.3 Build, Test, and Release Artifacts
@@ -161,8 +162,8 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 ### ADR-T45 Effect Is the Sanctioned Declarative Integration Path
 - **Status:** accepted
 - **Context:** The current repo ships an imperative core and a lightweight JSX/signals overlay, while the strategic product direction explicitly rejects React/Solid parity as the main declarative roadmap. The team wants one blessed declarative story that still honors the same Rust-owned-state architecture.
-- **Decision:** Keep the imperative surface as the canonical model and reserve `tuvren-tui/effect` as the sanctioned declarative integration path over the same Bun and FFI runtime contract. The existing JSX/signals layer remains supported Brownfield reality, but it is not the strategic north star and should not pull the roadmap toward React or Solid parity.
-- **Consequences:** Declarative consumers get a clear future path without forcing the core package to absorb broad framework-adapter scope. The existing root-package JSX/signals exports remain supported Brownfield reality unless a later contract explicitly moves or deprecates them, but Epic S should stop positioning them as the strategic declarative story. Epic S must turn the current stub into a real optional integration over the official `effect` package without adding Effect runtime cost to the imperative root surface.
+- **Decision:** Keep the imperative/runtime authority in the native core and make `tuvren-tui/effect` the sanctioned package-first declarative surface over the same Bun and FFI contract. The existing root JSX/signals exports remain supported Brownfield reality, but they are secondary to the Effect package rather than the strategic north star.
+- **Consequences:** Declarative consumers get a real package surface instead of a thin adapter, while the core package still avoids absorbing a second mutable runtime. Epic S must shape `tuvren-tui/effect` as a self-contained authoring path with JSX runtime exports, package-owned command/keybinding services, testing helpers, and advanced escapes without adding mandatory Effect runtime cost to ordinary imperative imports.
 
 ### ADR-T46 Plugin Slots Are Pre-GA Framework Contribution Points
 - **Status:** accepted
@@ -189,7 +190,7 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 - ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
 - ADR-T42 is now shipped under Epic P. The source tree exports `Tuvren` from `tuvren-tui`, resolves native libraries through `TUVREN_LIB_PATH`, and names release assets after Tuvren. The staged-prebuild path is removed; the resolver now searches TUVREN_LIB_PATH → aux scoped package → source build (repo-checkout only).
 - ADR-T44 is now shipped under Epic R. The Host Layer exposes `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` in `ts/src/commands.ts` and `ts/src/keymap.ts`. `CommandPalette` consumes a `CommandRegistry`. The `commandDispatcher` option is wired into `app.run()` and `createLoop()`. Key binding syntax is `[modifier+]*key`; duplicate command IDs throw; multiple bindings to the same key resolve first-registered-wins. The `source: "plugin"` discriminant is reserved for Epic T.
-- `tuvren-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
+- ADR-T45 is now partially shipped and reopened under Epic S. The Host Layer already exposes `acquireApp()`, `acquireHeadlessApp()`, `makeTuvrenScope()`, `renderScoped()`, `streamEvents()`, and `createCommandService()` as advanced APIs, and now also provides package-first `render()` / `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, keyboard and terminal-size hooks, a package-first `examples/effect-counter.tsx`, and expanded `ts/test-effect.test.ts` coverage.
 - The GitHub repository now lives at `Tuvren/tuvren-tui`. npm package publication is not shipped Brownfield behavior yet; Epic V owns the first public `0.1.0` publish after Epic U SDK productization.
 
 ## 3. State & Data Modeling
@@ -634,7 +635,7 @@ interface DevSessionOptions {
 function createDevSession(options: DevSessionOptions): Promise<void>;
 ```
 
-Epic P shipped the rename: the source tree now exports `Tuvren`, `TuvrenError`, and a stub `tuvren-tui/effect` path. The API examples above reflect current Brownfield reality. The Native Core ownership model and the no-React/Solid-parity constraint are unchanged.
+Epic P shipped the rename, and Epic S now defines a package-first Effect path: the source tree exports `Tuvren`, `TuvrenError`, and a real `tuvren-tui/effect` subpath with high-level `render()` / `testRender()`, package-owned command and keybinding hooks, JSX runtime exports, and retained advanced lifecycle helpers over the same imperative runtime. The API examples above reflect current Brownfield reality. The Native Core ownership model and the no-React/Solid-parity constraint are unchanged.
 
 ### 4.3 Install / Resolver Contract
 - **Style:** Runtime artifact-resolution contract
@@ -724,22 +725,89 @@ interface KeymapRegistry {
 ### 4.5 Effect Integration Contract
 - **Style:** Optional `tuvren-tui/effect` subpath over the official `effect` package
 - **Authentication / Authorization:** Not applicable
-- **Compatibility Strategy:** The root package remains imperative-first. Effect runtime dependencies belong to the optional subpath and must not make ordinary imperative imports pay for Effect integration.
-- **Error model:** Effect integration errors are represented through Effect failures where the API is Effect-native, and through ordinary host exceptions only at the boundary between imperative Tuvren APIs and Effect adapters.
+- **Compatibility Strategy:** The root package remains imperative/runtime-authoritative. `tuvren-tui/effect` is the primary developer-facing package surface for declarative Effect apps, while advanced APIs remain available for expert workflows. Effect runtime dependencies belong to the optional subpath and must not make ordinary imperative imports pay for Effect integration.
+- **Error model:** Package-first lifecycle and testing APIs throw ordinary host exceptions at the bootstrap/teardown boundary; the advanced Effect-native APIs surface failures through Effect causes.
 
 ```ts
+interface EffectRenderOptions {
+  app?: Tuvren;
+  mode?: "onChange" | "continuous";
+  fps?: number;
+  idleTimeout?: number;
+  disableJsxDispatch?: boolean;
+  onTick?: () => void;
+  onEvent?: (event: TuvrenEvent, runtime: TuvrenEffectRuntime) => void;
+}
+
+interface EffectTestRenderOptions {
+  width?: number;
+  height?: number;
+}
+
+interface EffectTestHarness {
+  readonly app: Tuvren;
+  readonly runtime: TuvrenEffectRuntime;
+  readonly instance: Instance;
+  inject(event: TuvrenEvent): void;
+  tick(): Promise<void>;
+  shutdown(): void;
+}
+
+interface TuvrenEffectRuntime {
+  readonly app: Tuvren;
+  readonly commands: CommandRegistry;
+  readonly keymaps: KeymapRegistry;
+  readonly dispatcher: CommandDispatcher;
+  readonly commandService: DispatchingEffectCommandService;
+  readonly terminalSize: Signal<{ width: number; height: number }>;
+  stop(): void;
+}
+
+declare function render(root: () => VNode, options?: EffectRenderOptions): Promise<void>;
+declare function testRender(root: () => VNode, options?: EffectTestRenderOptions): EffectTestHarness;
+declare function useTuvren(): TuvrenEffectRuntime;
+declare function useCommands(): DispatchingEffectCommandService;
+declare function useCommand(command: Command): void;
+declare function useKeybinding(binding: KeyBinding): void;
+declare function useKeyboard(
+  handler: (event: TuvrenEvent) => void,
+  options?: { when?: (event: TuvrenEvent) => boolean },
+): void;
+declare function useTerminalSize(): ReadonlySignal<{ width: number; height: number }>;
+declare function useSignal<T>(initialValue: T): Signal<T>;
+
 interface TuvrenEffectScope {
   readonly app: Tuvren;
-  addFinalizer(finalizer: () => void | Promise<void>): void;
+  addFinalizer(finalizer: () => void | Promise<void> | Effect.Effect<unknown, unknown, never>): Effect.Effect<void>;
+  manageDisposable<T extends Disposable>(disposable: T): Effect.Effect<T>;
+  manageInstance<T extends Instance>(instance: T): Effect.Effect<T>;
+  manageLoop<T extends Loop>(loop: T): Effect.Effect<T>;
+  manageSubscription<T extends Disposable>(subscription: T): Effect.Effect<T>;
+  manageTheme<T extends Theme>(theme: T): Effect.Effect<T>;
+  manageWidget<T extends Widget>(widget: T, options?: { destroy?: "self" | "subtree" }): Effect.Effect<T>;
+  render(element: VNode): Effect.Effect<Instance, TuvrenEffectError>;
 }
 
 interface EffectEventStreamOptions {
   app: Tuvren;
-  include?: TuvrenEventType[];
+  include?: readonly TuvrenEventType[];
+  commandDispatcher?: CommandDispatcher;
+  disableJsxDispatch?: boolean;
+  fps?: number;
+  idleTimeout?: number;
+  mode?: "onChange" | "continuous";
 }
 
 interface EffectCommandOptions {
   registry: CommandRegistry;
+}
+
+interface EffectCommandService {
+  execute(id: string, context?: Partial<CommandContext>): Effect.Effect<boolean, TuvrenEffectError>;
+}
+
+interface DispatchingEffectCommandService extends EffectCommandService {
+  dispatch(event: TuvrenEvent): Effect.Effect<void, TuvrenEffectError>;
 }
 ```
 

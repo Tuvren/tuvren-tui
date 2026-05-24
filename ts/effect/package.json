@@ -1,0 +1,18 @@
+{
+  "private": true,
+  "type": "module",
+  "description": "Package-first Effect surface for Tuvren TUI source checkouts.",
+  "exports": {
+    ".": "./index.ts",
+    "./jsx-runtime": "./jsx-runtime.ts",
+    "./jsx-dev-runtime": "./jsx-dev-runtime.ts"
+  },
+  "peerDependencies": {
+    "effect": "^3.21.2"
+  },
+  "peerDependenciesMeta": {
+    "effect": {
+      "optional": true
+    }
+  }
+}

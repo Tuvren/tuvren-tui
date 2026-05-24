@@ -173,6 +173,29 @@ export interface VNode {
 export const Fragment: unique symbol = Symbol("Fragment");
 
 // ---------------------------------------------------------------------------
+// Component hook bookkeeping
+// ---------------------------------------------------------------------------
+
+export interface ComponentConstHookState<T = unknown> {
+	kind: "const";
+	value: T;
+}
+
+export interface ComponentEffectHookState {
+	kind: "effect";
+	deps?: readonly unknown[];
+	cleanup?: (() => void) | undefined;
+}
+
+export type ComponentHookState = ComponentConstHookState | ComponentEffectHookState;
+
+export interface ComponentFrame {
+	fn: ComponentFunction;
+	vnode: VNode;
+	hooks: ComponentHookState[];
+}
+
+// ---------------------------------------------------------------------------
 // Instance — mounted element bookkeeping
 // ---------------------------------------------------------------------------
 
@@ -184,6 +207,8 @@ export interface Instance {
 	key: string | number | null;
 	parent: Instance | null;
 	eventHandlers: Map<string, EventHandler>;
+	componentFrames?: ComponentFrame[];
+	contexts: ReadonlyMap<symbol, unknown>;
 }
 
 // ---------------------------------------------------------------------------
@@ -206,6 +231,18 @@ export declare namespace JSX {
 		Overlay: OverlayProps;
 		Transcript: TranscriptProps;
 		SplitPane: SplitPaneProps;
+		box: BoxProps;
+		text: TextProps;
+		input: InputProps;
+		select: SelectProps;
+		scrollbox: ScrollBoxProps;
+		textarea: TextAreaProps;
+		table: TableProps;
+		list: ListProps;
+		tabs: TabsProps;
+		overlay: OverlayProps;
+		transcript: TranscriptProps;
+		splitpane: SplitPaneProps;
 	}
 
 	interface ElementChildrenAttribute {

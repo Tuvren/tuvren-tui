@@ -65,6 +65,68 @@ bun run hello.ts
 
 Press **Esc** to exit. From install to a running terminal app in under 15 minutes.
 
+## Effect Package
+
+Tuvren ships `tuvren-tui/effect` as the package-first declarative authoring surface over the same native runtime.
+
+Install the official `effect` package when you want this path:
+
+```bash
+bun add tuvren-tui effect
+```
+
+```tsx
+/** @jsxImportSource tuvren-tui/effect */
+
+import {
+  Box,
+  Text,
+  KeyCode,
+  computed,
+  render,
+  useCommand,
+  useKeyboard,
+  useKeybinding,
+  useSignal,
+  useTerminalSize,
+  useTuvren,
+} from "tuvren-tui/effect";
+
+function App() {
+  const runtime = useTuvren();
+  const count = useSignal(0);
+  const status = useSignal("Press i to increment, q or Esc to quit.");
+  const size = useTerminalSize();
+
+  useCommand({
+    id: "app.increment",
+    title: "Increment counter",
+    run: () => {
+      count.value += 1;
+      status.value = "Incremented via package-owned command.";
+    },
+  });
+  useKeybinding({ command: "app.increment", key: "i" });
+  useKeyboard((event) => {
+    if (event.keyCode === KeyCode.Escape || event.codepoint === "q".codePointAt(0)) {
+      runtime.stop();
+    }
+  });
+
+  return (
+    <Box width="100%" height="100%" padding={1} gap={1} flexDirection="column">
+      <Text content={computed(() => `Count: ${count.value}`)} fg="#7dd3fc" />
+      <Text content={computed(() => `Terminal: ${size.value.width}x${size.value.height}`)} />
+      <Text content={status} />
+    </Box>
+  );
+}
+
+await render(() => <App />);
+```
+
+The package story is intentionally Tuvren-native: `tuvren-tui/effect` owns authoring ergonomics, commands, keybindings, hooks, and testing helpers, while Rust remains the single mutable UI authority underneath.
+
 ## JSX + Signals
 
 Tuvren also supports a JSX + `@preact/signals-core` reconciler for signal-driven interfaces:
@@ -147,6 +209,7 @@ app.shutdown();
 | `CommandRegistry` | Register typed commands with IDs, titles, run handlers, categories, and `when` predicates |
 | `KeymapRegistry` | Bind key strings (`ctrl+c`, `escape`, `f5`, `q`) to command IDs; first-registered wins |
 | `CommandDispatcher` | Wire a registry + keymap into `app.run()` or `createLoop()` for automatic dispatch |
+| `tuvren-tui/effect` | Package-first Effect authoring surface with `render()` / `testRender()`, JSX runtime exports, package-owned command/keybinding hooks, and advanced lifecycle helpers |
 
 **Commands & keymap quick start:**
 
@@ -210,6 +273,7 @@ bun install --cwd ts
 
 ```bash
 bun run examples/demo.ts                 # Box, Text, Input, Select, ScrollBox — imperative API
+bun run examples/effect-counter.tsx      # Package-first Effect JSX + commands + keyboard hooks
 bun run examples/migration-jsx.tsx       # Same app rewritten in JSX + signals
 bun run examples/showcase.ts             # Animations, themes, TextArea, runtime tree ops
 bun run examples/system-monitor.ts       # 9 core widgets: Box, Text, Input, TextArea, Select, Table, List, Tabs, Overlay
@@ -255,6 +319,8 @@ bun install --cwd ts
 # Run the full host test surface
 bun test ts/test-ffi.test.ts
 bun test ts/test-jsx.test.ts
+bun test ts/test-commands.test.ts
+bun test ts/test-effect.test.ts
 bun test ts/test-examples.test.ts
 bun test ts/test-install.test.ts
 bun test ts/test-runner.test.ts

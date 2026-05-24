@@ -157,11 +157,11 @@
 - **Capability:** The framework provides a consistent foundation for command palettes, keyboard shortcuts, and other application-level interaction patterns over the same core runtime.
 - **Rationale:** Moving from a productized imperative core to a competitive framework requires first-class application orchestration primitives, and commands plus keymaps are the minimum viable moat for that transition.
 
-### Epic 12 — Optional Declarative Integration Layer
+### Epic 12 — Package-First Effect Application Surface
 - **Priority:** P1
-- **Capability:** A Developer can opt into a declarative application model layered over the same imperative runtime contract without fragmenting the framework into separate state authorities.
-- **Capability:** The imperative core remains the canonical mental model even when a declarative integration layer is used.
-- **Rationale:** A competitive framework can support multiple development styles, but the declarative story must deepen adoption without undermining the clarity and authority of the core imperative runtime.
+- **Capability:** A Developer can build ordinary Tuvren applications primarily from `tuvren-tui/effect` without routine knowledge of raw Handles, manual loop setup, or root imperative lifecycle wiring.
+- **Capability:** `tuvren-tui/effect` acts as a self-contained package surface with JSX authoring, package-owned commands and keybindings, testing helpers, and advanced escape hatches over the same native runtime authority.
+- **Rationale:** A competitive framework needs a real declarative package in the role that other ecosystems reserve for their primary authoring packages, while still keeping Rust as the mutable runtime authority.
 
 ### Epic 13 — Extension Slots and Framework Contributions
 - **Priority:** P1
@@ -203,7 +203,7 @@
 - Imperative composition API as the primary mental model.
 - Productized installation, release, and onboarding experience for supported platforms.
 - Framework-level command and keybinding foundations over the same imperative runtime.
-- An optional declarative integration layer over the same runtime contract, without introducing a second mutable UI authority.
+- A package-first Effect application surface over the same runtime contract, without introducing a second mutable UI authority.
 - Pre-GA plugin and contribution slots for framework-level services after command/keymap and declarative contracts stabilize.
 - Expert-level SDK productization across imperative, JSX, Effect, plugin, composite, example, and devtools surfaces before first public npm publish.
 - Incremental rendering through dirty-region tracking.

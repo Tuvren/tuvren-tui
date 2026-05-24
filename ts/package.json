@@ -7,16 +7,20 @@
     ".": "./src/index.ts",
     "./jsx-runtime": "./src/jsx/jsx-runtime.ts",
     "./jsx-dev-runtime": "./src/jsx/jsx-runtime.ts",
-    "./effect": "./src/effect/index.ts"
+    "./effect": "./effect/index.ts",
+    "./effect/jsx-runtime": "./effect/jsx-runtime.ts",
+    "./effect/jsx-dev-runtime": "./effect/jsx-dev-runtime.ts"
   },
   "scripts": {
-    "test": "bun test test-ffi.test.ts && bun test test-jsx.test.ts && bun test test-examples.test.ts && bun test test-install.test.ts && bun test test-runner.test.ts && bun run check-bundle.ts",
+    "test": "bun test test-ffi.test.ts && bun test test-jsx.test.ts && bun test test-commands.test.ts && bun test test-effect.test.ts && bun test test-examples.test.ts && bun test test-install.test.ts && bun test test-runner.test.ts && bun run check-bundle.ts",
     "bench": "bun run bench-ffi.ts && bun run bench-render.ts",
     "bench:ffi": "bun run bench-ffi.ts",
     "bench:render": "bun run bench-render.ts",
     "guardrails": "bun run guardrails-ffi.ts",
     "guardrails:report": "bun run guardrails-ffi.ts --report-only",
+    "test:commands": "bun test test-commands.test.ts",
     "test:examples": "bun test test-examples.test.ts",
+    "test:effect": "bun test test-effect.test.ts",
     "test:install": "bun test test-install.test.ts",
     "test:jsx": "bun test test-jsx.test.ts",
     "test:runner": "bun test test-runner.test.ts",
@@ -33,9 +37,18 @@
     "@tuvren/tuvren-tui-win32-x64": "0.1.0"
   },
   "devDependencies": {
+    "effect": "^3.21.2",
     "typescript": "^5.0.0"
   },
   "engines": {
     "bun": ">=1.1"
+  },
+  "peerDependenciesMeta": {
+    "effect": {
+      "optional": true
+    }
+  },
+  "peerDependencies": {
+    "effect": "^3.21.2"
   }
 }
