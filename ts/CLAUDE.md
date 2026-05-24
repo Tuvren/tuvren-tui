@@ -89,7 +89,7 @@ This layer translates developer intent into FFI calls or safe host composites. I
   1. `TUVREN_LIB_PATH`
   2. aux scoped package `@tuvren/tuvren-tui-<platform>-<arch>` via `import.meta.resolve()`
   3. `native/target/release/` (only when `isRepoCheckout()` is true)
-- Repo-side FFI tests and benchmark harnesses that `dlopen` directly must bypass staged prebuilds and validate the local Cargo-built branch artifact.
+- Repo-side FFI tests and benchmark harnesses that `dlopen` directly must bypass old packaged artifacts and validate the local Cargo-built branch artifact.
 - Keep install and diagnostic messaging aligned with `resolver.ts` and `diagnostics.ts`.
 
 ### Transcript Wrapper Rule

@@ -1,4 +1,4 @@
-//! Native Text Substrate — TextBuffer (ADR-T37, TechSpec §3.4 / §4.4 `text_buffer`).
+//! Native Text Substrate — TextBuffer (ADR-T37, TechSpec §3.4 / §4.8 `text_buffer`).
 //!
 //! Owns the canonical content for substantial text surfaces. Mutation routes
 //! through `replace_range` / `append`; style spans, selections, and highlights

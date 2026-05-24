@@ -650,7 +650,7 @@ const symbols = {
 		returns: "i32" as const,
 	},
 
-	// Native Text Substrate — TextBuffer (ADR-T37, TechSpec §4.4)
+	// Native Text Substrate — TextBuffer (ADR-T37, TechSpec §4.8)
 	// Handle constructor: 0 = invalid handle / error (consult tui_get_last_error).
 	tui_text_buffer_create: { args: [] as FFIType[], returns: "u32" as const },
 	tui_text_buffer_destroy: {
@@ -716,7 +716,7 @@ const symbols = {
 		returns: "i32" as const,
 	},
 
-	// Native Text Substrate — TextView (ADR-T37, TechSpec §4.4)
+	// Native Text Substrate — TextView (ADR-T37, TechSpec §4.8)
 	// Handle constructor: 0 = invalid handle / error.
 	tui_text_view_create: {
 		args: ["u32"] as FFIType[],
@@ -761,7 +761,7 @@ const symbols = {
 		returns: "u64" as const,
 	},
 
-	// Native Text Substrate — EditBuffer (ADR-T38, TechSpec §4.4)
+	// Native Text Substrate — EditBuffer (ADR-T38, TechSpec §4.8)
 	tui_edit_buffer_create: {
 		args: ["u32"] as FFIType[],
 		returns: "u32" as const,

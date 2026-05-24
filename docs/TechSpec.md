@@ -675,6 +675,15 @@ supported_release_targets:
 - **Plugin source status:** `source: "plugin"` is reserved for Epic T contributions. Epic R must preserve the discriminant shape but does not need to implement plugin registration or plugin-specific dispatch semantics.
 
 ```ts
+interface WidgetRef {
+  readonly handle: Handle;
+  readonly kind?: string;
+}
+
+interface Disposable {
+  dispose(): void;
+}
+
 interface Command {
   id: string;
   title: string;
@@ -689,6 +698,8 @@ interface CommandContext {
   focused?: WidgetRef;
   source: "keymap" | "palette" | "programmatic" | "plugin";
 }
+
+type CommandPredicate = (context: CommandContext) => boolean;
 
 interface KeyBinding {
   command: string;
@@ -737,6 +748,36 @@ interface EffectCommandOptions {
 - **Error model:** Plugin setup failures are isolated to the registering plugin where possible and surfaced through diagnostics; rejected contributions fail synchronously during registration.
 
 ```ts
+interface ContributionRegistration<TContribution> {
+  register(contribution: TContribution): Disposable;
+  list(): TContribution[];
+}
+
+interface PaletteContribution {
+  command: string;
+  title?: string;
+}
+
+interface DevtoolsContribution {
+  id: string;
+  title: string;
+}
+
+interface ThemeContribution {
+  id: string;
+  title: string;
+}
+
+interface ExampleContribution {
+  id: string;
+  title: string;
+}
+
+type PaletteContributionRegistry = ContributionRegistration<PaletteContribution>;
+type DevtoolsContributionRegistry = ContributionRegistration<DevtoolsContribution>;
+type ThemeContributionRegistry = ContributionRegistration<ThemeContribution>;
+type ExampleContributionRegistry = ContributionRegistration<ExampleContribution>;
+
 interface Extension {
   id: string;
   activate(context: ExtensionContext): void | Promise<void>;

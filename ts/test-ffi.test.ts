@@ -234,7 +234,7 @@ const lib = dlopen(LIB_PATH, {
 	tui_debug_get_trace:           { args: ["u8", "ptr", "u32"] as FFIType[],                   returns: "i32" as const },
 	tui_debug_clear_traces:        { args: [] as FFIType[],                                     returns: "i32" as const },
 
-	// Native Text Substrate (ADR-T37, TechSpec §4.4)
+	// Native Text Substrate (ADR-T37, TechSpec §4.8)
 	tui_text_buffer_create:            { args: [] as FFIType[],                                     returns: "u32" as const },
 	tui_text_buffer_destroy:           { args: ["u32"] as FFIType[],                                returns: "i32" as const },
 	tui_text_buffer_replace_range:     { args: ["u32", "u32", "u32", "ptr", "u32"] as FFIType[],    returns: "i32" as const },

@@ -89,7 +89,7 @@ The C ABI prefix `tui_*` is intentionally preserved to avoid gratuitous ABI chur
 
 ## 8. Auxiliary Native Packages (New Topology)
 
-The approved target-state (ADR-T43) introduces one public package (`tuvren-tui`) backed by auxiliary scoped native packages. These packages do not exist in the Brownfield source and must be created.
+The approved target-state (ADR-T43) introduces one public package (`tuvren-tui`) backed by auxiliary scoped native packages. Epic P created the package stubs in the Brownfield source; Epic V owns the first public publish cycle and package-manager smoke coverage.
 
 | Package name | Platform | Architecture | Ticket |
 |-------------|----------|--------------|--------|

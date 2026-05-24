@@ -85,7 +85,7 @@ thread_local! {
 ///
 /// Success paths clear `last_error` so callers that disambiguate a returned
 /// `0` via `tui_get_last_error()` (notably substrate value-returning getters,
-/// per TechSpec §4.4) cannot observe a stale diagnostic from a prior call.
+/// per TechSpec §4.8) cannot observe a stale diagnostic from a prior call.
 fn ffi_wrap(f: impl FnOnce() -> Result<i32, String>) -> i32 {
     match catch_unwind(AssertUnwindSafe(f)) {
         Ok(Ok(code)) => {
@@ -2909,7 +2909,7 @@ pub extern "C" fn tui_get_perf_counter(counter_id: u32) -> u64 {
             11 => ctx.perf_text_wrap_us,
             12 => ctx.perf_text_cache_hits as u64,
             13 => ctx.perf_text_cache_misses as u64,
-            // v4 additions (TechSpec §4.5)
+            // v4 transcript/devtools additions
             14 => ctx
                 .nodes
                 .values()
@@ -3337,7 +3337,7 @@ pub extern "C" fn tui_splitpane_set_resizable(handle: u32, enabled: u8) -> i32 {
 }
 
 // ============================================================================
-// Native Text Substrate FFI (ADR-T37, TechSpec §4.4 `text_buffer`, `text_view`)
+// Native Text Substrate FFI (ADR-T37, TechSpec §4.8 `text_buffer`, `text_view`)
 // ============================================================================
 
 #[no_mangle]
@@ -3891,7 +3891,7 @@ mod tests {
         let epoch = tui_text_buffer_get_epoch(buf);
         assert_eq!(epoch, 0, "fresh buffer epoch is a valid 0");
 
-        // 3. Per the TechSpec §4.4 contract, last_error must now be cleared.
+        // 3. Per the TechSpec §4.8 contract, last_error must now be cleared.
         let ptr_after = tui_get_last_error();
         assert!(
             ptr_after.is_null(),

@@ -224,7 +224,9 @@ jobs:
 
             npm publish support and the `bun add tuvren-tui` install path are deferred to
             Epic V after the SDK productization pass. The planned first public npm release
-            is `0.1.0` and remains pre-GA.
+            is `0.1.0` and remains pre-GA. The GitHub release is still published as a
+            normal release asset set; pre-GA describes API compatibility before `v1.0`,
+            not an npm prerelease tag or draft release channel.
           files: |
             tuvren-tui-*
           draft: false

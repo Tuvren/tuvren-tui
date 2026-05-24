@@ -1,4 +1,4 @@
-//! Native Text Substrate — EditBuffer (ADR-T38, TechSpec §3.4 / §4.4 `edit_buffer`).
+//! Native Text Substrate — EditBuffer (ADR-T38, TechSpec §3.4 / §4.8 `edit_buffer`).
 //!
 //! Wraps a `TextBuffer` handle with operation-based undo/redo history. The
 //! history records the replaced bytes and the replacement payload so ordinary

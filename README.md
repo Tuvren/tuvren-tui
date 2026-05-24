@@ -228,7 +228,7 @@ cargo fmt --manifest-path native/Cargo.toml -- --check
 cargo clippy --manifest-path native/Cargo.toml -- -D warnings
 ```
 
-Repo-side FFI tests and benchmark harnesses target the local Cargo-built artifact under `native/target/release/` so branch validation is never shadowed by a staged prebuild.
+Repo-side FFI tests and benchmark harnesses target the local Cargo-built artifact under `native/target/release/` so branch validation is never shadowed by old packaged artifacts.
 
 ## Verification and Budgets
 

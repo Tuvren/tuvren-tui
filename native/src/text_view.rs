@@ -1,4 +1,4 @@
-//! Native Text Substrate — TextView (ADR-T37, TechSpec §3.4 / §4.4 `text_view`).
+//! Native Text Substrate — TextView (ADR-T37, TechSpec §3.4 / §4.8 `text_view`).
 //!
 //! Viewport and soft-wrap projection over a `TextBuffer`. Holds an invalidatable
 //! visual-line cache keyed by `(content_epoch, wrap_width, wrap_mode, tab_width,
