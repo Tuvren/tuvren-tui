@@ -26,9 +26,9 @@ The Effect package is the primary declarative authoring surface over Tuvren-nati
   - custom finalizers
   - widgets
   - themes
-- loops
-- command/keymap subscriptions
-- reconciler `Instance`s
+  - loops
+  - command/keymap subscriptions
+  - reconciler `Instance`s
 - high-level `render()` / `testRender()` own app bootstrapping, package-owned commands/keybindings, and testing ergonomics for normal apps
 - `renderScoped()` binds the existing declarative mount/unmount lifecycle into an Effect scope for advanced workflows, but the package does not require React/Svelte-style adapters or external component runtimes
 

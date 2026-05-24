@@ -697,6 +697,8 @@ function updateInstance(instance: Instance, newVNode: VNode): void {
 		return;
 	}
 
+	disposeComponentFrames(instance);
+
 	// Fragment — reconcile the fragment's own children.
 	// Fragment children are native children of the nearest widget-bearing ancestor,
 	// so we look up the ancestor widget for mount/append operations.

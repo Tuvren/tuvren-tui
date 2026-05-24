@@ -37,6 +37,7 @@ import {
 import { jsx } from "./effect/jsx-runtime";
 import { ffi } from "./src/ffi";
 import { KeyCode } from "./src/ffi/structs";
+import { reconcileChildren } from "./src/jsx/reconciler";
 import { KeymapRegistry } from "./src/keymap";
 import { Theme } from "./src/theme";
 import { Box as WidgetBox } from "./src/widgets/box";
@@ -177,6 +178,112 @@ describe("High-level Effect authoring", () => {
 			});
 			await harness.tick();
 			expect(getContent(getChildAt(rootHandle, 1))).toBe("Size: 90x20");
+		} finally {
+			harness.shutdown();
+		}
+	});
+
+	test("useCommands execute injects the package-owned app context", async () => {
+		let service: ReturnType<typeof useCommands> | undefined;
+		let seenApp: Tuvren | undefined;
+
+		function App() {
+			service = useCommands();
+
+			useCommand({
+				id: "capture.app",
+				title: "Capture app",
+				run: (context) => {
+					seenApp = context.app;
+				},
+			});
+
+			return jsx(EffectBox, {
+				width: "100%",
+				height: "100%",
+			});
+		}
+
+		const harness = testRender(() => jsx(App, {}), { width: 24, height: 8 });
+
+		try {
+			if (service === undefined) {
+				throw new Error("Expected command service to be captured during render");
+			}
+
+			const executed = await Effect.runPromise(service.execute("capture.app"));
+			expect(executed).toBe(true);
+			expect(seenApp).toBe(harness.app);
+		} finally {
+			harness.shutdown();
+		}
+	});
+
+	test("reconcileChildren disposes component hook cleanups when keyed children become intrinsic", () => {
+		function CommandChild() {
+			useCommand({
+				id: "component.bound",
+				title: "Component bound",
+				run: () => {},
+			});
+
+			return jsx(EffectText, {
+				content: "component child",
+			});
+		}
+
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+					children: jsx(CommandChild, { key: "same" }),
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		try {
+			expect(harness.runtime.commands.list().map((command) => command.id)).toContain("component.bound");
+
+			reconcileChildren(harness.instance, [
+				jsx(EffectText, {
+					key: "same",
+					content: "plain child",
+				}),
+			]);
+
+			expect(harness.runtime.commands.list().map((command) => command.id)).not.toContain("component.bound");
+		} finally {
+			harness.shutdown();
+		}
+	});
+
+	test("keyboard listeners dispatch against a stable snapshot", () => {
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		try {
+			const seen: string[] = [];
+			let disposeSecond: (() => void) | undefined;
+
+			harness.runtime.addKeyboardListener(() => {
+				seen.push("first");
+				disposeSecond?.();
+			});
+
+			const second = harness.runtime.addKeyboardListener(() => {
+				seen.push("second");
+			});
+			disposeSecond = () => second.dispose();
+
+			harness.runtime.notifyEvent(makeCharKeyEvent("x"));
+			expect(seen).toEqual(["first", "second"]);
 		} finally {
 			harness.shutdown();
 		}

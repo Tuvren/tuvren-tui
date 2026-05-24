@@ -93,7 +93,8 @@ export function createEffectRuntime(app: Tuvren): TuvrenEffectRuntime {
 				return;
 			}
 
-			for (const listener of keyboardListeners) {
+			// Snapshot listeners so disposal during dispatch cannot skip peers.
+			for (const listener of [...keyboardListeners]) {
 				if (listener.when != null && !listener.when(event)) {
 					continue;
 				}

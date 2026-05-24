@@ -134,6 +134,10 @@ export class CommandDispatcher {
 		this._keymaps.setRegistry(_commands);
 	}
 
+	get app(): Tuvren {
+		return this._app;
+	}
+
 	/**
 	 * Attempt to dispatch a single event through the keymap resolver.
 	 * Non-key events are silently ignored.
