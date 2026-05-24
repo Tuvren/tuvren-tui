@@ -398,6 +398,38 @@ describe("High-level Effect authoring", () => {
 		}
 	});
 
+	test("mountComponent disposes hook side effects when a new child component fails to mount", () => {
+		function InvalidChild() {
+			useCommand({
+				id: "component.leak",
+				title: "Component leak",
+				run: () => {},
+			});
+
+			return jsx("NotARealThing", {});
+		}
+
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		try {
+			expect(() =>
+				reconcileChildren(harness.instance, [
+					jsx(InvalidChild, { key: "broken" }),
+				]),
+			).toThrow('Unknown JSX element type: "NotARealThing"');
+			expect(harness.runtime.commands.list()).toEqual([]);
+		} finally {
+			harness.shutdown();
+		}
+	});
+
 	test("keyboard listeners dispatch against a stable snapshot", () => {
 		const harness = testRender(
 			() =>
@@ -427,6 +459,79 @@ describe("High-level Effect authoring", () => {
 		} finally {
 			harness.shutdown();
 		}
+	});
+
+	test("render() still shuts down an owned app when unmount throws", async () => {
+		const app = Tuvren.initHeadless(24, 8);
+		const originalInit = Tuvren.init;
+		const originalShutdown = app.shutdown.bind(app);
+		let shutdownCalls = 0;
+		let rootWidget: { destroySubtree(): void } | undefined;
+		let ticked = false;
+
+		app.shutdown = () => {
+			shutdownCalls += 1;
+			originalShutdown();
+		};
+		Tuvren.init = () => app;
+
+		function App() {
+			return jsx(EffectBox, {
+				width: "100%",
+				height: "100%",
+				ref: (widget) => {
+					rootWidget = widget as unknown as { destroySubtree(): void };
+				},
+			});
+		}
+
+		try {
+			await expect(
+				renderEffectApp(() => jsx(App, {}), {
+					idleTimeout: 0,
+					onTick: () => {
+						if (ticked) {
+							return;
+						}
+						ticked = true;
+						if (rootWidget == null) {
+							throw new Error("Expected root widget ref before cleanup test");
+						}
+						rootWidget.destroySubtree = () => {
+							throw new Error("render cleanup boom");
+						};
+						app.stop();
+					},
+				}),
+			).rejects.toThrow("render cleanup boom");
+			expect(shutdownCalls).toBe(1);
+		} finally {
+			Tuvren.init = originalInit;
+		}
+	});
+
+	test("testRender shutdown still shuts down the app when unmount throws", () => {
+		const harness = testRender(
+			() =>
+				jsx(EffectBox, {
+					width: "100%",
+					height: "100%",
+				}),
+			{ width: 24, height: 8 },
+		);
+
+		const originalShutdown = harness.app.shutdown.bind(harness.app);
+		let shutdownCalls = 0;
+		harness.app.shutdown = () => {
+			shutdownCalls += 1;
+			originalShutdown();
+		};
+		(harness.instance.widget as unknown as { destroySubtree(): void }).destroySubtree = () => {
+			throw new Error("testRender cleanup boom");
+		};
+
+		expect(() => harness.shutdown()).toThrow("testRender cleanup boom");
+		expect(shutdownCalls).toBe(1);
 	});
 
 	test("render() boots the package-owned loop and exits when runtime.stop() is called", async () => {

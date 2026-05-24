@@ -56,11 +56,14 @@ export async function render(
 			},
 		});
 	} finally {
-		if (instance != null) {
-			unmount(instance);
-		}
-		if (ownsApp) {
-			app.shutdown();
+		try {
+			if (instance != null) {
+				unmount(instance);
+			}
+		} finally {
+			if (ownsApp) {
+				app.shutdown();
+			}
 		}
 	}
 }
@@ -109,8 +112,11 @@ export function testRender(
 				return;
 			}
 			closed = true;
-			unmount(instance);
-			app.shutdown();
+			try {
+				unmount(instance);
+			} finally {
+				app.shutdown();
+			}
 		},
 	};
 }

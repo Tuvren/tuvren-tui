@@ -23,6 +23,7 @@ import type { Tuvren } from "../app";
 import { Buffer } from "buffer";
 import {
 	createComponentFrame,
+	disposeComponentFrame,
 	disposeComponentFrames,
 	disposeComponentFramesFrom,
 	resolveInstanceContexts,
@@ -201,15 +202,20 @@ function mountComponent(
 	contexts: ReadonlyMap<symbol, unknown>,
 ): Instance {
 	const frame = createComponentFrame(vnode);
-	const fn = vnode.type as ComponentFunction;
-	const propsWithChildren = withChildrenProp(vnode);
-	const resultVNode = runComponentFrame(frame, contexts, () => fn(propsWithChildren));
-	const instance = mount(resultVNode, parentInstance, { contexts });
-	instance.componentFrames = [frame, ...(instance.componentFrames ?? [])];
-	instance.key = vnode.key;
-	instance.vnode = vnode;
-	instance.contexts = contexts;
-	return instance;
+	try {
+		const fn = vnode.type as ComponentFunction;
+		const propsWithChildren = withChildrenProp(vnode);
+		const resultVNode = runComponentFrame(frame, contexts, () => fn(propsWithChildren));
+		const instance = mount(resultVNode, parentInstance, { contexts });
+		instance.componentFrames = [frame, ...(instance.componentFrames ?? [])];
+		instance.key = vnode.key;
+		instance.vnode = vnode;
+		instance.contexts = contexts;
+		return instance;
+	} catch (cause: unknown) {
+		disposeComponentFrame(frame);
+		throw cause;
+	}
 }
 
 /**
@@ -776,9 +782,6 @@ function updateResolvedInstance(instance: Instance, newVNode: VNode): void {
 
 	// Re-apply all new props (rebinds signals)
 	applyProps(instance, type, newVNode.props);
-
-	// Update vnode reference
-	instance.vnode = newVNode;
 
 	// Recursively reconcile children
 	if (newVNode.children.length > 0 || instance.children.length > 0) {

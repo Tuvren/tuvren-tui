@@ -139,7 +139,7 @@ export function disposeComponentFramesFrom(instance: Instance, index: number): v
 	}
 }
 
-function disposeComponentFrame(frame: ComponentFrame): void {
+export function disposeComponentFrame(frame: ComponentFrame): void {
 	for (const hook of frame.hooks) {
 		if (hook.kind === "effect") {
 			hook.cleanup?.();
