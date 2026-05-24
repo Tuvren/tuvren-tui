@@ -159,11 +159,11 @@ app.setRoot(root);
 
 const registry = new CommandRegistry();
 const keymaps = new KeymapRegistry();
-keymaps.setRegistry(registry);
 
 registry.register({ id: "app.quit", title: "Quit", run: () => app.stop() });
 keymaps.register({ command: "app.quit", key: "q" });
 
+// CommandDispatcher wires keymaps to the registry automatically in its constructor
 const dispatcher = new CommandDispatcher(registry, keymaps, app);
 await app.run({ commandDispatcher: dispatcher });
 app.shutdown();

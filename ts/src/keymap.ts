@@ -5,7 +5,14 @@
  *   Modifiers (case-insensitive): ctrl, shift, alt, super
  *   Named keys: escape, enter, backspace, tab, backtab, delete, insert,
  *               up, down, left, right, home, end, pageup, pagedown, f1-f12
- *   Character keys: any single printable character
+ *   Character keys: any single printable character (case-insensitive — "Q"
+ *                   and "q" are equivalent; use "shift+q" to require Shift)
+ *
+ * Native-core reserved keys: Escape (dismissable overlays), Tab/BackTab
+ * (focus traversal), and keys consumed by focused widgets (Input printable
+ * chars, Enter→Submit, Backspace, arrows, etc.) are intercepted before the
+ * host event drain — keymap bindings on those keys will not fire while the
+ * relevant widget or overlay holds focus.
  *
  * Examples: "ctrl+c", "ctrl+shift+k", "escape", "f5", "q", "enter"
  */
