@@ -36,7 +36,7 @@
 ### 1.4 Brownfield Transition Note
 - **Public product name:** `Tuvren` (Epic P shipped the hard-cut rename)
 - **Current source-tree reality:** The repo now lives at `Tuvren/tuvren-tui`; package names, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P, and the GitHub organization move is complete as pre-Epic-R operational cleanup.
-- **Current framework-service reality:** Epic R is shipped, and Epic S is reopened as a package-shaping wave. Commands/keymaps already live in the Host Layer; `tuvren-tui/effect` now provides a real package-first authoring surface over the same native authority, while the remaining work is to deepen docs, examples, and broader productization around that package story.
+- **Current framework-service reality:** Epic R and Epic S are both shipped. Commands/keymaps already live in the Host Layer, and `tuvren-tui/effect` now provides the real package-first authoring surface over the same native authority rather than an adapter-like helper layer.
 - **Architectural interpretation:** The logical design is governed by the public framework direction. Downstream artifacts must distinguish current Brownfield naming from approved future-state naming where the two still differ.
 
 ## 2. System Containers

@@ -1,7 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
-- v8.1.0 - Reopened Epic S as a package-shaping wave: `tuvren-tui/effect` now exposes package-first `render()` / `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, retained advanced lifecycle helpers, an updated `effect-counter.tsx` example, and focused package coverage in `ts/test-effect.test.ts`.
+- v8.1.0 - Executed Epic S with the clarified package-first scope: `tuvren-tui/effect` now exposes package-first `render()` / `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, retained advanced lifecycle helpers, an updated `effect-counter.tsx` example, and focused package coverage in `ts/test-effect.test.ts`.
 - v8.0.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to the registry; `commandDispatcher` wired into `app.run()` and `createLoop()`; 46 focused tests in `test-commands.test.ts`; all 433 host tests pass; bundle at 72.2 KB under 75 KB budget. Epic S is now the active wave.
 - v7.9.0 - Planned the full Epics R-V sequence: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.8.0 - Marked Epic Q shipped after the adoption and framework positioning wave landed: README rewritten as a general-purpose framework with public install path and Hello World, example framing updated into two tiers (general-purpose demos and flagship workload proofs), and Kraken-to-Tuvren hard-cut migration guide published at `docs/migration/kraken-to-tuvren.md`. Epic R is now the next queued wave.
@@ -10,21 +10,20 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Active Critical Path
-- **Total Active Story Points:** 123 (Epic R shipped; Epic S reopened after package-surface realignment)
-- **Critical Path:** `EFF-S001 -> EFF-S002 -> EFF-S003 -> EFF-S004 -> EFF-S005 -> EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
+- **Total Active Story Points:** 80 (Epic R and Epic S shipped)
+- **Critical Path:** `EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
 - **Planning Assumptions:**
   - Epic M, Epic N, Epic O, Epic P, and Epic Q are all shipped. The Brownfield source now includes the native text substrate, transcript and split-pane semantics, devtools, terminal-capability hardening, the full Tuvren hard-cut rename, and the general-purpose framework onboarding and migration story.
   - The GitHub repository move is complete; the canonical remote is `Tuvren/tuvren-tui`. The local checkout directory may still be named `KrakenTUI` until the operator renames it.
   - The product story is **general-purpose framework first**, with agentic and transcript-heavy products as the flagship showcase and harshest proof workload. This positioning is now reflected in the README and example framing.
   - Bun remains the only supported runtime in the active contract. Node portability is deferred.
-  - The following framework waves are intentionally sequenced: commands and keymaps (Epic R), package-first Effect completion (Epic S), pre-GA plugin slots (Epic T), expert-level SDK DX productization (Epic U), and first public npm publish plus feedback loop (Epic V).
+  - The following framework waves are intentionally sequenced: commands and keymaps (Epic R), the package-first Effect execution (Epic S), pre-GA plugin slots (Epic T), expert-level SDK DX productization (Epic U), and first public npm publish plus feedback loop (Epic V).
   - First public npm publish is planned as `0.1.0` pre-GA, not `v1.0`; breaking changes remain allowed before public `v1.0 GA`.
   - React and Solid parity are not roadmap goals in this planning wave.
 
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
 
-- **Epic S — Effect Declarative Integration:** Finish shaping `tuvren-tui/effect` as a real package surface with package-first docs, examples, and broader productization follow-through over the same native runtime authority.
 - **Epic T — Plugin Slots and Extensibility:** Pre-GA contribution points for commands, keymaps, palettes, devtools panels, themes, and showcase/example integrations.
 - **Epic U — SDK Productization / Expert-Level DX:** Productize all public SDK surfaces before npm publish: imperative, JSX, Effect, plugins, composites, examples, and devtools.
 - **Epic V — First Public npm Publish and Feedback Loop:** Publish `tuvren-tui@0.1.0` plus auxiliary native packages and establish post-publish feedback triage.
@@ -39,7 +38,7 @@
 - No public musl/Alpine support before a separate release-matrix decision.
 
 ### Archived or Already Completed Scope
-- Epic S (Effect Declarative Integration) is reopened after the first foundation landed. The low-level lifecycle and stream helpers are already present, but the remaining wave is to finish the package-first story across docs, examples, and broader SDK productization.
+- Epic S (Effect Declarative Integration) shipped as the package-first Effect execution. It clarified the intended product scope after the repo Q&A, kept the native runtime boundary intact, and turned `tuvren-tui/effect` into the real package surface rather than an adapter-like helper layer.
 - Epic R (Commands & Keymap Foundations) shipped `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` as Host Layer services; rebased `CommandPalette` to the registry; wired `commandDispatcher` into `app.run()` and `createLoop()`; 46 focused tests added in `test-commands.test.ts`; all 433 host tests passing with bundle at 72.2 KB.
 - Epic Q (Adoption and Framework Positioning) shipped the general-purpose framework README, two-tier example framing, and Kraken-to-Tuvren migration guide.
 - Epic P (Tuvren Identity, Packaging, and Release Migration) shipped the hard-cut Tuvren rename, package topology, resolver contract, release workflow, cross-platform smoke gate, and surface-wide bench/test/example updates.
@@ -456,9 +455,9 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 Epic R is archived as a shipped framework-services wave. It added `CommandRegistry` (typed command definitions, disposable registration, programmatic execution, `when` predicates), `KeymapRegistry` (key string normalization for `[modifier+]*key` syntax, `when` predicates, first-registered-wins resolution), and `CommandDispatcher` (bridges registry + keymap into the event drain; focus context read from `app.getFocused()`). The `CommandPalette` composite was rebased to consume a `CommandRegistry`. A `commandDispatcher` option was added to both `app.run()` and `createLoop()`. The old `Command{label, action}` shape was replaced with `Command{title, run, category?, when?}` across all examples. 46 focused tests in `ts/test-commands.test.ts` cover registration, disposal, execution, key normalization, event resolution, dispatch, and palette integration. All 433 host tests pass; bundle at 72.2 KB under 75 KB budget.
 
-### 6.2 Reopened Epic S — Effect Declarative Integration
+### 6.2 Archived Epic S — Effect Declarative Integration
 
-Epic S is no longer treated as fully archived. The first foundation wave already turned `tuvren-tui/effect` into a viable advanced integration over `effect@^3.21.2`, and the current reopening pushes it further into a true package surface. The shipped-and-retained advanced API includes `acquireApp()`, `acquireHeadlessApp()`, `makeTuvrenScope()`, `renderScoped()`, `streamEvents()`, and `createCommandService()`. The reopened package layer now also includes `render()`, `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, keyboard and terminal-size hooks, and the package-first `examples/effect-counter.tsx`. The manifest still declares `effect` as an optional peer with local dev/test wiring; the remaining work is broader doc and productization follow-through rather than rethinking the native-runtime boundary.
+Epic S is archived as a shipped framework-services wave. After the repo Q&A clarified that the docs had underspecified the intended scope, Epic S was executed as a package-first Effect surface rather than an adapter pass. The shipped-and-retained advanced API includes `acquireApp()`, `acquireHeadlessApp()`, `makeTuvrenScope()`, `renderScoped()`, `streamEvents()`, and `createCommandService()`. The shipped package layer now also includes `render()`, `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, keyboard and terminal-size hooks, and the package-first `examples/effect-counter.tsx`. The manifest declares `effect` as an optional peer with local dev/test wiring, while Rust remains the single mutable runtime authority underneath.
 
 ### 6.3 Archived Epic Q — Adoption and Framework Positioning
 
