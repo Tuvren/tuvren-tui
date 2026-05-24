@@ -759,7 +759,12 @@ interface TuvrenEffectRuntime {
   readonly keymaps: KeymapRegistry;
   readonly dispatcher: CommandDispatcher;
   readonly commandService: DispatchingEffectCommandService;
-  readonly terminalSize: Signal<{ width: number; height: number }>;
+  readonly terminalSize: ReadonlySignal<{ width: number; height: number }>;
+  addKeyboardListener(
+    handler: (event: TuvrenEvent) => void,
+    options?: { when?: (event: TuvrenEvent) => boolean },
+  ): Disposable;
+  notifyEvent(event: TuvrenEvent): void;
   stop(): void;
 }
 

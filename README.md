@@ -115,9 +115,9 @@ function App() {
 
   return (
     <Box width="100%" height="100%" padding={1} gap={1} flexDirection="column">
-      <Text content={computed(() => `Count: ${count.value}`)} fg="#7dd3fc" />
-      <Text content={computed(() => `Terminal: ${size.value.width}x${size.value.height}`)} />
-      <Text content={status} />
+      <Text content={computed(() => `Count: ${count.value}`)} fg="#7dd3fc" height={1} />
+      <Text content={computed(() => `Terminal: ${size.value.width}x${size.value.height}`)} height={1} />
+      <Text content={status} height={1} />
     </Box>
   );
 }
@@ -324,7 +324,6 @@ bun test ts/test-effect.test.ts
 bun test ts/test-examples.test.ts
 bun test ts/test-install.test.ts
 bun test ts/test-runner.test.ts
-bun test ts/test-commands.test.ts
 
 # Native tests and quality checks
 cargo test --manifest-path native/Cargo.toml

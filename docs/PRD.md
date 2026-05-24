@@ -1,6 +1,7 @@
 # Product Requirements Document
 
 ## 0. Version History & Changelog
+- v2.6.0 - Clarified Epic 12 as a package-first Effect application surface over the same native runtime authority and aligned the product language with the shipped Epic S package model.
 - v2.5.0 - Sequenced the next framework waves as commands/keymaps, Effect, plugin slots, SDK productization, and first public npm release as a pre-GA `0.1.0` feedback loop.
 - v2.4.0 - Reframed the product as a general-purpose framework, activated productization and framework-foundation scope, and adopted the future public name Tuvren with an explicit Brownfield transition note.
 - v2.3.0 - Reformatted to the current stage-1 framework skeleton while preserving approved scope, roadmap context, and operator preferences.
