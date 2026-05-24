@@ -1,5 +1,5 @@
 /**
- * Animation-aware async event loop for Tuvren TUI (TechSpec §5.7).
+ * Animation-aware async event loop for Tuvren TUI.
  *
  * When animations are active: non-blocking input + ~60fps rendering.
  * When idle: blocks on input (saves CPU).
@@ -33,7 +33,7 @@ export interface Loop {
 	stop: () => void;
 }
 
-/** Perf counter ID for active animation count (TechSpec §5.7, lib.rs:1397). */
+/** Perf counter ID for active animation count. */
 export const PERF_ACTIVE_ANIMATIONS = 6;
 
 // Maps event type string to JSX handler prop name

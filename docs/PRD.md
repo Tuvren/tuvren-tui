@@ -1,9 +1,9 @@
 # Product Requirements Document
 
 ## 0. Version History & Changelog
+- v2.5.0 - Sequenced the next framework waves as commands/keymaps, Effect, plugin slots, SDK productization, and first public npm release as a pre-GA `0.1.0` feedback loop.
 - v2.4.0 - Reframed the product as a general-purpose framework, activated productization and framework-foundation scope, and adopted the future public name Tuvren with an explicit Brownfield transition note.
 - v2.3.0 - Reformatted to the current stage-1 framework skeleton while preserving approved scope, roadmap context, and operator preferences.
-- v2.2.0 - Approved the current product emphasis around long-lived developer and agent workflows.
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Target Archetype
@@ -19,15 +19,16 @@
 - **Current Product Emphasis:** Tuvren tells a general-purpose framework story. Its showcase and proving grounds remain demanding agentic and developer-facing products because those workloads stress the performance, viewport, and inspectability requirements that motivated the project in the first place.
 - **JTBD Priority Order:** Ship Faster > Productized Trust > Framework Foundations > Bun-native DX > Own the Full Stack
 
-### 1.2 Version Roadmap Context
+### 1.2 Capability Roadmap Context
 
-| Version | Scope Emphasis | Summary |
+| Wave | Scope Emphasis | Summary |
 | --- | --- | --- |
 | **v0** | Core interaction surface | Widget composition, layout, styling, keyboard and mouse input, scrolling, cross-platform terminal handling, and rich text rendering |
 | **v1** | Product polish | Animation system and theming foundation |
 | **v2** | Hardening and advanced DX | Core hardening, tree operations for reconciler support, theme inheritance, TextArea, choreography, lightweight JSX reconciler, and foundational accessibility |
-| **v3** | Productization and framework foundations | Public rename to Tuvren, packaging and release trust, onboarding polish, general-purpose framework positioning, and the queued command/keymap foundation wave that follows the active productization pass |
-| **v4** | Declarative and extensibility expansion | Effect-based declarative integration begins after the remaining v3 command/keymap wave, and post-v1 plugin-slot exploration only follows once those foundations stabilize |
+| **v3** | Productization and framework foundations | Public rename to Tuvren, package topology, onboarding polish, general-purpose framework positioning, and the queued command/keymap foundation wave |
+| **v4** | Declarative and extensibility expansion | Effect-based declarative integration and pre-GA plugin-slot boundaries once command/keymap foundations stabilize |
+| **v5** | SDK productization and public pre-GA release | Expert-level SDK DX across imperative, JSX, Effect, plugin, composite, example, and devtools surfaces, followed by the first public npm release as `0.1.0` and a feedback loop before any `v1.0` compatibility guarantees |
 
 ### 1.3 Brownfield Transition Note
 - **Public name:** `Tuvren` / `tuvren-tui` (Epic P shipped the hard-cut rename)
@@ -162,6 +163,18 @@
 - **Capability:** The imperative core remains the canonical mental model even when a declarative integration layer is used.
 - **Rationale:** A competitive framework can support multiple development styles, but the declarative story must deepen adoption without undermining the clarity and authority of the core imperative runtime.
 
+### Epic 13 — Extension Slots and Framework Contributions
+- **Priority:** P1
+- **Capability:** A Developer can extend framework-level services through bounded contribution points for commands, keymaps, command palettes, devtools panels, themes, and showcase/example integrations.
+- **Capability:** Extension slots remain pre-GA and explicitly do not create `v1.0` compatibility guarantees before the product has real public feedback.
+- **Rationale:** Extension boundaries need to exist before public adoption grows, but they must be shaped after commands/keymaps and declarative integration so the framework does not lock in the wrong host-service contract.
+
+### Epic 14 — Expert-Level SDK Developer Experience
+- **Priority:** P0
+- **Capability:** A Developer can build polished TUIs through the public SDK without routine knowledge of Rust internals, raw FFI calls, numeric Handles, or native lifecycle details.
+- **Capability:** Imperative, JSX, Effect, plugin, composite, example, and devtools surfaces feel coherent, documented, and production-grade before the first public npm release.
+- **Rationale:** Public publishing should expose a framework-quality SDK, not merely a strong native engine with bindings.
+
 ## 5. Non-Functional Constraints
 | Constraint Area | Requirement | Rationale |
 | --- | --- | --- |
@@ -174,6 +187,7 @@
 | **Operability** | Every supported public release target in the published matrix receives install and load smoke verification before the productization wave is considered complete. | Cross-platform credibility is part of the framework promise, not an optional afterthought. |
 | **Adoption** | Time to Hello World stays below 15 minutes for a competent TypeScript Developer. | Reinforces the primary JTBD: shipping faster. |
 | **Adoption** | The public story must be understandable as a general-purpose framework without hiding the demanding agentic/operator workloads that prove the design under stress. | The framework needs broad appeal without losing the concrete workload that justifies its deeper architecture. |
+| **Adoption** | Ordinary SDK workflows do not require Developers to reach for raw FFI or numeric Handle plumbing. | Expert-level DX is required before the first public npm release can represent the framework credibly. |
 | **Stability** | Semantic versioning guarantees begin at public v1.0 GA; pre-GA releases may include breaking changes. | Sets realistic trust expectations for open source adoption. |
 | **Contributor Experience** | Module boundaries, architecture decisions, and build environment remain understandable and reproducible. | Makes contribution and long-term maintenance realistic. |
 | **Accessibility** | Accessibility is not a v0/v1 hard constraint and is tracked as a v2 commitment. | Keeps MVP scope disciplined while preserving accessibility as a real product requirement. |
@@ -190,6 +204,8 @@
 - Productized installation, release, and onboarding experience for supported platforms.
 - Framework-level command and keybinding foundations over the same imperative runtime.
 - An optional declarative integration layer over the same runtime contract, without introducing a second mutable UI authority.
+- Pre-GA plugin and contribution slots for framework-level services after command/keymap and declarative contracts stabilize.
+- Expert-level SDK productization across imperative, JSX, Effect, plugin, composite, example, and devtools surfaces before first public npm publish.
 - Incremental rendering through dirty-region tracking.
 - Cross-platform terminal abstraction.
 - Scrollable regions.
@@ -206,7 +222,8 @@
 - Widget state persistence through serialization and deserialization of the Composition Tree.
 - Background render threading as part of the default product contract unless later evidence justifies promotion.
 - React or Solid parity as the public declarative strategy for the current roadmap.
-- Plugin-slot extensibility before `v1.0` and before command/keymap foundations plus the declarative integration layer stabilize.
+- Stable plugin-slot compatibility guarantees before `v1.0` GA.
+- Plugin-slot extensibility before command/keymap foundations plus the declarative integration layer stabilize.
 - Host runtime expansion beyond the current Bun-first public posture for the immediate roadmap wave.
 - Broad new widget breadth as a substitute for productization, release trust, and framework-level interaction foundations.
 - Public musl/Alpine Linux support until the Bun-first native-package enforcement strategy is proven.
@@ -304,7 +321,8 @@ _The following are developer-stated implementation preferences. They are preserv
 | --- | --- |
 | Future public product name | `Tuvren` |
 | Future public package name | `tuvren-tui` |
-| Planned hosting organization move | Yes; current repo is expected to move into another organization as part of the productization wave |
+| Hosting organization move | Complete; canonical remote is `Tuvren/tuvren-tui` |
+| First public npm release | `0.1.0` pre-GA after SDK productization; `v1.0` compatibility guarantees come later |
 | Core implementation language | Rust |
 | Target runtime | Bun |
 | FFI mechanism | `bun:ffi` |

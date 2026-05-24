@@ -6,7 +6,7 @@
 
 import type { Tuvren } from "../app";
 
-/** Names for all perf counters 0-18 (TechSpec §4.5). Indexed by counter ID. */
+/** Names for all perf counters 0-18. Indexed by counter ID. */
 export const PERF_COUNTER_NAMES: string[] = [
 	"layout_us",
 	"render_us",

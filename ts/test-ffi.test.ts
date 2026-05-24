@@ -225,7 +225,7 @@ const lib = dlopen(LIB_PATH, {
 	tui_splitpane_set_resize_step: { args: ["u32", "u16"] as FFIType[],                         returns: "i32" as const },
 	tui_splitpane_set_resizable:   { args: ["u32", "u8"] as FFIType[],                          returns: "i32" as const },
 
-	// Debug and Devtools (ADR-T34, TechSpec §4.3.3)
+	// Debug and Devtools (ADR-T34)
 	tui_debug_set_overlay:         { args: ["u32"] as FFIType[],                                returns: "i32" as const },
 	tui_debug_set_trace_flags:     { args: ["u32"] as FFIType[],                                returns: "i32" as const },
 	tui_debug_get_snapshot_len:    { args: [] as FFIType[],                                     returns: "i32" as const },
@@ -234,7 +234,7 @@ const lib = dlopen(LIB_PATH, {
 	tui_debug_get_trace:           { args: ["u8", "ptr", "u32"] as FFIType[],                   returns: "i32" as const },
 	tui_debug_clear_traces:        { args: [] as FFIType[],                                     returns: "i32" as const },
 
-	// Native Text Substrate (ADR-T37, TechSpec §4.4)
+	// Native Text Substrate (ADR-T37, TechSpec §4.8)
 	tui_text_buffer_create:            { args: [] as FFIType[],                                     returns: "u32" as const },
 	tui_text_buffer_destroy:           { args: ["u32"] as FFIType[],                                returns: "i32" as const },
 	tui_text_buffer_replace_range:     { args: ["u32", "u32", "u32", "ptr", "u32"] as FFIType[],    returns: "i32" as const },
@@ -3391,7 +3391,7 @@ describe("FFI integration", () => {
 	});
 
 	// =========================================================================
-	// Devtools / Debug FFI (ADR-T34, TechSpec §4.3.3)
+	// Devtools / Debug FFI (ADR-T34)
 	// =========================================================================
 
 	describe("devtools FFI", () => {

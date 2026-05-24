@@ -1,9 +1,9 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
+- v7.7.0 - Extended the implementation contract through Epics R-V: command/keymap services, Effect integration, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
 - v7.4.1 - Landed Epic O Brownfield updates: native terminal capability state, diagnostic query APIs, write-only OSC52, OSC8 text-buffer link spans, Kitty keyboard disambiguation negotiation, and conservative multiplexer degradation are now implemented.
-- v7.4.0 - Activated the Epic O terminal-capability contract: capability discovery becomes detection-first, OSC52 is write-only, OSC8 hyperlinks are range-scoped, Kitty keyboard support is negotiated, and multiplexer variance is an explicit implementation concern.
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Stack Specification (Bill of Materials)
@@ -34,10 +34,10 @@
 | Language | TypeScript | `^5.0.0` | Keep strict typed wrappers and examples in TypeScript. |
 | FFI mechanism | `bun:ffi` | built-in | Preserve the direct native-library loading path rather than adding an alternate bridge. |
 | Reactivity | `@preact/signals-core` | `^1.8.0` | Preserve the lightweight JSX/signals path without promoting it to the primary lifecycle model. |
-| Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` dependency belongs to the optional declarative subpath rather than the main surface. |
+| Additional runtime deps | none beyond signals today | current package state | Keep the host bundle intentionally thin in the imperative core; any future `Effect` package relationship belongs to the optional declarative subpath as an optional peer/dev dependency rather than a root-package runtime dependency. |
 | Public package contract | `tuvren-tui` (Epic P shipped the rename from `kraken-tui`) | `ts/package.json`, source tree | One public package as the user-facing contract; the hard rename is complete. |
 | Optional declarative subpath | `tuvren-tui/effect` stub (Epic P shipped the rename from `kraken-tui/effect`) | `ts/package.json`, `ts/src/effect/index.ts` | Reserve `Effect` as the sanctioned declarative path over the same core runtime; React/Solid parity is not the strategic direction. |
-| Native package topology | current Brownfield: GitHub assets and manual staging; approved target-state: auxiliary scoped platform packages | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the new organization, while keeping `tuvren-tui` as the only public package. |
+| Native package topology | current Brownfield: GitHub assets plus auxiliary scoped package stubs; approved public publish follows in Epic V | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the Tuvren organization, while keeping `tuvren-tui` as the only public package. |
 
 ### 1.3 Build, Test, and Release Artifacts
 
@@ -45,7 +45,7 @@
 | --- | --- | --- |
 | Native Core | Shared library (`.so`, `.dylib`, `.dll`) | `native/target/release/` for source builds; versioned GitHub release assets for published native binaries |
 | Host Package | ESM TypeScript package (`tuvren-tui`, Epic P shipped the rename) | `ts/package.json`, `ts/src/` |
-| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries (`@tuvren/tuvren-tui-*`); stubs committed, publish follows in Epic Q | `packages/@tuvren/` |
+| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries (`@tuvren/tuvren-tui-*`); stubs committed, public npm publish deferred to Epic V | `packages/@tuvren/` |
 | Release Artifacts | Versioned platform builds with `.sha256` sidecars named `tuvren-tui-*` (Epic P renamed from `kraken-tui-*`) | `.github/workflows/release.yml` |
 | Flagship Examples | Bun entrypoints | `examples/agent-console.ts`, `examples/ops-log-console.ts`, `examples/repo-inspector.ts` |
 | Replay Fixtures | JSON fixtures and headless assertions | `examples/fixtures/`, `ts/test-examples.test.ts` |
@@ -60,7 +60,7 @@
 | macOS | x64 | `tuvren-tui-<tag>-darwin-x64.dylib` | `@tuvren/tuvren-tui-darwin-x64` |
 | Windows | x64 | `tuvren-tui-<tag>-win32-x64.dll` | `@tuvren/tuvren-tui-win32-x64` |
 
-The repo-owned release workflow publishes **versioned GitHub release assets** with SHA-256 sidecars. The resolver searches `TUVREN_LIB_PATH`, then the auxiliary scoped native package, then the local Cargo build (repo-checkout only). Standalone release assets are available for manual acquisition via `TUVREN_LIB_PATH`; they are not part of the automatic resolver path. Source-build fallback remains valid for repo-side development and verification. npm publish of auxiliary packages follows in Epic Q.
+The repo-owned release workflow publishes **versioned GitHub release assets** with SHA-256 sidecars. The resolver searches `TUVREN_LIB_PATH`, then the auxiliary scoped native package, then the local Cargo build (repo-checkout only). Standalone release assets are available for manual acquisition via `TUVREN_LIB_PATH`; they are not part of the automatic resolver path. Source-build fallback remains valid for repo-side development and verification. npm publish of `tuvren-tui` and auxiliary packages is deferred to Epic V after SDK productization, with `0.1.0` as the planned first public pre-GA release.
 
 Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"libc": ["glibc"]` in each Linux aux `package.json` causes Bun ≥1.1 to filter them on musl hosts, so Alpine Linux installs will not silently load an incompatible `.so`. musl-targeted packages remain out of scope; unsupported installs fail with a clear diagnostic.
 
@@ -147,29 +147,48 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 
 ### ADR-T43 One Public Package Sits Above Internal Scoped Native Packages
 - **Status:** accepted
-- **Context:** The current Brownfield install story relies on GitHub native assets plus manual or staged prebuild placement. That is workable for source checkouts but falls short of the productized install experience needed for a competitive framework release.
+- **Context:** The current Brownfield install story relies on GitHub native assets, `TUVREN_LIB_PATH`, auxiliary package stubs, and source-checkout fallback. That is workable for source checkouts but falls short of the productized install experience needed for a competitive framework release.
 - **Decision:** Keep one public package as the only documented install target and move platform-native distribution behind auxiliary scoped packages published under the new organization. `tuvren-tui` remains the public facade; auxiliary packages such as `@tuvren/tuvren-tui-linux-x64` and `@tuvren/tuvren-tui-darwin-arm64` carry the shared libraries that the resolver loads after it first checks `TUVREN_LIB_PATH`. If no override is provided and the platform-native package is skipped or unavailable, the resolver must fall through to the local Cargo build in repo checkouts and otherwise fail with a clear diagnostic instead of assuming the optional package exists. Source-build fallback remains part of repo-side development and verification.
 - **Consequences:** End-user install UX becomes simpler and less error-prone, while the release workflow and resolver gain packaging responsibilities that must stay aligned across CI, diagnostics, and test coverage. The project also accepts npm package-topology work as core productization scope rather than as release glue, including the need to handle optional native-package omission explicitly at runtime. "Auxiliary scoped package" here means a public distribution unit beneath `tuvren-tui`, not a separate documented install target.
 
 ### ADR-T44 Commands and Keymaps Are the First Framework-Level Host Services
 - **Status:** accepted
 - **Context:** The product direction is moving from a specialist library posture toward a general-purpose framework story, but the architectural invariant remains that Rust owns mutable UI state. The first framework moat should therefore add application ergonomics without creating a second source of truth in the host layer.
-- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the active productization and adoption wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are explicitly deferred until after `v1.0` and until the commands/keymap contract proves stable, and they are not part of the active implementation contract in this document yet.
+- **Decision:** Treat commands and keymaps as the first sanctioned framework-level host services after the shipped productization and adoption wave. They live in the Host Layer over the existing imperative command protocol and native event stream. Plugin slots are deferred until commands/keymaps and Effect integration prove their boundaries, but they are allowed pre-GA before first public npm publish.
 - **Consequences:** The framework can grow more competitive application ergonomics without weakening the native-state boundary, but the command dispatch, focus integration, and keybinding resolution APIs must be designed deliberately before a plugin story is added on top.
 
 ### ADR-T45 Effect Is the Sanctioned Declarative Integration Path
 - **Status:** accepted
 - **Context:** The current repo ships an imperative core and a lightweight JSX/signals overlay, while the strategic product direction explicitly rejects React/Solid parity as the main declarative roadmap. The team wants one blessed declarative story that still honors the same Rust-owned-state architecture.
 - **Decision:** Keep the imperative surface as the canonical model and reserve `tuvren-tui/effect` as the sanctioned declarative integration path over the same Bun and FFI runtime contract. The existing JSX/signals layer remains supported Brownfield reality, but it is not the strategic north star and should not pull the roadmap toward React or Solid parity.
-- **Consequences:** Declarative consumers get a clear future path without forcing the core package to absorb broad framework-adapter scope. The existing root-package JSX/signals exports remain supported Brownfield reality unless a later contract explicitly moves or deprecates them, but Epic S should stop positioning them as the strategic declarative story. The project must still define the exact `Effect` API through a later contract-setting wave before it can be treated as release-ready product surface.
+- **Consequences:** Declarative consumers get a clear future path without forcing the core package to absorb broad framework-adapter scope. The existing root-package JSX/signals exports remain supported Brownfield reality unless a later contract explicitly moves or deprecates them, but Epic S should stop positioning them as the strategic declarative story. Epic S must turn the current stub into a real optional integration over the official `effect` package without adding Effect runtime cost to the imperative root surface.
+
+### ADR-T46 Plugin Slots Are Pre-GA Framework Contribution Points
+- **Status:** accepted
+- **Context:** Plugin slots are useful only after commands/keymaps and Effect establish the host-service boundaries they will extend. The project also intends first public npm publish to be a `0.1.0` pre-GA release, not `v1.0`.
+- **Decision:** Allow Epic T to define plugin slots before first public npm publish and before `v1.0` GA. Slots must be bounded host-layer contribution points for commands, keymaps, command palettes, devtools panels, themes, and showcase/example integrations. They must not let plugins own Widget state, bypass the Native Core, or mutate private native structures.
+- **Consequences:** Tuvren can publish with a credible extensibility story while preserving pre-GA breaking-change freedom. Plugin API stability is explicitly not guaranteed until a later `v1.0` compatibility pass.
+
+### ADR-T47 SDK Productization Gates Public Publishing
+- **Status:** accepted
+- **Context:** The Native Core and FFI contracts are disciplined, but ordinary SDK workflows still expose too much handle plumbing, lifecycle management, wrapper incompleteness, and low-level event handling for a public framework-quality release.
+- **Decision:** Epic U is a required SDK productization pass before npm publish. It must improve the imperative, JSX, Effect, plugin, composite, example, and devtools surfaces together, close routine wrapper gaps, reduce normal application reliance on raw FFI and numeric Handles, and make lifecycle/error guidance coherent.
+- **Consequences:** First public npm publish waits until the SDK feels like an expert-level framework surface rather than only a strong native engine. The host bundle budget still applies, so productization must improve ergonomics without moving performance-critical state out of Rust.
+
+### ADR-T48 First Public npm Release Is `0.1.0` Pre-GA
+- **Status:** accepted
+- **Context:** The package manifests already carry version `0.1.0`, the source tree is pre-`1.0`, and semantic-versioning guarantees are intentionally deferred until GA.
+- **Decision:** Epic V owns the first public npm publish of `tuvren-tui@0.1.0` and matching `@tuvren/tuvren-tui-*` auxiliary packages after Epic U. Publishing must include package metadata, LICENSE payloads, publish automation, packed/registry install smoke, and a feedback triage loop.
+- **Consequences:** Public users can install the framework through `bun add tuvren-tui`, but all public messaging must state that `0.1.0` is pre-GA and may include breaking changes before `v1.0`.
 
 ### 2.2 Brownfield Reality Note
 - The prior v6 TechSpec described transcript, devtools, split-pane, and flagship examples as future work. The current source tree implements them.
 - This v7 artifact is therefore intentionally present-tense and canonical rather than future-tense and phase-only.
-- ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.4 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
+- ADR-T37 through ADR-T40 introduced forward-looking scope during the rebase wave. Sections 3.4 and 4.8 now describe Brownfield reality for `TextBuffer`, `TextView`, `EditBuffer`, and the rebased substantial text surfaces (`Text`, `Markdown`, code spans, `TextArea`, transcript blocks`) after Epic N shipped.
 - ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
 - ADR-T42 is now shipped under Epic P. The source tree exports `Tuvren` from `tuvren-tui`, resolves native libraries through `TUVREN_LIB_PATH`, and names release assets after Tuvren. The staged-prebuild path is removed; the resolver now searches TUVREN_LIB_PATH → aux scoped package → source build (repo-checkout only).
 - `tuvren-tui/effect` exists today only as a stub subpath export. ADR-T45 records `Effect` as the sanctioned declarative direction, but no release-ready `Effect` contract exists in the shipped Brownfield implementation yet.
+- The GitHub repository now lives at `Tuvren/tuvren-tui`. npm package publication is not shipped Brownfield behavior yet; Epic V owns the first public `0.1.0` publish after Epic U SDK productization.
 
 ## 3. State & Data Modeling
 ### 3.1 Native UI State Model
@@ -630,7 +649,7 @@ current_brownfield:
     - diagnostic_error
 notes:
   - "Epic P shipped the resolver rewrite. Kraken-era KRAKEN_LIB_PATH and ts/prebuilds/ search paths are removed."
-  - "One public package, tuvren-tui, consumes auxiliary scoped native packages under the Tuvren organization. npm publish of those packages follows in Epic Q."
+  - "One public package, tuvren-tui, consumes auxiliary scoped native packages under the Tuvren organization. npm publish of those packages is deferred to Epic V after SDK productization."
   - "Standalone GitHub native artifacts may still be published for provenance, checksum verification, and manual or air-gapped acquisition, but they are not a first-class automatic resolver search path."
   - "Resolver lookup must be package-manager-layout agnostic: resolve the auxiliary package by name first, then derive the shared-library path from the resolved package root rather than assuming a nested node_modules filesystem layout."
   - "Repo-checkout fallback is authorized only when the resolver can prove it was loaded from a Tuvren workspace (native/Cargo.toml sibling of the ts/ package root); published consumer installs and arbitrary linked directories must not probe native/target/release opportunistically."
@@ -648,7 +667,149 @@ supported_release_targets:
   - win32-x64
 ```
 
-### 4.4 Native Text Substrate ABI
+### 4.4 Host Framework Services Contract
+- **Style:** Host-layer library APIs over the existing event drain and imperative command protocol
+- **Authentication / Authorization:** Not applicable
+- **Compatibility Strategy:** Commands, keymaps, Effect bindings, and plugin slots remain pre-GA APIs. They must not add native mutable state authorities or require new Native Core callbacks.
+- **Error model:** Invalid registrations, duplicate command IDs, malformed keybindings, and rejected plugin contributions fail synchronously with `TuvrenError` or typed host errors before runtime dispatch.
+- **Plugin source status:** `source: "plugin"` is reserved for Epic T contributions. Epic R must preserve the discriminant shape but does not need to implement plugin registration or plugin-specific dispatch semantics.
+
+```ts
+interface WidgetRef {
+  readonly handle: Handle;
+  readonly kind?: string;
+}
+
+interface Disposable {
+  dispose(): void;
+}
+
+interface Command {
+  id: string;
+  title: string;
+  run(context: CommandContext): void | Promise<void>;
+  category?: string;
+  when?: CommandPredicate;
+}
+
+interface CommandContext {
+  app: Tuvren;
+  event?: TuvrenEvent;
+  focused?: WidgetRef;
+  source: "keymap" | "palette" | "programmatic" | "plugin";
+}
+
+type CommandPredicate = (context: CommandContext) => boolean;
+
+interface KeyBinding {
+  command: string;
+  key: string;
+  when?: CommandPredicate;
+}
+
+interface CommandRegistry {
+  register(command: Command): Disposable;
+  execute(id: string, context?: Partial<CommandContext>): Promise<boolean>;
+  list(): Command[];
+}
+
+interface KeymapRegistry {
+  register(binding: KeyBinding): Disposable;
+  resolve(event: TuvrenEvent, context: CommandContext): Command | undefined;
+}
+```
+
+### 4.5 Effect Integration Contract
+- **Style:** Optional `tuvren-tui/effect` subpath over the official `effect` package
+- **Authentication / Authorization:** Not applicable
+- **Compatibility Strategy:** The root package remains imperative-first. Effect runtime dependencies belong to the optional subpath and must not make ordinary imperative imports pay for Effect integration.
+- **Error model:** Effect integration errors are represented through Effect failures where the API is Effect-native, and through ordinary host exceptions only at the boundary between imperative Tuvren APIs and Effect adapters.
+
+```ts
+interface TuvrenEffectScope {
+  readonly app: Tuvren;
+  addFinalizer(finalizer: () => void | Promise<void>): void;
+}
+
+interface EffectEventStreamOptions {
+  app: Tuvren;
+  include?: TuvrenEventType[];
+}
+
+interface EffectCommandOptions {
+  registry: CommandRegistry;
+}
+```
+
+### 4.6 Plugin Slot Contract
+- **Style:** Host-layer extension registration API
+- **Authentication / Authorization:** Not applicable
+- **Compatibility Strategy:** Plugin APIs are pre-GA and may break before `v1.0`. Contributions are registered through a bounded context object; plugins never receive private native structures or own Widget state.
+- **Error model:** Plugin setup failures are isolated to the registering plugin where possible and surfaced through diagnostics; rejected contributions fail synchronously during registration.
+
+```ts
+interface ContributionRegistration<TContribution> {
+  register(contribution: TContribution): Disposable;
+  list(): TContribution[];
+}
+
+interface PaletteContribution {
+  command: string;
+  title?: string;
+}
+
+interface DevtoolsContribution {
+  id: string;
+  title: string;
+}
+
+interface ThemeContribution {
+  id: string;
+  title: string;
+}
+
+interface ExampleContribution {
+  id: string;
+  title: string;
+}
+
+type PaletteContributionRegistry = ContributionRegistration<PaletteContribution>;
+type DevtoolsContributionRegistry = ContributionRegistration<DevtoolsContribution>;
+type ThemeContributionRegistry = ContributionRegistration<ThemeContribution>;
+type ExampleContributionRegistry = ContributionRegistration<ExampleContribution>;
+
+interface Extension {
+  id: string;
+  activate(context: ExtensionContext): void | Promise<void>;
+  deactivate?(): void | Promise<void>;
+}
+
+interface ExtensionContext {
+  commands: CommandRegistry;
+  keymaps: KeymapRegistry;
+  palette: PaletteContributionRegistry;
+  devtools: DevtoolsContributionRegistry;
+  themes: ThemeContributionRegistry;
+  examples: ExampleContributionRegistry;
+  subscriptions: Disposable[];
+}
+```
+
+### 4.7 SDK Productization Contract
+- **Style:** Public SDK quality contract
+- **Authentication / Authorization:** Not applicable
+- **Compatibility Strategy:** Ergonomic additions are additive where feasible, but breaking cleanup remains allowed before `v1.0`. Raw Handle and FFI access may remain available for advanced use, but ordinary documented workflows should not require them.
+- **Error model:** Public SDK APIs should surface actionable, typed errors or clear diagnostics rather than raw FFI status codes.
+
+```yaml
+productization_requirements:
+  - "Public examples avoid direct ffi.* calls unless explicitly demonstrating advanced internals."
+  - "Ordinary event handling can use WidgetRef or equivalent handle-safe ergonomics rather than numeric Handle comparisons."
+  - "Lifecycle helpers make shutdown, destroy, theme cleanup, Effect cleanup, and extension disposal explicit and hard to misuse."
+  - "Imperative, JSX, Effect, plugin, composite, example, and devtools docs describe the preferred happy path before advanced internals."
+```
+
+### 4.8 Native Text Substrate ABI
 - **Style:** Library API / C ABI (additive)
 - **Authentication / Authorization:** Not applicable
 - **Compatibility Strategy:** New substrate symbols are added additively under the existing `tui_` prefix. They follow the same conventions as the existing ABI: `u32` Handles with `0` invalid and copy-out for outbound strings and metrics. Status-returning entry points (`-> i32`) follow the standard `0 / -1 / -2` error model below; value-returning getters (`-> u32` / `-> u64`) follow the sentinel pattern documented under "Getter error model" below because they have no separate channel for a status code.
@@ -706,7 +867,7 @@ ownership:
   - "Visual-line and cursor results are returned through caller-owned out-pointers; no interior pointers cross the boundary."
 ```
 
-### 4.5 Terminal Capability Protocol Contract
+### 4.9 Terminal Capability Protocol Contract
 - **Style:** Native backend protocol contract with C ABI and host-library wrappers
 - **Authentication / Authorization:** Not applicable, but clipboard operations are security-sensitive and therefore write-only in Epic O.
 - **Compatibility Strategy:** All Epic O symbols are additive. Unsupported features report false capability flags or return a successful `false` host result when the request is valid but not supported. Invalid payloads return `-1` with `tui_get_last_error()`.
@@ -852,8 +1013,8 @@ multiplexer_policy:
   - Perf counters, debug overlays, trace rings, and frame snapshots are maintained as first-class diagnostics.
   - Dev-session helpers must preserve deterministic teardown and re-init.
 - **Migration / Deployment Notes:**
-  - Releases build prebuilt native artifacts for five platform/arch targets with checksum sidecars.
-  - The host resolver must continue to support both prebuilt and source-build workflows.
+  - Releases build GitHub-native artifacts for five platform/arch targets with checksum sidecars; manual consumers load them through `TUVREN_LIB_PATH`.
+  - The host resolver must continue to support auxiliary scoped native packages for published installs and source-build fallback for repo checkouts.
   - Background rendering remains experimental and must not silently alter default lifecycle semantics.
   - Terminal protocol enhancements must be opt-in by capability and must restore terminal state during `tui_shutdown()` even when intermediate feature setup fails.
 - **Performance / Capacity Notes:**
@@ -893,7 +1054,7 @@ cargo build --manifest-path native/Cargo.toml --release && bun run examples/ops-
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/repo-inspector.ts
 ```
 
-Repo-side host verification entrypoints that `dlopen` directly are expected to target the local Cargo-built native artifact under `native/target/release/`. The general runtime resolver still supports staged prebuilds for package/install flows, but branch validation must not be shadowed by stale packaged assets.
+Repo-side host verification entrypoints that `dlopen` directly are expected to target the local Cargo-built native artifact under `native/target/release/`. The general runtime resolver no longer supports staged prebuilds; package/install verification must exercise the documented order of `TUVREN_LIB_PATH`, auxiliary scoped package, then source build.
 
 ### 5.4 Performance and Quality Gates
 
@@ -907,7 +1068,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to t
 | Debug-off overhead | bounded and benchmarked | `native/benches/devtools_bench.rs` |
 | Substrate append and cursor prefix cost | benchmarked before transcript closeout | `native/benches/text_substrate_bench.rs`, `docs/reports/substrate-benchmarks.md` |
 
-Current CI validates the host benchmark and install surfaces on Linux. Cross-platform release artifacts are built in the release workflow, and the resolver path for staged prebuilds is covered by install smoke tests, but the full host benchmark matrix is not yet exercised on macOS and Windows in CI.
+Current CI validates the host benchmark and install surfaces on Linux. Cross-platform release artifacts are built in the release workflow, and the source-build resolver fallback is covered by install smoke tests, but the full host benchmark matrix is not yet exercised on macOS and Windows in CI. Epic V owns packed/registry smoke coverage for the auxiliary scoped package resolver branch.
 
 The approved first productization wave extends CI and/or release verification with install and load smoke coverage for the full supported public target matrix while keeping the benchmark-heavy enforcement path Linux-blocking until cross-platform performance gates are proven stable.
 

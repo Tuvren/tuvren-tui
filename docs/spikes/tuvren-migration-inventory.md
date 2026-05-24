@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-This document enumerates every public-facing Kraken-era name and release/distribution touchpoint that must change as part of the hard-cut rename from Kraken to Tuvren. Downstream rename tickets (PROD-P002 through PROD-P006) reference this inventory directly. No compatibility aliases are planned — the rename is a pre-1.0 hard cut per ADR-T42.
+This document enumerates every public-facing Kraken-era name and release/distribution touchpoint that had to change as part of the hard-cut rename from Kraken to Tuvren. Historical downstream rename ticket labels (PROD-P002 through PROD-P006) referenced this inventory directly; their detailed ticket bodies are now archived out of `docs/Tasks.md`. No compatibility aliases were planned — the rename was a pre-1.0 hard cut per ADR-T42.
 
 ---
 
@@ -89,7 +89,7 @@ The C ABI prefix `tui_*` is intentionally preserved to avoid gratuitous ABI chur
 
 ## 8. Auxiliary Native Packages (New Topology)
 
-The approved target-state (ADR-T43) introduces one public package (`tuvren-tui`) backed by auxiliary scoped native packages. These packages do not exist in the Brownfield source and must be created.
+The approved target-state (ADR-T43) introduces one public package (`tuvren-tui`) backed by auxiliary scoped native packages. Epic P created the package stubs in the Brownfield source; Epic V owns the first public publish cycle and package-manager smoke coverage.
 
 | Package name | Platform | Architecture | Ticket |
 |-------------|----------|--------------|--------|
@@ -157,10 +157,10 @@ The `tui_*` ABI prefix is explicitly preserved by ADR-T42 and is not part of the
 
 ## 14. Gaps and Deferred Items
 
-- **Organization move**: The actual npm organization move to `@tuvren` and GitHub org transfer are operational prerequisites for publishing; this inventory records the naming contract but does not automate the org setup.
+- **Organization move**: The GitHub repository transfer is complete; the canonical repo is `Tuvren/tuvren-tui`. The npm organization and publish-token setup remain Epic V responsibilities before first public publish.
 - **Musl runtime detection fallback**: If Bun's `libc` optional-dependency filtering cannot be confirmed for the deployed Bun version, the resolver must add an explicit musl detection gate. This is validated in PROD-P005.
 - **npm registry publishing**: The CI workflow scaffolding for publishing auxiliary packages (PROD-P004) prepares the package manifests and workflow steps, but actual publishing requires the `@tuvren` npm organization and a publish token in GitHub Actions secrets.
-- **Aux-package resolver smoke test**: The cross-platform smoke gate (PROD-P006) validates the source-build path of the resolver. The auxiliary-package branch (`resolveAuxPackage` + `import.meta.resolve`) is not covered by the current smoke matrix because it requires a published or locally staged `@tuvren/*` package. A proper integration test for step 2 of the resolver is deferred until the first actual npm publish cycle; the unit behavior of `fileURLToPath` + `existsSync` is verified at the module level.
+- **Aux-package resolver smoke test**: The cross-platform smoke gate (PROD-P006) validates the source-build path of the resolver. The auxiliary-package branch (`resolveAuxPackage` + `import.meta.resolve`) is not covered by the current smoke matrix because it requires a published or locally staged `@tuvren/*` package. Epic V owns the packed/registry install smoke for step 2 of the resolver; the unit behavior of `fileURLToPath` + `existsSync` is verified at the module level.
 - **User-visible Kraken strings in examples**: ~~Deferred to Epic Q~~ — completed in Epic P. All example titles, ARIA labels, markdown headings, and docstrings across `examples/*.{ts,tsx}` and `examples/AGENTS.md` now use Tuvren naming. Only historical and changelog references to "Kraken" remain in `docs/Tasks.md` and the migration inventory itself, which are intentionally kept for continuity context.
 - **`linux-arm64` load smoke**: The cross-platform CI gate cross-compiles `linux-arm64` on an x64 runner and therefore cannot run a native headless `dlopen` smoke. Upgrading this to a full load smoke requires a native arm64 CI runner and is tracked as a future gate upgrade.
-- **Apache-2.0 LICENSE in aux packages**: Apache-2.0 §4(c) requires a copy of the License to be included with redistributed works. The aux `package.json` files declare `"license": "Apache-2.0"` but the tarball `files` arrays do not include a LICENSE file. This must be added to each aux package before the first `npm publish` cycle in Epic Q. The release workflow's payload assembly step is the natural place to copy the repo LICENSE.md into each `packages/@tuvren/...` directory before upload.
+- **Apache-2.0 LICENSE in aux packages**: Apache-2.0 §4(c) requires a copy of the License to be included with redistributed works. The aux `package.json` files declare `"license": "Apache-2.0"` but the tarball `files` arrays do not include a LICENSE file. This must be added to each aux package before the first `npm publish` cycle in Epic V. The release workflow's payload assembly step is the natural place to copy the repo LICENSE.md into each `packages/@tuvren/...` directory before upload.

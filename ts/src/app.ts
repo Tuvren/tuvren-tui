@@ -13,7 +13,7 @@ import { dispatchToJsxHandlers, PERF_ACTIVE_ANIMATIONS } from "./loop";
 import { Widget } from "./widget";
 import type { Theme } from "./theme";
 
-/** Options for the `app.run()` event loop (ADR-T26, TechSpec §4.7). */
+/** Options for the `app.run()` event loop (ADR-T26). */
 export interface RunOptions {
 	/** Loop mode. "onChange" renders only when work exists (default). "continuous" runs at fixed fps. */
 	mode?: "onChange" | "continuous";
@@ -370,7 +370,7 @@ export class Tuvren {
 	}
 
 	// =========================================================================
-	// Debug / Devtools (ADR-T34, TechSpec §4.3.3)
+	// Debug / Devtools (ADR-T34)
 	// =========================================================================
 
 	/**
@@ -480,7 +480,7 @@ export class Tuvren {
 	}
 
 	/**
-	 * Run the application event loop (ADR-T26, TechSpec §4.7).
+	 * Run the application event loop (ADR-T26).
 	 *
 	 * Resolves when `stop()` is called. Does not call `shutdown()` —
 	 * the caller is responsible for lifecycle bracketing.

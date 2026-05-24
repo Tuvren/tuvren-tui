@@ -2,7 +2,7 @@
 
 This guide covers the hard-cut rename from `kraken-tui` to `tuvren-tui` and all associated symbol, environment variable, and artifact changes.
 
-**Audience:** Early adopters consuming this repository as a git dependency, source checkout, or internal install. Neither `kraken-tui` nor `tuvren-tui` has been published to the public npm registry yet (binary publishing is staged for the first `@tuvren` release). If you have been importing from a local clone or git URL, this guide provides the complete migration map.
+**Audience:** Early adopters consuming this repository as a git dependency, source checkout, or internal install. Neither `kraken-tui` nor `tuvren-tui` has been published to the public npm registry yet (binary publishing is deferred to Epic V after SDK productization and is planned as `0.1.0` pre-GA). If you have been importing from a local clone or git URL, this guide provides the complete migration map.
 
 **This is a pre-1.0 breaking change.** No compatibility aliases are provided. Old names are removed outright rather than deprecated. Update all usages at once before resuming development against the new package.
 
@@ -40,7 +40,7 @@ The `tui_*` C ABI prefix is **unchanged**. No ABI migration is required if you w
 
 **Source checkout users (the current working path before npm publish):** Re-clone or pull from the updated repo. Import paths, symbol names, and environment variables are all that need to change inside your own source — no package-manager step is required if you reference `tuvren-tui` from a local checkout.
 
-**Once `tuvren-tui` is published to the npm registry** (first `@tuvren` release), the install command will be:
+**Once `tuvren-tui` is published to the npm registry** (Epic V first public pre-GA release), the install command will be:
 
 ```bash
 bun add tuvren-tui
