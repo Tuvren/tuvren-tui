@@ -215,8 +215,7 @@ export class KeymapRegistry {
 			if (binding.when && !binding.when(context)) continue;
 
 			if (!this._registry) continue;
-			const commands = this._registry.list();
-			const cmd = commands.find(c => c.id === binding.command);
+			const cmd = this._registry.get(binding.command);
 			if (cmd) {
 				// Respect the command's own `when` predicate as well
 				if (cmd.when && !cmd.when(context)) continue;

@@ -89,6 +89,11 @@ export class CommandRegistry {
 		return true;
 	}
 
+	/** Look up a single command by id. O(1). */
+	get(id: string): Command | undefined {
+		return this._commands.get(id);
+	}
+
 	/** Return all currently registered commands. */
 	list(): Command[] {
 		return [...this._commands.values()];

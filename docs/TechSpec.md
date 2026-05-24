@@ -1,7 +1,7 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
-- v7.8.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to consume the registry; `commandDispatcher` option wired into `app.run()` and `createLoop()`; 44 focused command/keymap tests added. Next active wave is Epic S (Effect Declarative Integration).
+- v7.8.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to consume the registry; `commandDispatcher` option wired into `app.run()` and `createLoop()`; 46 focused command/keymap tests added. Next active wave is Epic S (Effect Declarative Integration).
 - v7.7.0 - Extended the implementation contract through Epics R-V: command/keymap services, Effect integration, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
 - v7.6.0 - Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
 - v7.4.1 - Landed Epic O Brownfield updates: native terminal capability state, diagnostic query APIs, write-only OSC52, OSC8 text-buffer link spans, Kitty keyboard disambiguation negotiation, and conservative multiplexer degradation are now implemented.
