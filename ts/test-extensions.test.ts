@@ -483,13 +483,36 @@ describe("ExtensionRegistry — diagnostics", () => {
     expect(r.getExtension("find.me")).toBe(ext);
   });
 
+  test("diagnostics always include extension ID for every status", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ok"));
+    r.register(makeExtension("fail"));
+    await r.activate("ok");
+    // "fail" is registered but not activated — should be "inactive"
+    // Register a throwing extension to test activation-failed
+    r.register(makeExtension("bad", () => { throw new Error("bad"); }));
+    await r.activate("bad");
+
+    const diags = r.getDiagnostics();
+    for (const d of diags) {
+      expect(typeof d.id).toBe("string");
+      expect(d.id.length).toBeGreaterThan(0);
+      expect(["inactive", "active", "activation-failed", "deactivation-failed"]).toContain(d.status);
+    }
+    const okDiag = diags.find((d) => d.id === "ok");
+    const badDiag = diags.find((d) => d.id === "bad");
+    const failDiag = diags.find((d) => d.id === "fail");
+    expect(okDiag!.status).toBe("active");
+    expect(badDiag!.status).toBe("activation-failed");
+    expect(badDiag!.error).toBeDefined();
+    expect(failDiag!.status).toBe("inactive");
+  });
+
   test("getExtension returns undefined for unknown", () => {
     const r = new ExtensionRegistry();
     expect(r.getExtension("unknown")).toBeUndefined();
   });
 });
-
-// ── Validation ───────────────────────────────────────────────────────────────
 
 describe("Contribution validation", () => {
   test("palette rejects empty command string", async () => {

@@ -7,7 +7,10 @@ import type { Command, CommandContext, Disposable } from "./commands";
 import { KeymapRegistry } from "./keymap";
 import { TuvrenError } from "./errors";
 
+/** @pre-GA — Plugin APIs may break before v1.0 (ADR-T46). */
 export interface ContributionRegistration<T> { register(c: T): Disposable; list(): T[]; }
+
+/** @pre-GA — Plugin APIs may break before v1.0. Generic in-memory contribution registry. */
 export class ContributionRegistry<T> implements ContributionRegistration<T> {
   private _: T[] = [];
   register(c: T): Disposable {
@@ -17,15 +20,27 @@ export class ContributionRegistry<T> implements ContributionRegistration<T> {
   list(): T[] { return this._.slice(); }
 }
 
+/** @pre-GA */
 export interface PaletteContribution { command: string; title?: string; }
+/** @pre-GA */
 export interface DevtoolsContribution { id: string; title: string; }
+/** @pre-GA */
 export interface ThemeContribution { id: string; title: string; }
+/** @pre-GA */
 export interface ExampleContribution { id: string; title: string; }
+/**
+ * An extension that contributes framework-level services.
+ * @pre-GA — Plugin APIs may break before v1.0.
+ */
 export interface Extension {
   id: string;
   activate(ctx: ExtensionContext): void | Promise<void>;
   deactivate?(): void | Promise<void>;
 }
+/**
+ * Bounded context passed to an extension's activate() method.
+ * @pre-GA — Plugin APIs may break before v1.0.
+ */
 export interface ExtensionContext {
   readonly commands: CommandRegistry;
   readonly keymaps: KeymapRegistry;
@@ -35,6 +50,7 @@ export interface ExtensionContext {
   readonly examples: ContributionRegistration<ExampleContribution>;
   readonly subscriptions: Disposable[];
 }
+/** @pre-GA — Per-extension diagnostic record. */
 export interface ExtensionDiagnostic {
   id: string;
   status: "inactive" | "active" | "activation-failed" | "deactivation-failed";
@@ -50,6 +66,10 @@ const vcheck = (msg: string) => (v: unknown) => {
   if (typeof v !== "string" || (v as string).trim() === "") throw new TuvrenError(msg, -1);
 };
 
+/**
+ * Central registry for Tuvren extensions.
+ * @pre-GA — Plugin APIs may break before v1.0 (ADR-T46).
+ */
 export class ExtensionRegistry {
   readonly commands = new CommandRegistry();
   readonly keymaps = new KeymapRegistry();
