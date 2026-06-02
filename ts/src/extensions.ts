@@ -92,7 +92,13 @@ export class ExtensionRegistry {
     this._diag.set(ext.id, { id: ext.id, status: "inactive" });
     let g = false;
     const s = this;
-    return { dispose() { if (g) return; g = true; if (s._actv.has(ext.id)) s.deactivate(ext.id); s._exts.delete(ext.id); s._diag.delete(ext.id); } };
+    return { dispose() { if (g) return; g = true;
+      // Fire-and-forget: Disposable.dispose() is contractually synchronous.
+      // If deactivate runs async, the extension is removed from _exts/_diag
+      // immediately while _actv may briefly still hold it until the promise settles.
+      // Callers should check isActive() before re-registering.
+      if (s._actv.has(ext.id)) s.deactivate(ext.id).catch(() => {});
+      s._exts.delete(ext.id); s._diag.delete(ext.id); } };
   }
 
   async activate(id: string): Promise<boolean> {
@@ -103,7 +109,8 @@ export class ExtensionRegistry {
     const subs: Disposable[] = [];
     const ctx: ExtensionContext = {
       commands: { register: trap(this.commands.register, this.commands, deps), execute: (id, c) => this.commands.execute(id, c), get: (id) => this.commands.get(id), list: () => this.commands.list() },
-      keymaps: { register: trap(this.keymaps.register, this.keymaps, deps), resolve: (e, c) => this.keymaps.resolve(e as Parameters<typeof this.keymaps.resolve>[0], c), setRegistry: (r) => this.keymaps.setRegistry(r) },
+      // setRegistry is intentionally excluded — host-layer wiring, not extension surface.
+      keymaps: { register: trap(this.keymaps.register, this.keymaps, deps), resolve: (e, c) => this.keymaps.resolve(e as Parameters<typeof this.keymaps.resolve>[0], c) },
       palette:    { register: (c: PaletteContribution) => { vcheck("Palette command must be a non-empty string")(c.command); return trap(this._p.register, this._p, deps)(c); }, list: () => this._p.list() },
       devtools:   { register: (c: DevtoolsContribution) => { vcheck("Devtools id must be a non-empty string")(c.id); vcheck("Devtools title must be a non-empty string")(c.title); return trap(this._d.register, this._d, deps)(c); }, list: () => this._d.list() },
       themes:     { register: (c: ThemeContribution) => { vcheck("Theme id must be a non-empty string")(c.id); vcheck("Theme title must be a non-empty string")(c.title); return trap(this._t.register, this._t, deps)(c); }, list: () => this._t.list() },
@@ -111,7 +118,12 @@ export class ExtensionRegistry {
       subscriptions: subs,
     };
     try { await ext.activate(ctx); this._actv.set(id, { ext, deps, ctx }); this._diag.set(id, { id, status: "active" }); return true; }
-    catch (e: unknown) { for (const d of deps) d.dispose(); for (const s of subs) try { s.dispose(); } catch { /* best-effort */ } this._diag.set(id, { id, status: "activation-failed", error: e instanceof Error ? e.message : String(e) }); return true; }
+    catch (e: unknown) {
+      for (const d of deps) try { d.dispose(); } catch { /* best-effort */ }
+      for (const s of subs) try { s.dispose(); } catch { /* best-effort */ }
+      this._diag.set(id, { id, status: "activation-failed", error: e instanceof Error ? e.message : String(e) });
+      return false;
+    }
   }
 
   async deactivate(id: string): Promise<boolean> {

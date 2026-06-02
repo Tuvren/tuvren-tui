@@ -80,8 +80,10 @@ async function main(): Promise<void> {
   const registry = new ExtensionRegistry();
 
   banner("1. Register extensions");
-  registry.register(helloExtension);
-  registry.register(brokenExtension);
+  // Hold disposables from register() so they can be cleaned up later.
+  // Each disposable deactivates the extension (if active) and unregisters it.
+  const helloDisp = registry.register(helloExtension);
+  const brokenDisp = registry.register(brokenExtension);
   console.log("Extensions registered:");
   for (const ext of registry.list()) {
     console.log(`  - ${ext.id}`);
@@ -109,7 +111,7 @@ async function main(): Promise<void> {
 
   banner("3. Activate brokenExtension (failure isolation)");
   const brokenOk = await registry.activate("demo.broken");
-  console.log(`Activation result: ${brokenOk} (false = already active or unknown, true = found)`);
+  console.log(`Activation result: ${brokenOk} (true = success, false = failed / unknown / already active)`);
 
   banner("4. Diagnostics");
   logDiag(registry);
@@ -121,21 +123,13 @@ async function main(): Promise<void> {
   console.log(`Command still registered: ${registry.commands.get("demo.hello.greet") ? "YES" : "NO"}`);
 
   banner("6. Dispose registrations");
-  // Dispose the broken extension (deactivates if active, removes from list)
-  // Already deactivated hello, so only broken remains
-  console.log("Disposing all extensions...");
-  // Dispose by re-acquiring disposables (for demo purposes)
-  const remaining = registry.list();
-  console.log(`Remaining before cleanup: ${remaining.length}`);
-  for (const ext of remaining) {
-    // In real code, keep the Disposable from register() and call dispose()
-    // For this demo, just show the manual path
-    if (registry.isActive(ext.id)) {
-      await registry.deactivate(ext.id);
-    }
-    // Unregister by removing from diagnostics
-    registry.getDiagnostics();
-  }
+  // Dispose the registration — this deactivates the extension (if active)
+  // and removes it from the registry. Contributions are cleaned up automatically.
+  brokenDisp.dispose();
+  // helloExtension was already deactivated in step 5, but dispose also
+  // handles the case where it's still active.
+  helloDisp.dispose();
+  console.log(`Remaining after cleanup: ${registry.list().length}`);
 
   banner("7. Final diagnostics");
   logDiag(registry);
