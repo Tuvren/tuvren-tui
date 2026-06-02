@@ -23,8 +23,8 @@
  *   - Deactivation disposes all contributed resources tracked through the context.
  */
 
-import type { CommandRegistry } from "./commands";
-import type { KeymapRegistry } from "./keymap";
+import { CommandRegistry } from "./commands";
+import { KeymapRegistry } from "./keymap";
 import type { Disposable } from "./commands";
 
 /** @pre-GA — Plugin APIs may break before v1.0 (ADR-T46). */
@@ -72,8 +72,8 @@ export interface Extension {
  * @pre-GA — Plugin APIs may break before v1.0.
  */
 export interface ExtensionContext {
-	/** Full CommandRegistry — extensions may register and execute commands. */
-	readonly commands: CommandRegistry;
+	/** Bounded command surface — extensions may register and execute commands. */
+	readonly commands: Pick<CommandRegistry, "register" | "execute" | "get" | "list">;
 	/** Bounded keymap surface — setRegistry is withheld (host-layer wiring). */
 	readonly keymaps: Pick<KeymapRegistry, "register" | "resolve">;
 	readonly palette: ContributionRegistration<PaletteContribution>;
@@ -94,8 +94,6 @@ export interface ExtensionDiagnostic {
 
 import { TuvrenError } from "./errors";
 import type { TuvrenEvent } from "./events";
-import { CommandRegistry } from "./commands";
-import { KeymapRegistry } from "./keymap";
 
 /** Wrap a register function so returned disposables are tracked for cleanup. */
 function trap<A extends unknown[]>(
@@ -117,28 +115,25 @@ function vcheck(msg: string): (v: unknown) => void {
 	};
 }
 
-// ── ContributionRegistry ─────────────────────────────────────────────────────
+// ── Internal contribution registry helper ────────────────────────────────
 
-/** @pre-GA — Generic in-memory contribution registry. */
-export class ContributionRegistry<T> implements ContributionRegistration<T> {
-	private readonly _items: T[] = [];
-
-	register(c: T): Disposable {
-		this._items.push(c);
-		let gone = false;
-		return {
-			dispose: () => {
-				if (gone) return;
-				gone = true;
-				const i = this._items.indexOf(c);
-				if (i !== -1) this._items.splice(i, 1);
-			},
-		};
-	}
-
-	list(): T[] {
-		return this._items.slice();
-	}
+function makeRegistry<T>(): ContributionRegistration<T> {
+	const items: T[] = [];
+	return {
+		register(c: T): Disposable {
+			items.push(c);
+			let gone = false;
+			return {
+				dispose: () => {
+					if (gone) return;
+					gone = true;
+					const i = items.indexOf(c);
+					if (i !== -1) items.splice(i, 1);
+				},
+			};
+		},
+		list: () => items.slice(),
+	};
 }
 
 // ── ExtensionRegistry ────────────────────────────────────────────────────────
@@ -150,10 +145,10 @@ export class ContributionRegistry<T> implements ContributionRegistration<T> {
 export class ExtensionRegistry {
 	readonly commands = new CommandRegistry();
 	readonly keymaps = new KeymapRegistry();
-	private readonly _p = new ContributionRegistry<PaletteContribution>();
-	private readonly _d = new ContributionRegistry<DevtoolsContribution>();
-	private readonly _t = new ContributionRegistry<ThemeContribution>();
-	private readonly _e = new ContributionRegistry<ExampleContribution>();
+	private readonly _p = makeRegistry<PaletteContribution>();
+	private readonly _d = makeRegistry<DevtoolsContribution>();
+	private readonly _t = makeRegistry<ThemeContribution>();
+	private readonly _e = makeRegistry<ExampleContribution>();
 	readonly palette = this._p;
 	readonly devtools = this._d;
 	readonly themes = this._t;

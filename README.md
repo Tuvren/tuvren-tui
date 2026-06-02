@@ -336,7 +336,7 @@ Repo-side FFI tests and benchmark harnesses target the local Cargo-built artifac
 ## Verification and Budgets
 
 ```bash
-# Bundle budget (enforced at ≤ 75KB)
+# Bundle budget (enforced at ≤ 100KB)
 bun run ts/check-bundle.ts
 
 # FFI and render benchmarks

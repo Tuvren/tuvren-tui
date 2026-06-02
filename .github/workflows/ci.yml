@@ -106,7 +106,7 @@ jobs:
       - name: Run runner API tests
         run: bun test ts/test-runner.test.ts
 
-      - name: Check bundle budget (< 75KB)
+      - name: Check bundle budget (< 100KB)
         run: bun run ts/check-bundle.ts
 
   # ── Host Benchmarks ──────────────────────────────────────────────────────

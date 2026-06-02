@@ -10,7 +10,6 @@
 import { describe, test, expect, beforeEach } from "bun:test";
 import {
 	ExtensionRegistry,
-	ContributionRegistry,
 } from "./src/extensions";
 import type {
 	Extension,
@@ -46,51 +45,51 @@ function noopKeyBinding(command: string = "test.cmd", key: string = "f1"): KeyBi
 	return { command, key };
 }
 
-// ── ContributionRegistry ─────────────────────────────────────────────────────
+// ── Contribution registry behavior (via ExtensionRegistry) ──────────────────
 
-describe("ContributionRegistry", () => {
+describe("Contribution registry behavior", () => {
 	test("register returns a disposable", () => {
-		const r = new ContributionRegistry<string>();
-		const d = r.register("item-a");
+		const r = new ExtensionRegistry();
+		const d = r.palette.register({ command: "cmd" });
 		expect(typeof d.dispose).toBe("function");
 	});
 
 	test("list returns registered items", () => {
-		const r = new ContributionRegistry<string>();
-		r.register("a");
-		r.register("b");
-		expect(r.list()).toEqual(["a", "b"]);
+		const r = new ExtensionRegistry();
+		r.palette.register({ command: "a" });
+		r.palette.register({ command: "b" });
+		expect(r.palette.list()).toEqual([{ command: "a" }, { command: "b" }]);
 	});
 
 	test("dispose removes the item from the registry", () => {
-		const r = new ContributionRegistry<string>();
-		const d = r.register("a");
-		r.register("b");
+		const r = new ExtensionRegistry();
+		const d = r.palette.register({ command: "a" });
+		r.palette.register({ command: "b" });
 		d.dispose();
-		expect(r.list()).toEqual(["b"]);
+		expect(r.palette.list()).toEqual([{ command: "b" }]);
 	});
 
 	test("double-dispose is safe", () => {
-		const r = new ContributionRegistry<string>();
-		const d = r.register("a");
+		const r = new ExtensionRegistry();
+		const d = r.palette.register({ command: "a" });
 		d.dispose();
 		d.dispose();
-		expect(r.list()).toEqual([]);
+		expect(r.palette.list()).toEqual([]);
 	});
 
 	test("empty registry returns empty list", () => {
-		const r = new ContributionRegistry<string>();
-		expect(r.list()).toEqual([]);
+		const r = new ExtensionRegistry();
+		expect(r.palette.list()).toEqual([]);
 	});
 
 	test("double-dispose does not remove other items", () => {
-		const r = new ContributionRegistry<string>();
-		r.register("a");
-		const db = r.register("b");
-		r.register("c");
+		const r = new ExtensionRegistry();
+		r.palette.register({ command: "a" });
+		const db = r.palette.register({ command: "b" });
+		r.palette.register({ command: "c" });
 		db.dispose();
 		db.dispose();
-		expect(r.list()).toEqual(["a", "c"]);
+		expect(r.palette.list()).toEqual([{ command: "a" }, { command: "c" }]);
 	});
 });
 

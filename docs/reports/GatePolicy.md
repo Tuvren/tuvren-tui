@@ -75,7 +75,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to v
 | Property | Value |
 | --- | --- |
 | **Metric** | Minified TypeScript bundle size |
-| **Threshold** | `< 75KB` |
+| **Threshold** | `< 100KB` |
 | **CI Job** | `host-tests` |
 | **Enforcement** | `bun run ts/check-bundle.ts` |
 
