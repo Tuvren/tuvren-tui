@@ -190,6 +190,22 @@ describe("ExtensionRegistry — activation", () => {
 		const cmds = r.commands.list();
 		expect(cmds.find((c) => c.id === "plugin.cmd")).toBeDefined();
 	});
+
+	test("disposed during activation records failure diagnostic", async () => {
+		const r = new ExtensionRegistry();
+		const reg = r.register(makeExtension("ext.race", async (ctx) => {
+			await new Promise((resolve) => setTimeout(resolve, 1));
+			ctx.commands.register(noopCommand("race.cmd"));
+		}));
+		// Activate and immediately dispose while activation is in-flight
+		const actPromise = r.activate("ext.race");
+		reg.dispose();
+		await actPromise;
+
+		const diag = r.getDiagnostics().find((d) => d.id === "ext.race");
+		expect(diag).toBeDefined();
+		expect(diag!.status).toBe("activation-failed");
+	});
 });
 
 // ── ExtensionRegistry — deactivation ─────────────────────────────────────────
@@ -320,6 +336,22 @@ describe("ExtensionRegistry — failure isolation", () => {
 		expect(diag).toBeDefined();
 		expect(diag!.status).toBe("deactivation-failed");
 		expect(diag!.error).toContain("deactivation failed");
+	});
+
+	test("deactivation failure via dispose preserves diagnostic", async () => {
+		const r = new ExtensionRegistry();
+		const d = r.register(makeExtension("ext.dispose-fail", () => {}, () => {
+			throw new Error("dispose deactivation failed");
+		}));
+		await r.activate("ext.dispose-fail");
+		d.dispose();
+		// Allow the fire-and-forget deactivation to settle
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		const diag = r.getDiagnostics().find((d_) => d_.id === "ext.dispose-fail");
+		expect(diag).toBeDefined();
+		expect(diag!.status).toBe("deactivation-failed");
+		expect(diag!.error).toContain("dispose deactivation failed");
 	});
 
 	test("async activate works correctly", async () => {
@@ -779,11 +811,18 @@ describe("Plugin safety and diagnostics", () => {
 		expect(diag!.error).toContain("deact boom");
 	});
 
-	test("pre-GA markers are present on exported types", () => {
-		// Verify that the exported Extension type carries pre-GA documentation
-		const ext: Extension = { id: "test", activate: () => {} };
-		expect(ext.id).toBe("test");
-		// The JSDoc @pre-GA markers are compile-time only; their presence is
-		// verified by the TypeScript compiler and by source inspection.
+	test("pre-GA markers are present on exported types", async () => {
+		const source = await Bun.file("ts/src/extensions.ts").text();
+		const markers = [
+			"@pre-GA — Plugin APIs may break before v1.0 (ADR-T46).",
+			"@pre-GA — Palette-visible command metadata",
+			"@pre-GA — Devtools panel metadata.",
+			"@pre-GA — Theme preset metadata.",
+			"@pre-GA — Showcase/example metadata.",
+			"@pre-GA — Plugin APIs may break before v1.0.",
+		];
+		for (const m of markers) {
+			expect(source).toContain(m);
+		}
 	});
 });

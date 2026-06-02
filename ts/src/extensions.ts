@@ -23,9 +23,10 @@
  *   - Deactivation disposes all contributed resources tracked through the context.
  */
 
-import { CommandRegistry } from "./commands";
+import { CommandRegistry, type Disposable } from "./commands";
 import { KeymapRegistry } from "./keymap";
-import type { Disposable } from "./commands";
+import { TuvrenError } from "./errors";
+import type { TuvrenEvent } from "./events";
 
 /** @pre-GA — Plugin APIs may break before v1.0 (ADR-T46). */
 export interface ContributionRegistration<T> {
@@ -91,9 +92,6 @@ export interface ExtensionDiagnostic {
 }
 
 // ── Internal helpers ─────────────────────────────────────────────────────────
-
-import { TuvrenError } from "./errors";
-import type { TuvrenEvent } from "./events";
 
 /** Wrap a register function so returned disposables are tracked for cleanup. */
 function trap<A extends unknown[]>(
@@ -181,11 +179,21 @@ export class ExtensionRegistry {
 			dispose() {
 				if (gone) return;
 				gone = true;
-				if (s._actv.has(ext.id)) {
-					s.deactivate(ext.id).catch(() => {});
-				}
+				// Unregister immediately so list() and getExtension() reflect
+				// the disposal without waiting for async deactivation.
 				s._exts.delete(ext.id);
-				s._diag.delete(ext.id);
+				const cleanupDiag = () => {
+					// Preserve a deactivation-failed diagnostic rather than
+					// silently dropping the error when deactivate() throws.
+					if (s._diag.get(ext.id)?.status !== "deactivation-failed") {
+						s._diag.delete(ext.id);
+					}
+				};
+				if (s._actv.has(ext.id)) {
+					s.deactivate(ext.id).then(cleanupDiag).catch(cleanupDiag);
+				} else {
+					cleanupDiag();
+				}
 			},
 		};
 	}
@@ -266,6 +274,11 @@ export class ExtensionRegistry {
 			if (!this._exts.has(id)) {
 				for (const d of deps) try { d.dispose(); } catch { /* best-effort */ }
 				for (const s of subs) try { s.dispose(); } catch { /* best-effort */ }
+				this._diag.set(id, {
+					id,
+					status: "activation-failed",
+					error: "Extension was disposed during activation",
+				});
 				return false;
 			}
 			this._actv.set(id, { ext, deps, ctx });
@@ -311,13 +324,14 @@ export class ExtensionRegistry {
 			try {
 				await a.ext.deactivate();
 			} catch (e: unknown) {
-				if (this._exts.has(id)) {
-					this._diag.set(id, {
-						id,
-						status: "deactivation-failed",
-						error: e instanceof Error ? e.message : String(e),
-					});
-				}
+				// Record the failure even if the extension was unregistered during
+				// deactivation — deactivation of an active extension is legitimate
+				// framework business regardless of registration state.
+				this._diag.set(id, {
+					id,
+					status: "deactivation-failed",
+					error: e instanceof Error ? e.message : String(e),
+				});
 			}
 		}
 		for (const d of [...a.deps, ...a.ctx.subscriptions]) {
