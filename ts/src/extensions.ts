@@ -86,7 +86,8 @@ export class ExtensionRegistry {
   private readonly _exts = new Map<string, Extension>();
   private readonly _actv = new Map<string, { ext: Extension; deps: Disposable[]; ctx: ExtensionContext }>();
   private readonly _diag = new Map<string, ExtensionDiagnostic>();
-  private readonly _inflight = new Map<string, Promise<boolean>>();
+  private readonly _actInflight = new Map<string, Promise<boolean>>();
+  private readonly _deactInflight = new Map<string, Promise<boolean>>();
 
   register(ext: Extension): Disposable {
     if (typeof ext.id !== "string" || ext.id.trim() === "") throw new TuvrenError("Extension id must be a non-empty string", -1);
@@ -105,11 +106,11 @@ export class ExtensionRegistry {
   }
 
   async activate(id: string): Promise<boolean> {
-    const inflight = this._inflight.get(id);
+    const inflight = this._actInflight.get(id);
     if (inflight !== undefined) return inflight;
     const op = this._activateInner(id);
-    this._inflight.set(id, op);
-    try { return await op; } finally { this._inflight.delete(id); }
+    this._actInflight.set(id, op);
+    try { return await op; } finally { this._actInflight.delete(id); }
   }
 
   private async _activateInner(id: string): Promise<boolean> {
@@ -128,7 +129,7 @@ export class ExtensionRegistry {
       examples:   { register: (c: ExampleContribution) => { vcheck("Example id must be a non-empty string")(c.id); vcheck("Example title must be a non-empty string")(c.title); return trap(this._e.register, this._e, deps)(c); }, list: () => this._e.list() },
       subscriptions: subs,
     };
-    try { await ext.activate(ctx); this._actv.set(id, { ext, deps, ctx }); this._diag.set(id, { id, status: "active" }); return true; }
+    try { await ext.activate(ctx); if (!this._exts.has(id)) { for (const d of deps) try { d.dispose(); } catch { /* best-effort */ } for (const s of subs) try { s.dispose(); } catch { /* best-effort */ } return false; } this._actv.set(id, { ext, deps, ctx }); this._diag.set(id, { id, status: "active" }); return true; }
     catch (e: unknown) {
       for (const d of deps) try { d.dispose(); } catch { /* best-effort */ }
       for (const s of subs) try { s.dispose(); } catch { /* best-effort */ }
@@ -138,11 +139,11 @@ export class ExtensionRegistry {
   }
 
   async deactivate(id: string): Promise<boolean> {
-    const inflight = this._inflight.get(id);
+    const inflight = this._deactInflight.get(id);
     if (inflight !== undefined) return inflight;
     const op = this._deactivateInner(id);
-    this._inflight.set(id, op);
-    try { return await op; } finally { this._inflight.delete(id); }
+    this._deactInflight.set(id, op);
+    try { return await op; } finally { this._deactInflight.delete(id); }
   }
 
   private async _deactivateInner(id: string): Promise<boolean> {
