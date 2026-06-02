@@ -1,16 +1,17 @@
 /**
  * Bundle budget check (TASK-L6).
  *
- * Bundles the tuvren-tui TypeScript layer and verifies it stays under 75KB.
+ * Bundles the tuvren-tui TypeScript layer and verifies it stays under 100KB.
  * Per PRD §5 and ADR-T35 addendum: budget increased from 50KB to 75KB to
- * accommodate host composites (CommandPalette, TracePanel, CodeView, DiffView).
+ * accommodate host composites, and from 75KB to 100KB to accommodate the
+ * extension registry (Epic T).
  *
  * Run:  bun run ts/check-bundle.ts
  */
 
 import { rmSync } from "fs";
 
-const BUDGET_BYTES = 75 * 1024; // 75KB (increased from 50KB per ADR-T35 addendum)
+const BUDGET_BYTES = 100 * 1024; // 100KB (increased from 75KB per Epic T closeout)
 
 // Resolve paths relative to this script, not cwd
 const scriptDir = import.meta.dir;

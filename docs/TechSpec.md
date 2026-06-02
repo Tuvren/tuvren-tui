@@ -1094,7 +1094,7 @@ multiplexer_policy:
   - Background rendering remains experimental and must not silently alter default lifecycle semantics.
   - Terminal protocol enhancements must be opt-in by capability and must restore terminal state during `tui_shutdown()` even when intermediate feature setup fails.
 - **Performance / Capacity Notes:**
-  - Bundle budget target is 75KB for the host package.
+  - Bundle budget target is 100KB for the host package.
   - Render and transcript replay budgets are enforced through benchmark and replay gates rather than prose-only goals.
   - Debug-off overhead must remain low enough that devtools can stay available without distorting ordinary use.
 
@@ -1136,7 +1136,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to t
 
 | Gate | Target | Current enforcement path |
 | --- | --- | --- |
-| Host bundle size | `< 75KB` | `bun run ts/check-bundle.ts` |
+| Host bundle size | `< 100KB` | `bun run ts/check-bundle.ts` |
 | Single FFI call overhead | `< 1ms` | `bun run ts/bench-ffi.ts` |
 | Render frame budget | `< 16ms` target envelope | `bun run ts/bench-render.ts` |
 | Goldens and native correctness | zero failures | `cargo test --manifest-path native/Cargo.toml` |

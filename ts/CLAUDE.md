@@ -125,7 +125,7 @@ app.render();
 ## Constraints
 
 - Runtime dependencies stay effectively minimal in the root package: `bun:ffi` plus `@preact/signals-core`; the optional `tuvren-tui/effect` subpath carries `effect` as an optional peer with a local dev/test dependency
-- Bundle budget: `< 75KB`
+- Bundle budget: `< 100KB`
 - `strict: true` TypeScript remains required
 - Host wrappers stay thin even when examples and composites become more ambitious
 - Devtools and resolver UX are part of the maintained host contract, not throwaway helper code
