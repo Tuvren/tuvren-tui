@@ -10,8 +10,8 @@
 - ... [Older history truncated, refer to git logs]
 
 ## 1. Executive Summary & Active Critical Path
-- **Total Active Story Points:** 80 (Epic R and Epic S shipped)
-- **Critical Path:** `EXT-T001 -> EXT-T002 -> EXT-T003 -> EXT-T004 -> EXT-T005 -> EXT-T006 -> SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
+- **Total Active Story Points:** 56 (Epic T shipped)
+- **Critical Path:** `SDK-U001 -> SDK-U002 -> SDK-U003 -> SDK-U004 -> SDK-U005 -> SDK-U006 -> SDK-U007 -> PUB-V001 -> PUB-V002 -> PUB-V003 -> PUB-V004 -> PUB-V005 -> PUB-V006 -> PUB-V007`
 - **Planning Assumptions:**
   - Epic M, Epic N, Epic O, Epic P, and Epic Q are all shipped. The Brownfield source now includes the native text substrate, transcript and split-pane semantics, devtools, terminal-capability hardening, the full Tuvren hard-cut rename, and the general-purpose framework onboarding and migration story.
   - The GitHub repository move is complete; the canonical remote is `Tuvren/tuvren-tui`. The local checkout directory may still be named `KrakenTUI` until the operator renames it.
@@ -24,7 +24,6 @@
 ## 2. Project Phasing & Iteration Strategy
 ### Current Active Scope
 
-- **Epic T — Plugin Slots and Extensibility:** Pre-GA contribution points for commands, keymaps, palettes, devtools panels, themes, and showcase/example integrations.
 - **Epic U — SDK Productization / Expert-Level DX:** Productize all public SDK surfaces before npm publish: imperative, JSX, Effect, plugins, composites, examples, and devtools.
 - **Epic V — First Public npm Publish and Feedback Loop:** Publish `tuvren-tui@0.1.0` plus auxiliary native packages and establish post-publish feedback triage.
 
@@ -114,8 +113,8 @@ flowchart LR
     V5 --> V6
     V6 --> V7
 
-    class O,P,Q,R,S1,S2,S3,S4,S5 done;
-    class T1,T2,T3,T4,T5,T6,U1,U2,U3,U4,U5,U6,U7,V1,V2,V3,V4,V5,V6,V7 active;
+    class O,P,Q,R,S1,S2,S3,S4,S5,T1,T2,T3,T4,T5,T6 done;
+    class U1,U2,U3,U4,U5,U6,U7,V1,V2,V3,V4,V5,V6,V7 active;
     classDef done fill:#dff5dd,stroke:#3f9d3f,color:#1f4d1f;
     classDef active fill:#fff4d6,stroke:#d39b14,color:#5c4100;
     classDef future fill:#e6eefc,stroke:#4c78d0,color:#14315f;
@@ -131,91 +130,9 @@ See archived summary in §6. All six tickets (CMD-R001 through CMD-R006) are com
 
 See archived summary in §6. All five tickets (EFF-S001 through EFF-S005) are complete.
 
-### Epic T — Plugin Slots and Extensibility (EXT)
+### Epic T — Plugin Slots and Extensibility (EXT) — SHIPPED
 
-**EXT-T001 Ratify Plugin Slot Contract**
-- **Type:** Spike
-- **Effort:** 3
-- **Dependencies:** Epic S shipped
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §4 Epic 13, [Architecture](./Architecture.md) §4.6, [TechSpec](./TechSpec.md) ADR-T46 and §4.6
-- **Description:** Finalize pre-GA plugin boundaries and contribution slot responsibilities.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given commands/keymaps and Effect are available
-When the plugin-slot contract is ratified
-Then supported contribution types, lifecycle hooks, diagnostics, and pre-GA compatibility posture are documented
-And plugins cannot own native Widget state
-```
-
-**EXT-T002 Add Extension Registry and Lifecycle API**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** EXT-T001
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §4.6
-- **Description:** Add extension registration, activation, deactivation, subscriptions, and diagnostics.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given an extension is registered
-When it activates and later deactivates
-Then its contributed resources are tracked and disposed
-And activation failures are isolated and reported with the extension ID
-```
-
-**EXT-T003 Add Command, Keymap, and Palette Contribution Slots**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** EXT-T002, CMD-R005
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §4.4 and §4.6
-- **Description:** Allow extensions to contribute commands, keybindings, and palette-visible command metadata.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given an extension contributes commands and keymaps
-When the extension is active
-Then its commands appear in registry-backed dispatch and palettes
-And deactivation removes those contributions
-```
-
-**EXT-T004 Add Devtools, Theme, and Showcase Contribution Slots**
-- **Type:** Feature
-- **Effort:** 5
-- **Dependencies:** EXT-T002
-- **Capability / Contract Mapping:** [PRD](./PRD.md) §4 Epic 13
-- **Description:** Allow extensions to contribute bounded devtools panels, theme presets, and showcase/example metadata.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given an extension contributes devtools, theme, or showcase entries
-When the host enumerates those contributions
-Then they are available through public registries without private native access
-And invalid contributions fail during registration
-```
-
-**EXT-T005 Add Plugin Safety, Compatibility, and Diagnostics Rules**
-- **Type:** Chore
-- **Effort:** 3
-- **Dependencies:** EXT-T003, EXT-T004
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) ADR-T46
-- **Description:** Add diagnostics, docs, and compatibility labels for pre-GA plugin APIs.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given plugin APIs are pre-GA
-When a Developer reads diagnostics or docs
-Then the unsupported behaviors, lifecycle expectations, and breaking-change posture are explicit
-And plugin failures do not obscure the owning extension ID
-```
-
-**EXT-T006 Add Plugin Examples, Tests, and Docs**
-- **Type:** Chore
-- **Effort:** 3
-- **Dependencies:** EXT-T005
-- **Capability / Contract Mapping:** [TechSpec](./TechSpec.md) §5.3
-- **Description:** Add example extensions and tests for all supported contribution slots.
-- **Acceptance Criteria (Gherkin):**
-```gherkin
-Given plugin slots are implemented
-When the host tests and examples run
-Then command, keymap, palette, devtools, theme, and showcase contributions are covered
-And docs present plugins as pre-GA contribution points
-```
+Shipped as a pre-GA framework-services wave. It added bounded extension contribution points (`ExtensionRegistry`, `ExtensionContext`, `ExtensionDiagnostic`) for commands, keymaps, palette title overrides, devtools panels, theme presets, and showcase/example metadata. The `ContributionRegistration<T>` contract and `makeRegistry<T>()` helper provide generic in-memory contribution tracking. `ExtensionRegistry` handles activation, deactivation, subscription cleanup, failure isolation by extension ID, and in-flight serialization between concurrent activate/deactivate calls. `CommandPalette` was extended to consume a `paletteRegistry` for title overrides. 58 focused tests in `ts/test-extensions.test.ts` cover registration, activation, deactivation, failure isolation, all six contribution slots, CommandPalette integration, plugin command dispatch via `CommandDispatcher`, validation, and safety rules. The `examples/plugin-demo.ts` example exercises all contribution types plus diagnostics. Bundle at 78.9 KB under 100 KB budget.
 
 ### Epic U — SDK Productization / Expert-Level DX (SDK)
 
@@ -427,12 +344,6 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 | ID | Epic | Type | SP | Dependencies | Phase |
 | --- | --- | --- | --- | --- | --- |
-| EXT-T001 | T | Spike | 3 | Epic S shipped | Active |
-| EXT-T002 | T | Feature | 5 | EXT-T001 | Active |
-| EXT-T003 | T | Feature | 5 | EXT-T002, Epic R shipped | Active |
-| EXT-T004 | T | Feature | 5 | EXT-T002 | Active |
-| EXT-T005 | T | Chore | 3 | EXT-T003, EXT-T004 | Active |
-| EXT-T006 | T | Chore | 3 | EXT-T005 | Active |
 | SDK-U001 | U | Spike | 3 | Epic T shipped | Active |
 | SDK-U002 | U | Feature | 5 | SDK-U001 | Active |
 | SDK-U003 | U | Feature | 5 | SDK-U001 | Active |
@@ -447,29 +358,26 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 | PUB-V005 | V | Chore | 5 | PUB-V004 | Active |
 | PUB-V006 | V | Chore | 3 | PUB-V005 | Active |
 | PUB-V007 | V | Chore | 3 | PUB-V006 | Active |
-|  |  | **TOTAL** | **80** |  |  |
+|  |  | **TOTAL** | **56** |  |  |
 
 ## 6. Archived Continuity Summary
 
-### 6.1 Archived Epic R — Commands & Keymap Foundations
+### 6.1 Archived Epic T — Plugin Slots and Extensibility
+
+Epic T is archived as a shipped pre-GA framework-services wave. It added bounded extension contribution points (`ExtensionRegistry`, `ExtensionContext`, `ExtensionDiagnostic`) for commands, keymaps, palette title overrides, devtools panels, theme presets, and showcase/example metadata. `CommandPalette` was extended to consume a `paletteRegistry` for title overrides. 58 focused tests in `ts/test-extensions.test.ts` cover registration, activation, deactivation, failure isolation, all six contribution slots, CommandPalette integration, plugin command dispatch, validation, and safety rules. The `examples/plugin-demo.ts` example exercises all contribution types plus diagnostics. Bundle at 78.9 KB under 100 KB budget.
+
+### 6.2 Archived Epic R — Commands & Keymap Foundations
 
 Epic R is archived as a shipped framework-services wave. It added `CommandRegistry` (typed command definitions, disposable registration, programmatic execution, `when` predicates), `KeymapRegistry` (key string normalization for `[modifier+]*key` syntax, `when` predicates, first-registered-wins resolution), and `CommandDispatcher` (bridges registry + keymap into the event drain; focus context read from `app.getFocused()`). The `CommandPalette` composite was rebased to consume a `CommandRegistry`. A `commandDispatcher` option was added to both `app.run()` and `createLoop()`. The old `Command{label, action}` shape was replaced with `Command{title, run, category?, when?}` across all examples. 46 focused tests in `ts/test-commands.test.ts` cover registration, disposal, execution, key normalization, event resolution, dispatch, and palette integration. All 433 host tests pass; bundle at 72.2 KB under 75 KB budget.
 
-### 6.2 Archived Epic S — Effect Declarative Integration
+### 6.3 Archived Epic S — Effect Declarative Integration
 
 Epic S is archived as a shipped framework-services wave. After the repo Q&A clarified that the docs had underspecified the intended scope, Epic S was executed as a package-first Effect surface rather than an adapter pass. The shipped-and-retained advanced API includes `acquireApp()`, `acquireHeadlessApp()`, `makeTuvrenScope()`, `renderScoped()`, `streamEvents()`, and `createCommandService()`. The shipped package layer now also includes `render()`, `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, keyboard and terminal-size hooks, and the package-first `examples/effect-counter.tsx`. The manifest declares `effect` as an optional peer with local dev/test wiring, while Rust remains the single mutable runtime authority underneath.
 
-### 6.3 Archived Epic Q — Adoption and Framework Positioning
+### 6.4 Archived Epic Q — Adoption and Framework Positioning
 
 Epic Q is archived as a shipped adoption wave. It repositioned Tuvren as a general-purpose terminal UI framework, refreshed README onboarding, organized examples into general-purpose and flagship workload tiers, and published the hard-cut Kraken-to-Tuvren migration guide.
 
-### 6.4 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
+### 6.5 Archived Epic P — Tuvren Identity, Packaging, and Release Migration
 
 Epic P is archived as a shipped identity and packaging wave. It completed the hard-cut Tuvren rename across TypeScript, Rust, environment variables, shared-library names, resolver diagnostics, release assets, auxiliary native package stubs, and cross-platform smoke verification.
-
-### 6.5 Archived v7 Docs-Maintenance Wave
-
-The archived docs-maintenance wave normalized the canonical PRD, Architecture, TechSpec, and Tasks chain, preserved historical context, and reconciled source-truth drift against code, examples, tests, and workflow state.
-
-### 6.6 Archived v6 Delivery Wave
-The archived v6 delivery wave shipped native transcript and anchor semantics, replay and benchmark gates, devtools APIs and inspector surfaces, native split-pane behavior, host composites (`CommandPalette`, `TracePanel`, `StructuredLogView`, `CodeView`, `DiffView`), and flagship examples (`agent-console`, `ops-log-console`, `repo-inspector`).
