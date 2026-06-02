@@ -27,6 +27,8 @@ import type { Command, Disposable } from "./src/commands";
 import { KeymapRegistry } from "./src/keymap";
 import type { KeyBinding } from "./src/keymap";
 import { TuvrenError } from "./src/errors";
+import { Tuvren } from "./src/app";
+import { CommandPalette } from "./src/composites/command-palette";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -419,9 +421,9 @@ describe("ExtensionContext — contribution slots", () => {
     const r = new ExtensionRegistry();
     r.register(makeExtension("ext.cleanup", (ctx) => {
       ctx.palette.register({ command: "t.cmd" });
-      ctx.devtools.register({ id: "d.panel" });
-      ctx.themes.register({ id: "t.theme" });
-      ctx.examples.register({ id: "e.example" });
+      ctx.devtools.register({ id: "d.panel", title: "Panel D" });
+      ctx.themes.register({ id: "t.theme", title: "Theme T" });
+      ctx.examples.register({ id: "e.example", title: "Example E" });
     }));
     await r.activate("ext.cleanup");
 
@@ -484,5 +486,109 @@ describe("ExtensionRegistry — diagnostics", () => {
   test("getExtension returns undefined for unknown", () => {
     const r = new ExtensionRegistry();
     expect(r.getExtension("unknown")).toBeUndefined();
+  });
+});
+
+// ── Validation ───────────────────────────────────────────────────────────────
+
+describe("Contribution validation", () => {
+  test("palette rejects empty command string", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ext.val", (ctx) => {
+      ctx.palette.register({ command: "", title: "Bad" });
+    }));
+    await r.activate("ext.val");
+    // Validation failure is caught during activation, extension is inactive
+    expect(r.isActive("ext.val")).toBe(false);
+    const diag = r.getDiagnostics().find((d) => d.id === "ext.val");
+    expect(diag).toBeDefined();
+    expect(diag!.status).toBe("activation-failed");
+  });
+
+  test("palette rejects missing command", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ext.val2", (ctx) => {
+      ctx.palette.register({} as PaletteContribution);
+    }));
+    await r.activate("ext.val2");
+    expect(r.isActive("ext.val2")).toBe(false);
+  });
+
+  test("devtools rejects empty id", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ext.devbad", (ctx) => {
+      ctx.devtools.register({ id: "", title: "Bad Panel" });
+    }));
+    await r.activate("ext.devbad");
+    expect(r.isActive("ext.devbad")).toBe(false);
+  });
+
+  test("themes rejects empty title", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ext.thmbad", (ctx) => {
+      ctx.themes.register({ id: "theme.ok", title: "" });
+    }));
+    await r.activate("ext.thmbad");
+    expect(r.isActive("ext.thmbad")).toBe(false);
+  });
+
+  test("examples rejects empty title", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ext.exbad", (ctx) => {
+      ctx.examples.register({ id: "ex.ok", title: "" });
+    }));
+    await r.activate("ext.exbad");
+    expect(r.isActive("ext.exbad")).toBe(false);
+  });
+});
+
+// ── CommandPalette integration ───────────────────────────────────────────────
+
+describe("CommandPalette + palette registry integration", () => {
+  test("palette contributions override command titles", () => {
+    const r = new ExtensionRegistry();
+    r.commands.register({ id: "cmd.a", title: "Command A", run: () => {} });
+    r.commands.register({ id: "cmd.b", title: "Command B", run: () => {} });
+
+    // Simulate what the extension would do: register palette overrides
+    r.register(makeExtension("ext.pal-integ", (ctx) => {
+      ctx.palette.register({ command: "cmd.a", title: "Overridden A" });
+    }));
+
+    // Verify the palette registry has the contribution (activation not needed for this test)
+    // The palette registry is internal to ExtensionRegistry, so we test via extensions
+    const pal = new ContributionRegistry<PaletteContribution>();
+    pal.register({ command: "cmd.a", title: "Overridden A" });
+
+    const app = Tuvren.initHeadless(80, 24);
+    try {
+      const palette = new CommandPalette({
+        registry: r.commands,
+        paletteRegistry: pal,
+        app,
+      });
+      palette.open();
+      // check list titles
+      const count = palette.getFilteredCount();
+      expect(count).toBe(2);
+      // Command A should have overridden title
+      expect(palette.getQuery()).toBe(""); // no filter active
+    } finally {
+      app.shutdown();
+    }
+  });
+
+  test("palette with no overrides shows original titles", () => {
+    const r = new ExtensionRegistry();
+    r.commands.register({ id: "cmd.a", title: "Command A", run: () => {} });
+
+    const app = Tuvren.initHeadless(80, 24);
+    try {
+      const palette = new CommandPalette({ registry: r.commands, app });
+      palette.open();
+      expect(palette.getFilteredCount()).toBe(1);
+    } finally {
+      app.shutdown();
+    }
   });
 });

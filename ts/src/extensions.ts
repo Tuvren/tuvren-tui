@@ -45,6 +45,11 @@ export interface ExtensionDiagnostic {
 const trap = (f: (...a: unknown[]) => Disposable, self: unknown, t: Disposable[]) =>
   (...a: unknown[]) => { const d = f.apply(self, a) as Disposable; t.push(d); return d; };
 
+// Validated wrapper: throws TuvrenError if validation fails before registering.
+const vcheck = (msg: string) => (v: unknown) => {
+  if (typeof v !== "string" || (v as string).trim() === "") throw new TuvrenError(msg, -1);
+};
+
 export class ExtensionRegistry {
   readonly commands = new CommandRegistry();
   readonly keymaps = new KeymapRegistry();
@@ -75,10 +80,10 @@ export class ExtensionRegistry {
     const ctx: ExtensionContext = {
       commands: { register: trap(this.commands.register, this.commands, deps), execute: (id, c) => this.commands.execute(id, c), get: (id) => this.commands.get(id), list: () => this.commands.list() },
       keymaps: { register: trap(this.keymaps.register, this.keymaps, deps), resolve: (e, c) => this.keymaps.resolve(e as Parameters<typeof this.keymaps.resolve>[0], c), setRegistry: (r) => this.keymaps.setRegistry(r) },
-      palette:    { register: trap(this._p.register, this._p, deps), list: () => this._p.list() },
-      devtools:   { register: trap(this._d.register, this._d, deps), list: () => this._d.list() },
-      themes:     { register: trap(this._t.register, this._t, deps), list: () => this._t.list() },
-      examples:   { register: trap(this._e.register, this._e, deps), list: () => this._e.list() },
+      palette:    { register: (c: PaletteContribution) => { vcheck("Palette command must be a non-empty string")(c.command); return trap(this._p.register, this._p, deps)(c); }, list: () => this._p.list() },
+      devtools:   { register: (c: DevtoolsContribution) => { vcheck("Devtools id must be a non-empty string")(c.id); vcheck("Devtools title must be a non-empty string")(c.title); return trap(this._d.register, this._d, deps)(c); }, list: () => this._d.list() },
+      themes:     { register: (c: ThemeContribution) => { vcheck("Theme id must be a non-empty string")(c.id); vcheck("Theme title must be a non-empty string")(c.title); return trap(this._t.register, this._t, deps)(c); }, list: () => this._t.list() },
+      examples:   { register: (c: ExampleContribution) => { vcheck("Example id must be a non-empty string")(c.id); vcheck("Example title must be a non-empty string")(c.title); return trap(this._e.register, this._e, deps)(c); }, list: () => this._e.list() },
       subscriptions: subs,
     };
     try { await ext.activate(ctx); this._actv.set(id, { ext, deps, ctx }); this._diag.set(id, { id, status: "active" }); return true; }
