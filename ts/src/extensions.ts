@@ -72,7 +72,9 @@ export interface Extension {
  * @pre-GA — Plugin APIs may break before v1.0.
  */
 export interface ExtensionContext {
-	readonly commands: Pick<CommandRegistry, "register" | "execute" | "get" | "list">;
+	/** Full CommandRegistry — extensions may register and execute commands. */
+	readonly commands: CommandRegistry;
+	/** Bounded keymap surface — setRegistry is withheld (host-layer wiring). */
 	readonly keymaps: Pick<KeymapRegistry, "register" | "resolve">;
 	readonly palette: ContributionRegistration<PaletteContribution>;
 	readonly devtools: ContributionRegistration<DevtoolsContribution>;
