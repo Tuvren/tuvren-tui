@@ -12,7 +12,7 @@ export class ContributionRegistry<T> implements ContributionRegistration<T> {
   private _: T[] = [];
   register(c: T): Disposable {
     this._.push(c); let g = false;
-    return { dispose: () => { if (g) return; g = true; this._.splice(this._.indexOf(c), 1); } };
+    return { dispose: () => { if (g) return; g = true; const i = this._.indexOf(c); if (i !== -1) this._.splice(i, 1); } };
   }
   list(): T[] { return this._.slice(); }
 }
@@ -67,6 +67,7 @@ export class ExtensionRegistry {
   }
 
   async activate(id: string): Promise<boolean> {
+    if (this._actv.has(id)) return false;
     const ext = this._exts.get(id);
     if (!ext) return false;
     const deps: Disposable[] = [];
@@ -81,7 +82,7 @@ export class ExtensionRegistry {
       subscriptions: subs,
     };
     try { await ext.activate(ctx); this._actv.set(id, { ext, deps, ctx }); this._diag.set(id, { id, status: "active" }); return true; }
-    catch (e: unknown) { for (const d of deps) d.dispose(); this._diag.set(id, { id, status: "activation-failed", error: e instanceof Error ? e.message : String(e) }); return true; }
+    catch (e: unknown) { for (const d of deps) d.dispose(); for (const s of subs) try { s.dispose(); } catch { /* best-effort */ } this._diag.set(id, { id, status: "activation-failed", error: e instanceof Error ? e.message : String(e) }); return true; }
   }
 
   async deactivate(id: string): Promise<boolean> {

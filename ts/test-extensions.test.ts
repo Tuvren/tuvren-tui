@@ -82,6 +82,17 @@ describe("ContributionRegistry", () => {
     const r = new ContributionRegistry<string>();
     expect(r.list()).toEqual([]);
   });
+
+  test("double-dispose does not remove other items", () => {
+    const r = new ContributionRegistry<string>();
+    r.register("a");
+    const db = r.register("b");
+    r.register("c");
+    // Double-dispose item "b"
+    db.dispose();
+    db.dispose();
+    expect(r.list()).toEqual(["a", "c"]);
+  });
 });
 
 // ── ExtensionRegistry — registration and lifecycle ───────────────────────────
@@ -148,6 +159,15 @@ describe("ExtensionRegistry — activation", () => {
     r.register(makeExtension("ext.a"));
     expect(await r.activate("ext.a")).toBe(true);
     expect(await r.activate("nonexistent")).toBe(false);
+  });
+
+  test("double activation is rejected and returns false", async () => {
+    const r = new ExtensionRegistry();
+    r.register(makeExtension("ext.dup"));
+    expect(await r.activate("ext.dup")).toBe(true);
+    expect(await r.activate("ext.dup")).toBe(false);
+    // The extension should still be active after the rejected second call
+    expect(r.isActive("ext.dup")).toBe(true);
   });
 
   test("commands registered during activation appear in the shared registry", async () => {
@@ -221,19 +241,20 @@ describe("ExtensionRegistry — deactivation", () => {
     expect(disposed).toBe(true);
   });
 
-  test("disposing a registered extension deactivates it first", async () => {
+  test("disposing an active extension auto-deactivates and cleans up contributions", async () => {
     const r = new ExtensionRegistry();
-    r.register(makeExtension("ext.auto", (ctx) => {
-      ctx.commands.register(noopCommand("plugin.auto"));
+    const cmd = noopCommand("plugin.auto");
+    const d = r.register(makeExtension("ext.auto", (ctx) => {
+      ctx.commands.register(cmd);
     }));
-    const d = r.register(makeExtension("ext.b"));
     await r.activate("ext.auto");
     expect(r.commands.get("plugin.auto")).toBeDefined();
 
     // Dispose the extension registration — should auto-deactivate
     d.dispose();
-    // Verify ext.b is gone from list
-    expect(r.list().find((e) => e.id === "ext.b")).toBeUndefined();
+    // Verify the command was removed via auto-deactivation
+    expect(r.commands.get("plugin.auto")).toBeUndefined();
+    expect(r.list().find((e) => e.id === "ext.auto")).toBeUndefined();
   });
 });
 
@@ -265,6 +286,18 @@ describe("ExtensionRegistry — failure isolation", () => {
     expect(badDiag).toBeDefined();
     expect(badDiag!.status).toBe("activation-failed");
     expect(badDiag!.error).toContain("boom");
+  });
+
+  test("activation failure cleans up subscription disposables", async () => {
+    const r = new ExtensionRegistry();
+    let subsDisposed = false;
+    r.register(makeExtension("ext.subfail", (ctx) => {
+      ctx.subscriptions.push({ dispose: () => { subsDisposed = true; } });
+      throw new Error("boom");
+    }));
+    await r.activate("ext.subfail");
+    // The subscription should have been cleaned up after the failure
+    expect(subsDisposed).toBe(true);
   });
 
   test("successful activation appears as active in diagnostics", async () => {
