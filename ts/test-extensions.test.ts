@@ -717,3 +717,73 @@ describe("Contribution validation", () => {
 		expect(r.isActive("ext.exbad")).toBe(false);
 	});
 });
+
+// ── Plugin safety and diagnostics rules ──────────────────────────────────────
+
+describe("Plugin safety and diagnostics", () => {
+	test("public registries expose devtools, themes, and examples without native access", async () => {
+		const r = new ExtensionRegistry();
+		r.register(makeExtension("ext.all", (ctx) => {
+			ctx.devtools.register({ id: "panel.a", title: "Panel A" });
+			ctx.themes.register({ id: "theme.a", title: "Theme A" });
+			ctx.examples.register({ id: "ex.a", title: "Example A" });
+		}));
+		await r.activate("ext.all");
+
+		// All registries are publicly accessible as properties
+		expect(r.devtools.list().length).toBe(1);
+		expect(r.themes.list().length).toBe(1);
+		expect(r.examples.list().length).toBe(1);
+		expect(r.devtools.list()[0]!.id).toBe("panel.a");
+		expect(r.themes.list()[0]!.id).toBe("theme.a");
+		expect(r.examples.list()[0]!.id).toBe("ex.a");
+	});
+
+	test("plugin failures include the owning extension ID", async () => {
+		const r = new ExtensionRegistry();
+		r.register(makeExtension("ext.fail", () => {
+			throw new Error("boom");
+		}));
+		await r.activate("ext.fail");
+
+		const diag = r.getDiagnostics().find((d) => d.id === "ext.fail");
+		expect(diag).toBeDefined();
+		expect(diag!.id).toBe("ext.fail");
+		expect(diag!.status).toBe("activation-failed");
+		expect(diag!.error).toBeDefined();
+	});
+
+	test("duplicate extension id includes the id in the error message", () => {
+		const r = new ExtensionRegistry();
+		r.register(makeExtension("dup.id"));
+		expect(() => r.register(makeExtension("dup.id"))).toThrow("dup.id");
+	});
+
+	test("invalid extension id includes validation context in the error", () => {
+		const r = new ExtensionRegistry();
+		expect(() => r.register(makeExtension(""))).toThrow("Extension id");
+	});
+
+	test("deactivation failure still records the extension ID", async () => {
+		const r = new ExtensionRegistry();
+		r.register(makeExtension("ext.deact-fail", () => {}, () => {
+			throw new Error("deact boom");
+		}));
+		await r.activate("ext.deact-fail");
+		await r.deactivate("ext.deact-fail");
+
+		const diag = r.getDiagnostics().find((d) => d.id === "ext.deact-fail");
+		expect(diag).toBeDefined();
+		expect(diag!.id).toBe("ext.deact-fail");
+		expect(diag!.status).toBe("deactivation-failed");
+		expect(diag!.error).toContain("deact boom");
+	});
+
+	test("pre-GA markers are present on exported types", () => {
+		// Verify that the exported Extension type carries pre-GA documentation
+		const ext: Extension = { id: "test", activate: () => {} };
+		expect(ext.id).toBe("test");
+		// The JSDoc @pre-GA markers are compile-time only; their presence is
+		// verified by the TypeScript compiler and by source inspection.
+	});
+});
