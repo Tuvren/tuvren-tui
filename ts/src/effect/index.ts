@@ -88,6 +88,7 @@ export { KeymapRegistry } from "../keymap";
 export type { KeyBinding } from "../keymap";
 
 // Plugin Slots and Extensibility (Epic T, ADR-T46)
+export { ExtensionRegistry, ContributionRegistry } from "../extensions";
 export type {
 	Extension,
 	ExtensionContext,
