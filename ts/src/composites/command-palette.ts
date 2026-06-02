@@ -19,6 +19,7 @@ import { Box } from "../widgets/box";
 import { Buffer } from "buffer";
 import type { Command, CommandContext, CommandRegistry } from "../commands";
 import type { Tuvren } from "../app";
+import type { ContributionRegistration, PaletteContribution } from "../extensions";
 
 export type { Command };
 
@@ -30,6 +31,12 @@ export interface CommandPaletteOptions {
 	 * Accepts Command objects (title + run) for forward-compatibility.
 	 */
 	commands?: Command[];
+	/**
+	 * Optional palette contribution registry for title overrides from extensions.
+	 * When provided, palette entries are merged with the command registry to
+	 * allow extensions to override display titles.
+	 */
+	paletteRegistry?: ContributionRegistration<PaletteContribution>;
 	/** Tuvren app instance, required for registry-backed execute with full context. */
 	app?: Tuvren;
 	width?: string | number;
@@ -45,6 +52,7 @@ export class CommandPalette {
 	private list: List;
 	private _registry?: CommandRegistry;
 	private _staticCommands: Command[] = [];
+	private _paletteRegistry?: ContributionRegistration<PaletteContribution>;
 	private _app?: Tuvren;
 	private filteredCommands: Command[] = [];
 	private restoreFocusHandle = 0;
@@ -53,6 +61,7 @@ export class CommandPalette {
 	constructor(options: CommandPaletteOptions = {}) {
 		this._registry = options.registry;
 		this._staticCommands = options.commands ? [...options.commands] : [];
+		this._paletteRegistry = options.paletteRegistry;
 		this._app = options.app;
 
 		this.overlay = new Overlay({
@@ -97,6 +106,13 @@ export class CommandPalette {
 	/** Replace or attach the registry. */
 	setRegistry(registry: CommandRegistry): void {
 		this._registry = registry;
+		this.filteredCommands = [...this._sourceCommands()];
+		this._syncListItems();
+	}
+
+	/** Replace or attach the palette contribution registry. */
+	setPaletteRegistry(paletteRegistry: ContributionRegistration<PaletteContribution>): void {
+		this._paletteRegistry = paletteRegistry;
 		this.filteredCommands = [...this._sourceCommands()];
 		this._syncListItems();
 	}
@@ -230,7 +246,21 @@ export class CommandPalette {
 	}
 
 	private _sourceCommands(): Command[] {
-		return this._registry ? this._registry.list() : this._staticCommands;
+		const source = this._registry ? this._registry.list() : this._staticCommands;
+		if (!this._paletteRegistry) return source;
+
+		// Merge palette contributions: override titles where palette provides them
+		const paletteEntries = this._paletteRegistry.list();
+		const titleOverrides = new Map<string, string>();
+		for (const pe of paletteEntries) {
+			if (pe.title) titleOverrides.set(pe.command, pe.title);
+		}
+		if (titleOverrides.size === 0) return source;
+
+		return source.map((cmd) => {
+			const override = titleOverrides.get(cmd.id);
+			return override ? { ...cmd, title: override } : cmd;
+		});
 	}
 
 	private _syncListItems(): void {

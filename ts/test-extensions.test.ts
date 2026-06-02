@@ -500,6 +500,172 @@ describe("ExtensionRegistry — diagnostics", () => {
 	});
 });
 
+// ── CommandPalette + palette registry integration ────────────────────────────
+
+import { CommandPalette } from "./src/composites/command-palette";
+import { Tuvren } from "./src/app";
+
+describe("CommandPalette + palette registry integration", () => {
+	test("palette contributions override command titles", () => {
+		const r = new ExtensionRegistry();
+		r.commands.register({ id: "cmd.a", title: "Command A", run: () => {} });
+		r.commands.register({ id: "cmd.b", title: "Command B", run: () => {} });
+
+		// Register a palette override for cmd.a via the shared registry
+		r.palette.register({ command: "cmd.a", title: "Overridden A" });
+
+		const app = Tuvren.initHeadless(80, 24);
+		try {
+			const palette = new CommandPalette({
+				registry: r.commands,
+				paletteRegistry: r.palette,
+				app,
+			});
+			palette.open();
+			expect(palette.getFilteredCount()).toBe(2);
+
+			// Filter by the overridden title — should match exactly 1 command
+			palette.applyFilter("Overridden");
+			expect(palette.getFilteredCount()).toBe(1);
+
+			// Filter by the original title — should no longer match
+			palette.applyFilter("Command A");
+			expect(palette.getFilteredCount()).toBe(0);
+		} finally {
+			app.shutdown();
+		}
+	});
+
+	test("palette with no overrides shows original titles", () => {
+		const r = new ExtensionRegistry();
+		r.commands.register({ id: "cmd.a", title: "Command A", run: () => {} });
+
+		const app = Tuvren.initHeadless(80, 24);
+		try {
+			const palette = new CommandPalette({ registry: r.commands, app });
+			palette.open();
+			expect(palette.getFilteredCount()).toBe(1);
+			palette.applyFilter("Command A");
+			expect(palette.getFilteredCount()).toBe(1);
+		} finally {
+			app.shutdown();
+		}
+	});
+
+	test("deactivation removes palette contributions from CommandPalette", async () => {
+		const r = new ExtensionRegistry();
+		r.commands.register({ id: "cmd.a", title: "Command A", run: () => {} });
+		r.register(makeExtension("ext.pal", (ctx) => {
+			ctx.palette.register({ command: "cmd.a", title: "Overridden A" });
+		}));
+
+		const app = Tuvren.initHeadless(80, 24);
+		try {
+			await r.activate("ext.pal");
+			const palette = new CommandPalette({
+				registry: r.commands,
+				paletteRegistry: r.palette,
+				app,
+			});
+			palette.open();
+			expect(palette.getFilteredCount()).toBe(1);
+			palette.applyFilter("Overridden");
+			expect(palette.getFilteredCount()).toBe(1);
+
+			// After deactivation, the override should be gone
+			await r.deactivate("ext.pal");
+			palette.open();
+			palette.applyFilter("Overridden");
+			expect(palette.getFilteredCount()).toBe(0);
+			palette.applyFilter("Command A");
+			expect(palette.getFilteredCount()).toBe(1);
+		} finally {
+			app.shutdown();
+		}
+	});
+});
+
+// ── Plugin command dispatch ──────────────────────────────────────────────────
+
+import { CommandDispatcher } from "./src/commands";
+import type { TuvrenEvent } from "./src/events";
+import { KeyCode, Modifier } from "./src/ffi/structs";
+
+describe("Plugin command dispatch", () => {
+	function keyEvent(keyCode: number, modifiers = 0, codepoint = 0): TuvrenEvent {
+		return { type: "key", target: 0, keyCode, modifiers, codepoint };
+	}
+
+	test("plugin commands are dispatched through CommandDispatcher", async () => {
+		const app = Tuvren.initHeadless(80, 24);
+		const r = new ExtensionRegistry();
+		let ran = false;
+		r.commands.register({
+			id: "plugin.run",
+			title: "Plugin Run",
+			run: () => { ran = true; },
+		});
+		r.keymaps.setRegistry(r.commands);
+		r.register(makeExtension("ext.cmd", (ctx) => {
+			ctx.keymaps.register({ command: "plugin.run", key: "escape" });
+		}));
+		await r.activate("ext.cmd");
+
+		const dispatcher = new CommandDispatcher(r.commands, r.keymaps, app);
+		await dispatcher.dispatch(keyEvent(KeyCode.Escape));
+		expect(ran).toBe(true);
+		app.shutdown();
+	});
+
+	test("plugin deactivation removes keybindings", async () => {
+		const app = Tuvren.initHeadless(80, 24);
+		const r = new ExtensionRegistry();
+		let ran = false;
+		r.commands.register({
+			id: "plugin.run",
+			title: "Plugin Run",
+			run: () => { ran = true; },
+		});
+		r.keymaps.setRegistry(r.commands);
+		r.register(makeExtension("ext.cmd", (ctx) => {
+			ctx.keymaps.register({ command: "plugin.run", key: "escape" });
+		}));
+		await r.activate("ext.cmd");
+
+		const dispatcher = new CommandDispatcher(r.commands, r.keymaps, app);
+		await dispatcher.dispatch(keyEvent(KeyCode.Escape));
+		expect(ran).toBe(true);
+
+		// Reset and deactivate
+		ran = false;
+		await r.deactivate("ext.cmd");
+		await dispatcher.dispatch(keyEvent(KeyCode.Escape));
+		expect(ran).toBe(false);
+		app.shutdown();
+	});
+
+	test("plugin command context includes correct source", async () => {
+		const app = Tuvren.initHeadless(80, 24);
+		const r = new ExtensionRegistry();
+		let capturedSource: string | undefined;
+		r.commands.register({
+			id: "plugin.run",
+			title: "Plugin Run",
+			run: (ctx) => { capturedSource = ctx.source; },
+		});
+		r.keymaps.setRegistry(r.commands);
+		r.register(makeExtension("ext.cmd", (ctx) => {
+			ctx.keymaps.register({ command: "plugin.run", key: "f1" });
+		}));
+		await r.activate("ext.cmd");
+
+		const dispatcher = new CommandDispatcher(r.commands, r.keymaps, app);
+		await dispatcher.dispatch(keyEvent(KeyCode.F1));
+		expect(capturedSource).toBe("keymap");
+		app.shutdown();
+	});
+});
+
 // ── Contribution validation ──────────────────────────────────────────────────
 
 describe("Contribution validation", () => {
