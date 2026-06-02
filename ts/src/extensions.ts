@@ -5,6 +5,8 @@
 import { CommandRegistry } from "./commands";
 import type { Command, CommandContext, Disposable } from "./commands";
 import { KeymapRegistry } from "./keymap";
+import type { KeyBinding } from "./keymap";
+import type { TuvrenEvent } from "./events";
 import { TuvrenError } from "./errors";
 
 /** @pre-GA — Plugin APIs may break before v1.0 (ADR-T46). */
@@ -42,8 +44,8 @@ export interface Extension {
  * @pre-GA — Plugin APIs may break before v1.0.
  */
 export interface ExtensionContext {
-  readonly commands: CommandRegistry;
-  readonly keymaps: KeymapRegistry;
+  readonly commands: Pick<CommandRegistry, "register" | "execute" | "get" | "list">;
+  readonly keymaps: Pick<KeymapRegistry, "register" | "resolve">;
   readonly palette: ContributionRegistration<PaletteContribution>;
   readonly devtools: ContributionRegistration<DevtoolsContribution>;
   readonly themes: ContributionRegistration<ThemeContribution>;
@@ -58,8 +60,8 @@ export interface ExtensionDiagnostic {
 }
 
 // Helpers: wrap register to auto-track disposables.
-const trap = (f: (...a: unknown[]) => Disposable, self: unknown, t: Disposable[]) =>
-  (...a: unknown[]) => { const d = f.apply(self, a) as Disposable; t.push(d); return d; };
+const trap = <A extends unknown[]>(f: (...args: A) => Disposable, self: unknown, t: Disposable[]) =>
+  (...args: A) => { const d = f.apply(self, args) as Disposable; t.push(d); return d; };
 
 // Validated wrapper: throws TuvrenError if validation fails before registering.
 const vcheck = (msg: string) => (v: unknown) => {
@@ -84,6 +86,7 @@ export class ExtensionRegistry {
   private readonly _exts = new Map<string, Extension>();
   private readonly _actv = new Map<string, { ext: Extension; deps: Disposable[]; ctx: ExtensionContext }>();
   private readonly _diag = new Map<string, ExtensionDiagnostic>();
+  private readonly _inflight = new Map<string, Promise<boolean>>();
 
   register(ext: Extension): Disposable {
     if (typeof ext.id !== "string" || ext.id.trim() === "") throw new TuvrenError("Extension id must be a non-empty string", -1);
@@ -102,6 +105,14 @@ export class ExtensionRegistry {
   }
 
   async activate(id: string): Promise<boolean> {
+    const inflight = this._inflight.get(id);
+    if (inflight !== undefined) return inflight;
+    const op = this._activateInner(id);
+    this._inflight.set(id, op);
+    try { return await op; } finally { this._inflight.delete(id); }
+  }
+
+  private async _activateInner(id: string): Promise<boolean> {
     if (this._actv.has(id)) return false;
     const ext = this._exts.get(id);
     if (!ext) return false;
@@ -110,7 +121,7 @@ export class ExtensionRegistry {
     const ctx: ExtensionContext = {
       commands: { register: trap(this.commands.register, this.commands, deps), execute: (id, c) => this.commands.execute(id, c), get: (id) => this.commands.get(id), list: () => this.commands.list() },
       // setRegistry is intentionally excluded — host-layer wiring, not extension surface.
-      keymaps: { register: trap(this.keymaps.register, this.keymaps, deps), resolve: (e, c) => this.keymaps.resolve(e as Parameters<typeof this.keymaps.resolve>[0], c) },
+      keymaps: { register: trap(this.keymaps.register, this.keymaps, deps), resolve: (e: TuvrenEvent, c: CommandContext) => this.keymaps.resolve(e, c) },
       palette:    { register: (c: PaletteContribution) => { vcheck("Palette command must be a non-empty string")(c.command); return trap(this._p.register, this._p, deps)(c); }, list: () => this._p.list() },
       devtools:   { register: (c: DevtoolsContribution) => { vcheck("Devtools id must be a non-empty string")(c.id); vcheck("Devtools title must be a non-empty string")(c.title); return trap(this._d.register, this._d, deps)(c); }, list: () => this._d.list() },
       themes:     { register: (c: ThemeContribution) => { vcheck("Theme id must be a non-empty string")(c.id); vcheck("Theme title must be a non-empty string")(c.title); return trap(this._t.register, this._t, deps)(c); }, list: () => this._t.list() },
@@ -127,6 +138,14 @@ export class ExtensionRegistry {
   }
 
   async deactivate(id: string): Promise<boolean> {
+    const inflight = this._inflight.get(id);
+    if (inflight !== undefined) return inflight;
+    const op = this._deactivateInner(id);
+    this._inflight.set(id, op);
+    try { return await op; } finally { this._inflight.delete(id); }
+  }
+
+  private async _deactivateInner(id: string): Promise<boolean> {
     const a = this._actv.get(id);
     if (!a) return false;
     if (a.ext.deactivate) try { await a.ext.deactivate(); } catch (e: unknown) { this._diag.set(id, { id, status: "deactivation-failed", error: e instanceof Error ? e.message : String(e) }); }
