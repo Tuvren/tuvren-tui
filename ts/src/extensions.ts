@@ -114,6 +114,9 @@ export class ExtensionRegistry {
   }
 
   private async _activateInner(id: string): Promise<boolean> {
+    // Wait for any in-flight deactivation to complete first
+    const deactOp = this._deactInflight.get(id);
+    if (deactOp !== undefined) await deactOp;
     if (this._actv.has(id)) return false;
     const ext = this._exts.get(id);
     if (!ext) return false;
@@ -147,9 +150,12 @@ export class ExtensionRegistry {
   }
 
   private async _deactivateInner(id: string): Promise<boolean> {
+    // Wait for any in-flight activation to complete first
+    const actOp = this._actInflight.get(id);
+    if (actOp !== undefined) await actOp;
     const a = this._actv.get(id);
     if (!a) return false;
-    if (a.ext.deactivate) try { await a.ext.deactivate(); } catch (e: unknown) { this._diag.set(id, { id, status: "deactivation-failed", error: e instanceof Error ? e.message : String(e) }); }
+    if (a.ext.deactivate) try { await a.ext.deactivate(); } catch (e: unknown) { if (this._exts.has(id)) this._diag.set(id, { id, status: "deactivation-failed", error: e instanceof Error ? e.message : String(e) }); }
     for (const d of [...a.deps, ...a.ctx.subscriptions]) try { d.dispose(); } catch { /* best-effort */ }
     this._actv.delete(id);
     if (this._diag.get(id)?.status === "active") this._diag.set(id, { id, status: "inactive" });
