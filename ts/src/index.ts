@@ -66,6 +66,18 @@ export type {
 export { KeymapRegistry } from "./keymap";
 export type { KeyBinding } from "./keymap";
 
+// Plugin Slots and Extensibility (Epic T, ADR-T46)
+export type {
+	Extension,
+	ExtensionContext,
+	ExtensionDiagnostic,
+	ContributionRegistration,
+	PaletteContribution,
+	DevtoolsContribution,
+	ThemeContribution,
+	ExampleContribution,
+} from "./extensions";
+
 // App-Shaped Surface Composites (Epic K, ADR-T35)
 export { CommandPalette } from "./composites/command-palette";
 export type { CommandPaletteOptions } from "./composites/command-palette";
