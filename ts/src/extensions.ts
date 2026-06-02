@@ -57,6 +57,10 @@ export class ExtensionRegistry {
   private readonly _d = new ContributionRegistry<DevtoolsContribution>();
   private readonly _t = new ContributionRegistry<ThemeContribution>();
   private readonly _e = new ContributionRegistry<ExampleContribution>();
+  readonly palette = this._p;
+  readonly devtools = this._d;
+  readonly themes = this._t;
+  readonly examples = this._e;
   private readonly _exts = new Map<string, Extension>();
   private readonly _actv = new Map<string, { ext: Extension; deps: Disposable[]; ctx: ExtensionContext }>();
   private readonly _diag = new Map<string, ExtensionDiagnostic>();

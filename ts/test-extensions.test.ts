@@ -550,29 +550,26 @@ describe("CommandPalette + palette registry integration", () => {
     r.commands.register({ id: "cmd.a", title: "Command A", run: () => {} });
     r.commands.register({ id: "cmd.b", title: "Command B", run: () => {} });
 
-    // Simulate what the extension would do: register palette overrides
-    r.register(makeExtension("ext.pal-integ", (ctx) => {
-      ctx.palette.register({ command: "cmd.a", title: "Overridden A" });
-    }));
-
-    // Verify the palette registry has the contribution (activation not needed for this test)
-    // The palette registry is internal to ExtensionRegistry, so we test via extensions
-    const pal = new ContributionRegistry<PaletteContribution>();
-    pal.register({ command: "cmd.a", title: "Overridden A" });
+    // Register a palette override for cmd.a via the shared registry
+    r.palette.register({ command: "cmd.a", title: "Overridden A" });
 
     const app = Tuvren.initHeadless(80, 24);
     try {
       const palette = new CommandPalette({
         registry: r.commands,
-        paletteRegistry: pal,
+        paletteRegistry: r.palette,
         app,
       });
       palette.open();
-      // check list titles
-      const count = palette.getFilteredCount();
-      expect(count).toBe(2);
-      // Command A should have overridden title
-      expect(palette.getQuery()).toBe(""); // no filter active
+      expect(palette.getFilteredCount()).toBe(2);
+
+      // Filter by the overridden title — should match exactly 1 command
+      palette.applyFilter("Overridden");
+      expect(palette.getFilteredCount()).toBe(1);
+
+      // Filter by the original title — should no longer match (title was overridden)
+      palette.applyFilter("Command A");
+      expect(palette.getFilteredCount()).toBe(0);
     } finally {
       app.shutdown();
     }
@@ -586,6 +583,8 @@ describe("CommandPalette + palette registry integration", () => {
     try {
       const palette = new CommandPalette({ registry: r.commands, app });
       palette.open();
+      expect(palette.getFilteredCount()).toBe(1);
+      palette.applyFilter("Command A");
       expect(palette.getFilteredCount()).toBe(1);
     } finally {
       app.shutdown();
