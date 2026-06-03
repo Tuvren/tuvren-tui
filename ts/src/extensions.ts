@@ -144,9 +144,17 @@ function makeRegistry<T>(validate?: (c: T) => void): ContributionRegistration<T>
 export class ExtensionRegistry {
 	readonly commands = new CommandRegistry();
 	readonly keymaps = new KeymapRegistry();
-	private readonly _p = makeRegistry<PaletteContribution>(
-		(c) => vcheck("Palette command must be a non-empty string")(c.command),
-	);
+	private readonly _p = makeRegistry<PaletteContribution>((c) => {
+		vcheck("Palette command must be a non-empty string")(c.command);
+		// Reject empty-string title — it is ambiguous and currently
+		// ignored by CommandPalette._sourceCommands().
+		if (typeof c.title === "string" && c.title.trim() === "") {
+			throw new TuvrenError(
+				"Palette title must be a non-empty string (or undefined)",
+				-1,
+			);
+		}
+	});
 	private readonly _d = makeRegistry<DevtoolsContribution>((c) => {
 		vcheck("Devtools id must be a non-empty string")(c.id);
 		vcheck("Devtools title must be a non-empty string")(c.title);
@@ -246,22 +254,12 @@ export class ExtensionRegistry {
 			keymaps: {
 				register: trap(this.keymaps.register, this.keymaps, deps),
 				resolve: (e: TuvrenEvent, c) =>
-					// Inject default source so plugins don't have to provide it.
-					this.keymaps.resolve(e, { source: "plugin", ...c } as CommandContext),
+					// Inject default source so plugins don't have to provide it;
+					// guard against single-argument calls (c may be undefined at runtime).
+					this.keymaps.resolve(e, { source: "plugin", ...(c ?? {}) } as CommandContext),
 			},
 			palette: {
-				register: (c: PaletteContribution) => {
-					vcheck("Palette command must be a non-empty string")(c.command);
-					// Reject empty-string title — it is ambiguous and currently
-					// ignored by CommandPalette._sourceCommands().
-					if (typeof c.title === "string" && c.title.trim() === "") {
-						throw new TuvrenError(
-							"Palette title must be a non-empty string (or undefined)",
-							-1,
-						);
-					}
-					return trap(this._p.register, this._p, deps)(c);
-				},
+				register: trap(this._p.register, this._p, deps),
 				list: () => this._p.list(),
 			},
 			devtools: {
