@@ -1,6 +1,7 @@
 # Product Requirements Document
 
 ## 0. Version History & Changelog
+- v2.7.0 - Bumped host bundle budget from 75KB to 100KB to accommodate framework-level services (commands/keymaps, Effect, plugin slots) shipped in Epics R–T while keeping the TypeScript layer intentionally thin.
 - v2.6.0 - Clarified Epic 12 as a package-first Effect application surface over the same native runtime authority and aligned the product language with the shipped Epic S package model.
 - v2.5.0 - Sequenced the next framework waves as commands/keymaps, Effect, plugin slots, SDK productization, and first public npm release as a pre-GA `0.1.0` feedback loop.
 - v2.4.0 - Reframed the product as a general-purpose framework, activated productization and framework-foundation scope, and adopted the future public name Tuvren with an explicit Brownfield transition note.
@@ -183,7 +184,7 @@
 | **Performance** | Input latency stays below 50ms from keystroke to Surface update. | Keeps interaction below the threshold where terminal UIs feel sluggish. |
 | **Performance** | A Render Pass stays below 16ms when operating within the intended workload envelope. | Preserves 60fps-capable responsiveness for real-time dashboards and streaming workflows. |
 | **Performance** | Foreign-function overhead stays below 1ms per cross-boundary call. | Ensures the language boundary does not become the bottleneck. |
-| **Operability** | The host-language package stays below 75KB. | Keeps the TypeScript layer intentionally thin so the value remains in the Native Core. |
+| **Operability** | The host-language package stays below 100KB. | Keeps the TypeScript layer intentionally thin so the value remains in the Native Core. |
 | **Operability** | Supported public releases install and load on the supported glibc-based Linux, macOS, and Windows targets without requiring a local source build in the ordinary path. | Productized adoption depends on a trustworthy install path, not just a strong source-checkout story. |
 | **Operability** | Every supported public release target in the published matrix receives install and load smoke verification before the productization wave is considered complete. | Cross-platform credibility is part of the framework promise, not an optional afterthought. |
 | **Adoption** | Time to Hello World stays below 15 minutes for a competent TypeScript Developer. | Reinforces the primary JTBD: shipping faster. |

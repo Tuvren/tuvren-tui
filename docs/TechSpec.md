@@ -1,6 +1,8 @@
 # Technical Specification
 
 ## 0. Version History & Changelog
+- v8.1.0 - Bumped host bundle budget from 75KB to 100KB across `check-bundle.ts`, `test-runner.test.ts`, CI workflow, README, GatePolicy, PRD, and TechSpec to reflect framework growth from Epics R–T.
+- v8.0.0 - Ratified pre-GA plugin slot contract (Epic T): bounded extension contribution types (`CommandRegistry`, `KeymapRegistry`, palette, devtools, themes, examples), `ExtensionDiagnostic`, and `ExtensionContext` with `Pick<KeymapRegistry, "register" | "resolve">` to withhold `setRegistry` from extensions. TechSpec §4.6 updated to include `ExtensionDiagnostic` and bounded context surface.
 - v7.9.0 - Executed Epic S with the clarified package-first scope: `tuvren-tui/effect` now exposes a package-first authoring surface with `render()` / `testRender()`, JSX runtime exports, package-owned commands and keybindings, keyboard and terminal-size hooks, component tokens, retained advanced lifecycle helpers, updated package coverage, and a package-first `effect-counter.tsx` example over the same native runtime authority.
 - v7.8.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to consume the registry; `commandDispatcher` option wired into `app.run()` and `createLoop()`; 46 focused command/keymap tests added. Next active wave is Epic S (Effect Declarative Integration).
 - v7.7.0 - Extended the implementation contract through Epics R-V: command/keymap services, Effect integration, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
@@ -191,6 +193,7 @@ Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"l
 - ADR-T42 is now shipped under Epic P. The source tree exports `Tuvren` from `tuvren-tui`, resolves native libraries through `TUVREN_LIB_PATH`, and names release assets after Tuvren. The staged-prebuild path is removed; the resolver now searches TUVREN_LIB_PATH → aux scoped package → source build (repo-checkout only).
 - ADR-T44 is now shipped under Epic R. The Host Layer exposes `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` in `ts/src/commands.ts` and `ts/src/keymap.ts`. `CommandPalette` consumes a `CommandRegistry`. The `commandDispatcher` option is wired into `app.run()` and `createLoop()`. Key binding syntax is `[modifier+]*key`; duplicate command IDs throw; multiple bindings to the same key resolve first-registered-wins. The `source: "plugin"` discriminant is reserved for Epic T.
 - ADR-T45 is now shipped under Epic S. The Host Layer exposes `acquireApp()`, `acquireHeadlessApp()`, `makeTuvrenScope()`, `renderScoped()`, `streamEvents()`, and `createCommandService()` as advanced APIs, and also provides package-first `render()` / `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, keyboard and terminal-size hooks, a package-first `examples/effect-counter.tsx`, and expanded `ts/test-effect.test.ts` coverage.
+- ADR-T46 is now shipped under Epic T. The Host Layer exposes `ExtensionRegistry`, `ExtensionContext`, `ExtensionDiagnostic`, and bounded contribution registries for commands, keymaps, palette, devtools, themes, and examples. `CommandPalette` consumes a palette contribution registry for title overrides. Plugin APIs are pre-GA and marked with `@pre-GA` JSDoc. 58 focused tests in `ts/test-extensions.test.ts` and the `examples/plugin-demo.ts` example cover all slots.
 - The GitHub repository now lives at `Tuvren/tuvren-tui`. npm package publication is not shipped Brownfield behavior yet; Epic V owns the first public `0.1.0` publish after Epic U SDK productization.
 
 ## 3. State & Data Modeling
@@ -859,9 +862,15 @@ interface Extension {
   deactivate?(): void | Promise<void>;
 }
 
+interface ExtensionDiagnostic {
+  id: string;
+  status: "inactive" | "active" | "activation-failed" | "deactivation-failed";
+  error?: string;
+}
+
 interface ExtensionContext {
-  commands: CommandRegistry;
-  keymaps: KeymapRegistry;
+  commands: Pick<CommandRegistry, "register" | "execute" | "get" | "list">;
+  keymaps: Pick<KeymapRegistry, "register" | "resolve">;
   palette: PaletteContributionRegistry;
   devtools: DevtoolsContributionRegistry;
   themes: ThemeContributionRegistry;
@@ -1093,7 +1102,7 @@ multiplexer_policy:
   - Background rendering remains experimental and must not silently alter default lifecycle semantics.
   - Terminal protocol enhancements must be opt-in by capability and must restore terminal state during `tui_shutdown()` even when intermediate feature setup fails.
 - **Performance / Capacity Notes:**
-  - Bundle budget target is 75KB for the host package.
+  - Bundle budget target is 100KB for the host package.
   - Render and transcript replay budgets are enforced through benchmark and replay gates rather than prose-only goals.
   - Debug-off overhead must remain low enough that devtools can stay available without distorting ordinary use.
 
@@ -1135,7 +1144,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to t
 
 | Gate | Target | Current enforcement path |
 | --- | --- | --- |
-| Host bundle size | `< 75KB` | `bun run ts/check-bundle.ts` |
+| Host bundle size | `< 100KB` | `bun run ts/check-bundle.ts` |
 | Single FFI call overhead | `< 1ms` | `bun run ts/bench-ffi.ts` |
 | Render frame budget | `< 16ms` target envelope | `bun run ts/bench-render.ts` |
 | Goldens and native correctness | zero failures | `cargo test --manifest-path native/Cargo.toml` |
