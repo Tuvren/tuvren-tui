@@ -7,7 +7,7 @@
  * Run: bun test ts/test-extensions.test.ts
  */
 
-import { describe, test, expect, beforeEach } from "bun:test";
+import { describe, test, expect } from "bun:test";
 import {
 	ExtensionRegistry,
 } from "./src/extensions";
@@ -345,10 +345,16 @@ describe("ExtensionRegistry — failure isolation", () => {
 		}));
 		await r.activate("ext.dispose-fail");
 		d.dispose();
-		// Allow the fire-and-forget deactivation to settle
-		await new Promise((resolve) => setTimeout(resolve, 10));
+		// Poll until deactivation settles — the fire-and-forget dispose path
+		// defers diagnostic cleanup so we must wait for it to land.
+		const deadline = Date.now() + 500;
+		let diag: ExtensionDiagnostic | undefined;
+		while (Date.now() < deadline) {
+			diag = r.getDiagnostics().find((d_) => d_.id === "ext.dispose-fail");
+			if (diag && diag.status !== "active") break;
+			await new Promise((resolve) => setTimeout(resolve, 1));
+		}
 
-		const diag = r.getDiagnostics().find((d_) => d_.id === "ext.dispose-fail");
 		expect(diag).toBeDefined();
 		expect(diag!.status).toBe("deactivation-failed");
 		expect(diag!.error).toContain("dispose deactivation failed");

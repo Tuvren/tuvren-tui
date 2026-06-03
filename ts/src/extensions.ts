@@ -23,7 +23,7 @@
  *   - Deactivation disposes all contributed resources tracked through the context.
  */
 
-import { CommandRegistry, type Disposable } from "./commands";
+import { CommandRegistry, type Disposable, type CommandContext } from "./commands";
 import { KeymapRegistry } from "./keymap";
 import { TuvrenError } from "./errors";
 import type { TuvrenEvent } from "./events";
@@ -115,10 +115,11 @@ function vcheck(msg: string): (v: unknown) => void {
 
 // ── Internal contribution registry helper ────────────────────────────────
 
-function makeRegistry<T>(): ContributionRegistration<T> {
+function makeRegistry<T>(validate?: (c: T) => void): ContributionRegistration<T> {
 	const items: T[] = [];
 	return {
 		register(c: T): Disposable {
+			if (validate) validate(c);
 			items.push(c);
 			let gone = false;
 			return {
@@ -143,10 +144,21 @@ function makeRegistry<T>(): ContributionRegistration<T> {
 export class ExtensionRegistry {
 	readonly commands = new CommandRegistry();
 	readonly keymaps = new KeymapRegistry();
-	private readonly _p = makeRegistry<PaletteContribution>();
-	private readonly _d = makeRegistry<DevtoolsContribution>();
-	private readonly _t = makeRegistry<ThemeContribution>();
-	private readonly _e = makeRegistry<ExampleContribution>();
+	private readonly _p = makeRegistry<PaletteContribution>(
+		(c) => vcheck("Palette command must be a non-empty string")(c.command),
+	);
+	private readonly _d = makeRegistry<DevtoolsContribution>((c) => {
+		vcheck("Devtools id must be a non-empty string")(c.id);
+		vcheck("Devtools title must be a non-empty string")(c.title);
+	});
+	private readonly _t = makeRegistry<ThemeContribution>((c) => {
+		vcheck("Theme id must be a non-empty string")(c.id);
+		vcheck("Theme title must be a non-empty string")(c.title);
+	});
+	private readonly _e = makeRegistry<ExampleContribution>((c) => {
+		vcheck("Example id must be a non-empty string")(c.id);
+		vcheck("Example title must be a non-empty string")(c.title);
+	});
 	readonly palette = this._p;
 	readonly devtools = this._d;
 	readonly themes = this._t;
@@ -233,11 +245,21 @@ export class ExtensionRegistry {
 			},
 			keymaps: {
 				register: trap(this.keymaps.register, this.keymaps, deps),
-				resolve: (e: TuvrenEvent, c) => this.keymaps.resolve(e, c),
+				resolve: (e: TuvrenEvent, c) =>
+					// Inject default source so plugins don't have to provide it.
+					this.keymaps.resolve(e, { source: "plugin", ...c } as CommandContext),
 			},
 			palette: {
 				register: (c: PaletteContribution) => {
 					vcheck("Palette command must be a non-empty string")(c.command);
+					// Reject empty-string title — it is ambiguous and currently
+					// ignored by CommandPalette._sourceCommands().
+					if (typeof c.title === "string" && c.title.trim() === "") {
+						throw new TuvrenError(
+							"Palette title must be a non-empty string (or undefined)",
+							-1,
+						);
+					}
 					return trap(this._p.register, this._p, deps)(c);
 				},
 				list: () => this._p.list(),
