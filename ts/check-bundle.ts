@@ -11,7 +11,7 @@
 
 import { rmSync } from "fs";
 
-const BUDGET_BYTES = 100 * 1024; // 100KB
+const BUDGET_BYTES = 100 * 1024; // 100KB (increased from 75KB per Epic T closeout)
 
 // Resolve paths relative to this script, not cwd
 const scriptDir = import.meta.dir;

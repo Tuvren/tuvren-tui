@@ -1,6 +1,7 @@
 # Engineering Execution Plan
 
 ## 0. Version History & Changelog
+- v8.2.0 - Executed Epic T: `ExtensionRegistry` with activation/deactivation lifecycle, bounded contribution slots for commands, keymaps, palette, devtools, themes, and examples; `ContributionRegistration<T>` contract and `makeRegistry<T>()` helper; `CommandPalette` extended with `paletteRegistry`; 60 focused tests in `test-extensions.test.ts`; `examples/plugin-demo.ts` exercising all slots; bundle at 79.6 KB under 100 KB budget. Epic U is now the active wave.
 - v8.1.0 - Executed Epic S with the clarified package-first scope: `tuvren-tui/effect` now exposes package-first `render()` / `testRender()`, JSX runtime exports, component tokens, package-owned command/keybinding hooks, retained advanced lifecycle helpers, an updated `effect-counter.tsx` example, and focused package coverage in `ts/test-effect.test.ts`.
 - v8.0.0 - Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to the registry; `commandDispatcher` wired into `app.run()` and `createLoop()`; 46 focused tests in `test-commands.test.ts`; all 433 host tests pass; bundle at 72.2 KB under 75 KB budget. Epic S is now the active wave.
 - v7.9.0 - Planned the full Epics R-V sequence: commands/keymaps, Effect, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
@@ -132,7 +133,7 @@ See archived summary in §6. All five tickets (EFF-S001 through EFF-S005) are co
 
 ### Epic T — Plugin Slots and Extensibility (EXT) — SHIPPED
 
-Shipped as a pre-GA framework-services wave. It added bounded extension contribution points (`ExtensionRegistry`, `ExtensionContext`, `ExtensionDiagnostic`) for commands, keymaps, palette title overrides, devtools panels, theme presets, and showcase/example metadata. The `ContributionRegistration<T>` contract and `makeRegistry<T>()` helper provide generic in-memory contribution tracking. `ExtensionRegistry` handles activation, deactivation, subscription cleanup, failure isolation by extension ID, and in-flight serialization between concurrent activate/deactivate calls. `CommandPalette` was extended to consume a `paletteRegistry` for title overrides. 58 focused tests in `ts/test-extensions.test.ts` cover registration, activation, deactivation, failure isolation, all six contribution slots, CommandPalette integration, plugin command dispatch via `CommandDispatcher`, validation, and safety rules. The `examples/plugin-demo.ts` example exercises all contribution types plus diagnostics. Bundle at 78.9 KB under 100 KB budget.
+See archived summary in §6. All six tickets (EXT-T001 through EXT-T006) are complete.
 
 ### Epic U — SDK Productization / Expert-Level DX (SDK)
 
@@ -364,7 +365,7 @@ And feedback can inform the post-v0.1 roadmap before v1.0 commitments
 
 ### 6.1 Archived Epic T — Plugin Slots and Extensibility
 
-Epic T is archived as a shipped pre-GA framework-services wave. It added bounded extension contribution points (`ExtensionRegistry`, `ExtensionContext`, `ExtensionDiagnostic`) for commands, keymaps, palette title overrides, devtools panels, theme presets, and showcase/example metadata. `CommandPalette` was extended to consume a `paletteRegistry` for title overrides. 58 focused tests in `ts/test-extensions.test.ts` cover registration, activation, deactivation, failure isolation, all six contribution slots, CommandPalette integration, plugin command dispatch, validation, and safety rules. The `examples/plugin-demo.ts` example exercises all contribution types plus diagnostics. Bundle at 78.9 KB under 100 KB budget.
+Epic T is archived as a shipped pre-GA framework-services wave. It added bounded extension contribution points (`ExtensionRegistry`, `ExtensionContext`, `ExtensionDiagnostic`) for commands, keymaps, palette title overrides, devtools panels, theme presets, and showcase/example metadata. `CommandPalette` was extended to consume a `paletteRegistry` for title overrides. 60 focused tests in `ts/test-extensions.test.ts` cover registration, activation, deactivation, failure isolation, all six contribution slots, CommandPalette integration, plugin command dispatch, validation, and safety rules. The `examples/plugin-demo.ts` example exercises all contribution types plus diagnostics. Bundle at 79.6 KB under 100 KB budget.
 
 ### 6.2 Archived Epic R — Commands & Keymap Foundations
 

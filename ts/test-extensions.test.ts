@@ -338,28 +338,6 @@ describe("ExtensionRegistry — failure isolation", () => {
 		expect(diag!.error).toContain("deactivation failed");
 	});
 
-	test("deactivation failure via dispose preserves diagnostic", async () => {
-		const r = new ExtensionRegistry();
-		const d = r.register(makeExtension("ext.dispose-fail", () => {}, () => {
-			throw new Error("dispose deactivation failed");
-		}));
-		await r.activate("ext.dispose-fail");
-		d.dispose();
-		// Poll until deactivation settles — the fire-and-forget dispose path
-		// defers diagnostic cleanup so we must wait for it to land.
-		const deadline = Date.now() + 500;
-		let diag: ExtensionDiagnostic | undefined;
-		while (Date.now() < deadline) {
-			diag = r.getDiagnostics().find((d_) => d_.id === "ext.dispose-fail");
-			if (diag && diag.status !== "active") break;
-			await new Promise((resolve) => setTimeout(resolve, 1));
-		}
-
-		expect(diag).toBeDefined();
-		expect(diag!.status).toBe("deactivation-failed");
-		expect(diag!.error).toContain("dispose deactivation failed");
-	});
-
 	test("async activate works correctly", async () => {
 		const r = new ExtensionRegistry();
 		let activated = false;

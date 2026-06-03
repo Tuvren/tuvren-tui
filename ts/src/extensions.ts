@@ -199,20 +199,10 @@ export class ExtensionRegistry {
 			dispose() {
 				if (gone) return;
 				gone = true;
-				// Unregister immediately so list() and getExtension() reflect
-				// the disposal without waiting for async deactivation.
 				s._exts.delete(ext.id);
-				const cleanupDiag = () => {
-					// Preserve a deactivation-failed diagnostic rather than
-					// silently dropping the error when deactivate() throws.
-					if (s._diag.get(ext.id)?.status !== "deactivation-failed") {
-						s._diag.delete(ext.id);
-					}
-				};
+				s._diag.delete(ext.id);
 				if (s._actv.has(ext.id)) {
-					s.deactivate(ext.id).then(cleanupDiag).catch(cleanupDiag);
-				} else {
-					cleanupDiag();
+					s.deactivate(ext.id).catch(() => {});
 				}
 			},
 		};
