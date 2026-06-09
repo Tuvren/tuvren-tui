@@ -32,6 +32,86 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 - Activated the first post-Epic-O roadmap wave: Epic P covers the hard-cut Tuvren rename plus packaging and release trust, Epic Q covers adoption and framework positioning.
 
-## v7.0.0 - v7.5.0
+## v7.5.1
 
-- Substrate and hardening waves (Epic M, N, O) completed. Version history preserved in git logs.
+- Marked Epic O shipped after terminal capability state, multiplexer-aware degraded policy, Kitty keyboard disambiguation negotiation, OSC52 write-only clipboard, OSC8 link spans, and host diagnostics landed with native and Bun coverage.
+
+## v7.5.0
+
+- Framed Epic O as the next work-ready wave, sequenced terminal capability hardening behind a protocol/multiplexer spike, and moved completed Epic N work into archived continuity.
+
+## v7.4.1
+
+- Marked Epic N complete after the final authority-cut and coalescing audit: substrate-backed text/textarea/transcript paths are shipped, the benchmark gate is live, and the ticket table now reflects completion instead of in-flight target state.
+
+## v7.4.0
+
+- Reshaped Epic N to match Brownfield reality: added a contract-sync preflight, moved the substrate benchmark gate ahead of transcript migration, and expanded dirty ranges to record both replaced and replacement extents.
+
+## v7.3.11
+
+- Reflects review-wave 11 against PR #35. Substrate getters now return an explicit error instead of silently truncating when `usize` exceeds `u32::MAX`. Spike memo's dirty-range section documents that recorded extents are post-replacement only; CORE-N3 acceptance now requires a deliberate decision on whether to extend `DirtyRange` for incremental repaint or keep the cache-invalidation-only contract. `ts/test-ffi.test.ts` style/highlight/selection round-trip closes the remaining gap in the substrate FFI surface coverage.
+
+## v7.3.10
+
+- Reflects review-wave 10 against PR #35. ADR-T37 decision text updated to match shipped flat-`String` backing (rope/chunked deferred). Spike memo ABI ownership row reconciled with the borrowed-`&str` payload contract. `ts/test-ffi.test.ts` now exercises every wave-8 substrate FFI entry point end-to-end through `bun:ffi` so the host ABI signatures are mechanically validated, not just smoke-tested via symbol import.
+
+## v7.3.9
+
+- Reflects review-wave 9 against PR #35. `tui_text_view_get_cache_epoch` no longer returns a stale value: it projects before reading, so host code polling the epoch for view invalidation reliably observes changes from `set_wrap` / `set_viewport` / buffer mutation. Spike memo aligned with shipped one-boundary-copy payload contract.
+
+## v7.3.8
+
+- Reflects review-wave 8 against PR #35. Wired the substrate ABI into the Bun FFI symbol table — without this, the native `tui_text_buffer_*` / `tui_text_view_*` exports landed in Epic M but were inaccessible from TypeScript (`ffi.tui_text_buffer_create` was `undefined`). Also reconciled the §4.4 status-returning error-model list to include `tui_text_buffer_clear_dirty_ranges` so the contract is internally consistent for the wave-5 drain API.
+
+## v7.3.7
+
+- Reflects review-wave 7 against PR #35. Two renderer correctness fixes: (1) wave-5's wrap-boundary cursor suppression now also checks that the next visual row is within the rendered window — without this, a cursor at a wrap boundary disappeared when the next row was clipped by the viewport; (2) tabs no longer route through the wide-glyph `glyph_clipped` path, so clipped tab cells inside the rect get filled by the trailing-fill loop with the merged style instead of being left unstyled.
+
+## v7.3.6
+
+- Reflects review-wave 6 against PR #35. Two substrate correctness fixes plus three hot-path optimizations: (1) `wrap_segment` recomputes tab advance after wrap reset (column-dependent advance was stale, allowing multi-grapheme rows to overflow `wrap_width`); (2) cursor mapping now agrees across `set_cursor`, `byte_to_visual`, and `ensure_projection` reconciliation for offsets that fall in word-wrap consumed-whitespace gaps (set_cursor/byte_to_visual reject; reconciliation snaps forward); (3) `render_text_view` reads projection by reference instead of cloning `visual_lines`/`style_spans`/`highlights` per call; (4) `clear_last_error` peeks under a read lock first, skipping the write-lock acquisition when last_error is already empty (the common case after wave-3 made every successful FFI call clear); (5) `read_utf8_payload` returns `&str` instead of `String`, so substrate streaming-append paths copy each payload once into buffer storage rather than twice. Spike memo `CORE-M0-substrate-contract.md` updated to record the wave-5 dirty-range consume API.
+
+## v7.3.5
+
+- Reflects review-wave 5 against PR #35. Three substrate correctness fixes: (1) `wrap_segment` no longer emits visual lines whose `cell_width` exceeds `wrap_width` when the wrap break-point lands earlier in the segment than the for-loop's current grapheme — `run_col` is now recomputed against the iterated prefix after each wrap reset; (2) the renderer no longer double-draws the cursor at a soft-wrap boundary (end-of-row N marker is suppressed when row N+1 starts at the same byte); (3) left-clipped wide glyphs and tabs now paint their visible trailing cells, mirroring the right-edge clip path. New ABI: `tui_text_buffer_clear_dirty_ranges` lets consumers drain the dirty list so it doesn't grow unbounded; CORE-N3 picks up the wiring requirement. CORE-N1/N2/N3 acceptance criteria now require explicit substrate-routing assertions per migrated surface (G3/G4 behavioral coverage) and CORE-N1 picks up theme integration for highlight backgrounds. CORE-N5 benchmark scope expanded to include cursor-mapping cost as a function of prefix length so the wave-4 line-bounded scan question is measured before transcript-tail interactions ship.
+
+## v7.3.4
+
+- Reflects review-wave 4 against PR #35. Word-wrap no longer emits phantom zero-length visual rows when consumed inter-word whitespace precedes a long unbreakable token (the `last_ws` tracker is now scoped to the active run and the wrap branch refuses zero-length pushes). `is_grapheme_boundary` is now O(grapheme-position) instead of O(content) on no-match, removing a hidden quadratic in transcript-streaming workloads. Cursor `UNDERLINE` is restricted to the primary cell so wide-glyph and tab cursors don't smear the underline across trailing cells. `is_ws_grapheme`'s ASCII-only word-break set is documented. CORE-N3 is gated on a CORE-N5 append-cost benchmark before rebase ships, so the substrate's flat-`String` recompute-on-every-mutation cost cannot regress the transcript streaming path silently.
+
+## v7.3.3
+
+- Reflects review-wave 3 against PR #35. The substrate FFI now clears `last_error` on every successful call (via `ffi_wrap` / `ffi_wrap_handle` / `ffi_wrap_u64`), so the zero-sentinel getter contract is reliable in practice; added a Rust regression test for the stale-error-after-success path. `byte_to_visual` rejects non-grapheme offsets (matching `set_cursor` / `visual_to_byte`), making the byte<->visual mapping round-trippable for every accepted input. The unified renderer now fills every cell a tab grapheme advances through with the merged cell style, so selection / highlight / background coverage no longer leaves uncolored holes inside tab-expanded text. The `substrate_gates.rs` lede now matches the §5.4.1 reality (G3/G5/G6/G7/G8 enforced by named tests; G1/G4 source-review; G2 deferred to CORE-N2).
+
+## v7.3.2
+
+- Reflects review-wave 2 against PR #35. Documented the reality that substrate value-returning getters (`tui_text_buffer_get_*`, `tui_text_view_get_*`) cannot use the `0/-1/-2` status model and instead return `0` on error with the diagnostic surfaced through `tui_get_last_error()`; corrected stale §5.1 / "Appendix E" navigation references in the archived Epic M summary; updated `CORE-M2` notes to match shipped reality (10 `tui_text_view_*` FFI exports, expanded text_view test suite). Cursor reconciliation in `TextView` now snaps to a grapheme boundary, not just `byte_len`, so width-changing edits cannot strand the cursor inside a cluster.
+
+## v7.3.1
+
+- Reconciled `CORE-M4` description and acceptance with what the Epic-M gate suite actually enforces: G3/G5/G6/G7/G8 are covered by named native tests, G1/G4 are tracked as source-review gates, and G2 (TextArea undo without full snapshots) is deferred to `CORE-N2` along with `EditBuffer`. Reflects review-wave 1 against PR #35.
+
+## v7.3.0
+
+- Archived Epic M (Native Text Substrate) as completed: `CORE-M0` through `CORE-M4` shipped the contract memo, `TextBuffer`, `TextView`, the unified text renderer, and the §5.4.1 Unicode/wrapping gate suite. Active wave narrows to Epic N (Substrate Surface Rebase).
+
+## v7.2.0
+
+- Ratified Epic M (Native Text Substrate) and Epic N (Substrate Surface Rebase) as the active wave; documented Epic O (Terminal Capability Hardening) as deferred future scope; preserved the v6 and v7 archived appendices.
+
+## v7.1.0
+
+- Archived the completed docs-normalization wave and marked the active plan as intentionally idle until a post-v4 backlog is ratified.
+
+## v7.0.0
+
+- Reframed the plan around active versus archived scope, made documentation-chain normalization the current maintenance wave, and preserved the completed v4 execution record as archived continuity.
+
+## v6.0.0
+
+- Planned the transcript, devtools, split-pane, and flagship-example execution wave.
+
+## v5.0.0
+
+- Preserved the earlier v3 planning wave prior to the v4 focus reset.
