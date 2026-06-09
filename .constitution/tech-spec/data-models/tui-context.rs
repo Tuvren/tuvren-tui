@@ -1,11 +1,12 @@
 // TuiContext — root native UI state container
-// Corresponds to: .constitution/tech-spec/data-models/tui-context.rs
+// Schema snapshot — NOT COMPILED. Source: native/src/.
 
-use std::collections::{HashMap, VecDeque};
-use crate::terminal_capability::TerminalCapabilityState;
-use crate::theme::Theme;
-use crate::event::TuiEvent;
-use crate::debug::{DebugTraceEntry, DebugFrameSnapshot};
+#![allow(dead_code)]
+#![allow(unused_imports)]
+
+// NOT COMPILED — schema reference only.
+// These types are documented snapshots of native/src/ types.
+// They do not compile as a standalone crate.
 
 pub struct TuiContext {
     /// Next available Handle value. Handle(0) is permanently invalid.

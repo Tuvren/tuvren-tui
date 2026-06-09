@@ -1,5 +1,9 @@
 // NodeType — widget type enumeration
-// Corresponds to: .constitution/tech-spec/data-models/node-type.rs
+// Schema snapshot — NOT COMPILED. Source: native/src/.
+
+#![allow(dead_code)]
+
+// NOT COMPILED — schema reference only.
 
 #[repr(u8)]
 pub enum NodeType {

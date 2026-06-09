@@ -1,29 +1,13 @@
-# API Specification — Host Language Library
+# Tuvren TUI — Host Language Library API Contract
+# TechSpec stage: v8.1.0
+# NOT a standalone OpenAPI document — use the native .rs schema files
+# for authoritative type definitions. This file provides a machine-readable
+# summary of the host-facing API surface for linting and reference.
 
-## 0. Version
-
-**v8.1.0** — corresponds to the TechSpec version.
-
----
-
-## 1. Conventions
-
-- **Package:** `tuvren-tui` (Epic P rename shipped)
-- **Primary export:** `Tuvren` class
-- **Error type:** `TuvrenError`
-- **Handle type:** `u32` (opaque, `Handle(0)` is invalid sentinel)
-- **FFI convention:** `bun:ffi`, C ABI with `extern "C"`
-- **ABI error model:** `0` success, `-1` explicit error via `tui_get_last_error()`, `-2` panic at boundary
-
----
-
-## 2. Terminal Capabilities Interface
-
-```yaml
 openapi: 3.1.0
 info:
-  title: Tuvren TUI — Terminal Capabilities API
-  version: 0.1.0
+  title: Tuvren TUI — Host Language Library
+  version: 8.1.0
 
 components:
   schemas:
@@ -90,13 +74,7 @@ components:
           type: integer
         kittyKeyboardEnabled:
           type: boolean
-```
 
----
-
-## 3. Core App Interface
-
-```yaml
 paths:
   /app/capabilities:
     get:
@@ -142,4 +120,3 @@ paths:
             application/json:
               schema:
                 type: boolean
-```

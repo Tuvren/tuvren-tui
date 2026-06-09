@@ -1,5 +1,9 @@
 // EditBuffer — operation history for TextArea undo/redo (ADR-T38)
-// Corresponds to: .constitution/tech-spec/data-models/edit-buffer.rs
+// Schema snapshot — NOT COMPILED. Source: native/src/.
+
+#![allow(dead_code)]
+
+// NOT COMPILED — schema reference only.
 
 #[derive(Clone)]
 pub enum EditOp {
@@ -10,10 +14,7 @@ pub enum EditOp {
 }
 
 pub struct EditBuffer {
-    /// Handle of the backing TextBuffer.
     pub buffer: u32,
-    /// Operation history.
     pub history: Vec<EditOp>,
-    /// Current position in history for undo/redo. 0 means at the beginning (no ops applied).
     pub undo_cursor: usize,
 }

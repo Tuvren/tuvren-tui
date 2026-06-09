@@ -1,14 +1,10 @@
 // TuiNode — individual widget state node
-// Corresponds to: .constitution/tech-spec/data-models/tui-node.rs
+// Schema snapshot — NOT COMPILED. Source: native/src/.
 
-use crate::node_type::NodeType;
-use crate::accessibility::AccessibilityRole;
-use crate::transcript::TranscriptState;
-use crate::split_pane::SplitPaneState;
-use crate::table::TableState;
-use crate::list::ListState;
-use crate::tabs::TabsState;
-use crate::overlay::OverlayState;
+#![allow(dead_code)]
+#![allow(unused_imports)]
+
+// NOT COMPILED — schema reference only.
 
 pub struct TuiNode {
     pub node_type: NodeType,

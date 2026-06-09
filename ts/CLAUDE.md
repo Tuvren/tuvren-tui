@@ -2,7 +2,7 @@ CLAUDE.md — Host Language Bindings (TypeScript)
 
 Thin ergonomic wrapper over the Native Core via `bun:ffi`. This layer owns developer-facing ergonomics, composites, examples, resolver/install UX, and dev-session helpers, but it must not become a second source of mutable UI truth.
 
-See the repo-root `CLAUDE.md` for cross-layer rules and the canonical docs chain.
+See the repo-root `docs/CLAUDE.md` for cross-layer rules and the canonical four-stage constitution chain under `.constitution/`.
 
 ---
 
@@ -88,7 +88,7 @@ This layer translates developer intent into FFI calls or safe host composites. I
 - **Errors:** copy `tui_get_last_error()` immediately; never hold borrowed pointers.
 
 ### Resolver Contract
-- Preserve the Brownfield resolver contract unless the changes are part of the Epic P productization migration defined in `docs/Tasks.md`; for that wave, follow the approved target-state contract in `docs/TechSpec.md` §4.3.
+- Preserve the Brownfield resolver contract unless the changes are part of the Epic P productization migration defined in `.constitution/tasks/completed/EPIC-P-tuvren-identity.md`; for that wave, follow the approved target-state contract in `.constitution/tech-spec/stack.md` §4.3.
 - Brownfield search order is deterministic:
   1. `TUVREN_LIB_PATH`
   2. aux scoped package `@tuvren/tuvren-tui-<platform>-<arch>` via `import.meta.resolve()`

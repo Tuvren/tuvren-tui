@@ -1,7 +1,12 @@
 // TerminalCapabilityState — terminal feature detection and reporting
-// Corresponds to: .constitution/tech-spec/data-models/terminal-capability-state.rs
+// Schema snapshot — NOT COMPILED. Source: native/src/.
+
+#![allow(dead_code)]
+
+// NOT COMPILED — schema reference only.
 
 pub mod terminal_capability {
+    #![allow(dead_code)]
     pub const TRUECOLOR: u64 = 1 << 0;
     pub const COLOR_256: u64 = 1 << 1;
     pub const COLOR_16: u64 = 1 << 2;

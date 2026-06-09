@@ -348,11 +348,11 @@ bun run ts/bench-render.ts
 
 | Document | What it covers |
 |----------|---------------|
-| [PRD](./docs/PRD.md) | Product intent, actors, glossary, capabilities, scope |
-| [Architecture](./docs/Architecture.md) | Logical boundaries, container flows, resilience, risks |
-| [TechSpec](./docs/TechSpec.md) | ABI, state model, interface contracts, verification surface |
-| [Tasks](./docs/Tasks.md) | Active execution plan plus archived completed scope |
-| [GatePolicy](./docs/reports/GatePolicy.md) | CI quality gates and release verification policy |
+| [PRD](./.constitution/prd/vision.md) | Product intent, actors, glossary, capabilities, scope |
+| [Architecture](./.constitution/architecture/strategy.md) | Logical boundaries, container flows, resilience, risks |
+| [TechSpec](./.constitution/tech-spec/stack.md) | ABI, state model, interface contracts, verification surface |
+| [Tasks](./.constitution/tasks/critical-path.md) | Active execution plan plus archived completed scope |
+| [GatePolicy](./.constitution/reports/GatePolicy.md) | CI quality gates and release verification policy |
 | [Migration Guide](./docs/migration/kraken-to-tuvren.md) | Kraken → Tuvren hard-cut migration reference |
 
 ## License

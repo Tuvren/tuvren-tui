@@ -1,10 +1,9 @@
 // TranscriptState — transcript surface state
-// Corresponds to: .constitution/tech-spec/data-models/transcript-state.rs
+// Schema snapshot — NOT COMPILED. Source: native/src/.
 
-use std::collections::HashMap;
-use crate::transcript_block::TranscriptBlock;
-use crate::follow_mode::FollowMode;
-use crate::viewport_anchor::ViewportAnchorKind;
+#![allow(dead_code)]
+
+// NOT COMPILED — schema reference only.
 
 #[repr(u8)]
 pub enum SplitAxis {
@@ -14,7 +13,7 @@ pub enum SplitAxis {
 
 pub struct TranscriptState {
     pub blocks: Vec<TranscriptBlock>,
-    pub block_index: HashMap<u64, usize>,   // block_id -> blocks index
+    pub block_index: HashMap<u64, usize>,
     pub follow_mode: FollowMode,
     pub anchor_kind: ViewportAnchorKind,
     pub unread_anchor: Option<u64>,
