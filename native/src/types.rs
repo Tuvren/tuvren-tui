@@ -896,7 +896,7 @@ impl Default for SplitPaneState {
 
 /// Soft-wrap mode for `TextView`.
 ///
-/// Locked in `docs/spikes/CORE-M0-substrate-contract.md`.
+/// Locked in `.constitution/spikes/CORE-M0-substrate-contract.md`.
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum WrapMode {

@@ -4,7 +4,7 @@
 //! through `replace_range` / `append`; style spans, selections, and highlights
 //! are stored in byte units against the current epoch.
 //!
-//! Contract is locked in `docs/spikes/CORE-M0-substrate-contract.md`.
+//! Contract is locked in `.constitution/spikes/CORE-M0-substrate-contract.md`.
 
 use unicode_segmentation::UnicodeSegmentation;
 use unicode_width::UnicodeWidthStr;

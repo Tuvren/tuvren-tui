@@ -1,32 +1,48 @@
-CLAUDE.md
+# AI Agent Instruction Manual
 
-Guidance for AI agents working in this repository. Domain-specific details live in `native/CLAUDE.md` for the Rust core and `ts/CLAUDE.md` for the TypeScript/Bun host layer.
+Guidance for AI agents working in this repository. Domain-specific details
+live in `native/CLAUDE.md` for the Rust core and `ts/CLAUDE.md` for the
+TypeScript/Bun host layer.
 
 ---
 
 ## Project Overview
 
-**Tuvren TUI** (formerly Kraken TUI) is a Rust-native terminal UI engine with TypeScript/Bun bindings over FFI. Epic P completed the hard-cut rename; the codebase now uses `tuvren-tui`, `Tuvren`, `TUVREN_LIB_PATH`, `tuvren_tui` (crate), and `libtuvren_tui.*` throughout.
+**Tuvren TUI** is a Rust-native terminal UI engine with TypeScript/Bun bindings
+over FFI. Rust owns all mutable UI state. TypeScript holds opaque `u32` Handles
+and issues commands. Control flow is unidirectional: the Host Layer calls
+into the Native Core; the Native Core never calls back into the Host Layer.
 
-**Core invariant:** Rust owns all mutable UI state. TypeScript holds opaque `u32` Handles and issues commands. Control flow is unidirectional: the Host Layer calls into the Native Core; the Native Core never calls back into the Host Layer.
+---
 
-**Canonical document chain** (read in order for design and planning questions):
-1. [docs/PRD.md](./docs/PRD.md) — product intent, glossary, scope, and constraints
-2. [docs/Architecture.md](./docs/Architecture.md) — logical boundaries, containers, flows, and risks
-3. [docs/TechSpec.md](./docs/TechSpec.md) — concrete implementation contract, ABI, state model, and verification surface
-4. [docs/Tasks.md](./docs/Tasks.md) — active execution plan plus archived completed scope
+## Canonical Document Chain
+
+Read in order for design and planning questions:
+
+1. [`.constitution/prd/`](./.constitution/prd/) — product intent, actors,
+   glossary, capabilities, constraints, and scope
+2. [`.constitution/architecture/`](./.constitution/architecture/) — logical
+   boundaries, containers, flows, resilience, and risks
+3. [`.constitution/tech-spec/`](./.constitution/tech-spec/) — concrete
+   implementation contract, ABI, state model, and verification surface
+4. [`.constitution/tasks/`](./.constitution/tasks/) — active execution plan
+   plus archived completed scope
 
 **Information flow:** PRD -> Architecture -> TechSpec -> Tasks
 
 ---
 
-## Current Repo Status
+## Documentation Routing Table
 
-- The canonical docs chain is current and should be treated as the source of truth for planning work.
-- `Tasks.md` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), **Epic Q** (Adoption and Framework Positioning), **Epic R** (Commands & Keymap Foundations), and **Epic S** (Effect Declarative Integration) as shipped. Active scope is now planned through **Epic T** (Plugin Slots and Extensibility), **Epic U** (SDK Productization / Expert-Level DX), and **Epic V** (First Public npm Publish and Feedback Loop).
-- `Tasks.md` separates **active scope** from **archived completed scope**. Do not mistake archived waves for the current backlog.
-- README, onboarding materials, and public positioning were refreshed in Epic Q. First public npm publishing is deferred to Epic V as a pre-GA `0.1.0` release after SDK productization. The canonical docs chain is authoritative for roadmap and scope.
-- The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
+| If you need to know... | Target File |
+| --- | --- |
+| What product and scope Tuvren serves | `.constitution/prd/vision.md` |
+| Which term should be used consistently | `.constitution/prd/glossary.md` |
+| What the logical boundaries are | `.constitution/architecture/strategy.md` |
+| What concrete interfaces, state, and tests exist | `.constitution/tech-spec/stack.md` |
+| What should happen next | `.constitution/tasks/critical-path.md` |
+| What was already delivered in the previous wave | `.constitution/tasks/completed/` |
+| How CI and release gates currently work | `.constitution/reports/GatePolicy.md` |
 
 ---
 
@@ -71,7 +87,8 @@ cargo build --manifest-path native/Cargo.toml --release && bun run examples/syst
 cargo build --manifest-path native/Cargo.toml --release && bun run examples/accessibility-demo.tsx
 ```
 
-**Dependency note:** Run `cd ts && bun install` once after cloning to install `@preact/signals-core`.
+**Dependency note:** Run `cd ts && bun install` once after cloning to install
+`@preact/signals-core`.
 
 ---
 
@@ -87,7 +104,7 @@ Rust cdylib (single mutable UI authority)
   ├─ Render, Writer, Event, Scroll, Terminal
   ├─ Text + bounded Text Cache
   ├─ Native Text Substrate: TextBuffer + TextView + unified text renderer (ADR-T37)
-  ├─ Terminal Capability State: detection-first flags, OSC52, OSC8, Kitty keyboard negotiation
+  ├─ Terminal Capability State: detection-first flags, OSC52, OSC8, Kitty keyboard
   ├─ Transcript state and anchor-aware viewport semantics
   ├─ SplitPane layout and resize semantics
   ├─ Devtools: overlays, snapshots, traces, perf counters
@@ -95,7 +112,8 @@ Rust cdylib (single mutable UI authority)
   └─ Accessibility foundation on TuiNode metadata
 ```
 
-**FFI contract:** `0` success, `-1` explicit error via `tui_get_last_error()`, `-2` panic caught at the boundary. `Handle(0)` is the invalid sentinel.
+**FFI contract:** `0` success, `-1` explicit error via `tui_get_last_error()`,
+`-2` panic caught at the boundary. `Handle(0)` is the invalid sentinel.
 
 ---
 
@@ -103,25 +121,73 @@ Rust cdylib (single mutable UI authority)
 
 ### When changing product or planning docs
 1. Respect the document chain. Fix upstream artifacts before downstream artifacts.
-2. Keep each artifact in its own layer. Do not repair PRD or Architecture defects inside TechSpec or Tasks.
+2. Keep each artifact in its own layer. Do not repair PRD or Architecture
+   defects inside TechSpec or Tasks.
 3. Preserve active scope separately from archived completed scope.
-4. When Brownfield reality differs from a doc, report and reconcile the drift explicitly.
+4. When Brownfield reality differs from a doc, report and reconcile the drift
+   explicitly.
 
 ### When changing Rust FFI surface
-1. Read the relevant contract in `docs/TechSpec.md` section 4.
-2. Read the related ADRs in `docs/TechSpec.md` section 2.
-3. Read the state model in `docs/TechSpec.md` section 3.
+1. Read the relevant contract in `.constitution/tech-spec/` section 4.
+2. Read the related ADRs in `.constitution/tech-spec/adrs/`.
+3. Read the state model in `.constitution/tech-spec/` section 3.
 4. Implement feature logic in the appropriate `native/src/*.rs` module.
-5. Add or update the `extern "C"` entry point in `native/src/lib.rs` via `ffi_wrap()` or `ffi_wrap_handle()`.
+5. Add or update the `extern "C"` entry point in `native/src/lib.rs` via
+   `ffi_wrap()` or `ffi_wrap_handle()`.
 
 ### When changing the host layer
-1. Keep wrappers thin. Rust still owns mutable UI state and performance-critical semantics.
-2. Prefer composites over new native widgets unless the TechSpec or active Tasks plan explicitly justifies native promotion.
-3. The active native library resolver contract (Epic P / ADR-T43) is: `TUVREN_LIB_PATH` env override → `@tuvren/tuvren-tui-<platform>-<arch>` aux package via `import.meta.resolve()` → Cargo source build (repo checkout only, proven by workspace markers) → diagnostic error. The staged-prebuild path is removed.
-4. Repo-side verification entrypoints that `dlopen` directly should target the local Cargo build, not staged prebuilds, so branch validation cannot be shadowed by old packaged artifacts.
+1. Keep wrappers thin. Rust still owns mutable UI state and
+   performance-critical semantics.
+2. Prefer composites over new native widgets unless the TechSpec or active
+   Tasks plan explicitly justifies native promotion.
+3. The active native library resolver contract is:
+   `TUVREN_LIB_PATH` env override → `@tuvren/tuvren-tui-<platform>-<arch>`
+   aux package via `import.meta.resolve()` → Cargo source build (repo checkout
+   only, proven by workspace markers) → diagnostic error.
+4. Repo-side verification entrypoints that `dlopen` directly should target
+   the local Cargo build, not staged prebuilds.
 
 ### When picking what to read
-- Product/scope question -> `docs/PRD.md`
-- Boundary/flow question -> `docs/Architecture.md`
-- ABI/state/test/release question -> `docs/TechSpec.md`
-- Current execution priority -> `docs/Tasks.md`
+- Product/scope question -> `.constitution/prd/`
+- Boundary/flow question -> `.constitution/architecture/`
+- ABI/state/test/release question -> `.constitution/tech-spec/`
+- Current execution priority -> `.constitution/tasks/critical-path.md`
+
+---
+
+## Documentation Rules
+
+1. **Respect layer boundaries.** Do not move stack or ABI detail into the PRD.
+   Do not move product intent into TechSpec. Do not invent contracts in Tasks.
+2. **Preserve continuity.** Version history, archived completed scope, and major
+   historical decisions are part of the trust surface.
+3. **Use current framework shape.** The canonical docs follow the four-stage
+   constitution skeleton; keep future revisions in that format.
+4. **Treat code as Brownfield truth.** If a doc drifts from the source tree,
+   reconcile explicitly instead of silently preserving stale future-tense
+   language.
+5. **Keep active and archived scope separate.** `.constitution/tasks/active/`
+   should not let completed execution masquerade as the active backlog.
+
+---
+
+## When Revising Docs
+
+### Product-layer change
+- Start with `.constitution/prd/`
+- Validate whether the requested change is really a scope change or only an
+  implementation/architecture change
+
+### Logical design change
+- Confirm the PRD already authorizes the change
+- Revise `.constitution/architecture/` before touching `.constitution/tech-spec/`
+
+### Implementation contract change
+- Confirm Architecture already authorizes it
+- Revise `.constitution/tech-spec/`
+- Then revise `.constitution/tasks/` if execution implications change
+
+### Execution-plan change
+- Only revise `.constitution/tasks/` once the upstream contract is already
+  present
+- Preserve archived scope if it still explains current reality
