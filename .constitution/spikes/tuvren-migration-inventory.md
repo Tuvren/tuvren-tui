@@ -8,7 +8,7 @@
 
 ## 1. Purpose
 
-This document enumerates every public-facing Kraken-era name and release/distribution touchpoint that had to change as part of the hard-cut rename from Kraken to Tuvren. Historical downstream rename ticket labels (PROD-P002 through PROD-P006) referenced this inventory directly; their detailed ticket bodies are now archived out of `docs/Tasks.md`. No compatibility aliases were planned — the rename was a pre-1.0 hard cut per ADR-T42.
+This document enumerates every public-facing Kraken-era name and release/distribution touchpoint that had to change as part of the hard-cut rename from Kraken to Tuvren. Historical downstream rename ticket labels (PROD-P002 through PROD-P006) referenced this inventory directly; their detailed ticket bodies are now archived out of `.constitution/tasks/`. No compatibility aliases were planned — the rename was a pre-1.0 hard cut per ADR-T42.
 
 ---
 
@@ -143,7 +143,7 @@ The staged `ts/prebuilds/` path is removed from the default resolver order as pa
 | `README.md` | All install instructions, import examples, package name | ADOPT-Q001 |
 | `examples/*.ts`, `examples/*.tsx` | Import source (`../ts/src/index`), `Kraken` → `Tuvren`, `KrakenEvent` → `TuvrenEvent` | ADOPT-Q001, ADOPT-Q002 |
 | `examples/AGENTS.md` | `Kraken.init()` references | ADOPT-Q001 |
-| `docs/reports/GatePolicy.md` | Product name, cross-platform gate additions | PROD-P006 |
+| `.constitution/reports/GatePolicy.md` | Product name, cross-platform gate additions | PROD-P006 |
 
 ---
 
@@ -161,6 +161,6 @@ The `tui_*` ABI prefix is explicitly preserved by ADR-T42 and is not part of the
 - **Musl runtime detection fallback**: If Bun's `libc` optional-dependency filtering cannot be confirmed for the deployed Bun version, the resolver must add an explicit musl detection gate. This is validated in PROD-P005.
 - **npm registry publishing**: The CI workflow scaffolding for publishing auxiliary packages (PROD-P004) prepares the package manifests and workflow steps, but actual publishing requires the `@tuvren` npm organization and a publish token in GitHub Actions secrets.
 - **Aux-package resolver smoke test**: The cross-platform smoke gate (PROD-P006) validates the source-build path of the resolver. The auxiliary-package branch (`resolveAuxPackage` + `import.meta.resolve`) is not covered by the current smoke matrix because it requires a published or locally staged `@tuvren/*` package. Epic V owns the packed/registry install smoke for step 2 of the resolver; the unit behavior of `fileURLToPath` + `existsSync` is verified at the module level.
-- **User-visible Kraken strings in examples**: ~~Deferred to Epic Q~~ — completed in Epic P. All example titles, ARIA labels, markdown headings, and docstrings across `examples/*.{ts,tsx}` and `examples/AGENTS.md` now use Tuvren naming. Only historical and changelog references to "Kraken" remain in `docs/Tasks.md` and the migration inventory itself, which are intentionally kept for continuity context.
+- **User-visible Kraken strings in examples**: ~~Deferred to Epic Q~~ — completed in Epic P. All example titles, ARIA labels, markdown headings, and docstrings across `examples/*.{ts,tsx}` and `examples/AGENTS.md` now use Tuvren naming. Only historical and changelog references to "Kraken" remain in the archived Epic summaries in `.constitution/tasks/completed/` and the migration inventory itself, which are intentionally kept for continuity context.
 - **`linux-arm64` load smoke**: The cross-platform CI gate cross-compiles `linux-arm64` on an x64 runner and therefore cannot run a native headless `dlopen` smoke. Upgrading this to a full load smoke requires a native arm64 CI runner and is tracked as a future gate upgrade.
 - **Apache-2.0 LICENSE in aux packages**: Apache-2.0 §4(c) requires a copy of the License to be included with redistributed works. The aux `package.json` files declare `"license": "Apache-2.0"` but the tarball `files` arrays do not include a LICENSE file. This must be added to each aux package before the first `npm publish` cycle in Epic V. The release workflow's payload assembly step is the natural place to copy the repo LICENSE.md into each `packages/@tuvren/...` directory before upload.
