@@ -1,0 +1,145 @@
+# API Specification — Host Language Library
+
+## 0. Version
+
+**v8.1.0** — corresponds to the TechSpec version.
+
+---
+
+## 1. Conventions
+
+- **Package:** `tuvren-tui` (Epic P rename shipped)
+- **Primary export:** `Tuvren` class
+- **Error type:** `TuvrenError`
+- **Handle type:** `u32` (opaque, `Handle(0)` is invalid sentinel)
+- **FFI convention:** `bun:ffi`, C ABI with `extern "C"`
+- **ABI error model:** `0` success, `-1` explicit error via `tui_get_last_error()`, `-2` panic at boundary
+
+---
+
+## 2. Terminal Capabilities Interface
+
+```yaml
+openapi: 3.1.0
+info:
+  title: Tuvren TUI — Terminal Capabilities API
+  version: 0.1.0
+
+components:
+  schemas:
+    TerminalCapabilities:
+      type: object
+      properties:
+        flags:
+          type: integer
+          format: uint64
+          description: Full capability bitmask
+        raw:
+          type: integer
+          format: uint64
+          description: Compatibility alias for early Epic O callers
+        truecolor:
+          type: boolean
+        color256:
+          type: boolean
+        color16:
+          type: boolean
+        mouse:
+          type: boolean
+        utf8:
+          type: boolean
+        alternateScreen:
+          type: boolean
+        synchronizedOutput:
+          type: boolean
+        osc52ClipboardWrite:
+          type: boolean
+        osc8Hyperlinks:
+          type: boolean
+        kittyKeyboardDisambiguate:
+          type: boolean
+        pixelSize:
+          type: boolean
+        colorDepthQuery:
+          type: boolean
+        multiplexerPresent:
+          type: boolean
+
+    TerminalInfo:
+      type: object
+      properties:
+        flags:
+          type: integer
+          format: uint64
+        terminalName:
+          type: string
+        terminalProgram:
+          type: string
+        multiplexer:
+          type: string
+          enum: [none, tmux, screen, zellij, unknown]
+        cellWidthPx:
+          type: integer
+        cellHeightPx:
+          type: integer
+        screenWidthPx:
+          type: integer
+        screenHeightPx:
+          type: integer
+        colorDepthBits:
+          type: integer
+        kittyKeyboardEnabled:
+          type: boolean
+```
+
+---
+
+## 3. Core App Interface
+
+```yaml
+paths:
+  /app/capabilities:
+    get:
+      operationId: getCapabilities
+      responses:
+        '200':
+          description: Terminal capabilities
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalCapabilities'
+
+  /app/terminal-info:
+    get:
+      operationId: getTerminalInfo
+      responses:
+        '200':
+          description: Full terminal diagnostic info
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TerminalInfo'
+
+  /app/write-clipboard:
+    post:
+      operationId: writeClipboard
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                target:
+                  type: string
+                  enum: [clipboard, primary]
+                  default: clipboard
+      responses:
+        '200':
+          description: Write succeeded
+          content:
+            application/json:
+              schema:
+                type: boolean
+```
