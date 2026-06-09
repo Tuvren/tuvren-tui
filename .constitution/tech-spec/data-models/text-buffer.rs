@@ -1,18 +1,11 @@
 // TextBuffer — native content storage for substantial text surfaces (ADR-T37)
-// Schema snapshot — NOT COMPILED. Source: native/src/.
+// Schema snapshot — NOT COMPILED. Source: native/src/text_buffer.rs:24-41.
 
 #![allow(dead_code)]
 
 // NOT COMPILED — schema reference only.
-
-/// Bounded cache entry key for visual-line cache.
-#[derive(Eq, PartialEq, Hash)]
-pub struct VisualLineCacheKey {
-    pub content_epoch: u64,
-    pub wrap_width: u32,
-    pub style_fingerprint: u64,
-    pub viewport_rows: u32,
-}
+// DirtyRange, StyleSpan, SelectionRange, HighlightRange, TerminalLinkSpan
+// live in native/src/types.rs.
 
 /// Single dirty range entry recording both the replaced and replacement extents.
 pub struct DirtyRange {

@@ -1,12 +1,12 @@
 // TerminalCapabilityState — terminal feature detection and reporting
-// Schema snapshot — NOT COMPILED. Source: native/src/terminal_capabilities.rs:37-50.
+// Schema snapshot — NOT COMPILED. Source: native/src/terminal_capabilities.rs:1-54.
 
 #![allow(dead_code)]
 
 // NOT COMPILED — schema reference only.
-// Serialization: all fields use #[serde(rename_all = "camelCase")]. The `flags`
-// field is serialized as a decimal string (not a JSON number) via
-// serialize_u64_string to avoid precision loss for u64 values in JavaScript.
+// Serialization: TerminalMultiplexer uses #[serde(rename_all = "lowercase")];
+// TerminalCapabilityState uses #[serde(rename_all = "camelCase")]. The `flags`
+// field is serialized as a decimal string via serialize_u64_string.
 
 pub mod terminal_capability {
     #![allow(dead_code)]

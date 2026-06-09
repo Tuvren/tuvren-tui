@@ -141,7 +141,7 @@ CI Trigger
 | Gate 6 | Host bundle-size constraint | `.constitution/prd/`, `.constitution/tech-spec/`, `ts/check-bundle.ts` |
 | Gate 7 | Interactive render budget target | `.constitution/prd/`, `.constitution/tech-spec/`, render bench |
 | Gate 8 | Foreign-function overhead target | `.constitution/prd/`, `.constitution/tech-spec/`, FFI bench |
-| Gate 9 | Cross-platform install and load trust | `.constitution/prd/` §5, `.constitution/tech-spec/` §5.4, `.constitution/tasks/` archived Epic P summary |
+| Gate 9 | Cross-platform install and load trust | PRD constraints.md (Operability: every supported public release target receives install and load smoke verification), TechSpec stack.md §5 (Release and Distribution Matrix), completed/EPIC-P-tuvren-identity.md |
 
 ---
 

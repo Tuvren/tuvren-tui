@@ -10,9 +10,7 @@ components:
       properties:
         flags:
           type: string
-          description: Full capability bitmask. Serialized as a decimal string
-            (not JSON number) via serialize_u64_string to avoid u64 precision
-            loss in JavaScript.
+          description: Full capability bitmask as a decimal string.
         raw:
           type: integer
           format: uint64

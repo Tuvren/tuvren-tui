@@ -23,6 +23,9 @@ pub struct TextView {
     /// viewport_rows at render time; scroll/height changes do not rebuild
     /// the projection. Resize invalidates it only when wrap_width changes.
     pub visual_lines: Vec<VisualLine>,
+    /// Composite invalidation key: content_epoch, wrap_width, wrap_mode,
+    /// tab_width, style_fingerprint. Private; participates in cache logic.
+    cached_key: CacheKey,
     /// Next cache key epoch; incremented each time the projection is rebuilt.
     pub cache_key_epoch: u64,
 }

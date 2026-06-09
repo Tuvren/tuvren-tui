@@ -1,5 +1,5 @@
 // TuiContext — root native UI state container
-// Schema snapshot — NOT COMPILED. Source: native/src/context.rs:18-84.
+// Schema snapshot — NOT COMPILED. Source: native/src/context.rs:23-89.
 
 #![allow(dead_code)]
 
@@ -67,6 +67,7 @@ pub struct TuiContext {
     pub debug_overlay_flags: u32,
     pub debug_trace_flags: u32,
     pub debug_traces: [VecDeque<DebugTraceEntry>; 4],
+    pub debug_frames: VecDeque<DebugFrameSnapshot>,
     pub next_debug_seq: u64,
     pub frame_seq: u64,
 }
