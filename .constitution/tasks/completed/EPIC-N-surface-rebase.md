@@ -151,3 +151,9 @@ When the benchmark runs
 Then the grapheme-boundary scan cost as a function of offset is published under docs/reports/
 And the curve informs whether the line-bounded scan optimization is required before transcript-tail interactions ship
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T37 continued under Epic N (Substrate Surface Rebase). The `Text`, `Markdown`, code spans, `TextArea`, and transcript block surfaces now route through `TextBuffer`/`TextView` backed by the unified text renderer. `EditBuffer` in `native/src/edit_buffer.rs` provides operation-based undo with coalescing for ordinary single-edit operations. The substrate benchmark suite in `native/benches/` measures `tui_text_buffer_append` cost as a function of buffer size. The `dirty_ranges` contract records post-replacement extents only (cache-invalidation-only, not incremental cell-level repaint).

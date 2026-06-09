@@ -111,3 +111,9 @@ When the guardrail suite runs
 Then memory stays under documented limits for target workloads
 And regressions fail CI with actionable counter output
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T16 (Safe Global State) shipped under Epic I. The `static mut CONTEXT` in `native/src/context.rs` was replaced with `OnceLock<RwLock<TuiContext>>`. All FFI entry points in `native/src/lib.rs` acquire explicit read/write locks. `tui_init()` / `tui_shutdown()` / `tui_reinit()` have deterministic lifecycle semantics. Handle(0) is the invalid sentinel.

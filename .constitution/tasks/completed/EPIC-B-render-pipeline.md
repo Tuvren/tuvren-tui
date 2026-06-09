@@ -126,3 +126,9 @@ Given a Text widget with opacity = 0.0
 When render() is called
 Then the foreground color equals the background color (fully transparent)
 ```
+
+---
+
+## Brownfield Note
+
+Epic B shipped ScrollBox clipping, cursor rendering, Select widget options, and opacity blending in the Render Module. The fixes are reflected in `native/src/render.rs` where `render_box`, cursor handling, and `render_select` implement the corrected behavior. The `opacity` field on visual styles is resolved during render pass blending.

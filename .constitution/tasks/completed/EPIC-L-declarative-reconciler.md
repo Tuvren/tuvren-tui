@@ -143,3 +143,9 @@ When reconciler artifacts are built
 Then keyed update and unmount tests pass
 And the core host package stays within the documented size budget
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T20 (Reconciler Strategy) shipped under Epic L. The `tuvren-tui` host package at `ts/src/` exposes the JSX factory (`jsx`, `jsxs`, `Fragment`) and signal-based reactive prop updates. Keyed child reconciliation uses native `insert_child` and `destroy_subtree` O(1) tree primitives. The `tuvren-tui/effect` package provides optional Effect-layer integration. Bundle budget is enforced in `ts/check-bundle.ts`.

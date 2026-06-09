@@ -71,3 +71,9 @@ Then every module shows ✅ status
 And the Notes column accurately reflects v0 completion
 And no module shows ⚠️ or "scaffolding" status
 ```
+
+---
+
+## Brownfield Note
+
+Epic E shipped the `demo.ts` example and updated `CLAUDE.md` documentation. The `examples/demo.ts` file demonstrates the widget composition, layout, and rendering pattern for new users. The `CLAUDE.md` at the repo root reflects the v0 implementation status and development commands.

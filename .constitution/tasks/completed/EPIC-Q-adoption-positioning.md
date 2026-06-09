@@ -18,3 +18,4 @@ Epic Q repositioned Tuvren as a general-purpose terminal UI framework, refreshed
 ## Brownfield Note
 
 Epic Q shipped the general-purpose framework repositioning and adoption work. The canonical remote is `Tuvren/tuvren-tui`. The product story targets a broad framework audience while preserving demanding agentic/operator workloads as the proving grounds.
+

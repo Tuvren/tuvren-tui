@@ -24,3 +24,4 @@ Epic R added `CommandRegistry` (typed command definitions, disposable registrati
 | CMD-R004 | CommandPalette rebased to consume registry | Feature | 3 |
 | CMD-R005 | commandDispatcher option in app.run() and createLoop() | Feature | 3 |
 | CMD-R006 | Command and keybinding adoption across examples | Chore | 3 |
+

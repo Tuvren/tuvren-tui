@@ -227,3 +227,9 @@ When the group start command is issued
 Then all scheduled animations begin according to the declared timeline rules
 And cancelling the group prevents unscheduled followers from starting
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T19 (TextArea), ADR-T21 (Theme Inheritance), and ADR-T22 (Position Animation) shipped under Epic K. `NodeType::TextArea` in `native/src/types.rs` provides multi-line editing with cursor, wrap mode, and line buffer. Theme `type_defaults` in `native/src/theme.rs` stores per-NodeType visual style defaults with precedence resolution. `AnimProp::PositionX/Y` in `native/src/animation.rs` writes `render_offset` on nodes for position animation without touching layout. `ChoreoGroup` and `ChoreoMember` in `native/src/animation.rs` implement the choreography MVP.

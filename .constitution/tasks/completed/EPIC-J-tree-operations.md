@@ -111,3 +111,9 @@ When tui_insert_child(new_parent, child, 0) is called
 Then child is detached from the old parent and inserted at index 0
 And no duplicate parent references exist
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T17 (Subtree Destruction) and ADR-T18 (Indexed Insertion) shipped under Epic J. The `destroy_subtree()` in `native/src/tree.rs` performs post-order traversal to clean up all descendants. `insert_child()` with reparenting detaches a node from its old parent and inserts at the target index. The FFI surface exposes `tui_destroy_subtree()` and `tui_insert_child()` through `ffi_wrap` in `native/src/lib.rs`. Cross-module cleanup (animations, theme bindings, Taffy, focus/root state) is enforced by the native tree module.

@@ -20,3 +20,4 @@ Epic O shipped native terminal capability state, diagnostic query APIs, write-on
 ## Brownfield Note
 
 ADR-T41 is now shipped under Epic O. The source tree has explicit terminal capability state, diagnostic query APIs, conservative multiplexer degradation, write-only OSC52, OSC8 link metadata, Kitty keyboard disambiguation negotiation, and tested fallback behavior.
+

@@ -105,3 +105,9 @@ Given chained animations A -> B
 When renders advance past A completion
 Then B starts only after A completion and in-order
 ```
+
+---
+
+## Brownfield Note
+
+Epic H shipped animation primitives and ADR-T23 (Accessibility Foundation). The `Animation` struct in `native/src/animation.rs` gained looping, pending state, and chain_next fields. The accessibility foundation added `role`, `aria_label`, and `focusable` metadata to `TuiNode` in `native/src/types.rs`. The accessibility event system in `native/src/event.rs` dispatches events based on node roles.

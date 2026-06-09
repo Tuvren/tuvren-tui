@@ -23,3 +23,4 @@ After the repo Q&A clarified that the docs had underspecified the intended scope
 | EFF-S003 | Package-owned command and keybinding hooks | Feature | 5 |
 | EFF-S004 | Keyboard and terminal-size hooks | Feature | 3 |
 | EFF-S005 | Advanced lifecycle helpers (acquireApp, makeTuvrenScope, etc.) | Feature | 5 |
+

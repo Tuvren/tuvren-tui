@@ -177,3 +177,9 @@ When bun test is run from ts/
 Then widget.animate() correctly bit-casts f32 opacity to u32
 And widget.animate() correctly encodes color strings
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T13 (Animation Module) and ADR-T14 (Animation Chaining) shipped under Epic G. The `Animation` struct in `native/src/animation.rs` manages animation lifecycle, easing, and target tracking. The animation system supports chaining via `chain_next` references and provides `Linear` and `EaseIn` easing variants. The TypeScript `Widget.animate()` method at `ts/src/widgets.ts` encodes opacity and color values for the FFI boundary.

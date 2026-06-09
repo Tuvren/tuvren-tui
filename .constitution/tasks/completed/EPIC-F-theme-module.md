@@ -201,3 +201,9 @@ Then all 9 theme FFI functions are tested
 And theme resolution produces correct colors in rendered output
 And tui_destroy_theme correctly invalidates bindings
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T12 (Theme Module) and ADR-T15 shipped under Epic F. The `Theme` struct in `native/src/theme.rs` provides `Theme.DARK` and `Theme.LIGHT` built-in themes. Theme resolution in `native/src/style.rs` applies the precedence: explicit node style > theme NodeType default > theme global default > node stored value. The TypeScript `Theme` class at `ts/src/theme.ts` exposes `new Theme()`, `Theme.DARK`, `Theme.LIGHT`, and `Tuvren.switchTheme()`.

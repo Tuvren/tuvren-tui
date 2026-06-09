@@ -120,3 +120,9 @@ Then a valid JSON file exists with name "kraken-tui" and version "0.1.0"
 And "scripts" contains "test" and "bench" entries
 And the "type" field is set to "module"
 ```
+
+---
+
+## Brownfield Note
+
+Epic A established the code quality baseline for the project. The Rust FFI entry points (`native/src/lib.rs`) are clippy-clean and rustfmt-compliant. The null-termination fix in `tui_get_last_error()` is reflected in the current `native/src/context.rs` error handling. The TypeScript `package.json` at `ts/package.json` defines the current host layer package with test and bench scripts.

@@ -128,3 +128,9 @@ Then grapheme, wcwidth, wrap, tab, resize, cursor, and selection edge cases are 
 And each structural gate listed in TechSpec section 5.4.1 is enforced by at least one native test
 And the suite fails when any documented Unicode behavior regresses
 ```
+
+---
+
+## Brownfield Note
+
+ADR-T37 (Native Text Substrate) shipped under Epic M. The `TextBuffer` in `native/src/text_buffer.rs` provides content storage with flat-`String` backing, content epochs, dirty ranges, line-start markers, grapheme boundaries, tab expansion, style spans, selection ranges, and highlights. `TextView` in `native/src/text_view.rs` provides viewport/wrap projections keyed by `(content_epoch, wrap_width, wrap_mode, tab_width, style_fingerprint, viewport_rows)`. The unified text renderer in `native/src/render.rs` handles all text drawing. `native/src/substrate_gates.rs` enforces the §5.4.1 Unicode/wrapping structural gates.

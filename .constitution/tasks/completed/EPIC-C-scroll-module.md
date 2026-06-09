@@ -76,3 +76,9 @@ When tui_append_child(scrollbox, child2) is called
 Then it returns -1 (error)
 And tui_get_last_error() contains "ScrollBox accepts exactly one child"
 ```
+
+---
+
+## Brownfield Note
+
+Epic C shipped ScrollBox content bounds clamping and single-child enforcement. The `ScrollBox` widget in `native/src/tree.rs` and `native/src/layout.rs` enforces that only one child is accepted and that scroll offsets are clamped to valid content ranges. These constraints are reflected in the current native source tree.

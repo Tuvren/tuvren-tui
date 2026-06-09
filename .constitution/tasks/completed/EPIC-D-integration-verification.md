@@ -116,3 +116,9 @@ Then all tests pass
 And every one of the 62 FFI functions is called at least once
 And no memory leaks are detected (no segfaults, no ASAN violations)
 ```
+
+---
+
+## Brownfield Note
+
+Epic D shipped the first render pipeline and FFI integration tests. The test suite at `ts/test-ffi.test.ts` covers all 62 FFI functions with round-trip verification. These tests are part of the current CI gate in `.github/workflows/ci.yml`. The 124 total tests (27 Rust + TS integration) represent the baseline quality bar for the project.
