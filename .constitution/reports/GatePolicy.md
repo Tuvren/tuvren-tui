@@ -1,9 +1,9 @@
 # Quality Gate Policy
 
-**Version**: 3.0
+**Version**: 3.1
 **Status**: Active
-**Date**: May 2026
-**Source**: `.github/workflows/ci.yml`, `docs/TechSpec.md`
+**Date**: June 2026
+**Source**: `.github/workflows/ci.yml`, `.constitution/tech-spec/`
 
 ---
 
@@ -133,15 +133,15 @@ CI Trigger
 
 | Gate | Primary Contract | Source of Truth |
 | --- | --- | --- |
-| Gate 1 | Render and replay correctness | `docs/TechSpec.md`, `native/fixtures/`, native test suite |
-| Gate 2 | Native implementation hygiene | `docs/TechSpec.md`, Rust lint/format rules |
-| Gate 3 | Writer, text-cache, and substrate throughput health | `docs/TechSpec.md`, native benches |
-| Gate 4 | Terminal emission efficiency | `docs/TechSpec.md`, writer tests |
-| Gate 5 | Host wrapper and example correctness | `docs/TechSpec.md`, `ts/` test suite |
-| Gate 6 | Host bundle-size constraint | `docs/PRD.md`, `docs/TechSpec.md`, `ts/check-bundle.ts` |
-| Gate 7 | Interactive render budget target | `docs/PRD.md`, `docs/TechSpec.md`, render bench |
-| Gate 8 | Foreign-function overhead target | `docs/PRD.md`, `docs/TechSpec.md`, FFI bench |
-| Gate 9 | Cross-platform install and load trust | `docs/PRD.md` §5, `docs/TechSpec.md` §5.4, `docs/Tasks.md` archived Epic P summary |
+| Gate 1 | Render and replay correctness | `.constitution/tech-spec/`, `native/fixtures/`, native test suite |
+| Gate 2 | Native implementation hygiene | `.constitution/tech-spec/`, Rust lint/format rules |
+| Gate 3 | Writer, text-cache, and substrate throughput health | `.constitution/tech-spec/`, native benches |
+| Gate 4 | Terminal emission efficiency | `.constitution/tech-spec/`, writer tests |
+| Gate 5 | Host wrapper and example correctness | `.constitution/tech-spec/`, `ts/` test suite |
+| Gate 6 | Host bundle-size constraint | `.constitution/prd/`, `.constitution/tech-spec/`, `ts/check-bundle.ts` |
+| Gate 7 | Interactive render budget target | `.constitution/prd/`, `.constitution/tech-spec/`, render bench |
+| Gate 8 | Foreign-function overhead target | `.constitution/prd/`, `.constitution/tech-spec/`, FFI bench |
+| Gate 9 | Cross-platform install and load trust | `.constitution/prd/` §5, `.constitution/tech-spec/` §5.4, `.constitution/tasks/` archived Epic P summary |
 
 ---
 
@@ -174,6 +174,6 @@ The `cross-platform-smoke` job was introduced in Epic P (PROD-P006) to satisfy t
 - The substrate, writer, and FFI benchmarks are micro-benchmarks that measure native code paths already validated by Gate 1 correctness tests.
 - Promoting benchmark gates to multi-platform blocking adds CI cost and flakiness risk without proportional safety benefit at this stage.
 
-When the decision is made to promote any benchmark gate to multi-platform enforcement, that change must be tracked as an explicit ticket in `Tasks.md` with a rationale for the threshold values chosen on each platform.
+When the decision is made to promote any benchmark gate to multi-platform enforcement, that change must be tracked as an explicit ticket in `.constitution/tasks/` with a rationale for the threshold values chosen on each platform.
 
 **musl/Alpine exclusion:** Linux auxiliary packages declare `"libc": ["glibc"]` in their `package.json`. Bun's package manager (Bun ≥ 1.1) respects the `libc` field for optional dependency filtering, preventing glibc-targeting packages from installing on musl hosts. The resolver also surfaces a clear diagnostic when the native library cannot be found. Public musl/Alpine support is out of scope per PRD §6 until a musl-targeted build and testing path is explicitly added to `Tasks.md`.

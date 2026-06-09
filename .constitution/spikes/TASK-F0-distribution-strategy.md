@@ -12,11 +12,11 @@
 
 | Rust Target Triple           | Platform | Arch  | Library Name            |
 | ---------------------------- | -------- | ----- | ----------------------- |
-| x86_64-unknown-linux-gnu     | linux    | x64   | libkraken_tui.so        |
-| aarch64-unknown-linux-gnu    | linux    | arm64 | libkraken_tui.so        |
-| x86_64-apple-darwin          | darwin   | x64   | libkraken_tui.dylib     |
-| aarch64-apple-darwin         | darwin   | arm64 | libkraken_tui.dylib     |
-| x86_64-pc-windows-msvc       | win32    | x64   | kraken_tui.dll          |
+| x86_64-unknown-linux-gnu     | linux    | x64   | libtuvren_tui.so        |
+| aarch64-unknown-linux-gnu    | linux    | arm64 | libtuvren_tui.so        |
+| x86_64-apple-darwin          | darwin   | x64   | libtuvren_tui.dylib     |
+| aarch64-apple-darwin         | darwin   | arm64 | libtuvren_tui.dylib     |
+| x86_64-pc-windows-msvc       | win32    | x64   | tuvren_tui.dll          |
 
 Platform and arch values match `process.platform` and `process.arch` from the Bun/Node runtime.
 
@@ -25,16 +25,16 @@ Platform and arch values match `process.platform` and `process.arch` from the Bu
 Release artifacts follow the pattern:
 
 ```
-kraken-tui-v{version}-{platform}-{arch}.{ext}
+tuvren-tui-{tag}-{platform}-{arch}.{ext}
 ```
 
 Examples:
-- `kraken-tui-v0.1.0-linux-x64.so`
-- `kraken-tui-v0.1.0-darwin-arm64.dylib`
-- `kraken-tui-v0.1.0-win32-x64.dll`
+- `tuvren-tui-v0.1.0-linux-x64.so`
+- `tuvren-tui-v0.1.0-darwin-arm64.dylib`
+- `tuvren-tui-v0.1.0-win32-x64.dll`
 
 Each artifact has a companion SHA-256 checksum sidecar:
-- `kraken-tui-v0.1.0-linux-x64.so.sha256`
+- `tuvren-tui-v0.1.0-linux-x64.so.sha256`
 
 ## Checksum Strategy
 
@@ -53,13 +53,13 @@ Each artifact has a companion SHA-256 checksum sidecar:
 
 The runtime resolver (`ts/src/resolver.ts`) searches for the native library in this order:
 
-1. **Environment override:** `KRAKEN_LIB_PATH` environment variable — absolute path to the library file. If set and the file exists, use it directly. Intended for CI, custom deployments, and debugging.
+1. **Environment override:** `TUVREN_LIB_PATH` environment variable — absolute path to the library file. If set and the file exists, use it directly. Intended for CI, custom deployments, and debugging.
 
 2. **Prebuilt artifacts:** `<package-root>/prebuilds/<platform>-<arch>/<libName>` — where `<package-root>` is the `ts/` directory. Prebuilds are populated by a postinstall step or manual download.
 
 3. **Source build (dev mode):** `<package-root>/../native/target/release/<libName>` — the standard Cargo release output. This is the existing behavior for developers building from source.
 
-4. **Failure:** If none of the above paths resolve, throw a `KrakenError` with platform-specific diagnostic information and remediation steps.
+4. **Failure:** If none of the above paths resolve, throw a `TuvrenError` with platform-specific diagnostic information and remediation steps.
 
 ## Fallback Behavior
 
@@ -69,7 +69,7 @@ The runtime resolver (`ts/src/resolver.ts`) searches for the native library in t
   - Linux: check glibc availability
   - macOS: verify architecture compatibility
   - Windows: ensure MSVC runtime
-  - All: instructions for manual source build and `KRAKEN_LIB_PATH` override
+  - All: instructions for manual source build and `TUVREN_LIB_PATH` override
 
 ## CI Workflow Design
 
