@@ -1,5 +1,5 @@
 // TextView — viewport projection over a TextBuffer (ADR-T37)
-// Schema snapshot — NOT COMPILED. Source: native/src/text_view.rs:59-72.
+// Schema snapshot — NOT COMPILED. Source: native/src/text_view.rs:60-72.
 
 #![allow(dead_code)]
 

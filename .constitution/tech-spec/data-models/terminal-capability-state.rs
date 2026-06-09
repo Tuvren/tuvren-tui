@@ -1,5 +1,5 @@
 // TerminalCapabilityState — terminal feature detection and reporting
-// Schema snapshot — NOT COMPILED. Source: native/src/terminal_capabilities.rs:1-54.
+// Schema snapshot — NOT COMPILED. Source: native/src/terminal_capabilities.rs:39-51.
 
 #![allow(dead_code)]
 

@@ -1,5 +1,5 @@
 // TranscriptState — transcript surface state
-// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:813-828.
+// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:813-829.
 
 #![allow(dead_code)]
 
