@@ -94,7 +94,7 @@ And examples avoid internal implementation details unless explicitly labeled adv
 - **Type:** Chore
 - **Effort:** 3
 - **Dependencies:** SDK-U004
-- **Capability / Contract Mapping:** Architecture resilience.md §3, TechSpec data-models/tui-node.rs (SDK public surface)
+- **Capability / Contract Mapping:** Architecture resilience.md §2 (Failure Handling Strategy), TechSpec data-models/tui-node.rs (SDK public surface)
 - **Description:** Improve diagnostics and docs for resolver errors, lifecycle mistakes, command/plugin failures, devtools inspection, and debugging.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin

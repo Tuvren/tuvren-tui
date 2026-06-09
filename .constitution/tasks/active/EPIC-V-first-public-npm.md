@@ -79,7 +79,7 @@ And ordinary published installs do not fall back to source builds
 - **Type:** Chore
 - **Effort:** 5
 - **Dependencies:** PUB-V004
-- **Capability / Contract Mapping:** PRD vision.md §5 (Brownfield Transition Note), reports/GatePolicy.md
+- **Capability / Contract Mapping:** Architecture strategy.md §1 (Brownfield transition context), reports/GatePolicy.md
 - **Description:** Run a release-candidate verification pass across supported platforms before public publish.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -115,7 +115,7 @@ And release notes state that the package is pre-GA
 - **Type:** Chore
 - **Effort:** 3
 - **Dependencies:** PUB-V006
-- **Capability / Contract Mapping:** PRD capabilities.md Epic 10 (PUB), vision.md §5 (Brownfield Transition Note)
+- **Capability / Contract Mapping:** PRD capabilities.md Epic 10 (PUB), Architecture strategy.md §1 (Brownfield transition context)
 - **Description:** Establish a feedback loop for install, DX, platform, and API issues after the first public release.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin

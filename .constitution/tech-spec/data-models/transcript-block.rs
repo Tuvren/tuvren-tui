@@ -1,5 +1,5 @@
 // TranscriptBlock — individual transcript content block
-// Schema snapshot — NOT COMPILED. Source: native/src/.
+// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:785-810.
 
 #![allow(dead_code)]
 

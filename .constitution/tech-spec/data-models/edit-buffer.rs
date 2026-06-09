@@ -1,5 +1,5 @@
 // EditBuffer — operation history for TextArea undo/redo (ADR-T38)
-// Schema snapshot — NOT COMPILED. Source: native/src/.
+// Schema snapshot — NOT COMPILED. Source: native/src/edit_buffer.rs:12-19.
 
 #![allow(dead_code)]
 

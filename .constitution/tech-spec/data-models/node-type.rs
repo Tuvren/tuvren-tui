@@ -1,5 +1,5 @@
 // NodeType — widget type enumeration
-// Schema snapshot — NOT COMPILED. Source: native/src/.
+// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:17-43.
 
 #![allow(dead_code)]
 
