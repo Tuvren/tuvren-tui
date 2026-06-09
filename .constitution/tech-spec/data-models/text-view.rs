@@ -10,6 +10,7 @@
 /// wrap_mode, tab_width, and style_fingerprint.
 struct CacheKey { /* 5 fields, private */ }
 
+#[derive(Debug, Clone)]
 pub struct TextView {
     pub buffer: u32,
     pub wrap_width: u32,

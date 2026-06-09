@@ -13,6 +13,7 @@ pub struct EditOp {
     pub generation: u64,
 }
 
+#[derive(Debug, Clone)]
 pub struct EditBuffer {
     pub buffer: u32,
     pub buffer_epoch: u64,

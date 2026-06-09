@@ -8,6 +8,7 @@
 // live in native/src/types.rs.
 
 /// Single dirty range entry recording both the replaced and replacement extents.
+#[derive(Debug, Clone)]
 pub struct DirtyRange {
     pub start: usize,
     pub old_end: usize,

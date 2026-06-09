@@ -6,42 +6,42 @@
 // NOT COMPILED — schema reference only.
 
 pub struct TuiContext {
-    // Tree module
+    // Tree Module
     pub tree: taffy::TaffyTree<()>,
     pub nodes: HashMap<u32, TuiNode>,
     pub next_handle: u32,
     pub root: Option<u32>,
 
-    // Event module
+    // Event Module
     pub event_buffer: Vec<TuiEvent>,
     pub focused: Option<u32>,
 
-    // Render module
+    // Render Module
     pub front_buffer: Buffer,
     pub back_buffer: Buffer,
     pub backend: Box<dyn TerminalBackend>,
     pub terminal_capabilities: TerminalCapabilityState,
 
-    // Writer module (ADR-T24)
+    // Writer Module (v3, ADR-T24)
     pub writer_state: WriterState,
 
-    // Text module
+    // Text Module
     pub syntax_set: syntect::parsing::SyntaxSet,
     pub theme_set: syntect::highlighting::ThemeSet,
     pub text_cache: TextCache,
 
-    // Native text substrate (ADR-T37)
+    // Native Text Substrate (ADR-T37, Epic M)
     pub text_buffers: HashMap<u32, TextBuffer>,
     pub text_views: HashMap<u32, TextView>,
     pub edit_buffers: HashMap<u32, EditBuffer>,
     pub next_substrate_handle: u32,
 
-    // Theme module
+    // Theme Module
     pub themes: HashMap<u32, Theme>,
     pub theme_bindings: HashMap<u32, u32>,
     pub next_theme_handle: u32,
 
-    // Animation module
+    // Animation Module (v1)
     pub animations: Vec<Animation>,
     pub animation_chains: HashMap<u32, u32>,
     pub choreo_groups: HashMap<u32, ChoreographyGroup>,
@@ -63,7 +63,7 @@ pub struct TuiContext {
     pub perf_text_cache_hits: u32,
     pub perf_text_cache_misses: u32,
 
-    // Dev mode (ADR-T34)
+    // Dev Mode (ADR-T34)
     pub debug_overlay_flags: u32,
     pub debug_trace_flags: u32,
     pub debug_traces: [VecDeque<DebugTraceEntry>; 4],

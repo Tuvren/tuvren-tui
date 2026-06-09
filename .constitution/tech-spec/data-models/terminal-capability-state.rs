@@ -5,8 +5,9 @@
 
 // NOT COMPILED — schema reference only.
 // Serialization: TerminalMultiplexer uses #[serde(rename_all = "lowercase")];
-// TerminalCapabilityState uses #[serde(rename_all = "camelCase")]. The `flags`
-// field is serialized as a decimal string via serialize_u64_string.
+// TerminalCapabilityState uses #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+// with #[serde(rename_all = "camelCase")]. The `flags` field uses
+// #[serde(serialize_with = "serialize_u64_string")] to emit a decimal string.
 
 pub mod terminal_capability {
     #![allow(dead_code)]
@@ -33,7 +34,10 @@ pub enum TerminalMultiplexer {
     Unknown,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct TerminalCapabilityState {
+    #[serde(serialize_with = "serialize_u64_string")]
     pub flags: u64,
     pub terminal_name: Option<String>,
     pub terminal_program: Option<String>,

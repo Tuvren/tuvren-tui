@@ -2,7 +2,7 @@ CLAUDE.md — Host Language Bindings (TypeScript)
 
 Thin ergonomic wrapper over the Native Core via `bun:ffi`. This layer owns developer-facing ergonomics, composites, examples, resolver/install UX, and dev-session helpers, but it must not become a second source of mutable UI truth.
 
-See the repo-root `docs/CLAUDE.md` for cross-layer rules and the canonical four-stage constitution chain under `.constitution/`.
+See the repo-root `CLAUDE.md` for cross-layer rules and the canonical four-stage constitution chain under `.constitution/`.
 
 ---
 

@@ -48,12 +48,15 @@ pub struct TuiNode {
     pub role: Option<AccessibilityRole>,
     pub label: Option<String>,
     pub description: Option<String>,
-    // Widget-type-specific optional state
+    // TextArea editor state (ADR-T28)
     pub textarea_state: Option<TextAreaState>,
+    // v3 widget state (ADR-T27)
     pub table_state: Option<TableState>,
     pub list_state: Option<ListState>,
     pub tabs_state: Option<TabsState>,
     pub overlay_state: Option<OverlayState>,
+    // Transcript widget state (ADR-T32)
     pub transcript_state: Option<TranscriptState>,
+    // SplitPane widget state (ADR-T35)
     pub split_pane_state: Option<SplitPaneState>,
 }
