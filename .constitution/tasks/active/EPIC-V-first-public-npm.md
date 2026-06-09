@@ -9,7 +9,7 @@
 - **Type:** Spike
 - **Effort:** 3
 - **Dependencies:** Epic U shipped
-- **Capability / Contract Mapping:** PRD §4 Epic 10, TechSpec ADR-T48 and §4.3
+- **Capability / Contract Mapping:** PRD capabilities.md Epic 10, TechSpec ADR-T48 and stack.md §5 (Release and Distribution)
 - **Description:** Audit the first public npm publish requirements for `tuvren-tui@0.1.0` and matching auxiliary packages.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -44,7 +44,7 @@ And pre-GA 0.1.0 messaging is explicit
 - **Type:** Feature
 - **Effort:** 5
 - **Dependencies:** PUB-V002
-- **Capability / Contract Mapping:** TechSpec §4.3
+- **Capability / Contract Mapping:** TechSpec stack.md §5 (Release and Distribution)
 - **Description:** Add release workflow steps to publish `tuvren-tui` and all auxiliary native packages with provenance-appropriate gating.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -62,7 +62,7 @@ And GitHub release artifacts remain available for manual acquisition
 - **Type:** Feature
 - **Effort:** 5
 - **Dependencies:** PUB-V003
-- **Capability / Contract Mapping:** TechSpec §4.3, reports/GatePolicy.md
+- **Capability / Contract Mapping:** TechSpec stack.md §5 (Release and Distribution), reports/GatePolicy.md
 - **Description:** Add smoke tests proving the resolver can load an auxiliary package path from packed or registry-installed packages rather than only source builds.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -79,7 +79,7 @@ And ordinary published installs do not fall back to source builds
 - **Type:** Chore
 - **Effort:** 5
 - **Dependencies:** PUB-V004
-- **Capability / Contract Mapping:** PRD §5, reports/GatePolicy.md
+- **Capability / Contract Mapping:** PRD vision.md §5 (Brownfield Transition Note), reports/GatePolicy.md
 - **Description:** Run a release-candidate verification pass across supported platforms before public publish.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -115,7 +115,7 @@ And release notes state that the package is pre-GA
 - **Type:** Chore
 - **Effort:** 3
 - **Dependencies:** PUB-V006
-- **Capability / Contract Mapping:** PRD §1.1 and §5
+- **Capability / Contract Mapping:** PRD capabilities.md Epic 10 (PUB), vision.md §5 (Brownfield Transition Note)
 - **Description:** Establish a feedback loop for install, DX, platform, and API issues after the first public release.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin

@@ -9,7 +9,7 @@
 - **Type:** Spike
 - **Effort:** 3
 - **Dependencies:** Epic T shipped
-- **Capability / Contract Mapping:** PRD §4 Epic 14, TechSpec ADR-T47 and §4.7
+- **Capability / Contract Mapping:** PRD capabilities.md Epic 14, TechSpec ADR-T47 and stack.md §3
 - **Description:** Audit imperative, JSX, Effect, plugin, composite, example, and devtools surfaces for raw handle, FFI, lifecycle, documentation, and wrapper gaps.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -26,7 +26,7 @@ And the Epic U implementation tickets have a prioritized gap list
 - **Type:** Feature
 - **Effort:** 5
 - **Dependencies:** SDK-U001
-- **Capability / Contract Mapping:** TechSpec §4.7
+- **Capability / Contract Mapping:** TechSpec data-models/tui-node.rs (SDK public surface)
 - **Description:** Add public ergonomics so ordinary event and focus handling can avoid numeric Handle comparison.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -43,7 +43,7 @@ And raw numeric Handle plumbing is only needed for advanced internals
 - **Type:** Feature
 - **Effort:** 5
 - **Dependencies:** SDK-U001
-- **Capability / Contract Mapping:** TechSpec §4.7
+- **Capability / Contract Mapping:** TechSpec data-models/tui-node.rs (SDK public surface)
 - **Description:** Add missing public wrappers where examples currently reach into `ffi.*` for routine widget state.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -77,7 +77,7 @@ And docs show the preferred lifecycle pattern for each public surface
 - **Type:** Chore
 - **Effort:** 5
 - **Dependencies:** SDK-U004
-- **Capability / Contract Mapping:** PRD §5 Adoption constraints
+- **Capability / Contract Mapping:** PRD constraints.md (Adoption constraints)
 - **Description:** Rework examples so each public development style has a clear, polished happy path.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
@@ -94,7 +94,7 @@ And examples avoid internal implementation details unless explicitly labeled adv
 - **Type:** Chore
 - **Effort:** 3
 - **Dependencies:** SDK-U004
-- **Capability / Contract Mapping:** Architecture §5.3, TechSpec §4.7
+- **Capability / Contract Mapping:** Architecture resilience.md §3, TechSpec data-models/tui-node.rs (SDK public surface)
 - **Description:** Improve diagnostics and docs for resolver errors, lifecycle mistakes, command/plugin failures, devtools inspection, and debugging.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin

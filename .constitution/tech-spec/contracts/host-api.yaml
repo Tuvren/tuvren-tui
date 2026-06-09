@@ -9,9 +9,10 @@ components:
       type: object
       properties:
         flags:
-          type: integer
-          format: uint64
-          description: Full capability bitmask
+          type: string
+          description: Full capability bitmask. Serialized as a decimal string
+            (not JSON number) via serialize_u64_string to avoid u64 precision
+            loss in JavaScript.
         raw:
           type: integer
           format: uint64
@@ -47,8 +48,8 @@ components:
       type: object
       properties:
         flags:
-          type: integer
-          format: uint64
+          type: string
+          description: Full capability bitmask as decimal string.
         terminalName:
           type: string
         terminalProgram:

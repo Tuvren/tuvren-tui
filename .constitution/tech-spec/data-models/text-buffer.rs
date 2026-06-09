@@ -22,14 +22,21 @@ pub struct DirtyRange {
 }
 
 pub struct TextBuffer {
+    /// The canonical content string. All mutations go through the substrate API.
+    pub content: String,
+    /// Increases monotonically per byte-changing mutation.
     pub epoch: u64,
+    /// Bumped when style spans, selection, or highlights change. Participates
+    /// in `TextView` cache invalidation but not in `epoch`.
     pub style_fingerprint: u64,
+    /// Byte offset of every line start. Always non-empty; `[0]` for empty.
     pub line_starts: Vec<usize>,
+    /// Cached per-line cell width, computed against `tab_width`.
     pub line_widths: Vec<u32>,
     pub style_spans: Vec<StyleSpan>,
+    pub terminal_link_spans: Vec<TerminalLinkSpan>,
     pub selection: Option<SelectionRange>,
     pub highlights: Vec<HighlightRange>,
-    pub terminal_link_spans: Vec<TerminalLinkSpan>,
     pub dirty_ranges: Vec<DirtyRange>,
     pub tab_width: u8,
 }

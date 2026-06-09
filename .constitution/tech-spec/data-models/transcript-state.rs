@@ -1,15 +1,9 @@
 // TranscriptState — transcript surface state
-// Schema snapshot — NOT COMPILED. Source: native/src/.
+// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:813-828.
 
 #![allow(dead_code)]
 
 // NOT COMPILED — schema reference only.
-
-#[repr(u8)]
-pub enum SplitAxis {
-    Horizontal = 0,
-    Vertical = 1,
-}
 
 pub struct TranscriptState {
     pub blocks: Vec<TranscriptBlock>,

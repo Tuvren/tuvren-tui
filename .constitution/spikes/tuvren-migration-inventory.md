@@ -2,7 +2,7 @@
 
 **Spike:** PROD-P001  
 **Status:** Complete — all items inventoried; no upstream document contradictions found.  
-**References:** PRD §1.3, Architecture §1.4 and Risk 9, TechSpec ADR-T42, ADR-T43, §1.4, §4.3
+**References:** PRD vision.md §1 (Vision), PRD constraints.md, Architecture strategy.md §1 (Architectural Pattern), Architecture risks.md Risk 9, TechSpec ADR-T42, ADR-T43, stack.md (BOM)
 
 ---
 
@@ -101,7 +101,7 @@ The approved target-state (ADR-T43) introduces one public package (`tuvren-tui`)
 
 Each package carries a single shared library. The public package references all five as optional dependencies. `TUVREN_LIB_PATH` still takes priority so manual/air-gapped installs remain supported.
 
-**Musl enforcement strategy (Bun-first):** Linux auxiliary packages declare `"libc": ["glibc"]` in their `package.json`. Bun's package manager (Bun ≥ 1.1) respects the `libc` field in optional dependency filtering, which prevents glibc-targeting packages from being silently installed on musl/Alpine hosts. If the bun version in use does not enforce `libc` filtering, the resolver must detect a musl host at runtime (check `/proc/version` or `ldd --version`) and fail with a clear diagnostic. Public musl/Alpine support remains out of scope for this wave per PRD §6.
+**Musl enforcement strategy (Bun-first):** Linux auxiliary packages declare `"libc": ["glibc"]` in their `package.json`. Bun's package manager (Bun ≥ 1.1) respects the `libc` field in optional dependency filtering, which prevents glibc-targeting packages from being silently installed on musl/Alpine hosts. If the bun version in use does not enforce `libc` filtering, the resolver must detect a musl host at runtime (check `/proc/version` or `ldd --version`) and fail with a clear diagnostic. Public musl/Alpine support remains out of scope for this wave (per `PRD/out-of-scope/musl-alpine-support.md`).
 
 ---
 
@@ -149,7 +149,7 @@ The staged `ts/prebuilds/` path is removed from the default resolver order as pa
 
 ## 13. Upstream Document Contradiction Check
 
-No contradictions found between PRD §1.3, Architecture §1.4, TechSpec ADR-T42/ADR-T43/§4.3, and this inventory. The approved target-state naming (`tuvren-tui`, `Tuvren`, `TUVREN_LIB_PATH`, `tuvren_tui`, `libtuvren_tui.*`, `@tuvren/*`) is consistent across all four upstream artifacts.
+No contradictions found between PRD (vision.md §1, constraints.md), Architecture (strategy.md §1, risks.md Risk 9), TechSpec (ADR-T42, ADR-T43, stack.md), and this inventory. The approved target-state naming (`tuvren-tui`, `Tuvren`, `TUVREN_LIB_PATH`, `tuvren_tui`, `libtuvren_tui.*`, `@tuvren/*`) is consistent across all four upstream artifacts.
 
 The `tui_*` ABI prefix is explicitly preserved by ADR-T42 and is not part of the rename scope.
 

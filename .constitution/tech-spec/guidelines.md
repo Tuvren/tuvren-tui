@@ -26,9 +26,9 @@ tuvren-tui/
 │   │   ├── text_view.rs      # TextView viewport projection (ADR-T37)
 │   │   ├── text_renderer.rs  # Unified text renderer
 │   │   ├── transcript.rs     # TranscriptState and TranscriptBlock
-│   │   ├── split_pane.rs     # SplitPane state
-│   │   ├── terminal_capability.rs  # TerminalCapabilityState (ADR-T41)
-│   │   └── debug.rs          # Devtools: traces, snapshots, overlays
+│   │   ├── splitpane.rs     # SplitPane state
+│   │   ├── terminal_capabilities.rs  # TerminalCapabilityState (ADR-T41)
+│   │   └── devtools.rs      # Devtools: traces, snapshots, overlays
 │   └── Cargo.toml
 │
 ├── ts/                       # TypeScript/Bun Host Layer
