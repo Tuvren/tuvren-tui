@@ -22,16 +22,20 @@ Local Stage 2 Changelog. Tracks semantic versioning for the Architecture layer.
 
 ## v3.2.0
 
-- Added anchor-based viewport semantics as a formal bounded context responsibility.
+- Reformatted to the current stage-2 framework skeleton and clarified logical boundaries without changing the approved cross-language architecture.
 
-## v3.1.0
+## v3.1
 
-- Added devtools as a formal bounded context in the Native Core.
+- Clarified the next-phase logical emphasis without changing the core architectural invariant: transcript-heavy surfaces for long-lived applications, anchor-aware viewport behavior, developer tooling/inspection, and pane-oriented workflows are now the primary logical extensions of the existing Native Core and Host Layer split.
 
-## v3.0.0
+## v3.0
 
-- Major rewrite to reflect modular monolith with cross-language facade pattern.
+- Aligned Architecture with v3 TechSpec scope: terminal writer stage (ADR-T24), rich-text wrap cache (ADR-T25), host Runner API (ADR-T26), dashboard staple widgets (ADR-T27), editor-grade TextArea extensions (ADR-T28), distribution prebuild strategy (ADR-T29), deterministic golden and benchmark gates (ADR-T30), and conditional background render thread policy (ADR-T31). Updated FFI contract semantics and event drain flows (`tui_read_input` + `tui_next_event`).
 
-## v2.x series
+## v2.3
 
-- Earlier version history preserved in git logs.
+- Added v2 scope: Tree Module operations (subtree destruction, indexed insertion), v2 module additions (Reconciler Layer), new Appendix B decisions for v2. Resolved Risk 1 with safe concurrency primitives. Added Risk 7 (background render thread — explicitly descoped to v3). Updated Appendix A with ADR-004 amendment. **v2 COMPLETE — March 2026**.
+
+## v2.2
+
+- Removed §6 Performance Budgets (implementation-level detail; migrated to TechSpec §5.5). Removed stale `lrsa-320` marker. Fixed duplicate §6 numbering — Logical Risks & Technical Debt is now the sole §6 per the Architecture output standard.

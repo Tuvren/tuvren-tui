@@ -24,3 +24,4 @@ Epic T added bounded extension contribution points (`ExtensionRegistry`, `Extens
 | EXT-T004 | CommandPalette palette contribution slot | Feature | 3 |
 | EXT-T005 | Devtools panel and theme contribution slots | Feature | 5 |
 | EXT-T006 | Examples contribution slot and plugin demo | Chore | 3 |
+

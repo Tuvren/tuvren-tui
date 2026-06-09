@@ -22,3 +22,4 @@ Epic P completed the hard-cut Tuvren rename across TypeScript, Rust, environment
 ## Brownfield Note
 
 ADR-T42 is now shipped under Epic P. The GitHub repository now lives at `Tuvren/tuvren-tui`. The staged-prebuild path is removed; the resolver now searches `TUVREN_LIB_PATH` → aux scoped package → source build (repo-checkout only) → diagnostic error.
+
