@@ -1,4 +1,4 @@
-CLAUDE.md
+# AI Agent Instruction Manual
 
 Guidance for AI agents working in this repository. Domain-specific details live in `native/CLAUDE.md` for the Rust core and `ts/CLAUDE.md` for the TypeScript/Bun host layer.
 
@@ -11,10 +11,10 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 **Core invariant:** Rust owns all mutable UI state. TypeScript holds opaque `u32` Handles and issues commands. Control flow is unidirectional: the Host Layer calls into the Native Core; the Native Core never calls back into the Host Layer.
 
 **Canonical document chain** (read in order for design and planning questions):
-1. [docs/PRD.md](./docs/PRD.md) — product intent, glossary, scope, and constraints
-2. [docs/Architecture.md](./docs/Architecture.md) — logical boundaries, containers, flows, and risks
-3. [docs/TechSpec.md](./docs/TechSpec.md) — concrete implementation contract, ABI, state model, and verification surface
-4. [docs/Tasks.md](./docs/Tasks.md) — active execution plan plus archived completed scope
+1. [`.constitution/prd/`](./.constitution/prd/) — product intent, actors, glossary, capabilities, constraints, and scope
+2. [`.constitution/architecture/`](./.constitution/architecture/) — logical boundaries, containers, flows, resilience, and risks
+3. [`.constitution/tech-spec/`](./.constitution/tech-spec/) — concrete implementation contract, ABI, state model, and verification surface
+4. [`.constitution/tasks/`](./.constitution/tasks/) — active execution plan plus archived completed scope
 
 **Information flow:** PRD -> Architecture -> TechSpec -> Tasks
 
@@ -22,10 +22,9 @@ Guidance for AI agents working in this repository. Domain-specific details live 
 
 ## Current Repo Status
 
-- The canonical docs chain is current and should be treated as the source of truth for planning work.
-- `Tasks.md` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), **Epic Q** (Adoption and Framework Positioning), **Epic R** (Commands & Keymap Foundations), and **Epic S** (Effect Declarative Integration) as shipped. Active scope is now planned through **Epic T** (Plugin Slots and Extensibility), **Epic U** (SDK Productization / Expert-Level DX), and **Epic V** (First Public npm Publish and Feedback Loop).
-- `Tasks.md` separates **active scope** from **archived completed scope**. Do not mistake archived waves for the current backlog.
-- README, onboarding materials, and public positioning were refreshed in Epic Q. First public npm publishing is deferred to Epic V as a pre-GA `0.1.0` release after SDK productization. The canonical docs chain is authoritative for roadmap and scope.
+- The canonical constitution chain under `.constitution/` is current and should be treated as the source of truth for planning work.
+- `.constitution/tasks/` marks **Epic O** (Terminal Capability Hardening), **Epic P** (Tuvren Identity, Packaging, and Release Migration), **Epic Q** (Adoption and Framework Positioning), **Epic R** (Commands & Keymap Foundations), **Epic S** (Effect Declarative Integration), and **Epic T** (Plugin Slots and Extensibility) as shipped. Active scope is now **Epic U** (SDK Productization / Expert-Level DX) and **Epic V** (First Public npm Publish and Feedback Loop).
+- `.constitution/tasks/active/` separates active scope from archived completed scope. Do not mistake archived waves for the current backlog.
 - The transcript/devtools/split-pane/flagship-example wave is already implemented in source.
 
 ---
@@ -108,9 +107,9 @@ Rust cdylib (single mutable UI authority)
 4. When Brownfield reality differs from a doc, report and reconcile the drift explicitly.
 
 ### When changing Rust FFI surface
-1. Read the relevant contract in `docs/TechSpec.md` section 4.
-2. Read the related ADRs in `docs/TechSpec.md` section 2.
-3. Read the state model in `docs/TechSpec.md` section 3.
+1. Read the relevant contract in `.constitution/tech-spec/` section 4.
+2. Read the related ADRs in `.constitution/tech-spec/adrs/`.
+3. Read the state model in `.constitution/tech-spec/` section 3.
 4. Implement feature logic in the appropriate `native/src/*.rs` module.
 5. Add or update the `extern "C"` entry point in `native/src/lib.rs` via `ffi_wrap()` or `ffi_wrap_handle()`.
 
@@ -121,7 +120,13 @@ Rust cdylib (single mutable UI authority)
 4. Repo-side verification entrypoints that `dlopen` directly should target the local Cargo build, not staged prebuilds, so branch validation cannot be shadowed by old packaged artifacts.
 
 ### When picking what to read
-- Product/scope question -> `docs/PRD.md`
-- Boundary/flow question -> `docs/Architecture.md`
-- ABI/state/test/release question -> `docs/TechSpec.md`
-- Current execution priority -> `docs/Tasks.md`
+- Product/scope question -> `.constitution/prd/`
+- Boundary/flow question -> `.constitution/architecture/`
+- ABI/state/test/release question -> `.constitution/tech-spec/`
+- Current execution priority -> `.constitution/tasks/critical-path.md`
+
+---
+
+## Migration Note
+
+The constitution was migrated from flat `docs/PRD.md`, `docs/Architecture.md`, `docs/TechSpec.md`, `docs/Tasks.md` to the modular `.constitution/` directory structure. The old flat docs are deleted; use the four-stage constitution chain for all planning and reference work.
