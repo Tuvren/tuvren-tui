@@ -1,5 +1,5 @@
 // TuiNode — individual widget state node
-// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:1001-1055.
+// Schema snapshot — NOT COMPILED. Source: native/src/types.rs:1001-1054.
 
 #![allow(dead_code)]
 
