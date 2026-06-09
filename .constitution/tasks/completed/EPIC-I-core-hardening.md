@@ -116,4 +116,4 @@ And regressions fail CI with actionable counter output
 
 ## Brownfield Note
 
-ADR-T16 (Safe Global State) shipped under Epic I. The `static mut CONTEXT` in `native/src/context.rs` was replaced with `OnceLock<RwLock<TuiContext>>`. All FFI entry points in `native/src/lib.rs` acquire explicit read/write locks. `tui_init()` / `tui_shutdown()` / `tui_reinit()` have deterministic lifecycle semantics. Handle(0) is the invalid sentinel.
+ADR-T16 (Safe Global State) shipped under Epic I. The `static mut CONTEXT` in `native/src/context.rs` was replaced with `static CONTEXT: OnceLock<RwLock<Option<TuiContext>>> = OnceLock::new()` (the `Option` wrapping allows the lock to exist pre-initialization). All FFI entry points in `native/src/lib.rs` acquire explicit read/write locks. `tui_init()` / `tui_shutdown()` / `tui_reinit()` have deterministic lifecycle semantics. Handle(0) is the invalid sentinel.
