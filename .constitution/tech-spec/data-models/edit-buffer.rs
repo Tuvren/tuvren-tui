@@ -5,16 +5,18 @@
 
 // NOT COMPILED — schema reference only.
 
-#[derive(Clone)]
-pub enum EditOp {
-    Insert { pos: usize, text: String },
-    Delete { pos: usize, len: usize },
-    Replace { pos: usize, old_len: usize, new_text: String },
-    CursorMove { pos: usize },
+#[derive(Debug, Clone)]
+pub struct EditOp {
+    pub start: usize,
+    pub deleted_text: String,
+    pub inserted_text: String,
+    pub generation: u64,
 }
 
 pub struct EditBuffer {
     pub buffer: u32,
+    pub buffer_epoch: u64,
     pub history: Vec<EditOp>,
     pub undo_cursor: usize,
+    pub generation: u64,
 }

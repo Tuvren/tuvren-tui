@@ -109,7 +109,7 @@ Repo-side host verification entrypoints that `dlopen` directly are expected to v
 | **CI Mode** | Blocking |
 | **Platform matrix** | `linux-x64`, `linux-arm64`, `darwin-arm64`, `darwin-x64`, `win32-x64` |
 | **Enforcement** | Each platform builds the native library from source and runs `bun test ts/test-install.test.ts`. Native targets (`linux-x64`, `darwin-arm64`, `darwin-x64`, `win32-x64`) also run a headless `dlopen` smoke confirming `tui_init_headless` / `tui_shutdown` succeed. `linux-arm64` is cross-compiled on an x64 runner and receives build + install-smoke only; load smoke requires a native arm64 runner and is tracked as a future gate upgrade. |
-| **Benchmark promotion** | Benchmark-heavy gates (Gates 3, 7, 8) remain Linux-only. Promoting any benchmark gate to a multi-platform blocking check requires an explicit decision tracked in `Tasks.md`. |
+| **Benchmark promotion** | Benchmark-heavy gates (Gates 3, 7, 8) remain Linux-only. Promoting any benchmark gate to a multi-platform blocking check requires an explicit decision tracked in the active epic plan under `.constitution/tasks/active/`. |
 | **Release timing** | This gate is pre-merge blocking in CI. No separate post-publish verification step exists at this time; Epic V will add packed/registry install smoke before the first public npm publish. |
 
 ---
@@ -176,4 +176,4 @@ The `cross-platform-smoke` job was introduced in Epic P (PROD-P006) to satisfy t
 
 When the decision is made to promote any benchmark gate to multi-platform enforcement, that change must be tracked as an explicit ticket in `.constitution/tasks/` with a rationale for the threshold values chosen on each platform.
 
-**musl/Alpine exclusion:** Linux auxiliary packages declare `"libc": ["glibc"]` in their `package.json`. Bun's package manager (Bun ≥ 1.1) respects the `libc` field for optional dependency filtering, preventing glibc-targeting packages from installing on musl hosts. The resolver also surfaces a clear diagnostic when the native library cannot be found. Public musl/Alpine support is out of scope per PRD §6 until a musl-targeted build and testing path is explicitly added to `Tasks.md`.
+**musl/Alpine exclusion:** Linux auxiliary packages declare `"libc": ["glibc"]` in their `package.json`. Bun's package manager (Bun ≥ 1.1) respects the `libc` field for optional dependency filtering, preventing glibc-targeting packages from installing on musl hosts. The resolver also surfaces a clear diagnostic when the native library cannot be found. Public musl/Alpine support is out of scope per PRD §6 until a musl-targeted build and testing path is explicitly added to the active epic plan under `.constitution/tasks/active/`.
