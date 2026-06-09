@@ -353,7 +353,7 @@ bun run ts/bench-render.ts
 | [TechSpec](./.constitution/tech-spec/stack.md) | ABI, state model, interface contracts, verification surface |
 | [Tasks](./.constitution/tasks/critical-path.md) | Active execution plan plus archived completed scope |
 | [GatePolicy](./.constitution/reports/GatePolicy.md) | CI quality gates and release verification policy |
-| [Migration Guide](./docs/migration/kraken-to-tuvren.md) | Kraken → Tuvren hard-cut migration reference |
+| [Migration Guide](./.constitution/spikes/tuvren-migration-inventory.md) | Kraken → Tuvren hard-cut migration inventory |
 
 ## License
 
