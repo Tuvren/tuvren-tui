@@ -2,7 +2,7 @@
 
 ## Scope
 
-Epic O hardens terminal capability handling without changing Kraken's authority
+Epic O hardens terminal capability handling without changing Tuvren's authority
 model: Rust owns terminal state and protocol emission; TypeScript only queries
 diagnostics and issues commands. This spike validates the implementation path
 for Kitty keyboard disambiguation, OSC52 clipboard writes, OSC8 hyperlinks,
@@ -45,7 +45,7 @@ may add explicit passthrough wrappers once validated against each mux.
 
 ## OSC52 Clipboard
 
-Kraken only supports write operations in Epic O.
+Tuvren only supports write operations in Epic O.
 
 - Targets: `0 = clipboard` maps to OSC52 target `c`; `1 = primary` maps to `p`.
 - Payloads are UTF-8 bytes accepted from the host, base64-encoded by Rust, and bounded before emission.
@@ -60,14 +60,14 @@ Link ranges are stored in byte offsets against `TextBuffer` content and are
 reconciled like style spans after replacement.
 
 - URI validation rejects empty URIs, non-ASCII payloads, C0/C1 controls, `ESC`, and backslash.
-- URI schemes allowed in Epic O: `http://`, `https://`, `mailto:`, `file://`, `ssh://`, and `kraken://`.
+- URI schemes allowed in Epic O: `http://`, `https://`, `mailto:`, `file://`, `ssh://`, and `tuvren://`.
 - Optional `id` values must be printable ASCII without semicolon, colon, equals, backslash, or `ESC`.
 - Writer emission opens and closes links around compacted runs and always closes an active link before frame reset.
 - Unsupported OSC8 terminals still render visible text with no OSC8 sequences.
 
 ## Kitty Keyboard
 
-Kraken negotiates only disambiguated escape codes in Epic O.
+Tuvren negotiates only disambiguated escape codes in Epic O.
 
 - Direct terminals call `supports_keyboard_enhancement()`.
 - If supported, `PushKeyboardEnhancementFlags(DISAMBIGUATE_ESCAPE_CODES)` is emitted during backend initialization.

@@ -12,7 +12,7 @@ It is intentionally constrained to the MVP behavior required by Epic K:
 
 ## FFI API
 
-All functions use Kraken's standard status conventions:
+All functions use Tuvren's standard status conventions:
 
 - `0` success
 - `-1` error (`tui_get_last_error`)

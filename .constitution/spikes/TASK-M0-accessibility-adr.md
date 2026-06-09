@@ -110,8 +110,8 @@ export const AccessibilityRole = {
 
 **Event decoding:**
 - `EventType.Accessibility = 7` added to `ffi/structs.ts`
-- `KrakenEventType` union extended with `"accessibility"`
-- `KrakenEvent` gains `roleCode?: number` field
+- `TuvrenEventType` union extended with `"accessibility"`
+- `TuvrenEvent` gains `roleCode?: number` field
 
 ## Consequences
 

@@ -55,9 +55,9 @@ The runtime resolver (`ts/src/resolver.ts`) searches for the native library in t
 
 1. **Environment override:** `TUVREN_LIB_PATH` environment variable — absolute path to the library file. If set and the file exists, use it directly. Intended for CI, custom deployments, and debugging.
 
-2. **Prebuilt artifacts:** `<package-root>/prebuilds/<platform>-<arch>/<libName>` — where `<package-root>` is the `ts/` directory. Prebuilds are populated by a postinstall step or manual download.
+2. **Auxiliary scoped native package:** Resolve `@tuvren/tuvren-tui-<platform>-<arch>` by package name via `import.meta.resolve()` and derive the library path from the resolved package root. Platform-correct `<libName>` is derived from the resolved package root rather than assuming a nested `node_modules/` filesystem layout.
 
-3. **Source build (dev mode):** `<package-root>/../native/target/release/<libName>` — the standard Cargo release output. This is the existing behavior for developers building from source.
+3. **Source build (dev mode):** `<package-root>/../native/target/release/<libName>` — the standard Cargo release output. Authorized only when the resolver can prove it was loaded from a Tuvren workspace (native/Cargo.toml sibling of the ts/ package root); arbitrary linked directories must not probe this path opportunistically.
 
 4. **Failure:** If none of the above paths resolve, throw a `TuvrenError` with platform-specific diagnostic information and remediation steps.
 
@@ -86,5 +86,5 @@ The runtime resolver (`ts/src/resolver.ts`) searches for the native library in t
 - Each artifact has a valid SHA-256 checksum sidecar.
 - The runtime resolver correctly selects the matching prebuilt artifact on supported platforms.
 - Unsupported platforms receive a diagnostic error with actionable remediation steps.
-- The `KRAKEN_LIB_PATH` override works for all platforms.
+- The `TUVREN_LIB_PATH` override works for all platforms.
 - Existing source-build development workflow remains functional with zero behavior change.
