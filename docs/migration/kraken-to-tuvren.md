@@ -167,4 +167,4 @@ Any remaining `kraken` occurrences outside of historical documentation or change
 
 This rename is part of the Tuvren productization wave (Epic P). The project moved from the working name `kraken-tui` / `Kraken` to the public product name `tuvren-tui` / `Tuvren` as a pre-1.0 hard cut. Semantic versioning guarantees and long-lived compatibility aliases begin at public `v1.0 GA`. Pre-GA releases, including this rename, may include breaking changes without a deprecation window.
 
-See [TechSpec ADR-T42](../TechSpec.md#adr-t42-public-product-and-package-naming-move-to-tuvren) for the decision record and [TechSpec ADR-T43](../TechSpec.md#adr-t43-one-public-package-sits-above-internal-scoped-native-packages) for the auxiliary native package distribution contract.
+See [TechSpec ADR-T42](../../.constitution/tech-spec/adrs/ADR-T42-tuvren-rename.md) for the decision record and [TechSpec ADR-T43](../../.constitution/tech-spec/adrs/ADR-T43-one-public-package.md) for the auxiliary native package distribution contract.
