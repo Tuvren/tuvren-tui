@@ -22,7 +22,7 @@ for Epics U–X and the launch centerpiece for Epic Z.
   - `.constitution/spikes/SPK-FLAG-Y001.md` (sole output)
 - **Scope (Out-of-Scope Files):**
   - `examples/opencode-client/` (no code changes in a Spike)
-- **Verification Command:** `test -s .constitution/spikes/SPK-FLAG-Y001.md`
+- **Verification Command:** `test -s .constitution/spikes/SPK-FLAG-Y001.md && ! grep -qF '[e.g.,' .constitution/spikes/SPK-FLAG-Y001.md`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP: no production code changes are allowed inside a Spike ticket."
@@ -52,7 +52,7 @@ And it lists FLAG-Y002 through FLAG-Y005 as the unlocked tickets
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP if the shell needs any internal import; a public-surface gap here is a defect against SDK-X006's gate and must be reported, not worked around."
-- **Description:** Build the client shell on the public SDK: SplitPane layout (session Transcript, input area, side panel), a Transcript wired to a mock streaming session producing realistic block volume, and keyboard-driven focus traversal between panes.
+- **Description:** Build the client shell on the public SDK: SplitPane layout (session Transcript, input area, side panel), a Transcript wired to a mock streaming session producing realistic block volume, and keyboard-driven focus traversal between panes. The run entry point is pinned as `examples/opencode-client/main.ts` (a planning decision, fixed regardless of the internal structure SPK-FLAG-Y001 defines), so the verification command stays stable across the epic.
 - **Acceptance Criteria (Gherkin):**
 ```gherkin
 Given the client runs against the mock session

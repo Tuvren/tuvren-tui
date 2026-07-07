@@ -88,7 +88,7 @@ And the module map documentation matches the source tree
   - `.constitution/spikes/SPK-ARCH-W003.md` (sole output)
 - **Scope (Out-of-Scope Files):**
   - `native/src/` (no code changes in a Spike)
-- **Verification Command:** `test -s .constitution/spikes/SPK-ARCH-W003.md`
+- **Verification Command:** `test -s .constitution/spikes/SPK-ARCH-W003.md && ! grep -qF '[e.g.,' .constitution/spikes/SPK-ARCH-W003.md`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP: no production code changes are allowed inside a Spike ticket."
@@ -292,7 +292,7 @@ And a deliberate violation of the gated property fails the gate
   - `.constitution/spikes/SPK-ARCH-W010.md` (sole output)
 - **Scope (Out-of-Scope Files):**
   - `native/Cargo.toml` (no dependency changes in a Spike)
-- **Verification Command:** `test -s .constitution/spikes/SPK-ARCH-W010.md`
+- **Verification Command:** `test -s .constitution/spikes/SPK-ARCH-W010.md && ! grep -qF '[e.g.,' .constitution/spikes/SPK-ARCH-W010.md`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP: no production code changes are allowed inside a Spike ticket."

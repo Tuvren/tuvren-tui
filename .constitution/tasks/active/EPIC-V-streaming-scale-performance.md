@@ -57,7 +57,7 @@ Then regressions beyond the recorded budgets fail the pipeline
   - `.constitution/spikes/SPK-PERF-V002.md` (sole output)
 - **Scope (Out-of-Scope Files):**
   - `native/src/transcript.rs` (no code changes in a Spike)
-- **Verification Command:** `test -s .constitution/spikes/SPK-PERF-V002.md`
+- **Verification Command:** `test -s .constitution/spikes/SPK-PERF-V002.md && ! grep -qF '[e.g.,' .constitution/spikes/SPK-PERF-V002.md`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP: no production code changes are allowed inside a Spike ticket."
@@ -145,7 +145,7 @@ Then the documented default policy from the ADR applies
   - `.constitution/spikes/SPK-PERF-V005.md` (sole output)
 - **Scope (Out-of-Scope Files):**
   - `native/src/render.rs` (no code changes in a Spike)
-- **Verification Command:** `test -s .constitution/spikes/SPK-PERF-V005.md`
+- **Verification Command:** `test -s .constitution/spikes/SPK-PERF-V005.md && ! grep -qF '[e.g.,' .constitution/spikes/SPK-PERF-V005.md`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:**
   - "STOP: no production code changes are allowed inside a Spike ticket."
