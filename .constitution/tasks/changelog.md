@@ -4,6 +4,10 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v9.0.0
+
+- Re-planned the entire active wave from the pre-GA deep audit (`.constitution/reports/audit-2026-07-07-161112-pre-ga-deep-audit.md`). Rewrote Epic U and Epic V in place with new scope and extended the chain to six active epics (177 points, 52 tickets): **U — Safety, Correctness & Gates** (SAFE), **V — Streaming-Scale Performance** (PERF), **W — Architecture Consolidation & Tech Debt** (ARCH), **X — SDK Productization / Expert-Level DX** (SDK, carries the former Epic U mandate), **Y — OpenCode Flagship Client** (FLAG, new scope from audit direction suggestion 2), and **Z — Release Readiness & First Public npm Publish** (PUB, carries the former Epic V mandate plus supply-chain hardening). Publishing is deliberately deferred to the end of the wave; the audit report supersedes the former SDK-U001 and PUB-V001 spikes. Added five ADR-producing spike placeholders (`SPK-PERF-V002`, `SPK-PERF-V005`, `SPK-ARCH-W003`, `SPK-ARCH-W010`, `SPK-FLAG-Y001`) for the contract-level changes. Major bump: the governing structure of the active backlog changed (epic meanings redefined, publish re-sequenced).
+
 ## v8.2.0
 
 - Executed Epic T: `ExtensionRegistry` with activation/deactivation lifecycle, bounded contribution slots for commands, keymaps, palette, devtools, themes, and examples; 60 focused tests in `test-extensions.test.ts`; `examples/plugin-demo.ts` exercising all slots; bundle at 79.6 KB under 100 KB budget. Epic U is now the active wave.
