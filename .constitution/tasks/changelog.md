@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.18 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.19 by making TUI-D006 run the dedicated Effect/imperative host animation-ordering suite and including that suite in TUI-I006's strict host aggregate.
+- Kept the 62-ticket, 385-point, 155-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged.
+
 ## v10.0.17 — 2026-08-26
 
 ### Fixed
