@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.17] — 2026-08-26
+
+### Fixed
+
+- Required Collection/Transcript native completion before application delivery and defined Transcript controller-to-target binding plus executor-cached visible ranges.
+- Bound ring-wrap payload identities to correlation fields and required unknown Event modifier bits to fail every live/test/replay decoder.
+- Changed final publication to quarantined exact artifacts, full registry verification, and same-byte final-tag promotion.
+
 ## [v9.0.16] — 2026-08-26
 
 ### Fixed

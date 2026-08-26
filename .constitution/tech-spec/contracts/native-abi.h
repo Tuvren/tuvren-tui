@@ -75,6 +75,7 @@ extern "C" {
 #define TUVREN_EVENT_MOD_CONTROL 0x00000002u
 #define TUVREN_EVENT_MOD_ALT 0x00000004u
 #define TUVREN_EVENT_MOD_SUPER 0x00000008u
+#define TUVREN_EVENT_MOD_MASK 0x0000000fu
 #define TUVREN_CAP_SYNC_OUTPUT 0x0000000000000001ull
 #define TUVREN_CAP_HYPERLINKS 0x0000000000000002ull
 #define TUVREN_CAP_ENHANCED_KEYBOARD 0x0000000000000004ull
@@ -1399,8 +1400,11 @@ typedef struct TuvrenQueryResult {
  * grapheme and TUVREN_QUERY_FIND_* flags as options, then writes matched UTF-8
  * and returns the match range; no match returns UNAVAILABLE. TEXT_ENCODE uses
  * argument0 as TuvrenTextEncoding and writes encoded bytes. Collection and
- * Transcript visible-range queries write no bytes and return their generation
- * and resident range. COLLECTION_SCROLL_POSITION writes exactly one
+ * Transcript visible-range queries write no bytes, return their generation and
+ * visible range, and return the committed observation's transaction/render
+ * identities in value0/value1. The executor copies those results into SDK
+ * caches; public lastVisibleRange() access never calls the ABI synchronously.
+ * COLLECTION_SCROLL_POSITION writes exactly one
  * TuvrenCollectionScrollPositionPayload plus any UTF-8 anchor key in the same
  * output buffer; key_offset is relative to the output-buffer start. A missing
  * anchor uses key_tag/key offsets/key number zero. String and numeric anchors
@@ -1410,6 +1414,10 @@ typedef struct TuvrenQueryResult {
  * TERMINAL_CAPABILITIES writes exactly one
  * TuvrenTerminalCapabilitiesPayload. Every BUFFER_TOO_SMALL response reports
  * required_bytes and writes no partial semantic value. */
+
+/* KEY, POINTER_MOVE, POINTER_BUTTON, and WHEEL decoders require
+ * (modifiers & ~TUVREN_EVENT_MOD_MASK) == 0 before accepting a batch. Unknown
+ * modifier bits are validation errors and are never ignored or normalized. */
 
 typedef struct TuvrenRecordBatchHeader {
     uint32_t magic;

@@ -15,6 +15,7 @@ import {
   Text,
   TextArea,
   ToggleButton,
+  Transcript,
   commandId,
   componentId,
   defineTheme,
@@ -24,6 +25,7 @@ import {
   render,
   themeToken,
   useStream,
+  useTranscriptController,
   withRequirements,
   type CommandService,
   type RangeLoadResult,
@@ -220,6 +222,16 @@ const erasedCommandPaletteRender: Effect.Effect<void, TuvrenError> =
   render(typedCommandPalette);
 const initialCursor = graphemeIndex(0);
 const boundTextArea = TextArea({ document: textDocumentService });
+const transcriptControllerA = useTranscriptController();
+const transcriptControllerB = useTranscriptController();
+const transcriptViewA = Transcript({
+  mode: "bounded-local",
+  controller: transcriptControllerA,
+});
+const transcriptViewB = Transcript({
+  mode: "bounded-local",
+  controller: transcriptControllerB,
+});
 const acceptedReplayTrace: ReplayInput = runtimeReplayTrace;
 const replayCaptureHarness: Effect.Effect<
   TestHarness<true>,
@@ -307,6 +319,8 @@ void erasedCommandMenuItemRender;
 void erasedCommandPaletteRender;
 void initialCursor;
 void boundTextArea;
+void transcriptViewA;
+void transcriptViewB;
 void acceptedReplayTrace;
 void replayCaptureHarness;
 void rejectedReplayTrace;
