@@ -492,7 +492,7 @@ pub struct DragState {
 #[derive(Clone, Debug)]
 pub struct TranscriptBlock {
     pub id: TranscriptBlockId,
-    pub generation: u64,
+    pub version: u64,
     pub text_document: TextDocumentId,
     pub streaming: bool,
     pub collapsed: bool,

@@ -1,5 +1,6 @@
 import * as Effect from "effect/Effect";
 import * as Stream from "effect/Stream";
+import type * as Scope from "effect/Scope";
 import {
   Box,
   Button,
@@ -11,6 +12,7 @@ import {
   commandId,
   componentId,
   defineTheme,
+  mount,
   provideTheme,
   render,
   themeToken,
@@ -45,7 +47,6 @@ const root = Box({
             items: ["one"],
           }),
       },
-      getKey: (item: string) => item,
       renderItem: (item: string) => Text({ content: item }),
       mutations: Stream.empty,
     }),
@@ -87,6 +88,36 @@ const jsxNode = jsx(Box, { children: "content" });
 
 const terminalTag = Terminal;
 const commandTag = Commands;
+interface Database {
+  readonly _tag: "Database";
+}
+declare const requiredLoad: Effect.Effect<
+  RangeLoadResult<string>,
+  "load-error",
+  Database
+>;
+declare const failingHandler: Effect.Effect<void, "event-handler-error">;
+const requiredView = Select<string, "load-error", Database>({
+  dataSource: {
+    getKey: (item) => item,
+    loadRange: () => requiredLoad,
+  },
+  renderItem: (item) => Text({ content: item }),
+});
+const requiredRoot = Box({ children: requiredView });
+const requiredRender: Effect.Effect<
+  void,
+  TuvrenError | "load-error",
+  Database
+> = render(requiredRoot);
+const observedSession: Effect.Effect<
+  void,
+  TuvrenError | "event-handler-error",
+  Scope.Scope
+> = Effect.flatMap(
+  mount(root, { onEvent: () => failingHandler }),
+  (session) => session.awaitExit,
+);
 const imperativeSave: ImperativeCommand<number, "save-failed"> = {
   id: save,
   title: "Save",
@@ -120,4 +151,6 @@ void jsxNode;
 void save;
 void terminalTag;
 void commandTag;
+void requiredRender;
+void observedSession;
 void imperative;

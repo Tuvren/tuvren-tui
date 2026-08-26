@@ -1,0 +1,10 @@
+{
+  "validator": "validateApplicationReplay",
+  "invariants": [
+    "events are ordered by nondecreasing atMilliseconds",
+    "expectations.afterEvent is a zero-based event index strictly less than events.length",
+    "expectations.afterEvent values are unique and ordered increasingly",
+    "each expectation snapshot passes validateDiagnosticSnapshotRuns",
+    "external-update numbers are finite and every encoded string and aggregate payload stays inside durable-file-limits.json"
+  ]
+}
