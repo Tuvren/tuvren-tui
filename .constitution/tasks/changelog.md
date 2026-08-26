@@ -4,6 +4,28 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.0 — 2026-08-26
+
+### Added
+
+- Added 55 atomic, mode-tagged tickets across nine active epics, totaling 350 points and mapping the complete P0 `0.1.0` contract from runtime foundation through atomic publication.
+- Added decision-producing spike plans for OD-02 selective Event arbitration and OD-01 comparative performance gates, with explicit upstream Evolution requirements.
+- Added a dependency-accurate build graph, a 111-point critical path, target paths and commands from TechSpec v9.0.0, and release-blocking OpenCode, five-target, accessibility, security, adoption, and performance evidence.
+
+### Changed
+
+- Replaced the prior audit/Plugin-era Epics U–Z with epics aligned to PRD v3.0.0, Architecture v4.0.0, and TechSpec v9.0.0: runtime, composition, text, interaction, Collections/Transcript, terminal, diagnostics, performance, and release.
+- Made the root Bun workspace and strict Brownfield migration the first ticket rather than assuming the target toolchain and repository shape already exist.
+- Separated binding 120/90/60 absolute performance work from evidence-dependent comparative targets.
+
+### Removed
+
+- Removed active Plugin-slot, RuntimeExtension, background-render, soft-reload, and premature publish work that contradicts the realigned upstream contract.
+
+### Security
+
+- Scheduled bounded codecs and queues, full untrusted-boundary inventory and fuzzing, diagnostic redaction, terminal restoration, immutable CI inputs, checksums, provenance, and atomic version validation as release blockers.
+
 ## v9.0.0
 
 - Re-planned the entire active wave from the pre-GA deep audit (`.constitution/reports/audit-2026-07-07-161112-pre-ga-deep-audit.md`). Rewrote Epic U and Epic V in place with new scope and extended the chain to six active epics (177 points, 52 tickets): **U — Safety, Correctness & Gates** (SAFE), **V — Streaming-Scale Performance** (PERF), **W — Architecture Consolidation & Tech Debt** (ARCH), **X — SDK Productization / Expert-Level DX** (SDK, carries the former Epic U mandate), **Y — OpenCode Flagship Client** (FLAG, new scope from audit direction suggestion 2), and **Z — Release Readiness & First Public npm Publish** (PUB, carries the former Epic V mandate plus supply-chain hardening). Publishing is deliberately deferred to the end of the wave; the audit report supersedes the former SDK-U001 and PUB-V001 spikes. Added five ADR-producing spike placeholders (`SPK-PERF-V002`, `SPK-PERF-V005`, `SPK-ARCH-W003`, `SPK-ARCH-W010`, `SPK-FLAG-Y001`) for the contract-level changes. Major bump: the governing structure of the active backlog changed (epic meanings redefined, publish re-sequenced).
