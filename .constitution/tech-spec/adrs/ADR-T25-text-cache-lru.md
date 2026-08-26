@@ -2,5 +2,5 @@
 
 - **Status:** accepted
 - **Context:** Stable content in rich text widgets and text wrapping benefits from caching to avoid repeated parse and measure work.
-- **Decision:** Rich text and wrap results are cached in a bounded native LRU. Cache entries are keyed by content epoch and style fingerprint; eviction uses a simple LRU policy with a configurable capacity.
-- **Consequences:** Stable content avoids repeated parse and wrap work inside the Native Core. Cache warming and eviction behavior must be observable through diagnostics.
+- **Decision:** Rich-text, syntax, grapheme, width, wrap, responsive-style, and projection artifacts use bounded native caches. Keys include every semantic input, including content and style epochs, width policy, wrap width, tab width, Capability Tier, and relevant environment conditions. Count and byte limits are mandatory.
+- **Consequences:** Stable content avoids repeated work while cache correctness stays explicit. Hits, misses, bytes, eviction, invalidation causes, and worst-case cold behavior are observable and benchmarked.

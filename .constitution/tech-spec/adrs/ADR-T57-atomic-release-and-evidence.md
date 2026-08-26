@@ -1,0 +1,6 @@
+# ADR-T57: Make the atomic package set and evidence matrix the release unit
+
+- **Status:** accepted
+- **Context:** One-command installation depends on a matching native artifact, while P0 requires five target smokes, public examples, OpenCode evidence, security gates, declarations, source maps, CLI commands, and absolute plus comparative performance evidence.
+- **Decision:** Publish `tuvren-tui` and five private platform packages atomically at one exact version with a schema-valid release manifest, checksums, provenance, declarations, source maps, licenses, and the `tuvren` executable. The resolver checks an explicit override, exact platform package, proven source checkout, then fails. Final `0.1.0` promotion requires every P0 capability mapping and gate; implementation builds remain private or `0.1.0-alpha.*`. OpenCode uses an application adapter and deterministic replay and never contributes core contract types.
+- **Consequences:** Release automation is part of the implementation contract, not packaging cleanup. A missing target or evidence row blocks final promotion. ABI compatibility is private and exact-version only; pre-GA public changes still require migration communication.

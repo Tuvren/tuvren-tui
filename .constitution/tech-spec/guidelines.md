@@ -1,108 +1,181 @@
-# Project Structure and Coding Standards
+# Engineering guidelines
 
-## 0. Version
+## Version
 
-**v8.1.0** — corresponds to the TechSpec version.
+**v9.0.0** — corresponds to `.constitution/tech-spec/changelog.md`.
 
----
+## Target repository structure
 
-## 1. Repository Layout
-
-```
+```text
 tuvren-tui/
-├── native/                    # Rust Native Core (cdylib)
+├── native/
 │   ├── src/
-│   │   ├── lib.rs            # FFI entry points (ffi_wrap / ffi_wrap_handle)
-│   │   ├── tree.rs           # Composition Tree and TuiNode
-│   │   ├── layout.rs         # Taffy-based layout engine
-│   │   ├── render.rs         # Render pipeline
-│   │   ├── writer.rs         # Terminal instruction compaction
-│   │   ├── event.rs          # Input capture and event buffering
-│   │   ├── scroll.rs         # Scroll state and nested-scroll handoff
-│   │   ├── theme.rs          # Theme and style resolution
-│   │   ├── style.rs          # Style application
-│   │   ├── animation.rs      # Animation state and transitions
-│   │   ├── text_buffer.rs    # TextBuffer native substrate (ADR-T37)
-│   │   ├── text_view.rs      # TextView viewport projection (ADR-T37)
-│   │   ├── text_renderer.rs  # Unified text renderer
-│   │   ├── transcript.rs     # TranscriptState and TranscriptBlock
-│   │   ├── splitpane.rs     # SplitPane state
-│   │   ├── terminal_capabilities.rs  # TerminalCapabilityState (ADR-T41)
-│   │   └── devtools.rs      # Devtools: traces, snapshots, overlays
-│   └── Cargo.toml
-│
-├── ts/                       # TypeScript/Bun Host Layer
+│   │   ├── lib.rs                    # Private C ABI entrypoints only
+│   │   ├── context.rs                # Explicit context registry and owner-thread checks
+│   │   ├── transaction.rs            # Decode, validate, and apply transaction batches
+│   │   ├── composition/              # RuntimeNode tree, layout, StyleSheet, Theme, semantics
+│   │   ├── interaction/              # Input, focus, modal, selection, pointer, Event ordering
+│   │   ├── content/                  # Text Document, StyledText, editing, collections, Transcript
+│   │   ├── animation/                # Elapsed time, timelines, reduced motion
+│   │   ├── presentation/             # Layout, text projection, cells, diff, writer, frame tiers
+│   │   ├── terminal/                 # Backends, Screen Modes, protocols, clipboard, output policy
+│   │   └── diagnostics/              # Diagnostic Graph, Trace, Issues, snapshots, replay evidence
+│   ├── benches/
+│   ├── fuzz/
+│   ├── Cargo.toml
+│   └── Cargo.lock
+├── ts/
 │   ├── src/
-│   │   ├── index.ts          # Public API entry (Tuvren export)
-│   │   ├── commands.ts       # CommandRegistry, CommandDispatcher
-│   │   ├── keymap.ts         # KeymapRegistry
-│   │   ├── extensions.ts     # ExtensionRegistry, ExtensionContext
-│   │   ├── effect/           # tuvren-tui/effect package surface
-│   │   └── composites/       # Higher-level composites (CommandPalette, etc.)
-│   ├── test-*.test.ts        # Integration tests
-│   └── package.json
-│
-├── examples/                 # Flagship and demo examples
-│   ├── agent-console.ts
-│   ├── ops-log-console.ts
-│   ├── repo-inspector.ts
-│   └── effect-counter.tsx
-│
-└── .github/workflows/
-    └── release.yml           # Versioned GitHub release assets
+│   │   ├── index.ts                  # Bare Effect UI SDK entrypoint
+│   │   ├── imperative/               # Explicit Imperative SDK and advanced embedding
+│   │   ├── components/               # First-party public Components and stable style slots
+│   │   ├── runtime/                  # Managed scopes, UI executor, transactions, private Reactivity
+│   │   ├── commands/                 # Command and Keymap services
+│   │   ├── styling/                  # StyleSpec, StyleSheet, ThemeTokens, ThemeRecipes declarations
+│   │   ├── testing/                  # Semantic harness, profiles, drivers, snapshots
+│   │   ├── devtools/                 # CLI bridge, inspector views, trace files, source mapping
+│   │   ├── ffi/                      # Private symbol table, binary codecs, resolver, error translation
+│   │   └── jsx/                      # JSX transforms and private reconciler
+│   ├── test/
+│   ├── package.json
+│   ├── tsconfig.json
+│   └── bun.lock
+├── packages/                         # Private exact-version platform packages
+├── examples/
+│   ├── flagship/                     # Dashboard/form, editor/inspector, streaming, inline/split
+│   ├── capabilities/                 # One public example per shipped capability
+│   ├── opencode-client/              # Reference adapter and deterministic replay only
+│   └── fixtures/
+├── benchmarks/
+│   ├── fixtures/                     # Equivalent public-API competitive workloads
+│   ├── terminal-profiles/
+│   └── results/                      # Raw schema-valid evidence, not committed machine noise
+├── scripts/                          # Contract, schema, release, and benchmark verification
+├── .github/workflows/
+├── rust-toolchain.toml
+└── devenv.nix
 ```
 
----
+Migration may happen incrementally, but completed modules must follow this target ownership. Compatibility forwarding files may exist for one migration wave only and cannot retain obsolete public exports.
 
-## 2. FFI Contract Conventions
+## Rust standards
 
-### Entry Point Style
-- All public FFI entry points use `ffi_wrap!` or `ffi_wrap_handle!` macros
-- The panic boundary (`-2`) catches any native panic and converts it to an error return
-- Handle `(0)` is permanently invalid; every command validates before use
+- Read and apply the repository's Rust core standard before authoring or reviewing Rust.
+- Use Rust 2024 idioms and `rustfmt`; `cargo clippy -- -D warnings` is mandatory.
+- `native/src/lib.rs` contains `extern "C"` entrypoints and delegates immediately. Business logic lives in the owning module.
+- Every FFI entrypoint catches unwinding. No panic, borrowed pointer, reference, slice, Rust enum, trait object, or allocator-owned buffer crosses the ABI.
+- Unsafe code is limited to audited boundary adapters. Each unsafe block states its preconditions and is covered by malformed-input tests or fuzz targets.
+- The transaction decoder performs bounds, alignment, version, opcode, property, identity, UTF-8, grapheme, and payload validation before mutation.
+- Once transaction application begins, expected failures are impossible. An unexpected failure freezes and discards the context; no rollback or continued mutation is attempted.
+- Runtime state belongs to an explicit context. Interactive use has one active context; tests and replay may create isolated headless contexts.
+- Runtime mutation checks the owner executor thread. Background workers may compute immutable application data but never mutate a runtime context.
+- Collections and Transcripts use stable keys and generations. Array positions and visible rows are never durable identities.
+- All caches and rings have count and byte limits plus observable eviction or wrap behavior.
+- The cell buffer stores complete grapheme payloads or interned grapheme identities; a single scalar is not a conforming P0 cell representation.
 
-### Naming
-- C ABI prefix: `tui_` (e.g., `tui_create_widget`, `tui_transcript_append_block`)
-- Host TypeScript wrapper: `Tuvren` class as the primary facade
-- Module naming: snake_case for Rust modules, camelCase for TypeScript
+## TypeScript standards
 
----
+- Read and apply the repository's TypeScript core standard before authoring or reviewing TypeScript.
+- Compile with TypeScript `5.9.3`, `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, `isolatedModules`, and declaration plus source-map output.
+- Ship ESM only. Do not add CommonJS wrappers.
+- Public code uses Component and Primitive. `RuntimeNode`, ABI handles, binary opcodes, and `@preact/signals-core` remain private.
+- The bare entrypoint must not import the Imperative SDK implementation eagerly unless tree shaking proves that no additional startup or bundle cost results.
+- `render` and resource-producing APIs return Effect values. Lifetimes use scopes; Commands use typed interruptible Effects; external updates and Events expose Streams where streaming is the right model.
+- Do not wrap an Effect API in a Promise and call it Effect-native. Promise conversion exists only at the outer Host Environment integration edge.
+- The UI executor is the sole caller of context-bound ABI functions, including input polling, Event and diagnostic drains, mutation, rendering, suspend, resume, and shutdown. Worker callbacks, Effects, Streams, Components, and imperative helpers enqueue typed work.
+- Reactivity is private. Public state hooks return Tuvren-owned interfaces and must not expose Signal identity, scheduling, equality, or disposal.
+- Validate `unknown` at public and durable-data boundaries. Do not introduce `any` to silence TypeScript 7 migration errors.
+- Public errors are tagged or classed `TuvrenError` variants and include stable code, category, operation, optional Component identity, cause, and remediation. Internal statuses never escape.
 
-## 3. Coding Standards
+## ABI and codec standards
 
-### Rust (Native Core)
-- **Edition:** 2021
-- **Linting:** `cargo clippy -- -D warnings` enforced in CI
-- **Formatting:** `cargo fmt -- --check` enforced in CI
-- **Testing:** `cargo test` must pass; golden snapshots for writer/render changes
-- **No unsafe in public FFI surface:** All `unsafe` blocks must be contained in internal implementation
+- `contracts/native-abi.h` is the ABI source of truth. Native exports and the Bun symbol table must be generated from or mechanically checked against it.
+- All integers use fixed widths. Sizes and offsets are unsigned and checked before addition or multiplication. Floating values use IEEE-754 fields, never undocumented integer bit casts.
+- Transaction and Event batches use little-endian versioned records with trailing byte arenas. Decoders reject unknown major versions, invalid lengths, overlapping regions, duplicate identities where forbidden, and trailing garbage.
+- Rust decoders read fields from bytes explicitly and never cast an untrusted or potentially unaligned buffer to a C or Rust struct. The C structs document layout for generated host codecs and conformance checks.
+- Callers own input and output buffers. The runtime never returns a pointer that outlives the call.
+- Strings are UTF-8 inside the ABI. TypeScript string conversion is transparent; explicit UTF-16LE and UTF-16BE adapters validate byte order and length.
+- Public positions are grapheme indices. Internal byte offsets may exist only beside the content epoch they were derived from.
+- ABI status values are private: success, buffer-too-small, invalid-input, stale-context, unavailable, and panic-contained. TypeScript copies details immediately and maps them to public errors.
+- Rust never invokes a TypeScript callback. Cancelable Event arbitration, if OD-02 is ratified, uses bounded request and disposition records through the executor.
 
-### TypeScript (Host Layer)
-- **Strict mode:** `--strict` enabled
-- **No `any`:** Use `unknown` and type guards for unvalidated data
-- **Bundle budget:** 100KB max (enforced in CI via `check-bundle.ts`)
-- **Testing:** `bun test ts/test-*.test.ts` must pass
+## Tests and evidence
 
-### State Ownership
-- **Rule:** Rust owns all mutable UI state. TypeScript holds opaque `u32` Handles.
-- **No reverse FFI calls:** The Native Core never initiates calls into the Host Layer.
-- **Copy semantics at boundary:** Internal pointers and mutable aliases never leak into host space.
+- Test public behavior before private helpers. A refactor that preserves behavior should not require rewriting the conformance suite.
+- Each P0 capability ID maps to at least one public example and automated acceptance test.
+- Every Primitive has imperative conformance; every first-party Component has Effect UI SDK conformance; shared fixtures prove semantic parity.
+- Text fixtures include joined emoji, flags, modifiers, combining marks, CJK, ambiguous widths, tabs, hyperlinks, selection, cursor, wrap, clip, search, editing, and negotiated width profiles.
+- Terminal tests include modern, compatible, multiplexer, denial, timeout, malformed response, partial write, disconnect, suspend, resume, and restoration cases.
+- Property tests cover transaction atomicity, Event order, Command concurrency, stale generation, eviction protection, grapheme coordinates, and style precedence.
+- Fuzz targets cover transaction batches, Event batches, formatted text, terminal responses, clipboard chunks, Diagnostic Traces, snapshots, profiles, and replay fixtures.
+- Performance evidence publishes pinned versions, hardware, warmup, samples, statistics, raw schema-valid results, engine time, terminal-write time, and input-to-Surface time.
+- Benchmark adaptation uses 120 Hz, 90 Hz, and 60 Hz tiers with hysteresis and an explicit degradation allowlist.
 
-### Error Model
-- Success: `0`
-- Explicit error: `-1` with `tui_get_last_error()` for message
-- Panic caught: `-2`
+## Observability and privacy
 
----
+- Every input, Event, Command, Effect span, transaction, mutation, dirty cause, layout, text operation, Render Pass, terminal write, error, and cleanup operation receives a causal identity.
+- Diagnostic-off code performs no steady-state diagnostic allocation and remains below 1% CPU overhead.
+- Passive metadata remains below 3%; full trace remains below 10%, uses bounded memory, and reports visible overhead.
+- Raw input, clipboard content, terminal payloads, environment values, and absolute paths are redacted by default. Full-content traces require confirmation.
+- Temporary debug output uses the ticket-scoped prefix required by the execution workflow and must not remain in a milestone commit.
 
-## 4. Test Surface
+## Compatibility and migration
 
-| Test Suite | Tool | Gate |
-| --- | --- | --- |
-| Native unit tests | `cargo test` | Required |
-| Native formatting | `cargo fmt -- --check` | Required |
-| Native linting | `cargo clippy -- -D warnings` | Required |
-| Host integration tests | `bun test ts/test-*.test.ts` | Required |
-| Bundle budget | `bun run ts/check-bundle.ts` | Required |
-| Example replay tests | `bun test ts/test-examples.test.ts` | Required |
-| Install smoke tests | GitHub Actions matrix | Required per platform |
+- Public package exports are checked from the declaration artifacts under `contracts/`.
+- Breaking pre-GA changes require a changelog and migration guide in the same release. Keep one minor of deprecation when safe; otherwise document the hard cut.
+- The migration removes root imperative exports, the `/effect` subpath, public Signals, Extension registries, and the legacy public-object name. It provides codemods for import paths and mechanical renames where practical.
+- Platform packages and ABI versions are exact-match implementation details; no cross-version ABI compatibility is promised.
+- Durable schema readers reject unknown major versions and may accept known older majors only through explicit migrations.
+
+## Commits
+
+Use Conventional Commits with a descriptive subject and body when the change has non-obvious motivation. Milestone commits name the ticket IDs once Stage 4 defines them. Do not include assistant branding.
+
+## Verification commands
+
+### Existing commands
+
+```bash
+cargo build --manifest-path native/Cargo.toml --release
+cargo check --manifest-path native/Cargo.toml --locked
+cargo test --manifest-path native/Cargo.toml --locked
+cargo fmt --manifest-path native/Cargo.toml -- --check
+cargo clippy --manifest-path native/Cargo.toml --locked -- -D warnings
+bun install --cwd ts --frozen-lockfile
+bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit
+bun test ts/test-ffi.test.ts
+bun test ts/test-jsx.test.ts
+bun test ts/test-commands.test.ts
+bun test ts/test-effect.test.ts
+bun test ts/test-examples.test.ts
+bun test ts/test-install.test.ts
+bun test ts/test-runner.test.ts
+bun run ts/check-bundle.ts
+bun run ts/bench-ffi.ts
+bun run ts/bench-render.ts
+```
+
+### Required commands not yet implemented
+
+Stage 4 must schedule these commands before relying on them as gates:
+
+```bash
+bun run check:contracts          # Typecheck declarations, compile ABI header, validate every JSON Schema and contract file
+bun run check:capability-map     # Prove every P0 ID has an example, test, flow, and task
+bun run test:semantic            # Shared Effect and imperative semantic conformance
+bun run test:terminal            # Protocol, Screen Mode, restoration, and multiplexer profiles
+bun run test:platform-smoke      # Install/load/init/headless-render/shutdown on all five targets
+bun run test:release-package     # Pack, install, exact-version resolve, declarations, source maps, CLI, and licenses
+bun run bench:envelope           # Absolute workload envelope and 120/90/60 tiers
+bun run bench:comparative        # OD-01 fixtures and raw results
+bun run bench:devtools           # Off, passive, and full-trace overhead
+bun run study:onboarding         # 5/10/30/10-minute adoption tasks
+bun run study:style-defect       # Median source-location task
+cargo fuzz run transaction_decode
+cargo fuzz run event_decode
+cargo fuzz run terminal_response
+cargo fuzz run durable_files
+cargo audit
+cargo deny check
+bun audit --cwd ts
+```

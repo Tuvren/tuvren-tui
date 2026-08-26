@@ -1,0 +1,5 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tuvren.dev/contract/release-manifest-1.json",
+  "$ref": "https://tuvren.dev/schema/release-manifest-1.json"
+}

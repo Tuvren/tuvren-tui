@@ -1,74 +1,115 @@
-# Stack Specification
+# Stack specification
 
-## 0. Version
+## Version
 
-**v8.1.0** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.0** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
----
+## Implementation posture
 
-## 1. Bill of Materials (BOM)
+Tuvren ships one compiled TypeScript ESM SDK on Bun and one matching Rust native runtime. The public package defaults to the Effect UI SDK and exposes the complete Imperative SDK through an explicit subpath. Rust owns all mutable UI state. TypeScript owns authoring, application orchestration, the private reactive reconciler, the UI executor queue, public errors, and package resolution.
 
-- **Primary Language / Runtime:** Rust 2021 for the Native Core, TypeScript 5.x for the Host Layer, and Bun 1.3.x as the primary runtime for host execution and FFI loading.
-- **Primary Frameworks / Libraries:** Taffy for layout, Crossterm for terminal I/O, pulldown-cmark and syntect for rich text, and `@preact/signals-core` for the optional JSX reconciler layer.
-- **State Stores / Persistence:** All runtime UI state lives in the Native Core in memory. There is no external database or persisted state store in the canonical product contract.
-- **Infrastructure / Tooling:** Cargo, Bun, GitHub Actions CI, GitHub release artifacts with checksum sidecars, Criterion benchmarks, headless terminal backend, replay fixtures, and golden snapshot utilities.
-- **Testing / Quality Tooling:** `cargo test`, `cargo fmt`, `cargo clippy`, native benchmarks, Bun integration tests, example replay tests, install smoke tests, runner API tests, and bundle-budget checks.
-- **Version Pinning / Compatibility Policy:** The framework remains pre-1.0 (`0.1.0` in both native and host packages), so breaking changes are allowed whenever they reduce duplication or remove design debt before public release. This file defines the current contract for the active branch; compatibility is owed to the documented contract, not to superseded interim shapes.
+There is no database, network service, or persisted application state in the core product. Durable files owned by Tuvren are Diagnostic Traces, snapshots, terminal profiles, replay fixtures, benchmark results, and release manifests. Their schemas are under `data-models/`.
 
----
+## Bill of materials
 
-## 2. Native Core Bill of Materials
+Versions were checked against official release documentation or registries on 2026-08-26. Manifest ranges may admit compatible patches, but release locks and CI use the exact versions in this table.
 
-| Component | Choice | Verified Source State | Decision |
-| --- | :--- | :--- | :--- |
-| Language | Rust | `edition = "2021"` | Keep the Native Core as the sole owner of mutable UI state and compute-heavy workflows. |
-| Layout engine | Taffy | `0.9` | Keep the current layout model and extend through the existing constraint engine rather than introducing a parallel layout path. |
-| Terminal backend | Crossterm | `0.29` | Keep terminal I/O and capability handling behind the existing backend abstraction. |
-| Rich text parser | pulldown-cmark | `0.13` | Keep Markdown parsing native-side for transcript and code-heavy interfaces. |
-| Syntax highlighting | syntect | `5.3` | Keep native syntax highlighting for code and diff viewing surfaces. |
-| Text measurement | unicode-width + unicode-segmentation | `0.2` and `1.12` | Keep native text width and grapheme handling for cursor, wrap, and viewport correctness. |
-| Serialization | serde + serde_json | `1.0` | Use JSON copy-out for debug snapshots and trace payloads. |
+| Area | Exact baseline | Posture | Reason and compatibility rule |
+| :-- | :-- | :-- | :-- |
+| Rust toolchain | `1.98.0`, edition `2024` | Adopt | Current stable toolchain; one pinned `rust-toolchain.toml` drives local and CI builds. MSRV equals the pinned release until `1.0.0`. |
+| Host runtime | Bun `1.4.0` | Trial | Current stable host and package manager. The 1.4 runtime is a major internal rewrite; it must pass all five target, FFI, lifecycle, and benchmark gates before final `0.1.0`. |
+| Host language compiler | TypeScript `5.9.3` | Adopt | Verified against the current source and Effect 3. TypeScript `7.0.2` is Hold because an isolated migration check fails current FFI declarations and one extension diagnostic. |
+| Declarative application model | Effect `3.22.1` | Adopt | Required peer range `>=3.22.1 <4`; CI and development pin `3.22.1`. Effect 4 prerelease builds are unsupported. |
+| Private Reactivity | `@preact/signals-core` `1.13.0` | Adopt internally | Used only inside reconciliation and hooks. No Signal type or constructor is exported publicly. |
+| Native bridge | `bun:ffi` from Bun `1.4.0` | Trial | Private high-performance C ABI bridge. Bun documents it as experimental, so five-target loading, malformed-input fuzzing, panic containment, and ABI benchmarks are release gates. No callback from Rust into TypeScript is permitted. |
+| Layout | Taffy `0.14.0` | Adopt | Provides Flexbox and Grid. Enable only `std`, `taffy_tree`, `flexbox`, `grid`, `content_size`, and `detailed_layout_info`; browser block, float, and parser features remain disabled. |
+| Terminal I/O | Crossterm `0.29.0` | Adopt | Stable cross-platform baseline behind Tuvren's own Terminal Session and protocol decoders. |
+| Markdown | pulldown-cmark `0.13.4` | Adopt | Native CommonMark parser. Enable only the declared GitHub-Flavored Markdown options. |
+| Syntax highlighting | syntect `5.3.0` | Adopt | Native code styling with default syntaxes and themes; regex backend remains explicit and benchmarked. |
+| Unicode segmentation | unicode-segmentation `1.13.3` | Adopt | Grapheme, word, and sentence boundaries; all public coordinates still use Tuvren grapheme indices. |
+| Terminal cell width | unicode-width `0.2.2` | Adopt | Default width model, overridden by negotiated terminal width policy where available. |
+| Serialization | serde `1.0.229`, serde_json `1.0.151` | Adopt | Versioned Diagnostic Trace, snapshot, profile, replay, benchmark, and release-manifest shapes. |
+| Validation helpers | regex `1.13.1`, base64 `0.23.1`, bitflags `2.13.1` | Adopt | Bounded parsing, protocol payloads, and capability/state masks. |
+| Native benchmarks | Criterion `0.8.2` | Adopt | Statistical native microbenchmarks with raw samples and pinned configuration. |
+| Property tests | proptest `1.11.0` | Adopt | State-machine and codec invariants for transactions, text, Events, projections, and terminal responses. |
+| Native fuzzing | cargo-fuzz `0.13.2`, libfuzzer-sys `0.4.13` | Adopt | Transaction, trace, formatted-text, terminal-response, clipboard, and replay decoders. |
+| Schema validation | Ajv `8.20.0`, ajv-formats `3.0.1` | Adopt | Compile every Draft 2020-12 schema and enforce date-time and URI formats. |
+| Supply-chain checks | cargo-audit `0.22.2`, cargo-deny `0.20.2`, Bun audit | Adopt | Block advisories, denied licenses or sources, duplicate-risk drift, and unlocked package graphs. |
+| Documentation formatting | Prettier `3.9.6`, invoked through `bunx` | Adopt | Markdown uses `--prose-wrap never`; no other package manager participates. |
 
----
+## Package and entrypoint contract
 
-## 3. Host Layer Bill of Materials
+The only documented install target is `tuvren-tui`. Platform packages are resolver implementation details and must not appear in ordinary application documentation.
 
-| Component | Choice | Verified Source State | Decision |
-| --- | :--- | :--- | :--- |
-| Runtime | Bun | `1.3.8` verified locally | Keep Bun as the default runtime and FFI host. |
-| Language | TypeScript | `^5.0.0` | Keep strict typed wrappers and examples in TypeScript. |
-| FFI mechanism | `bun:ffi` | built-in | Preserve the direct native-library loading path rather than adding an alternate bridge. |
-| Reactivity | `@preact/signals-core` | `^1.8.0` | Preserve the lightweight JSX/signals path without promoting it to the primary lifecycle model. |
-| Additional runtime deps | none beyond signals in the root package; `effect@^3.21.2` as optional peer + local dev dependency for `tuvren-tui/effect` | current package state | Keep the host bundle intentionally thin in the imperative core; Effect belongs only to the optional subpath and must not become a mandatory root-package runtime dependency. |
-| Public package contract | `tuvren-tui` (Epic P shipped the rename from `kraken-tui`) | `ts/package.json`, source tree | One public package as the user-facing contract; the hard rename is complete. |
-| Optional declarative subpath | `tuvren-tui/effect` over the official `effect` package | `ts/package.json`, `ts/effect/index.ts`, `ts/src/effect/` | Provide one sanctioned package-first Effect application surface over the same core runtime, with JSX authoring, package-owned command/keybinding services, testing helpers, and advanced escape hatches without introducing a second mutable runtime. |
-| Native package topology | current Brownfield: GitHub assets plus auxiliary scoped package stubs; approved public publish follows in Epic V | release workflow, resolver contract, approved roadmap | Resolve platform-native libraries through auxiliary scoped packages published under the Tuvren organization, while keeping `tuvren-tui` as the only public package. |
+| Entrypoint | Purpose | Public compatibility surface |
+| :-- | :-- | :-- |
+| `tuvren-tui` | Effect-first Components, JSX types, Effect-native lifecycle, Commands, Keymaps, styling, terminal services, and public errors | `contracts/tuvren-tui.d.ts` |
+| `tuvren-tui/jsx-runtime` | Production JSX transform | `contracts/jsx-runtime.d.ts` |
+| `tuvren-tui/jsx-dev-runtime` | Development JSX transform | `contracts/jsx-runtime.d.ts` |
+| `tuvren-tui/testing` | Effect-oriented semantic harness and drivers | `contracts/testing.d.ts` |
+| `tuvren-tui/imperative` | Capability-complete imperative primitives, Components, and managed or manual lifecycle | `contracts/imperative.d.ts` |
+| `tuvren-tui/imperative/testing` | Imperative semantic harness and drivers | `contracts/imperative-testing.d.ts` |
 
----
+There is no public `/effect` entrypoint. Root exports do not expose `@preact/signals-core`, raw FFI symbols, numeric RuntimeNode identities, platform package names, or internal ABI status codes.
 
-## 4. Build, Test, and Release Artifacts
+## Native build and artifact matrix
 
-| Artifact | Format | Source of Truth |
-| --- | :--- | :--- |
-| Native Core | Shared library (`.so`, `.dylib`, `.dll`) | `native/target/release/` for source builds; versioned GitHub release assets for published native binaries |
-| Host Package | ESM TypeScript package (`tuvren-tui`, Epic P shipped the rename) | `ts/package.json`, `ts/src/` |
-| Native Package Set | Auxiliary scoped npm packages carrying per-platform shared libraries (`@tuvren/tuvren-tui-*`); stubs committed, public npm publish deferred to Epic V | `packages/@tuvren/` |
-| Release Artifacts | Versioned platform builds with `.sha256` sidecars named `tuvren-tui-*` (Epic P renamed from `kraken-tui-*`) | `.github/workflows/release.yml` |
-| Flagship Examples | Bun entrypoints | `examples/agent-console.ts`, `examples/ops-log-console.ts`, `examples/repo-inspector.ts` |
-| Replay Fixtures | JSON fixtures and headless assertions | `examples/fixtures/`, `ts/test-examples.test.ts` |
+| Target | Rust target | Artifact inside private platform package |
+| :-- | :-- | :-- |
+| glibc Linux x64 | `x86_64-unknown-linux-gnu` | `libtuvren_tui.so` |
+| glibc Linux arm64 | `aarch64-unknown-linux-gnu` | `libtuvren_tui.so` |
+| macOS arm64 | `aarch64-apple-darwin` | `libtuvren_tui.dylib` |
+| macOS x64 | `x86_64-apple-darwin` | `libtuvren_tui.dylib` |
+| Windows x64 | `x86_64-pc-windows-msvc` | `tuvren_tui.dll` |
 
----
+The native crate produces `cdylib` for the SDK and `rlib` for native tests and benchmarks. Linux public artifacts target glibc; musl and Alpine fail with an actionable unsupported-target diagnostic.
 
-## 5. Release and Distribution Matrix
+## Architecture-flow traceability
 
-| Platform | Architecture | Release asset | Auxiliary native package |
-| --- | :--- | :--- | :--- |
-| Linux | x64 | `tuvren-tui-<tag>-linux-x64.so` | `@tuvren/tuvren-tui-linux-x64` |
-| Linux | arm64 | `tuvren-tui-<tag>-linux-arm64.so` | `@tuvren/tuvren-tui-linux-arm64` |
-| macOS | arm64 | `tuvren-tui-<tag>-darwin-arm64.dylib` | `@tuvren/tuvren-tui-darwin-arm64` |
-| macOS | x64 | `tuvren-tui-<tag>-darwin-x64.dylib` | `@tuvren/tuvren-tui-darwin-x64` |
-| Windows | x64 | `tuvren-tui-<tag>-win32-x64.dll` | `@tuvren/tuvren-tui-win32-x64` |
+| Architecture flow | Physical contracts | Data model or implementation owner |
+| :-- | :-- | :-- |
+| Authoring and lifecycle | `tuvren-tui.d.ts`, `imperative.d.ts`, `native-abi.h` | `RuntimeContext`, Effect scopes, UI executor |
+| Component composition | `shared.d.ts`, both SDK declarations | `RuntimeNode`, first-party Component modules |
+| Layout and responsive behavior | `shared.d.ts`, transaction properties | Taffy-backed composition and style kernel |
+| Styling and Theme | `shared.d.ts`, transaction properties | Native StyleSheet and Theme registries with provenance |
+| Text and rich content | `shared.d.ts`, transaction byte arena | `TextDocument`, `GraphemePool`, StyledText decoder |
+| Text editing | both SDK declarations, transaction text-edit opcode | `TextDocument` operation history and clipboard service |
+| Input, Event, focus, and direct manipulation | `shared.d.ts`, Event batch ABI | Interaction kernel; final interception records blocked by OD-02 |
+| Command and Keymap | `tuvren-tui.d.ts`, transaction ABI | Effect Command services and UI executor |
+| Virtual Collection and transient feedback | both SDK declarations | `VirtualCollectionState`, generations, Resident Projection |
+| Transcript and streaming data | `shared.d.ts`, transaction Transcript opcode | `TranscriptState`, stable block identities, Text Documents |
+| Terminal, Screen Mode, and clipboard | both SDK declarations, native ABI | `TerminalSession`, terminal profile schema |
+| Accessibility semantics | `shared.d.ts`, snapshot schema | `SemanticNode`, announcement Event, conformance harness |
+| Animation and time | both SDK declarations, transaction animation opcode | Native animation registry and manual clock |
+| Devtools, testing, and diagnostics | testing declarations, trace and snapshot schemas | Diagnostic Graph and isolated replay context |
+| Installation, distribution, safety, and release | `cli.json`, release and benchmark schemas | Resolver, atomic release manifest, target smoke matrix |
 
-The repo-owned release workflow publishes **versioned GitHub release assets** with SHA-256 sidecars. The resolver searches `TUVREN_LIB_PATH`, then the auxiliary scoped native package, then the local Cargo build (repo-checkout only). Standalone release assets are available for manual acquisition via `TUVREN_LIB_PATH`; they are not part of the automatic resolver path. Source-build fallback remains valid for repo-side development and verification. npm publish of `tuvren-tui` and auxiliary packages is deferred to Epic V after SDK productization, with `0.1.0` as the planned first public pre-GA release.
+## Resolution and release policy
 
-Linux auxiliary packages are glibc-targeted. Epic P validated that declaring `"libc": ["glibc"]` in each Linux aux `package.json` causes Bun ≥1.1 to filter them on musl hosts, so Alpine Linux installs will not silently load an incompatible `.so`. musl-targeted packages remain out of scope; unsupported installs fail with a clear diagnostic.
+The resolver order is:
+
+1. `TUVREN_LIB_PATH`, only as an explicit contributor or diagnostic override.
+2. The exact-version private platform package resolved through the Host Environment.
+3. The local Cargo release artifact, only when workspace markers prove a source checkout.
+4. A typed diagnostic failure.
+
+The SDK package and all platform packages publish atomically with the same exact version and release manifest. ABI compatibility is private and exact-version only. A mismatch rejects before context creation.
+
+Pre-`1.0` minor releases may break public SDK contracts only with a changelog, migration guide, one-minor deprecation when safe, and a codemod when practical. Diagnostic Trace, snapshot, terminal-profile, replay, benchmark-result, and release-manifest schemas version independently and never silently reinterpret incompatible data.
+
+## Dependency and upgrade policy
+
+- Commit `Cargo.lock` and `bun.lock`; CI uses frozen installs and `--locked` Cargo operations.
+- Production dependencies use explicit compatible ranges in manifests and exact versions in lockfiles. Toolchains and release automation use exact versions or immutable commit hashes.
+- One scheduled compatibility lane tests the latest patch of Rust stable, Bun stable, Effect 3, TypeScript 5.9, and every direct Rust dependency without updating the release lock.
+- Major dependency upgrades require a TechSpec Evolution pass when they affect public types, the private ABI, terminal behavior, layout, Unicode, schemas, or performance evidence.
+- TypeScript 7 remains Hold until the public declarations, Bun FFI types, emitted declarations, and all examples pass with no suppression added solely for the upgrade.
+- Effect 4 remains unsupported until it is stable and a PRD-compatible Effect-native surface passes a dedicated TechSpec Evolution review.
+- Bun FFI remains Trial until the final `0.1.0` release gates prove it on every supported target. Its experimental vendor status must remain visible in risk and release documentation.
+
+## Verification evidence for this pass
+
+- Local source resolves Rust `1.93.1`, Bun `1.3.8`, TypeScript `5.9.3`, Effect `3.21.2`, Taffy `0.9.2`, and the other lockfile versions recorded in the Brownfield audit.
+- Official sources report Rust `1.98.0`, Bun `1.4.0`, TypeScript `7.0.2`, Effect `3.22.1`, Taffy `0.14.0`, and the native crate versions pinned above.
+- An isolated TypeScript `7.0.2` typecheck failed current source declarations; this is the evidence for Hold rather than an assumption of compatibility.
+- Effect `3.22.1` declarations confirm `Effect<A, E, R>`, `Stream<A, E, R>`, `Layer<ROut, E, RIn>`, scoped effects, and `runPromise` signatures used by the public contract.
