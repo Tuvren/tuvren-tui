@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.15** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.16** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -102,7 +102,7 @@ Pre-`1.0` minor releases may break public SDK contracts only with a changelog, m
 
 JSON Schema validates each durable shape but cannot enforce cross-field or cross-artifact equality. Contract verification additionally runs `validateDiagnosticSnapshotRuns`, `validateDiagnosticTraceRecords`, `validateApplicationReplay`, and `validateBenchmarkResult` from their named files under `contracts/`; these prove dense Surface and typed Semantic Tree reconstruction, Issue registry/interval integrity, ordered native-owned/parent/domain trace causality, closed transaction status rules, enclosing-context and retained-or-wrap-baseline embedded snapshot identity, a reachable empty-context replay start with exact Event/transaction bytes and one-application semantics, wire-valid application replay ordering and inputs, and benchmark sample-count/metric-definition/value-type/statistic/check consistency. It also checks `error-codes.json` against TypeScript unions, subclasses, mappings, and doctor fixtures. Release verification runs those checks plus `validateAtomicReleaseManifest` from `contracts/release-validation.json`; that validator proves exact artifact membership, SemVer, package/artifact version equality, ABI equality, checksums, package manifests, source revisions, and provenance before any publish begins.
 
-`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes contract, native quality, and capability checks; semantic, terminal, target, and package suites; every named bounded fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; all five named cross-field validators; the checked error registry; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, nonconforming, or required-but-failed result, checks every constituent artifact against the candidate source revision, and writes a human-readable release-candidate report plus the existing schema-valid atomic release manifest. It does not introduce a durable evidence-index format.
+`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes toolchain, contract, fresh ABI symbol/codec parity, native quality, and capability checks; semantic, terminal, target, and package suites; every named bounded fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; all five named cross-field validators; the checked error registry; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, nonconforming, or required-but-failed result, checks every constituent artifact against the candidate source revision, and writes a human-readable release-candidate report plus the existing schema-valid atomic release manifest. It does not introduce a durable evidence-index format.
 
 Diagnostic snapshots use `row-major-rle-v1` cell runs. `validateDiagnosticSnapshotRuns` in `contracts/snapshot-validation.json` performs the checked cross-field sum, exact dense reconstruction, cursor bounds, rooted acyclic Semantic Tree integrity, and Issue registry-tuple checks that JSON Schema cannot express.
 

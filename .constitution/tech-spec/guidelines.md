@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.15** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.16** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -93,6 +93,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Reactivity is private. Public state hooks return Tuvren-owned interfaces and must not expose Signal identity, scheduling, equality, or disposal.
 - Validate `unknown` at public and durable-data boundaries. Do not introduce `any` to silence TypeScript 7 migration errors.
 - Public errors are tagged or classed `TuvrenError` variants and include stable code, category, operation, optional Component identity, cause, and remediation. Internal statuses never escape.
+- Normalized keyboard, pointer-button, pointer-move, and wheel Events share the closed `EventModifier` set (`shift`, `control`, `alt`, `super`) used by replay and ABI codecs; arbitrary modifier strings never enter the public Event union.
 - `contracts/error-codes.json` is the closed public error registry. TypeScript code/category unions, public subclasses, native-to-host mappings, trace payloads, and doctor fixtures match it exactly; direct construction of the base `TuvrenError` is protected.
 - Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Every imperative invocation completes as succeeded, failed, interrupted with a cancellation/restart/shutdown reason, or rejected as disabled, contextually unavailable, or concurrency-limited; interruption and each rejection have closed-registry error mappings. Buttons, menu items, and palette entries require a Command ID; they never duplicate the action body. Registry lookup failures are `TuvrenError` subclasses with the standard stable metadata.
 - `CommandId<A, E, R>` carries its registered result, failure, and environment contract through `invokeById` and every bound activation surface. `graphemeIndex()` is the only public constructor for an arbitrary grapheme position and rejects negative, fractional, or unsafe-integer values.
@@ -169,7 +170,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Diagnostic snapshots encode the dense Surface as `row-major-rle-v1`. A cross-field validator requires every run count to be positive and their checked sum to equal `width × height`; reconstruction expands runs in row-major order and rejects overflow, underfill, or trailing cells. It also proves Semantic Tree ID uniqueness, valid child and relationship targets, one rooted acyclic tree, reachability, exact tagged scalar values/states, and exact Issue code/category/operation registry tuples. This keeps ordinary snapshots compact while still representing the 3,000 × 1,000 stretch Surface inside an explicit 512 MiB encoded/1 GiB decoded ceiling.
 - Historical schema files never change after publication. Readers consult `contracts/schema-migrations.json`, migrate only registered versions into the current in-memory model, and reject unknown versions before interpreting payload fields.
 - `validateApplicationReplay` rejects nonmonotonic event time, unreachable or duplicate zero-based expectation indexes, surrogate key codes, and wheel deltas outside the exact signed-integer Event wire domain. `validateBenchmarkResult` recomputes core/custom statistics and checks sample count, metric definitions, value types, and required named checks. Both validators run in `check:contracts`; the release-candidate gate additionally requires every release-gating check to pass.
-- `validateDiagnosticTraceRecords` applies the exact kind-selected payload contracts from `trace-validation.json`, rejects unknown fields, checks exact error tuples and closed transaction statuses, proves unsigned sequence uniqueness/order, timestamp order, unique native-owned record identities and backward-only `parentRecordId` references, requires duplicate Command/Effect identities to agree, preserves stable command-instance and subject mappings, and requires the native Effect span or trace-scoped opaque Component/Text-Document subject appropriate to each producer without exposing runtime handles. Typed unattributed reasons distinguish ring-wrap boundaries from tooling defects. Every embedded snapshot is checked against the enclosing context and the latest retained transaction/render identities at its declared basis; after wrap, an explicit baseline reference carries each identity until a retained record supersedes it. Retained Issue intervals are validated. Runtime replay additionally requires context-creation-enabled confirmed full-content capture from an empty context with no wrap/gap and exact versioned Event/transaction bytes plus available migrations. It suppresses outward application-handler delivery while captured Events drive native default behavior and captured transactions apply once; logical application replay runs current handlers and injects no captured transaction.
+- Public Diagnostic Trace records form a `kind`-discriminated union whose payload types match `trace-validation.json`, including closed committed/rejected transactions and typed ring-wrap/tooling-defect records. `validateDiagnosticTraceRecords` rejects unknown fields, checks exact error tuples and closed transaction statuses, proves unsigned sequence uniqueness/order, timestamp order, unique native-owned record identities and backward-only `parentRecordId` references, requires duplicate Command/Effect identities to agree, preserves stable command-instance and subject mappings, and requires the native Effect span or trace-scoped opaque Component/Text-Document subject appropriate to each producer without exposing runtime handles. A ring-wrap record carries the transaction/render identities current at eviction, and the sole wrap baseline must match them before later snapshots may inherit an unsuperseded identity. Every embedded snapshot is checked against the enclosing context and declared basis; retained Issue intervals are validated. Runtime replay additionally requires context-creation-enabled confirmed full-content capture from an empty context with no wrap/gap and exact versioned Event/transaction bytes plus available migrations. It suppresses outward application-handler delivery while captured Events drive native default behavior and captured transactions apply once; logical application replay runs current handlers and injects no captured transaction.
 
 ## Commits
 
@@ -204,6 +205,7 @@ Stage 4 must schedule these commands before relying on them as gates:
 
 ```bash
 bun install --frozen-lockfile    # Install the target root workspace and produce no nested ts lock
+bun run check:toolchain          # Assert exact Bun, stable/nightly Rust, cargo-fuzz, and GCC versions before other gates
 bun run check:contracts          # Typecheck declarations, compile ABI header, validate every JSON Schema and contract file
 bun run check:abi-parity         # Compare implemented symbols and TypeScript/Rust decoding over every checked-in ABI byte fixture
 bun run check:native             # Run rustfmt, locked Clippy with warnings denied, and locked native tests on Rust 1.98.0
@@ -217,6 +219,7 @@ bun run test:semantic            # Shared Effect and imperative semantic conform
 bun run test:terminal            # Protocol, Screen Mode, restoration, and multiplexer profiles
 bun run test:platform-smoke      # Install/load/init/headless-render/shutdown on all five targets
 bun run test:release-package     # Pack, install, exact-version resolve, declarations, source maps, CLI, and licenses
+bun run test:registry-package    # Reinstall published artifacts and verify five targets, CLI, types, maps, licenses, checksums, and provenance
 bun run bench:envelope           # Absolute workload envelope and 120/90/60 tiers
 bun run bench:comparative        # OD-01 fixtures and raw results
 bun run bench:devtools           # Off, passive, and full-trace overhead

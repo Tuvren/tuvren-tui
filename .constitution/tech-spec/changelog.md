@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.16] — 2026-08-26
+
+### Fixed
+
+- Added authoritative transaction/render identities to typed ring-wrap records and required the wrap baseline to match before inheritance.
+- Replaced untyped Trace payloads with a public kind-discriminated record union and unified Event modifiers across keyboard, pointer, wheel, and replay contracts.
+- Added machine-checked toolchain and post-registry package commands and made fresh ABI parity an explicit aggregate release gate.
+
 ## [v9.0.15] — 2026-08-26
 
 ### Fixed

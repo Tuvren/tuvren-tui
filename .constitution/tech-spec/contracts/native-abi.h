@@ -1482,7 +1482,10 @@ typedef struct TuvrenDiagnosticRecord {
  * diagnostic_subject_id is a trace-scoped opaque identity—not a RuntimeNode or
  * TextDocument handle—and subject_kind distinguishes Component from standalone
  * Text Document work. Zero means unavailable. Domain IDs label the current
- * record and never substitute for parent_record_id. */
+ * record and never substitute for parent_record_id. A RING_WRAPPED record has
+ * kind UNATTRIBUTED and stores the current transaction/render identities in
+ * their ordinary fields; serialization emits them as the typed boundary
+ * payload used by wrap-baseline validation. */
 
 typedef struct TuvrenRenderOptions {
     uint16_t size;

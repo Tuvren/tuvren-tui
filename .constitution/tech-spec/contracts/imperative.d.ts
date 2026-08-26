@@ -86,6 +86,7 @@ export type {
   KeyGrapheme,
   NamedKey,
   ExternalOutputMode,
+  EventModifier,
   FormControlProps,
   FocusScopeProps,
   InputProps,
