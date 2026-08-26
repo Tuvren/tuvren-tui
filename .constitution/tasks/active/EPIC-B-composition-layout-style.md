@@ -98,7 +98,7 @@ Shared fixtures prove create, update, reorder, destroy, failure cleanup, and sem
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** structural shell and controlled/local authority fixtures pass
 - **STOP Conditions:** STOP if any mutable property has two simultaneous authorities.
-- **Description:** Compose the structural shells, public props, controlled/local state boundaries, stable slots, and native-kernel attachment points for Command-only Button/ToggleButton, Checkbox, Radio, RadioGroup, ProgressBar, Meter, and Spinner; applicable form controls share required, error, and submission behavior.
+- **Description:** Compose the structural shells, mutually exclusive controlled/default authority unions, stable slots, and native-kernel attachment points for Command-only Button/ToggleButton, Checkbox, Radio, RadioGroup, ProgressBar, Meter, and Spinner; applicable form controls share required, error, and submission behavior.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**

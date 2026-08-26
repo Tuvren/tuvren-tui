@@ -56,7 +56,7 @@ Packed CLI tests prove every schema-declared command, option, exit code, no-netw
 - **Verification Command:** `bun run test:platform-smoke`
 - **Expected Success Output:** all five native target jobs install, load, initialize, render headlessly, and shut down
 - **STOP Conditions:** STOP on missing native execution, unlocked inputs, absent checksum/provenance, or non-atomic target set.
-- **Description:** Pin immutable CI inputs, run Cargo/Bun audits and policy checks, build each target, generate provenance and checksums, validate exact versions, and execute target-native package smokes.
+- **Description:** Pin immutable CI inputs; run `cargo audit --file native/Cargo.lock`, `cargo deny check --manifest-path native/Cargo.toml`, and root-workspace `bun audit`; build each target; generate provenance and checksums; validate exact versions; and execute target-native package smokes.
 - **Acceptance:**
   - **Mode:** runbook_probe
   - **Evidence:**
@@ -117,9 +117,9 @@ Replay is identical across 100 runs; live and replay workloads publish schema-va
 - **Scope (In-Scope Files):** `scripts/check-release-candidate.ts`, release validation scripts, schema-valid evidence, release-candidate report and migration guide
 - **Scope (Out-of-Scope Files):** weakening a gate for schedule, publishing final artifacts
 - **Verification Command:** `bun run check:release-candidate`
-- **Expected Success Output:** every P0 command, required benchmark check, replay expectation, evidence row, and named cross-field validator passes and `validateAtomicReleaseManifest` accepts exactly six matching artifacts
+- **Expected Success Output:** every P0 command, registered error, required benchmark check, trace payload, replay expectation, evidence row, and named cross-field validator passes and `validateAtomicReleaseManifest` accepts exactly six matching artifacts
 - **STOP Conditions:** STOP on any missing capability row, unresolved OD-01/OD-02 Evolution, target failure, performance failure, privacy/security failure, undocumented break, or version/provenance mismatch.
-- **Description:** Implement and run the Stage 3 aggregate command over contract, capability-map, semantic, terminal, every named bounded fuzz target, bundle, envelope, comparative, devtools, adoption, OpenCode, supply-chain, target, package, schema, migration, restoration, snapshot/replay/benchmark cross-field validation, and atomic-manifest evidence.
+- **Description:** Implement and run the Stage 3 aggregate command over contract, capability-map, semantic, terminal, every named bounded fuzz target, bundle, envelope, comparative, devtools, adoption, OpenCode, supply-chain, target, package, schema, migration, restoration, error-registry and snapshot/trace/replay/benchmark cross-field validation, and atomic-manifest evidence.
 - **Acceptance:**
   - **Mode:** runbook_probe
   - **Evidence:**
