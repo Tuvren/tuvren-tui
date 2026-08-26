@@ -61,6 +61,12 @@ extern "C" {
 #define TUVREN_TEXT_EDIT_FIND_BACKWARD 0x00000001u
 #define TUVREN_TEXT_EDIT_FIND_CASE_SENSITIVE 0x00000002u
 #define TUVREN_TEXT_EDIT_FIND_WHOLE_WORD 0x00000004u
+#define TUVREN_TEXT_CONFIG_READ_ONLY 0x00000001u
+#define TUVREN_TEXT_CONFIG_SECURE 0x00000002u
+#define TUVREN_TEXT_CONFIG_REQUIRED 0x00000004u
+#define TUVREN_TEXT_CONFIG_HAS_MAX_LENGTH 0x00000008u
+#define TUVREN_TEXT_VALIDATION_CASE_INSENSITIVE 0x00000001u
+#define TUVREN_TEXT_VALIDATION_MULTILINE 0x00000002u
 #define TUVREN_DIAGNOSTIC_REDACTED 0x00000001u
 #define TUVREN_DIAGNOSTIC_RING_WRAPPED 0x00000002u
 #define TUVREN_DIAGNOSTIC_SNAPSHOT_BOUNDARY 0x00000004u
@@ -170,7 +176,9 @@ typedef enum TuvrenValueTag {
     TUVREN_VALUE_LAYOUT = 6,
     TUVREN_VALUE_STYLE = 7,
     TUVREN_VALUE_GRAPHEME_RANGE = 8,
-    TUVREN_VALUE_SEMANTIC = 9
+    TUVREN_VALUE_SEMANTIC = 9,
+    TUVREN_VALUE_TEXT_CONTENT = 10,
+    TUVREN_VALUE_TEXT_DOCUMENT_CONFIG = 11
 } TuvrenValueTag;
 
 typedef enum TuvrenDimensionTag {
@@ -261,6 +269,25 @@ typedef enum TuvrenTextEncoding {
     TUVREN_TEXT_ENCODING_UTF16_LE = 2,
     TUVREN_TEXT_ENCODING_UTF16_BE = 3
 } TuvrenTextEncoding;
+
+typedef enum TuvrenTextContentKind {
+    TUVREN_TEXT_CONTENT_PLAIN = 1,
+    TUVREN_TEXT_CONTENT_STYLED = 2,
+    TUVREN_TEXT_CONTENT_MARKDOWN = 3,
+    TUVREN_TEXT_CONTENT_CODE = 4,
+    TUVREN_TEXT_CONTENT_ANSI = 5
+} TuvrenTextContentKind;
+
+typedef enum TuvrenLineEnding {
+    TUVREN_LINE_ENDING_LF = 1,
+    TUVREN_LINE_ENDING_CRLF = 2
+} TuvrenLineEnding;
+
+typedef enum TuvrenTextValidationKind {
+    TUVREN_TEXT_VALIDATION_MINIMUM_LENGTH = 1,
+    TUVREN_TEXT_VALIDATION_MAXIMUM_LENGTH = 2,
+    TUVREN_TEXT_VALIDATION_PATTERN = 3
+} TuvrenTextValidationKind;
 
 typedef enum TuvrenThemeMode {
     TUVREN_THEME_ANY = 0,
@@ -431,7 +458,8 @@ typedef enum TuvrenCollectionMutationKind {
     TUVREN_COLLECTION_RESET = 5,
     TUVREN_COLLECTION_VISIBLE_RANGE = 6,
     TUVREN_COLLECTION_FOCUS = 7,
-    TUVREN_COLLECTION_RELOAD = 8
+    TUVREN_COLLECTION_RELOAD = 8,
+    TUVREN_COLLECTION_SELECTION = 9
 } TuvrenCollectionMutationKind;
 
 typedef enum TuvrenTranscriptMutationKind {
@@ -498,6 +526,7 @@ typedef enum TuvrenProperty {
     TUVREN_PROP_TEXT_CURSOR = 0x0303,
     TUVREN_PROP_TEXT_WRAP = 0x0304,
     TUVREN_PROP_TEXT_TAB_WIDTH = 0x0305,
+    TUVREN_PROP_TEXT_DOCUMENT_CONFIG = 0x0306,
     TUVREN_PROP_STATE_VISIBLE = 0x0401,
     TUVREN_PROP_STATE_DISABLED = 0x0402,
     TUVREN_PROP_STATE_SELECTED = 0x0403,
@@ -516,12 +545,15 @@ typedef enum TuvrenProperty {
  * CREATE_NODE/CreateNodePayload; DESTROY_NODE, SET_ROOT/no payload;
  * INSERT_CHILD, REMOVE_CHILD/ChildPayload; layout 0x0101..0x0110 requires
  * SET_PROPERTY_BYTES + VALUE_LAYOUT/LayoutPayload; style 0x0201..0x0204
- * requires SET_PROPERTY_BYTES + VALUE_STYLE/StylePayload; TEXT_CONTENT,
- * SEMANTIC_ROLE, NAME, DESCRIPTION, VALUE require SET_PROPERTY_BYTES +
- * VALUE_UTF8; TEXT_SELECTION requires SET_PROPERTY_BYTES +
- * VALUE_GRAPHEME_RANGE/GraphemeRange; TEXT_CURSOR, WRAP, TAB_WIDTH and state
- * 0x0401..0x0406 require SET_PROPERTY_U64 + VALUE_U64; semantic states and
- * relationships require SET_PROPERTY_BYTES + VALUE_SEMANTIC/SemanticPayload;
+ * requires SET_PROPERTY_BYTES + VALUE_STYLE/StylePayload; TEXT_CONTENT requires
+ * SET_PROPERTY_BYTES + VALUE_TEXT_CONTENT/TextContentPayload; SEMANTIC_ROLE,
+ * NAME, DESCRIPTION, VALUE require SET_PROPERTY_BYTES + VALUE_UTF8;
+ * TEXT_DOCUMENT_CONFIG requires SET_PROPERTY_BYTES +
+ * VALUE_TEXT_DOCUMENT_CONFIG/TextDocumentConfigPayload; TEXT_SELECTION
+ * requires SET_PROPERTY_BYTES + VALUE_GRAPHEME_RANGE/GraphemeRange;
+ * TEXT_CURSOR, WRAP, TAB_WIDTH and state 0x0401..0x0406 require
+ * SET_PROPERTY_U64 + VALUE_U64; semantic states and relationships require
+ * SET_PROPERTY_BYTES + VALUE_SEMANTIC/SemanticPayload;
  * TEXT_EDIT/TextEditPayload; COLLECTION_APPLY/CollectionMutationPayload;
  * TRANSCRIPT_APPLY/TranscriptMutationPayload; ANIMATION_APPLY and
  * ANIMATION_REPLACE/AnimationPayload; ANIMATION_CANCEL/AnimationPayload with
@@ -1008,6 +1040,62 @@ typedef struct TuvrenSemanticEntry {
     uint32_t reserved;
 } TuvrenSemanticEntry;
 
+typedef struct TuvrenTextContentPayload {
+    uint16_t size;
+    uint16_t kind; /* TuvrenTextContentKind */
+    uint32_t source_offset;
+    uint32_t source_length;
+    uint32_t language_offset;
+    uint32_t language_length;
+    uint32_t spans_offset;
+    uint32_t span_count;
+} TuvrenTextContentPayload;
+
+typedef struct TuvrenStyledSpanRecord {
+    uint32_t text_offset;
+    uint32_t text_length;
+    uint32_t style_offset;
+    uint32_t style_length;
+    uint32_t link_offset;
+    uint32_t link_length;
+} TuvrenStyledSpanRecord;
+
+/* PLAIN, MARKDOWN, CODE, and ANSI use source. CODE may additionally use a
+ * UTF-8 language; the other source kinds require zero language fields. STYLED
+ * requires zero source/language fields and a packed StyledSpanRecord array.
+ * Each nonzero style range contains one exact TuvrenStylePayload. Links are
+ * validated URLs. Markdown and code are parsed natively; ANSI is sanitized to
+ * approved styling and can never carry terminal control operations. */
+
+typedef struct TuvrenTextDocumentConfigPayload {
+    uint16_t size;
+    uint16_t line_ending; /* TuvrenLineEnding */
+    uint32_t flags; /* TUVREN_TEXT_CONFIG_* */
+    uint32_t tab_width;
+    uint32_t reserved;
+    uint64_t max_graphemes;
+    uint32_t validation_rules_offset;
+    uint32_t validation_rule_count;
+} TuvrenTextDocumentConfigPayload;
+
+typedef struct TuvrenTextValidationRuleRecord {
+    uint16_t size;
+    uint16_t kind; /* TuvrenTextValidationKind */
+    uint32_t flags; /* TUVREN_TEXT_VALIDATION_* */
+    uint64_t grapheme_limit;
+    uint32_t pattern_offset;
+    uint32_t pattern_length;
+    uint32_t message_offset;
+    uint32_t message_length;
+} TuvrenTextValidationRuleRecord;
+
+/* Length rules use grapheme_limit and zero pattern fields. Pattern rules use a
+ * bounded UTF-8 Rust-regex expression plus declared flags and set
+ * grapheme_limit to zero. Every rule requires a bounded UTF-8 message. Native
+ * input applies read-only, required, maximum-length, line-ending, secure-entry,
+ * and validation rules before accepting an edit; Rust never invokes a host
+ * validation callback. */
+
 typedef struct TuvrenTextEditPayload {
     uint16_t size;
     uint16_t edit_kind; /* TuvrenTextEditKind */
@@ -1036,6 +1124,10 @@ typedef struct TuvrenCollectionMutationPayload {
     double key_number;
     uint32_t item_offset;
     uint32_t item_length;
+    uint32_t keys_offset;
+    uint32_t key_count;
+    uint32_t key_record_bytes;
+    uint32_t reserved1;
     uint64_t index;
     uint64_t secondary_index;
     uint64_t generation;
@@ -1043,7 +1135,11 @@ typedef struct TuvrenCollectionMutationPayload {
 
 /* Numeric Collection keys are finite IEEE-754 doubles. Encoders normalize
  * negative zero to positive zero and reject NaN and infinities. UTF-8 keys use
- * key_offset/key_length; numeric keys require both fields to be zero. */
+ * key_offset/key_length; numeric keys require both fields to be zero.
+ * SELECTION uses a packed TuvrenIdentityRecord array in keys_offset/key_count,
+ * requires key_record_bytes == sizeof(TuvrenIdentityRecord), and sets the
+ * single-key and item fields to zero. Other mutations set all keys fields to
+ * zero. */
 
 typedef struct TuvrenTranscriptMutationPayload {
     uint16_t size;
@@ -1379,8 +1475,12 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenStyleRulePayload) == 80, "TuvrenStyleRulePaylo
 TUVREN_STATIC_ASSERT(sizeof(TuvrenGraphemeRange) == 8, "TuvrenGraphemeRange ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticPayload) == 16, "TuvrenSemanticPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticEntry) == 24, "TuvrenSemanticEntry ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTextContentPayload) == 28, "TuvrenTextContentPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenStyledSpanRecord) == 24, "TuvrenStyledSpanRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTextDocumentConfigPayload) == 32, "TuvrenTextDocumentConfigPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTextValidationRuleRecord) == 32, "TuvrenTextValidationRuleRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 48, "TuvrenTextEditPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 56, "TuvrenCollectionMutationPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 72, "TuvrenCollectionMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 72, "TuvrenTranscriptMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptBlockRecord) == 32, "TuvrenTranscriptBlockRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");

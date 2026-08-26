@@ -101,10 +101,12 @@ export type {
   TextAreaProps,
   TextContent,
   TextDocument,
+  TextDocumentConfig,
   TextDocumentSnapshot,
   TextEncoding,
   TextMatch,
   TextSearchOptions,
+  TextValidationRule,
   GraphemeIndex,
   GraphemeRange,
   TextProps,
@@ -162,6 +164,7 @@ export abstract class Component<Props extends object = object> {
   readonly props: Readonly<Props>;
   protected constructor(props: Props);
   update(next: Partial<Props>): void;
+  animate(spec: AnimationSpec | AnimationTimeline): ImperativeAnimationHandle;
   destroy(): void;
 }
 
@@ -525,6 +528,7 @@ export function encodeText(
 ): Uint8Array;
 export function createTextDocument(
   initial?: string,
+  config?: import("./shared").TextDocumentConfig,
 ): import("./shared").TextDocument;
 export function toStyledText(
   value: unknown,

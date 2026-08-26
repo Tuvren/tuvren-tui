@@ -5,9 +5,18 @@ import type {
   DiagnosticTrace,
   FailureTrace,
   LeakReport,
+  ReplayInput,
   SemanticElement,
   SemanticMatch,
   SyntheticInput,
+} from "./testing";
+
+export type {
+  ApplicationReplay,
+  ApplicationReplayEvent,
+  ApplicationReplayPayloadMap,
+  ReplayFile,
+  ReplayInput,
 } from "./testing";
 
 export interface ImperativeTestOptions {
@@ -43,7 +52,7 @@ export interface ImperativeTestHarness {
   ): SemanticElement | undefined;
   snapshot(): DiagnosticSnapshot;
   trace(): DiagnosticTrace;
-  replay(input: string | DiagnosticTrace): DiagnosticSnapshot;
+  replay(input: ReplayInput): DiagnosticSnapshot;
   failureTrace(): FailureTrace | undefined;
   saveTrace(path: string): void;
   checkLeaks(): LeakReport;

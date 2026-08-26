@@ -399,31 +399,52 @@ export interface BoxProps extends CommonProps<"root"> {}
 export interface TextProps extends CommonProps<"root"> {
   readonly content: TextContent;
 }
-export interface InputProps extends CommonProps<
-  "root" | "value" | "placeholder" | "cursor"
-> {
+export type TextValidationRule =
+  | Readonly<{
+      kind: "minimum-length";
+      graphemes: number;
+      message: string;
+    }>
+  | Readonly<{
+      kind: "maximum-length";
+      graphemes: number;
+      message: string;
+    }>
+  | Readonly<{
+      kind: "pattern";
+      pattern: string;
+      flags?: "i" | "m" | "im";
+      message: string;
+    }>;
+
+export interface TextDocumentConfig {
+  readonly readOnly?: boolean;
+  readonly secure?: boolean;
+  readonly maxLength?: number;
+  readonly required?: boolean;
+  readonly validation?: readonly TextValidationRule[];
+  readonly lineEnding?: "lf" | "crlf";
+  readonly tabWidth?: number;
+}
+export interface InputProps
+  extends
+    CommonProps<"root" | "value" | "placeholder" | "cursor">,
+    TextDocumentConfig {
   readonly value?: string;
   readonly defaultValue?: string;
   readonly onValueChange?: (value: string) => void;
   readonly placeholder?: string;
-  readonly readOnly?: boolean;
-  readonly secure?: boolean;
-  readonly maxLength?: number;
   readonly name?: string;
-  readonly required?: boolean;
   readonly error?: string;
-  readonly validate?: (value: string) => string | undefined;
   readonly onSubmit?: (value: string) => void;
 }
 export interface TextAreaProps extends InputProps {
   readonly wrap?: "soft" | "none";
-  readonly tabWidth?: number;
-  readonly lineEnding?: "lf" | "crlf";
 }
 
 export interface TextDocumentSnapshot {
   readonly content: string;
-  readonly cursor: GraphemeIndex;
+  readonly cursor?: GraphemeIndex;
   readonly selection?: GraphemeRange;
   readonly canUndo: boolean;
   readonly canRedo: boolean;
@@ -509,6 +530,11 @@ export type CollectionMutation<T> =
       readonly type: "reset";
       readonly items: readonly T[];
       readonly generation: number;
+    }
+  | {
+      readonly type: "selection";
+      readonly keys: readonly CollectionKey[];
+      readonly generation: number;
     };
 
 export interface DataSource<T, LoadResult> {
@@ -525,6 +551,7 @@ export interface CollectionController<T> {
     alignment?: "start" | "center" | "end" | "nearest",
   ): void;
   focusKey(key: CollectionKey | undefined): void;
+  setSelection(keys: readonly CollectionKey[]): void;
   visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
 }
 
@@ -693,17 +720,17 @@ export interface ViewNode {
   readonly props: Readonly<Record<string, unknown>>;
 }
 
-export interface ButtonProps extends CommonProps<
-  "root" | "label" | "indicator"
-> {
-  readonly command?: CommandId;
-  readonly onPress?: () => void;
-}
-export interface ToggleButtonProps extends ButtonProps {
+export type ButtonProps = CommonProps<"root" | "label" | "indicator"> &
+  (
+    | { readonly command: CommandId; readonly onPress?: never }
+    | { readonly command?: never; readonly onPress: () => void }
+    | { readonly command?: never; readonly onPress?: never }
+  );
+export type ToggleButtonProps = ButtonProps & {
   readonly pressed?: boolean;
   readonly defaultPressed?: boolean;
   readonly onPressedChange?: (pressed: boolean) => void;
-}
+};
 export interface CheckboxProps extends CommonProps<"root" | "box" | "label"> {
   readonly checked?: boolean | "mixed";
   readonly defaultChecked?: boolean | "mixed";

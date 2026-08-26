@@ -99,6 +99,83 @@ export interface DiagnosticTrace {
   readonly wrapCount: number;
 }
 
+export interface ApplicationReplayPayloadMap {
+  readonly key: Readonly<{
+    action: "press" | "repeat" | "release";
+    keyCode: number;
+    physicalCode?: number;
+    text?: string;
+    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+  }>;
+  readonly text: Readonly<{ text: string }>;
+  readonly paste: Readonly<{ text: string; truncated: boolean }>;
+  readonly "pointer-move": Readonly<{
+    cellX: number;
+    cellY: number;
+    pixelX?: number;
+    pixelY?: number;
+    buttons: readonly number[];
+    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+  }>;
+  readonly "pointer-button": Readonly<{
+    action: "press" | "release";
+    cellX: number;
+    cellY: number;
+    button: number;
+    clickCount: number;
+    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+  }>;
+  readonly wheel: Readonly<{
+    cellX: number;
+    cellY: number;
+    deltaRows: number;
+    deltaColumns: number;
+    deltaPixelX?: number;
+    deltaPixelY?: number;
+    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+  }>;
+  readonly focus: Readonly<Record<never, never>>;
+  readonly blur: Readonly<Record<never, never>>;
+  readonly resize: Readonly<{
+    widthCells: number;
+    heightCells: number;
+    widthPixels?: number;
+    heightPixels?: number;
+  }>;
+  readonly "external-update": Readonly<Record<string, unknown>>;
+  readonly clock: Readonly<{ elapsedMilliseconds: number }>;
+}
+
+export type ApplicationReplayEvent<
+  Kind extends keyof ApplicationReplayPayloadMap =
+    keyof ApplicationReplayPayloadMap,
+> = {
+  readonly [EventKind in Kind]: Readonly<{
+    atMilliseconds: number;
+    kind: EventKind;
+    payload: ApplicationReplayPayloadMap[EventKind];
+    redacted?: boolean;
+  }>;
+}[Kind];
+
+export interface ApplicationReplay {
+  readonly schemaVersion: "1.0.0";
+  readonly name: string;
+  readonly description?: string;
+  readonly terminalProfile: TerminalProfile;
+  readonly events: readonly ApplicationReplayEvent[];
+  readonly expectations?: readonly Readonly<{
+    afterEvent: number;
+    snapshot: DiagnosticSnapshot;
+  }>[];
+}
+
+export interface ReplayFile {
+  readonly file: string | URL;
+}
+
+export type ReplayInput = ApplicationReplay | DiagnosticTrace | ReplayFile;
+
 export interface FailureTrace {
   readonly error: TuvrenError;
   readonly trace: DiagnosticTrace;
@@ -170,9 +247,7 @@ export interface TestHarness {
   waitForVisualIdle(): Effect.Effect<void, TuvrenError>;
   snapshot(): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
   trace(): Effect.Effect<DiagnosticTrace, TuvrenError>;
-  replay(
-    input: string | DiagnosticTrace,
-  ): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
+  replay(input: ReplayInput): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
   failureTrace(): Effect.Effect<FailureTrace | undefined>;
   saveTrace(path: string): Effect.Effect<void, TuvrenError>;
   checkLeaks(): Effect.Effect<LeakReport, TuvrenError>;

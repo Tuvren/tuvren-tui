@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.5** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.6** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -93,7 +93,9 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries bind a Command ID; they never duplicate the action body.
 - Keymaps use branded hierarchical scope identities; an unscoped binding belongs to the global root. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
 - `DataSource.loadRange` receives an `AbortSignal`. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
+- Collection selection is a generation-stamped keyed mutation rather than a visible-node flag, so selection survives projection and eviction. Controllers submit the same operation through the executor.
 - Animation creation returns an interruptible handle in both SDKs. Cancellation and replacement are native animation-registry operations, and completion reports `completed`, `cancelled`, or `replaced` without making dropped presentations part of logical time.
+- Primitive and Component imperative wrappers both delegate animation to the same native registry; private Component roots remain inaccessible.
 
 ## ABI and codec standards
 
@@ -106,6 +108,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Rust decoders read fields from bytes explicitly and never cast an untrusted or potentially unaligned buffer to a C or Rust struct. The C structs document layout for generated host codecs and conformance checks.
 - Callers own input and output buffers. The runtime never returns a pointer that outlives the call.
 - Public Text Document read operations and Collection or Transcript visible-range reads use the bounded `tui_query_copy` protocol. Result-bearing text mutations return indexed scalar command results from the same atomic transaction apply; the host never reconstructs native state from cached writes.
+- Every public TextContent form has an explicit wire discriminator. Styled spans carry typed style and validated-link records; Markdown and code parsing and ANSI sanitization remain native. Text Document configuration and bounded validation rules are serializable records enforced before native edits, never host callbacks from Rust.
 - Style values may carry typed Theme-token references. The transaction encodes token names and optional fallbacks explicitly, Theme payloads carry typed token records, and Rust resolves them against the active Theme during style evaluation. Resolution proceeds from runtime defaults through ThemeTokens, ThemeRecipes, the built-in Component recipe, the instance StyleSheet, the instance slot override, and finally the inline StyleSpec; later levels win. A token reference changes only the value, not this precedence order.
 - Strings are UTF-8 inside the ABI. TypeScript string conversion is transparent; explicit UTF-16LE and UTF-16BE adapters validate byte order and length.
 - Public positions are grapheme indices. Internal byte offsets may exist only beside the content epoch they were derived from.

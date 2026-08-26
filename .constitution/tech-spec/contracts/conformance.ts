@@ -31,7 +31,7 @@ const root = Box({
   id: componentId("app.root"),
   children: [
     Text({ content: "Hello" }),
-    Button({ command: save, onPress: () => undefined }),
+    Button({ command: save }),
     Select({
       dataSource: {
         getKey: (item: string) => item,

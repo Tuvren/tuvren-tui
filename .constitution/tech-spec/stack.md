@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.5** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.6** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -75,7 +75,7 @@ The native crate produces `cdylib` for the SDK and `rlib` for native tests and b
 | Component composition | `shared.d.ts`, both SDK declarations | `RuntimeNode`, first-party Component modules |
 | Layout and responsive behavior | `shared.d.ts`, transaction properties | Taffy-backed composition and style kernel |
 | Styling and Theme | `shared.d.ts`, transaction properties | Native StyleSheet and Theme registries with provenance |
-| Text and rich content | `shared.d.ts`, transaction byte arena | `TextDocument`, `GraphemePool`, StyledText decoder |
+| Text and rich content | `shared.d.ts`, discriminated text-content and configuration records | `TextDocument`, `GraphemePool`, native format parsers and sanitizer |
 | Text editing | both SDK declarations, transaction text-edit opcode, bounded query/copy-out ABI | `TextDocument` operation history and clipboard service |
 | Input, Event, focus, and direct manipulation | `shared.d.ts`, Event batch ABI | Interaction kernel; final interception records blocked by OD-02 |
 | Command and Keymap | both SDK declarations, transaction ABI | Command registries, scoped Keymap resolution, and UI executor |

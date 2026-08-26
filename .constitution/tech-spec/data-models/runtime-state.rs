@@ -63,7 +63,7 @@ pub enum FlexWrap { NoWrap, Wrap, WrapReverse }
 pub enum AlignMode { Start, End, Center, Stretch, Baseline }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum JustifyMode { Start, End, Center, SpaceBetween, SpaceAround, SpaceEvenly }
+pub enum JustifyMode { Start, End, Center, SpaceBetween, SpaceAround, SpaceEvenly, Stretch }
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum GridTrack { Dimension(DimensionSpec), Fraction(f32), MinMax(DimensionSpec, DimensionSpec) }
@@ -295,6 +295,7 @@ pub struct RuntimeNode {
     pub style_slot: Option<u32>,
     pub theme: Option<u32>,
     pub text_document: Option<TextDocumentId>,
+    pub text_content: Option<TextContent>,
     pub semantic: SemanticNode,
     pub state: RuntimeNodeState,
     pub generation: u64,
@@ -340,10 +341,56 @@ pub struct TextDocument {
     pub style_spans: Vec<StyleSpan>,
     pub selection: Option<GraphemeRange>,
     pub cursor: Option<u32>,
+    pub config: TextDocumentConfig,
     pub edit_history: Vec<EditOperation>,
     pub undo_cursor: usize,
     pub byte_limit: usize,
     pub rejected_edits: u64,
+}
+
+#[derive(Clone, Debug)]
+pub enum TextContent {
+    Plain(String),
+    Styled(Vec<StyledContentSpan>),
+    Markdown(String),
+    Code { source: String, language: Option<String> },
+    SanitizedAnsi(String),
+}
+
+#[derive(Clone, Debug)]
+pub struct StyledContentSpan {
+    pub text: String,
+    pub style: Option<StyleSpec>,
+    pub link: Option<String>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum LineEnding {
+    Lf,
+    Crlf,
+}
+
+#[derive(Clone, Debug)]
+pub enum TextValidationRule {
+    MinimumLength { graphemes: u64, message: String },
+    MaximumLength { graphemes: u64, message: String },
+    Pattern {
+        pattern: String,
+        case_insensitive: bool,
+        multiline: bool,
+        message: String,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub struct TextDocumentConfig {
+    pub read_only: bool,
+    pub secure: bool,
+    pub required: bool,
+    pub max_graphemes: Option<u64>,
+    pub line_ending: LineEnding,
+    pub tab_width: u32,
+    pub validation: Vec<TextValidationRule>,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
