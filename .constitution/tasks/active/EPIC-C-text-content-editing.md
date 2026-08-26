@@ -62,7 +62,7 @@ State-machine tests generate edits, navigation, selection, undo/redo, find/repla
   - **Evidence:**
 
 ```text
-Allowlisted formatting survives; control operations and malformed sequences are rejected; cache keys include every behavior input; output remains grapheme-correct and bounded.
+Allowlisted formatting survives; styled spans preserve the distinction between absent style and an explicit style payload; control operations and malformed sequences are rejected; cache keys include every behavior input; output remains grapheme-correct and bounded.
 ```
 
 #### TUI-C004 Ship grapheme Text Document APIs and UTF adapters in both SDKs

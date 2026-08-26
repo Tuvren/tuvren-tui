@@ -4,6 +4,19 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.22 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.23 typed grapheme ranges, Grid/percentage normalization, exact Color encoding, optional span styles, distinct animation cancellation, and UTF-8 announcement discrimination.
+- Kept the 62-ticket, 385-point, 155-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged.
+
+## v10.0.21 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.8 executor-mediated Composition result delivery without changing the active graph.
+
 ## v10.0.20 — 2026-08-26
 
 ### Fixed

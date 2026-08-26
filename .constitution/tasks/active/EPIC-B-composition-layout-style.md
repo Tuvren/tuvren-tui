@@ -35,13 +35,13 @@ Property tests cover arbitrary practical depth, add/remove/reorder/update, stabl
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if Taffy 0.14 cannot represent a declared LayoutSpec field without a Stage 3 contract change.
-- **Description:** Map the complete LayoutSpec to Taffy with independent flex/grid display and relative/absolute positioning, add absolute anchors, axis gaps, placement and spans, intrinsic and percentage dimensions, width and height responsive rules, automatic recomputation, and deterministic overflow policies.
+- **Description:** Map the complete LayoutSpec to Taffy with independent flex/grid display and relative/absolute positioning, add absolute anchors, axis gaps, placement and spans, intrinsic and percentage dimensions, width and height responsive rules, automatic recomputation, and deterministic overflow policies. Enforce percentage-point units, finite/range/min-max rules, and the canonical per-kind Grid-track field allocation with zeroed unused fields.
 - **Acceptance:**
   - **Mode:** visual_regression
   - **Evidence:**
 
 ```text
-Goldens cover all layout modes, cell and percentage breakpoints, unsatisfied constraints, resize recomputation, nested panes, overlays, and a 300×100 reference Surface with zero unexplained geometry changes.
+Goldens cover all layout modes, canonical Dimension/Fraction/MinMax track bytes, `50%` = responsive `50` = wire `50.0`, rejected 0.5 ambiguity/out-of-range/nonfinite values, cell and percentage breakpoints, unsatisfied constraints, resize recomputation, nested panes, overlays, and a 300×100 reference Surface with zero unexplained geometry changes.
 ```
 
 #### TUI-B003 Implement native StyleSheet and Theme resolution with provenance
@@ -56,13 +56,13 @@ Goldens cover all layout modes, cell and percentage breakpoints, unsatisfied con
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if an override cannot be expressed through Theme, instance StyleSheet, named slot, or inline StyleSpec without exposing private structure.
-- **Description:** Implement typed rules, executable Theme-token references and fallbacks, state and environment conditions, ThemeRecipes, stable named slots, automatic invalidation, exact precedence, source provenance, and per-instance overrides.
+- **Description:** Implement typed rules, executable Theme-token references and fallbacks, state and environment conditions, ThemeRecipes, stable named slots, automatic invalidation, exact precedence, source provenance, per-instance overrides, and exact Color validation/packing for `#RRGGBB`, `#RRGGBBAA`, and integer channels.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Generated combinations prove the seven-level precedence order and diagnostics identify winning, overridden, and inactive declarations with source and reason.
+Generated combinations prove the seven-level precedence order; Color fixtures reject invalid syntax, fractions, nonfinite/out-of-range channels, rounding, and clamping while proving alpha default and `0xRRGGBBAA` byte order; diagnostics identify winning, overridden, and inactive declarations with source and reason.
 ```
 
 #### TUI-B004 Implement Primitive wrappers and reconciliation parity
