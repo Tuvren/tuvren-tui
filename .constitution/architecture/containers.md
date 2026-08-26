@@ -2,7 +2,7 @@
 
 ## Version
 
-**v4.0.0** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
+**v4.0.1** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
 
 ## External actors and environments
 
