@@ -1,9 +1,9 @@
 # Realign interview record
 
-**Date:** 2026-08-26  
-**Target:** Realign  
-**Mode:** Brownfield audit followed by ordered Evolution passes  
-**Depth:** Full sweep
+- **Date:** 2026-08-26
+- **Target:** Realign
+- **Mode:** Brownfield audit followed by ordered Evolution passes
+- **Depth:** Full sweep
 
 ## Purpose
 
@@ -60,6 +60,12 @@ The interview approved the following vocabulary after a context-free review by a
 - **Plugin:** A packaged, discoverable extension with a defined lifecycle, compatibility rules, installation model, and permissions. Reserve this term until those guarantees exist.
 
 **Reasoning:** `Component`, `Widget`, and `Node` must not compete as umbrella terms. `Primitive` communicates the low-level boundary more accurately than `Widget`. `StyleSheet` is appropriate because the approved API registers named rules; use `StyleSpec` for an individual rule.
+
+### `0.1.0` extensibility
+
+**Ruling:** Third parties extend `0.1.0` through ordinary TypeScript packages that export Components, Commands, Keymaps, helpers, and Effect services. These packages compose public SDK contracts without runtime discovery, activation, contribution slots, or Plugin lifecycle guarantees.
+
+**Reasoning:** Package composition supports reusable ecosystems without freezing a speculative RuntimeExtension protocol. A formal Plugin system requires evidence for discovery, isolation, coordinated teardown, permissions, and compatibility.
 
 ## Developer and SDK experience
 
@@ -250,14 +256,16 @@ Target full Unicode bidirectional and right-to-left behavior for `0.2.0`, includ
 **Ruling:** `0.1.0` supports these native-rendered content forms:
 
 - Plain text.
-- Canonical `StyledText` or `TextDocument` data.
+- Canonical `StyledText` data.
 - Markdown with a declared CommonMark and GitHub Flavored Markdown feature set.
 - Syntax-highlighted code.
 - Sanitized ANSI text.
 
 The ANSI parser may retain allowlisted styling and validated OSC 8 links. It must reject cursor movement, title changes, clipboard operations, and terminal control.
 
-Diffs, diagnostics, structured data, and structured logs are Components over the canonical document model. AsciiDoc, reStructuredText, HTML subsets, mathematics, and diagrams use adapters unless demand and measurement justify a native parser.
+`StyledText` is the public custom-format and rich-content interchange contract. A physical Rust document model remains a Stage 3 implementation detail and must not introduce a competing public term.
+
+Diffs, diagnostics, structured data, and structured logs are Components over `StyledText`. AsciiDoc, reStructuredText, HTML subsets, mathematics, and diagrams use adapters unless demand and measurement justify a native parser.
 
 ### Editing
 
@@ -441,6 +449,13 @@ Provide these commands:
 - `bunx tuvren trace view TRACE_FILE`
 - `bunx tuvren examples` or an equivalent no-clone browser.
 
+Register these rebindable framework Commands:
+
+- `tuvren.devtools.toggle`.
+- `tuvren.devtools.pick`.
+- `tuvren.devtools.record`.
+- `tuvren.devtools.saveTrace`.
+
 Use hard-restart watch mode rather than preserving native Handles across a soft reload.
 
 ### Shared observation graph
@@ -486,6 +501,17 @@ Set these intended tooling budgets:
 - Full trace recording: less than 10% overhead with bounded memory and visible overhead reporting.
 
 Defer browser and editor inspectors, live prop editing, source write-back, remote attachment, extension panels, arbitrary application-state time travel, state-preserving hot reload, built-in CPU or heap profiling, telemetry exports, and AI integrations until P0 usage justifies them.
+
+### Devtools adoption and correctness gates
+
+**Ruling:** Apply these measurable P0 gates:
+
+- A task study must show a median time below 60 seconds from a seeded visible layout defect to its source StyleSpec.
+- `doctor` must identify the correct cause and next action for every seeded package-load failure.
+- A deterministic fixture must produce identical character, style, cursor, and semantic snapshots across 100 repeated runs.
+- Every late Render Pass must have a causal path or an explicit `unattributed` tooling defect.
+
+These gates supplement the installation, first-render, interactive quickstart, and semantic-test onboarding targets recorded earlier.
 
 ## Security, failure, and error contracts
 
@@ -594,7 +620,7 @@ The following repository behavior is a defect rather than product intent:
 - Text state can have competing authorities.
 - Public examples can depend on private files and raw FFI.
 - Some native functions lack safe SDK wrappers.
-- CI omits shipped Command, Effect, and extension tests.
+- CI omits shipped Command and Effect tests. Retiring the extension surface removes the need to add its tests as a release gate; preserve any useful cases when they cover retained Commands, Keymaps, or package composition.
 - Package metadata, publish automation, lockfiles, audits, and provenance are incomplete.
 - The macOS x64 workflow uses a retired runner label.
 - Linux arm64 lacks native load evidence even though the PRD claims full target verification.

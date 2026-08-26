@@ -1,15 +1,15 @@
 # Open decisions
 
-**Date:** 2026-08-26  
-**Interview target:** Realign
+- **Date:** 2026-08-26
+- **Interview target:** Realign
 
 No earlier open-decision register exists in `.constitution/reports/`.
 
 ## OD-01: Final comparative benchmark gates
 
-**Status:** Open  
-**Owner:** Evidence-producing performance spike, followed by PRD, Architecture, TechSpec, and Tasks Evolution reviews  
-**Blocks:** Final absolute performance constraints, native-promotion cuts, and the `0.1.0` performance release gate
+- **Status:** Open
+- **Owner:** Evidence-producing performance spike, followed by PRD, Architecture, TechSpec, and Tasks Evolution reviews
+- **Blocks:** Final comparative margins and evidence-derived native-promotion cuts
 
 **Question asked:** Do the proposed competitive margins express the intended ambition for OpenTUI, Ratatui, and Ink?
 
@@ -20,6 +20,8 @@ No earlier open-decision register exists in `.constitution/reports/`.
 - No more than 5% slower than OpenTUI on any primary p95 latency fixture, with an aggregate-suite win.
 - Within 15% of Ratatui on comparable hot update and render paths.
 - At least 3x faster than Ink across the aggregate interactive workload, with materially lower incremental memory.
+
+The 120 Hz, 90 Hz, and 60 Hz frame budgets are settled. Falling below 60 Hz inside the declared workload envelope remains a release failure and isn't part of this open decision.
 
 **Evidence required to resolve:**
 
@@ -35,9 +37,9 @@ The downstream stage must not convert the provisional margins into hard gates wi
 
 ## OD-02: Selective two-phase Event arbitration feasibility
 
-**Status:** Open  
-**Owner:** Event-protocol feasibility spike, followed by Architecture, TechSpec, and Tasks Evolution reviews  
-**Blocks:** Final Event lifecycle, default-action timing, Event ABI, and dependent Component interaction contracts
+- **Status:** Open
+- **Owner:** Event-protocol feasibility spike, followed by Architecture, TechSpec, and Tasks Evolution reviews
+- **Blocks:** Final Event lifecycle, default-action timing, Event ABI, and dependent Component interaction contracts
 
 **Question asked:** Should Tuvren adopt selective two-phase arbitration for cancelable Events and a native fast path for noncancelable or unintercepted Events?
 
