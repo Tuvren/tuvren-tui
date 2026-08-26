@@ -2,6 +2,12 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.1] — 2026-08-26
+
+### Fixed
+
+- Added the root-owned `check:release-candidate` command so Stage 4 can verify the complete P0 evidence set and atomic manifest through one declared executable gate instead of treating the narrower package test as release proof.
+
 ## [v9.0.0] — 2026-08-26
 
 ### Added
