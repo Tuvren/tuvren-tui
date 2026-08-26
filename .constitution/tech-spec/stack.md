@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.1** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.2** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -101,7 +101,7 @@ Pre-`1.0` minor releases may break public SDK contracts only with a changelog, m
 
 JSON Schema validates each durable shape but cannot enforce cross-artifact equality. Release verification must additionally run `validateAtomicReleaseManifest` as defined by `contracts/release-validation.json`; that validator proves exact artifact membership, SemVer, package/artifact version equality, ABI equality, checksums, package manifests, source revisions, and provenance before any publish begins.
 
-`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes contract and capability checks; semantic, terminal, target, and package suites; every named fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, or nonconforming required result and writes the schema-valid evidence index consumed by release automation.
+`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes contract and capability checks; semantic, terminal, target, and package suites; every named fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, or nonconforming required result, checks every constituent artifact against the candidate source revision, and writes a human-readable release-candidate report plus the existing schema-valid atomic release manifest. It does not introduce a durable evidence-index format.
 
 Diagnostic snapshots use `row-major-rle-v1` cell runs. `validateDiagnosticSnapshotRuns` in `contracts/snapshot-validation.json` performs the checked cross-field sum, exact dense reconstruction, and cursor bounds that JSON Schema cannot express.
 

@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.1** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.2** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -184,10 +184,10 @@ bun run bench:comparative        # OD-01 fixtures and raw results
 bun run bench:devtools           # Off, passive, and full-trace overhead
 bun run study:onboarding         # 5/10/30/10-minute adoption tasks
 bun run study:style-defect       # Median source-location task
-cargo fuzz run transaction_decode
-cargo fuzz run event_decode
-cargo fuzz run terminal_response
-cargo fuzz run durable_files
+cargo fuzz run --fuzz-dir native/fuzz transaction_decode
+cargo fuzz run --fuzz-dir native/fuzz event_decode
+cargo fuzz run --fuzz-dir native/fuzz terminal_response
+cargo fuzz run --fuzz-dir native/fuzz durable_files
 cargo audit
 cargo deny check
 bun audit --cwd ts
