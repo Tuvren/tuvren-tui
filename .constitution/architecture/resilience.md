@@ -33,7 +33,7 @@ All external content and control data crosses a validating boundary before it re
 ## State integrity
 
 - The UI Executor is the only writer into runtime state. Worker tasks submit immutable transaction requests and never mutate the runtime directly.
-- A transaction either rejects before mutation or applies in deterministic command order. Stage 3 must define rollback or context-discard behavior for failures after partial application.
+- A transaction validates all expected failure conditions before mutation and then applies as one logical unit in deterministic command order. Tuvren does not promise rollback after application begins. An unexpected failure during application freezes and discards the affected runtime context after preserving bounded diagnostics and restoring the terminal; the system never continues from partially applied state.
 - Controlled properties accept the application's latest valid generation. Uncontrolled properties remain runtime-owned after initialization until authority changes explicitly.
 - The Composition Tree, Semantic Tree, focus state, layout, hit-testing, selection, and rendered Surface advance on one serialized timeline.
 - The last known-good Surface remains available for recoverable Issues and supervisor fallback.

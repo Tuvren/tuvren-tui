@@ -12,6 +12,7 @@ sequenceDiagram
     participant Interact as Interaction Kernel
     participant Content as Content and Projection Kernel
     participant Orch as Application Orchestration
+    participant Exec as UI Executor
     participant App as Application
     participant Present as Presentation Pipeline
 
@@ -20,10 +21,12 @@ sequenceDiagram
     Content-->>Orch: Emit keyed range demand with generation
     Orch->>App: Request range through Data Source
     App-->>Orch: Return keyed items or loading, empty, or error result
-    Orch->>Content: Submit result with generation
+    Orch->>Exec: Submit range-result transaction with generation
+    Exec->>Content: Apply serialized range result
     Content->>Content: Reject stale data and update bounded Resident Projection
     Content-->>Present: Provide visible keyed items and variable heights
-    Orch->>Content: Add or expire bounded Toast or Notification
+    Orch->>Exec: Submit Toast or Notification transaction
+    Exec->>Content: Add or expire bounded feedback
 ```
 
 ## Failure path

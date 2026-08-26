@@ -11,12 +11,14 @@ sequenceDiagram
     actor Dev as Developer
     actor EU as End User
     participant Orch as Application Orchestration
+    participant Exec as UI Executor
     participant Content as Content and Projection Kernel
     participant Interact as Interaction Kernel
     participant Present as Presentation Pipeline
 
     Dev->>Orch: Insert, stream, patch, finish, replace, collapse, expand, remove, or clear stable block
-    Orch->>Content: Submit block identity and generation
+    Orch->>Exec: Submit Transcript transaction with block identity and generation
+    Exec->>Content: Apply serialized Transcript update
     Content->>Content: Reject stale update and mutate bounded Resident Projection
     EU->>Interact: Scroll, select, or return to live edge
     Interact->>Content: Update anchor, selection, or follow intent

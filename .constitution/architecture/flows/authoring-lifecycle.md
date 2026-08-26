@@ -36,4 +36,4 @@ sequenceDiagram
 
 ## Failure path
 
-Invalid intent rejects before enqueue. Saturation applies the declared backpressure or rejection policy without unbounded storage. Any failure after initialization cancels scoped work, preserves bounded diagnostics, and restores the terminal; an inconsistent runtime context is discarded rather than reused.
+Invalid intent rejects before enqueue. Saturation applies the declared backpressure or rejection policy without unbounded storage. Recoverable application, Command, Component, and validation failures preserve the active context and last known-good Surface where possible. An unrecovered root-lifecycle or runtime-invariant failure cancels scoped work, preserves bounded diagnostics, restores the terminal, and discards the inconsistent runtime context rather than reusing it.
