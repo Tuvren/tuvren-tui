@@ -5,6 +5,8 @@ import {
   Box,
   Button,
   Commands,
+  ErrorBoundary,
+  Input,
   Menu,
   Select,
   Terminal,
@@ -12,12 +14,17 @@ import {
   commandId,
   componentId,
   defineTheme,
+  graphemeIndex,
   mount,
   provideTheme,
   render,
   themeToken,
+  useStream,
+  withRequirements,
+  type CommandService,
   type RangeLoadResult,
   type TuvrenError,
+  type View,
 } from "./tuvren-tui";
 import { jsx } from "./jsx-runtime";
 import {
@@ -29,7 +36,7 @@ import {
   type ImperativeCommand,
 } from "./imperative";
 
-const save = commandId("app.save");
+const save = commandId<number, "save-failed">("app.save");
 const root = Box({
   id: componentId("app.root"),
   children: [
@@ -97,6 +104,9 @@ declare const requiredLoad: Effect.Effect<
   Database
 >;
 declare const failingHandler: Effect.Effect<void, "event-handler-error">;
+declare const requiredCell: View<"cell-error", Database>;
+declare const requiredStream: Stream.Stream<number, "stream-error", Database>;
+declare const commandService: CommandService;
 const requiredView = Select<string, "load-error", Database>({
   dataSource: {
     getKey: (item) => item,
@@ -118,6 +128,54 @@ const observedSession: Effect.Effect<
   mount(root, { onEvent: () => failingHandler }),
   (session) => session.awaitExit,
 );
+const rendererView = Select<string, never, never, "cell-error", Database>({
+  items: ["one"],
+  getKey: (item) => item,
+  renderItem: () => requiredCell,
+});
+const rendererRender: Effect.Effect<
+  void,
+  TuvrenError | "cell-error",
+  Database
+> = render(rendererView);
+const recoveredView = ErrorBoundary({
+  children: requiredView,
+  fallback: () => Text({ content: "recovered" }),
+});
+const recoveredRender: Effect.Effect<void, TuvrenError, Database> =
+  render(recoveredView);
+const streamRequirement = useStream(requiredStream, () => undefined);
+const streamView = withRequirements(
+  Text({ content: "stream" }),
+  streamRequirement,
+);
+const streamRender: Effect.Effect<
+  void,
+  TuvrenError | "stream-error",
+  Database
+> = render(streamView);
+const typedCommandId = commandId<number, "command-error", Database>(
+  "typed.command",
+);
+const idInvocation: Effect.Effect<
+  number,
+  TuvrenError | "command-error",
+  Database
+> = commandService.invokeById(typedCommandId);
+const initialCursor = graphemeIndex(0);
+
+// @ts-expect-error A control cannot have simultaneous authorities.
+Input({ value: "controlled", defaultValue: "uncontrolled" });
+// @ts-expect-error A Collection cannot have simultaneous authorities.
+Select({
+  items: ["one"],
+  dataSource: {
+    getKey: (item: string) => item,
+    loadRange: () => Effect.never,
+  },
+  getKey: (item: string) => item,
+  renderItem: (item: string) => Text({ content: item }),
+});
 const imperativeSave: ImperativeCommand<number, "save-failed"> = {
   id: save,
   title: "Save",
@@ -153,4 +211,9 @@ void terminalTag;
 void commandTag;
 void requiredRender;
 void observedSession;
+void rendererRender;
+void recoveredRender;
+void streamRender;
+void idInvocation;
+void initialCursor;
 void imperative;

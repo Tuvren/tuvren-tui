@@ -6,6 +6,10 @@
     "every metricDefinitions key appears in every sample.metrics object and in summary.metrics",
     "number, integer, and boolean metric values match the declared valueType in every sample and summary",
     "each summary statistic is recomputed from the corresponding samples, except exact Boolean metrics which require identical sample values",
+    "p50, p95, and p99 sort finite sample values ascending and use nearest-rank index max(0, ceil(percentile * sampleCount) - 1) without interpolation",
+    "mean uses an IEEE-754 binary64 sum divided by sampleCount; validation accepts absolute error at most 1e-9 or relative error at most 1e-9 and applies no prior rounding",
+    "min, max, and sum use the exact finite sample values; integer sums reject overflow beyond the JavaScript safe-integer range",
+    "exact requires every sample value to be identical and the summary value to equal it",
     "core summary values are recomputed from samples using method.statistic",
     "check names are unique and every required suite check is present",
     "check:contracts rejects structural or recomputation drift; check:release-candidate additionally requires every release-gating check to pass"

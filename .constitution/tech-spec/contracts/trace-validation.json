@@ -1,0 +1,97 @@
+{
+  "validator": "validateDiagnosticTraceRecords",
+  "unknownFields": "reject",
+  "contracts": {
+    "input": {
+      "required": { "inputKind": "string", "redacted": "boolean" },
+      "optional": { "byteLength": "integer" }
+    },
+    "event": {
+      "required": { "eventType": "string", "cancelable": "boolean" },
+      "optional": { "target": "string", "disposition": "string" }
+    },
+    "command": {
+      "required": {
+        "commandId": "string",
+        "phase": "string",
+        "status": "string"
+      },
+      "optional": { "concurrency": "string" }
+    },
+    "effect-span": {
+      "required": { "spanId": "string", "phase": "string" },
+      "optional": { "parentSpanId": "string" }
+    },
+    "reconcile": {
+      "required": { "operation": "string", "component": "string" },
+      "optional": { "source": "string" }
+    },
+    "transaction": {
+      "required": { "status": "string", "commandCount": "integer" },
+      "optional": { "failedCommandIndex": "integer" }
+    },
+    "mutation": {
+      "required": {
+        "resource": "string",
+        "operation": "string",
+        "generation": "integer"
+      },
+      "optional": { "identity": "string" }
+    },
+    "dirty": {
+      "required": { "cause": "string" },
+      "optional": { "component": "string", "cellCount": "integer" }
+    },
+    "layout": {
+      "required": { "component": "string", "durationNanos": "integer" },
+      "optional": { "changedNodes": "integer" }
+    },
+    "text": {
+      "required": {
+        "operation": "string",
+        "startGrapheme": "integer",
+        "endGrapheme": "integer"
+      },
+      "optional": { "contentEpoch": "integer" }
+    },
+    "render": {
+      "required": { "dirtyCells": "integer", "engineNanos": "integer" },
+      "optional": { "presentationTierHz": "integer" }
+    },
+    "diff": {
+      "required": { "changedCells": "integer", "bytes": "integer" },
+      "optional": { "fullRedraw": "boolean" }
+    },
+    "terminal-write": {
+      "required": {
+        "bytes": "integer",
+        "durationNanos": "integer",
+        "status": "string"
+      },
+      "optional": {}
+    },
+    "error": {
+      "required": {
+        "code": "error-code",
+        "category": "error-category",
+        "operation": "string"
+      },
+      "optional": { "component": "string" }
+    },
+    "cleanup": {
+      "required": { "resource": "string", "count": "integer" },
+      "optional": { "retainedBytes": "integer" }
+    },
+    "unattributed": {
+      "required": { "description": "string" },
+      "optional": { "phase": "string" }
+    }
+  },
+  "invariants": [
+    "each record payload matches exactly the contract selected by record.kind",
+    "integer payload values are nonnegative safe integers unless the selected field explicitly allows signed values",
+    "error-code and error-category values exist in error-codes.json and correspond",
+    "input content remains redacted unless trace.redaction.fullContent is true",
+    "runtime replay rejects a record kind whose registered payload contract or migration is unavailable"
+  ]
+}

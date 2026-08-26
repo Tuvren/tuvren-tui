@@ -1,0 +1,161 @@
+{
+  "registryVersion": "1.0.0",
+  "defaultRemediationByCategory": {
+    "runtime": "Restart the affected context and inspect the linked diagnostic trace.",
+    "validation": "Correct the rejected input or declared validation rule.",
+    "resource": "Reduce retained work or raise the documented bounded limit.",
+    "command": "Register and enable the Command in the active scope before invocation.",
+    "clipboard": "Check terminal clipboard capability and permission, then retry explicitly.",
+    "terminal": "Restore or reconnect the terminal session before continuing.",
+    "capability": "Use the compatible fallback or a terminal that reports the capability.",
+    "permission": "Grant the requested permission or choose a non-privileged path.",
+    "distribution": "Install the exact supported package set for this platform and version.",
+    "application": "Handle the application failure at an Error Boundary or restart the context."
+  },
+  "codes": [
+    {
+      "code": "TUVREN_CONTEXT_STALE",
+      "category": "runtime",
+      "operation": "context.use",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_CONTEXT_FROZEN",
+      "category": "runtime",
+      "operation": "context.mutate",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_RUNTIME_PANIC",
+      "category": "runtime",
+      "operation": "native.call",
+      "componentContext": true
+    },
+    {
+      "code": "TUVREN_INVALID_INPUT",
+      "category": "validation",
+      "operation": "input.validate",
+      "componentContext": true
+    },
+    {
+      "code": "TUVREN_VALIDATION_FAILED",
+      "category": "validation",
+      "operation": "value.validate",
+      "componentContext": true
+    },
+    {
+      "code": "TUVREN_RESOURCE_LIMIT",
+      "category": "resource",
+      "operation": "resource.reserve",
+      "componentContext": true
+    },
+    {
+      "code": "TUVREN_QUEUE_SATURATED",
+      "category": "resource",
+      "operation": "executor.enqueue",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_COMMAND_NOT_REGISTERED",
+      "category": "command",
+      "operation": "command.invokeById",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_COMMAND_DISABLED",
+      "category": "command",
+      "operation": "command.invoke",
+      "componentContext": true
+    },
+    {
+      "code": "TUVREN_CLIPBOARD_UNAVAILABLE",
+      "category": "clipboard",
+      "operation": "clipboard.request",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_CLIPBOARD_DENIED",
+      "category": "clipboard",
+      "operation": "clipboard.request",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_CLIPBOARD_BUSY",
+      "category": "clipboard",
+      "operation": "clipboard.request",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_CLIPBOARD_MALFORMED",
+      "category": "clipboard",
+      "operation": "clipboard.decode",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_CLIPBOARD_TIMED_OUT",
+      "category": "clipboard",
+      "operation": "clipboard.request",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_TERMINAL_DISCONNECTED",
+      "category": "terminal",
+      "operation": "terminal.session",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_TERMINAL_WRITE_FAILED",
+      "category": "terminal",
+      "operation": "terminal.write",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_UNSUPPORTED_CAPABILITY",
+      "category": "capability",
+      "operation": "terminal.capability",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_PERMISSION_DENIED",
+      "category": "permission",
+      "operation": "permission.request",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_PACKAGE_NOT_FOUND",
+      "category": "distribution",
+      "operation": "package.resolve",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_VERSION_MISMATCH",
+      "category": "distribution",
+      "operation": "package.validateVersion",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_UNSUPPORTED_PLATFORM",
+      "category": "distribution",
+      "operation": "platform.resolve",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_NATIVE_LOAD_FAILED",
+      "category": "distribution",
+      "operation": "native.load",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_ABI_MISMATCH",
+      "category": "distribution",
+      "operation": "native.validateAbi",
+      "componentContext": false
+    },
+    {
+      "code": "TUVREN_APPLICATION_FAILURE",
+      "category": "application",
+      "operation": "application.run",
+      "componentContext": true
+    }
+  ]
+}

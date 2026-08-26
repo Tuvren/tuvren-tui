@@ -1,7 +1,16 @@
 export type Brand<T, Name extends string> = T & { readonly __brand: Name };
 
 export type ComponentId = Brand<string, "ComponentId">;
-export type CommandId = Brand<string, "CommandId">;
+export type CommandId<A = unknown, E = unknown, R = unknown> = Brand<
+  string,
+  "CommandId"
+> & {
+  readonly __commandContract?: Readonly<{
+    result: A;
+    error: E;
+    environment: R;
+  }>;
+};
 export type KeymapScopeId = Brand<string, "KeymapScopeId">;
 export type KeyGrapheme = Brand<string, "KeyGrapheme">;
 export type TranscriptBlockId = Brand<string, "TranscriptBlockId">;
@@ -460,20 +469,31 @@ export interface FormControlProps<Value> {
   readonly error?: string;
   readonly onSubmit?: (value: Value) => void;
 }
-export interface InputProps
-  extends
-    CommonProps<"root" | "value" | "placeholder" | "cursor">,
-    TextDocumentConfig,
-    FormControlProps<string> {
-  readonly value?: string;
-  readonly defaultValue?: string;
-  readonly onValueChange?: (value: string) => void;
-  readonly placeholder?: string;
-  readonly name?: string;
-}
-export interface TextAreaProps extends InputProps {
+export type StateAuthority<
+  Value,
+  Controlled extends string,
+  Uncontrolled extends string,
+> =
+  | ({ readonly [Key in Controlled]: Value } & {
+      readonly [Key in Uncontrolled]?: never;
+    })
+  | ({ readonly [Key in Controlled]?: never } & {
+      readonly [Key in Uncontrolled]?: Value;
+    });
+
+export type InputProps = CommonProps<
+  "root" | "value" | "placeholder" | "cursor"
+> &
+  TextDocumentConfig &
+  FormControlProps<string> &
+  StateAuthority<string, "value", "defaultValue"> & {
+    readonly onValueChange?: (value: string) => void;
+    readonly placeholder?: string;
+    readonly name?: string;
+  };
+export type TextAreaProps = InputProps & {
   readonly wrap?: "soft" | "none";
-}
+};
 
 export interface TextDocumentSnapshot {
   readonly content: string;
@@ -617,31 +637,29 @@ export type VirtualCollectionBinding<
         readonly mutations?: Mutations;
       }
   );
-export interface ScrollBoxProps extends CommonProps<
-  "root" | "viewport" | "scrollbar"
-> {
-  readonly scrollRow?: number;
-  readonly defaultScrollRow?: number;
-  readonly onScrollChange?: (row: number) => void;
-}
-export interface OverlayProps extends CommonProps<"backdrop" | "root"> {
-  readonly open?: boolean;
-  readonly defaultOpen?: boolean;
-  readonly onOpenChange?: (open: boolean) => void;
-}
-export interface TableColumn<T = unknown> {
+export type ScrollBoxProps = CommonProps<"root" | "viewport" | "scrollbar"> &
+  StateAuthority<number, "scrollRow", "defaultScrollRow"> & {
+    readonly onScrollChange?: (row: number) => void;
+  };
+export type OverlayProps = CommonProps<"backdrop" | "root"> &
+  StateAuthority<boolean, "open", "defaultOpen"> & {
+    readonly onOpenChange?: (open: boolean) => void;
+  };
+export interface TableColumn<T = unknown, E = never, R = never> {
   readonly key: string;
-  readonly header: View<unknown, unknown>;
-  readonly render: (item: T) => View<unknown, unknown>;
+  readonly header: View<E, R>;
+  readonly render: (item: T) => View<E, R>;
   readonly width?: Dimension;
 }
 export type TableProps<
   T = unknown,
   LoadResult = never,
   Mutations = never,
+  RenderE = never,
+  RenderR = never,
 > = CommonProps<"root" | "header" | "row" | "cell"> &
   VirtualCollectionBinding<T, LoadResult, Mutations> & {
-    readonly columns: readonly TableColumn<T>[];
+    readonly columns: readonly TableColumn<T, RenderE, RenderR>[];
     readonly selectedKeys?: readonly CollectionKey[];
     readonly onSelectionChange?: (keys: readonly CollectionKey[]) => void;
   };
@@ -652,20 +670,27 @@ export interface TranscriptBlock {
   readonly streaming?: boolean;
   readonly collapsed?: boolean;
 }
-export interface TranscriptProps extends CommonProps<
-  "root" | "block" | "liveIndicator"
-> {
-  readonly blocks?: readonly TranscriptBlock[];
-  readonly defaultBlocks?: readonly TranscriptBlock[];
-  readonly mode: "controlled" | "bounded-local";
-  readonly maxResidentBlocks?: number;
-  readonly onRangeChange?: (start: number, end: number) => void;
-  readonly onEvict?: (ids: readonly TranscriptBlockId[]) => void;
-  readonly onReloadRequest?: (request: RangeRequest) => void;
-  readonly onVisibleRangeChange?: (
-    range: Readonly<{ start: number; end: number; generation: number }>,
-  ) => void;
-}
+export type TranscriptProps = CommonProps<"root" | "block" | "liveIndicator"> &
+  (
+    | {
+        readonly mode: "controlled";
+        readonly blocks: readonly TranscriptBlock[];
+        readonly defaultBlocks?: never;
+      }
+    | {
+        readonly mode: "bounded-local";
+        readonly blocks?: never;
+        readonly defaultBlocks?: readonly TranscriptBlock[];
+      }
+  ) & {
+    readonly maxResidentBlocks?: number;
+    readonly onRangeChange?: (start: number, end: number) => void;
+    readonly onEvict?: (ids: readonly TranscriptBlockId[]) => void;
+    readonly onReloadRequest?: (request: RangeRequest) => void;
+    readonly onVisibleRangeChange?: (
+      range: Readonly<{ start: number; end: number; generation: number }>,
+    ) => void;
+  };
 
 export type TranscriptOperation =
   | { readonly type: "append"; readonly block: TranscriptBlock }
@@ -732,33 +757,35 @@ export interface TranscriptController {
   followLiveEdge(enabled: boolean): void;
   visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
 }
-export interface SplitPaneProps extends CommonProps<
+export type SplitPaneProps = CommonProps<
   "root" | "first" | "divider" | "second"
-> {
-  readonly axis?: "horizontal" | "vertical";
-  readonly ratio?: number;
-  readonly defaultRatio?: number;
-  readonly onRatioChange?: (ratio: number) => void;
-}
+> &
+  StateAuthority<number, "ratio", "defaultRatio"> & {
+    readonly axis?: "horizontal" | "vertical";
+    readonly onRatioChange?: (ratio: number) => void;
+  };
 export type SelectProps<
   T = unknown,
   LoadResult = never,
   Mutations = never,
+  RenderE = never,
+  RenderR = never,
 > = CommonProps<"root" | "trigger" | "list" | "option"> &
   VirtualCollectionBinding<T, LoadResult, Mutations> &
   FormControlProps<CollectionKey | undefined> & {
-    readonly selectedKey?: CollectionKey;
-    readonly defaultSelectedKey?: CollectionKey;
-    readonly renderItem: (item: T) => View<unknown, unknown>;
+    readonly renderItem: (item: T) => View<RenderE, RenderR>;
     readonly onSelectionChange?: (key: CollectionKey | undefined) => void;
-  };
+  } & StateAuthority<
+    CollectionKey | undefined,
+    "selectedKey",
+    "defaultSelectedKey"
+  >;
 
-export type ComponentPropsWithChildren<Props, E, R> = Omit<
-  Props,
-  "children"
-> & {
-  readonly children?: View<E, R> | readonly View<E, R>[];
-};
+export type ComponentPropsWithChildren<Props, E, R> = Props extends unknown
+  ? Omit<Props, "children"> & {
+      readonly children?: View<E, R> | readonly View<E, R>[];
+    }
+  : never;
 
 export interface ComponentType<Props = object> {
   <E = never, R = never>(
@@ -781,30 +808,25 @@ export interface ViewNode<E = never, R = never> {
 export type ButtonProps = CommonProps<"root" | "label" | "indicator"> & {
   readonly command: CommandId;
 };
-export type ToggleButtonProps = ButtonProps & {
-  readonly pressed?: boolean;
-  readonly defaultPressed?: boolean;
-  readonly onPressedChange?: (pressed: boolean) => void;
-};
-export interface CheckboxProps
-  extends
-    CommonProps<"root" | "box" | "label">,
-    FormControlProps<boolean | "mixed"> {
-  readonly checked?: boolean | "mixed";
-  readonly defaultChecked?: boolean | "mixed";
-  readonly onCheckedChange?: (checked: boolean | "mixed") => void;
-}
+export type ToggleButtonProps = ButtonProps &
+  StateAuthority<boolean, "pressed", "defaultPressed"> & {
+    readonly onPressedChange?: (pressed: boolean) => void;
+  };
+export type CheckboxProps = CommonProps<"root" | "box" | "label"> &
+  FormControlProps<boolean | "mixed"> &
+  StateAuthority<boolean | "mixed", "checked", "defaultChecked"> & {
+    readonly onCheckedChange?: (checked: boolean | "mixed") => void;
+  };
 export interface RadioProps extends CommonProps<
   "root" | "indicator" | "label"
 > {
   readonly value: string;
 }
-export interface RadioGroupProps
-  extends CommonProps<"root" | "item">, FormControlProps<string | undefined> {
-  readonly value?: string;
-  readonly defaultValue?: string;
-  readonly onValueChange?: (value: string) => void;
-}
+export type RadioGroupProps = CommonProps<"root" | "item"> &
+  FormControlProps<string | undefined> &
+  StateAuthority<string | undefined, "value", "defaultValue"> & {
+    readonly onValueChange?: (value: string) => void;
+  };
 export interface ProgressProps extends CommonProps<
   "root" | "track" | "fill" | "label"
 > {
@@ -816,9 +838,11 @@ export type MenuProps<
   T = unknown,
   LoadResult = never,
   Mutations = never,
+  RenderE = never,
+  RenderR = never,
 > = CommonProps<"root" | "item" | "separator"> &
   VirtualCollectionBinding<T, LoadResult, Mutations> & {
-    readonly renderItem: (item: T) => View<unknown, unknown>;
+    readonly renderItem: (item: T) => View<RenderE, RenderR>;
   };
 export interface MenuItemProps extends CommonProps<
   "root" | "label" | "keybinding"
@@ -830,23 +854,25 @@ export type CommandPaletteProps<
   T = unknown,
   LoadResult = never,
   Mutations = never,
-> = SelectProps<T, LoadResult, Mutations> & {
+  RenderE = never,
+  RenderR = never,
+> = SelectProps<T, LoadResult, Mutations, RenderE, RenderR> & {
   readonly commandForItem: (item: T) => CommandId;
 };
-export interface DialogProps extends CommonProps<
+export type DialogProps = CommonProps<
   "backdrop" | "root" | "title" | "description" | "actions"
-> {
-  readonly open?: boolean;
-  readonly defaultOpen?: boolean;
-  readonly onOpenChange?: (open: boolean) => void;
-}
-export interface TabsProps extends CommonProps<
-  "root" | "tabList" | "tab" | "panel"
-> {
-  readonly selectedKey?: CollectionKey;
-  readonly defaultSelectedKey?: CollectionKey;
-  readonly onSelectionChange?: (key: CollectionKey) => void;
-}
+> &
+  StateAuthority<boolean, "open", "defaultOpen"> & {
+    readonly onOpenChange?: (open: boolean) => void;
+  };
+export type TabsProps = CommonProps<"root" | "tabList" | "tab" | "panel"> &
+  StateAuthority<
+    CollectionKey | undefined,
+    "selectedKey",
+    "defaultSelectedKey"
+  > & {
+    readonly onSelectionChange?: (key: CollectionKey) => void;
+  };
 export interface CodeViewProps extends CommonProps<
   "root" | "gutter" | "content" | "selection"
 > {
@@ -869,10 +895,17 @@ export interface FocusScopeProps extends CommonProps<"root"> {
   readonly modal?: boolean;
 }
 
-export interface ErrorBoundaryProps extends CommonProps<"root" | "fallback"> {
+export type ErrorBoundaryProps<
+  ChildE = unknown,
+  ChildR = unknown,
+  FallbackE = never,
+  FallbackR = never,
+> = Omit<CommonProps<"root" | "fallback">, "children"> & {
+  readonly children: View<ChildE, ChildR> | readonly View<ChildE, ChildR>[];
   readonly fallback:
-    View<unknown, unknown> | ((error: TuvrenError) => View<unknown, unknown>);
-}
+    | View<FallbackE, FallbackR>
+    | ((error: TuvrenError | ChildE) => View<FallbackE, FallbackR>);
+};
 
 export interface AnimationSpec {
   readonly property:
@@ -991,11 +1024,117 @@ export interface ClipboardMediaTypes {
 
 export type ClipboardTarget = "clipboard" | "primary";
 
-export class TuvrenError extends Error {
-  readonly code: string;
-  readonly category: string;
+export type TuvrenErrorCode =
+  | "TUVREN_CONTEXT_STALE"
+  | "TUVREN_CONTEXT_FROZEN"
+  | "TUVREN_RUNTIME_PANIC"
+  | "TUVREN_INVALID_INPUT"
+  | "TUVREN_VALIDATION_FAILED"
+  | "TUVREN_RESOURCE_LIMIT"
+  | "TUVREN_QUEUE_SATURATED"
+  | "TUVREN_COMMAND_NOT_REGISTERED"
+  | "TUVREN_COMMAND_DISABLED"
+  | "TUVREN_CLIPBOARD_UNAVAILABLE"
+  | "TUVREN_CLIPBOARD_DENIED"
+  | "TUVREN_CLIPBOARD_BUSY"
+  | "TUVREN_CLIPBOARD_MALFORMED"
+  | "TUVREN_CLIPBOARD_TIMED_OUT"
+  | "TUVREN_TERMINAL_DISCONNECTED"
+  | "TUVREN_TERMINAL_WRITE_FAILED"
+  | "TUVREN_UNSUPPORTED_CAPABILITY"
+  | "TUVREN_PERMISSION_DENIED"
+  | "TUVREN_PACKAGE_NOT_FOUND"
+  | "TUVREN_VERSION_MISMATCH"
+  | "TUVREN_UNSUPPORTED_PLATFORM"
+  | "TUVREN_NATIVE_LOAD_FAILED"
+  | "TUVREN_ABI_MISMATCH"
+  | "TUVREN_APPLICATION_FAILURE";
+
+export type TuvrenErrorCategory =
+  | "runtime"
+  | "validation"
+  | "resource"
+  | "command"
+  | "clipboard"
+  | "terminal"
+  | "capability"
+  | "permission"
+  | "distribution"
+  | "application";
+
+export class TuvrenError<
+  Code extends TuvrenErrorCode = TuvrenErrorCode,
+> extends Error {
+  protected constructor(message: string);
+  readonly code: Code;
+  readonly category: TuvrenErrorCategory;
   readonly operation: string;
   readonly component?: ComponentId;
   readonly cause?: unknown;
   readonly remediation: string;
 }
+
+export class TuvrenRuntimeError extends TuvrenError<
+  "TUVREN_CONTEXT_STALE" | "TUVREN_CONTEXT_FROZEN" | "TUVREN_RUNTIME_PANIC"
+> {
+  readonly category: "runtime";
+}
+export class TuvrenValidationError extends TuvrenError<
+  "TUVREN_INVALID_INPUT" | "TUVREN_VALIDATION_FAILED"
+> {
+  readonly category: "validation";
+}
+export class TuvrenResourceError extends TuvrenError<
+  "TUVREN_RESOURCE_LIMIT" | "TUVREN_QUEUE_SATURATED"
+> {
+  readonly category: "resource";
+}
+export class TuvrenCommandError extends TuvrenError<
+  "TUVREN_COMMAND_NOT_REGISTERED" | "TUVREN_COMMAND_DISABLED"
+> {
+  readonly category: "command";
+}
+export class TuvrenClipboardError extends TuvrenError<
+  | "TUVREN_CLIPBOARD_UNAVAILABLE"
+  | "TUVREN_CLIPBOARD_DENIED"
+  | "TUVREN_CLIPBOARD_BUSY"
+  | "TUVREN_CLIPBOARD_MALFORMED"
+  | "TUVREN_CLIPBOARD_TIMED_OUT"
+> {
+  readonly category: "clipboard";
+}
+export class TuvrenTerminalError extends TuvrenError<
+  "TUVREN_TERMINAL_DISCONNECTED" | "TUVREN_TERMINAL_WRITE_FAILED"
+> {
+  readonly category: "terminal";
+}
+export class TuvrenCapabilityError extends TuvrenError<"TUVREN_UNSUPPORTED_CAPABILITY"> {
+  readonly category: "capability";
+}
+export class TuvrenPermissionError extends TuvrenError<"TUVREN_PERMISSION_DENIED"> {
+  readonly category: "permission";
+}
+export class TuvrenDistributionError extends TuvrenError<
+  | "TUVREN_PACKAGE_NOT_FOUND"
+  | "TUVREN_VERSION_MISMATCH"
+  | "TUVREN_UNSUPPORTED_PLATFORM"
+  | "TUVREN_NATIVE_LOAD_FAILED"
+  | "TUVREN_ABI_MISMATCH"
+> {
+  readonly category: "distribution";
+}
+export class TuvrenApplicationError extends TuvrenError<"TUVREN_APPLICATION_FAILURE"> {
+  readonly category: "application";
+}
+
+export type TuvrenErrorVariant =
+  | TuvrenRuntimeError
+  | TuvrenValidationError
+  | TuvrenResourceError
+  | TuvrenCommandError
+  | TuvrenClipboardError
+  | TuvrenTerminalError
+  | TuvrenCapabilityError
+  | TuvrenPermissionError
+  | TuvrenDistributionError
+  | TuvrenApplicationError;

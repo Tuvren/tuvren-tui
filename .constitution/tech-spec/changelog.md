@@ -2,6 +2,15 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.10] — 2026-08-26
+
+### Fixed
+
+- Made controlled/default state authorities mutually exclusive, including Transcript mode discrimination.
+- Propagated renderer, child, hook, and Error Boundary requirements through View types; made typed Command IDs preserve ID-invocation contracts; added a validating grapheme-index constructor.
+- Added a closed public error registry and discriminated subclasses plus exact per-kind Diagnostic Trace payload validation.
+- Pinned benchmark percentile/mean/tolerance rules and corrected Cargo/Bun supply-chain command paths.
+
 ## [v9.0.9] — 2026-08-26
 
 ### Fixed

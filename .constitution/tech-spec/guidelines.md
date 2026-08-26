@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.9** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.10** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -83,15 +83,19 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Ship ESM only. Do not add CommonJS wrappers.
 - Public code uses Component and Primitive. `RuntimeNode`, ABI handles, binary opcodes, and `@preact/signals-core` remain private.
 - A public Component exposes its props, lifecycle, declared controllers, and semantic APIs, but never its private Primitive root. Composition internals may change without creating a public escape hatch to native identities or duplicated mutable state.
+- Every controlled/local property is a mutually exclusive type union. Supplying both controlled and default values is a declaration error; controlled Transcript mode requires `blocks`, while bounded-local mode alone accepts `defaultBlocks`.
 - The bare entrypoint must not import the Imperative SDK implementation eagerly unless tree shaking proves that no additional startup or bundle cost results.
 - `render` and resource-producing APIs return Effect values. Lifetimes use scopes; Commands use typed interruptible Effects; external updates and Events expose Streams where streaming is the right model.
 - `View<E, R>` carries failures and environments from effectful Data Sources or mutation Streams through Component composition into `render`, `mount`, and `testRender`. `provideLayer` discharges the provided environment and adds Layer failures/inputs. A mounted `RenderSession<E>.awaitExit` retains every handler and View failure that can occur after setup.
+- Collection render callbacks and child Views contribute their requirements to the returned View. `ErrorBoundary` receives the child error type, discharges that error, preserves the child environment, and adds fallback requirements. Hooks return opaque `ComponentRequirement<E, R>` values that attach through `withRequirements`; dropping a requirement is a conformance failure.
 - Do not wrap an Effect API in a Promise and call it Effect-native. Promise conversion exists only at the outer Host Environment integration edge.
 - The UI executor is the sole caller of context-bound ABI functions, including input polling, Event and diagnostic drains, mutation, rendering, suspend, resume, and shutdown. Worker callbacks, Effects, Streams, Components, and imperative helpers enqueue typed work.
 - Reactivity is private. Public state hooks return Tuvren-owned interfaces and must not expose Signal identity, scheduling, equality, or disposal.
 - Validate `unknown` at public and durable-data boundaries. Do not introduce `any` to silence TypeScript 7 migration errors.
 - Public errors are tagged or classed `TuvrenError` variants and include stable code, category, operation, optional Component identity, cause, and remediation. Internal statuses never escape.
+- `contracts/error-codes.json` is the closed public error registry. TypeScript code/category unions, public subclasses, native-to-host mappings, trace payloads, and doctor fixtures match it exactly; direct construction of the base `TuvrenError` is protected.
 - Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries require a Command ID; they never duplicate the action body. Registry lookup failures are `TuvrenError` subclasses with the standard stable metadata.
+- `CommandId<A, E, R>` carries its registered result, failure, and environment contract through `invokeById` and every bound activation surface. `graphemeIndex()` is the only public constructor for an arbitrary grapheme position and rejects negative, fractional, or unsafe-integer values.
 - Keymaps use branded hierarchical scope identities; omitted scope identifies the global root in bindings, rebindings, conflict reports, and queries. A Key Sequence is a nonempty ordered array of Key Strokes. Named keys use the lowercase names declared by `NamedKey`; text keys pass through `keyGrapheme`, which requires one NFC grapheme and lowercases logical alphabetic keys while Shift remains a modifier. Modifier fields are an order-independent set. When `physicalCode` is present, its USB HID usage ID is the match discriminator and `key` is the logical fallback for terminals without physical codes. Chords use array order, default to a 1,000 ms inter-stroke timeout, accept 50–5,000 ms, and reset on mismatch, timeout, scope change, focus change, or shutdown. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
 - `DataSource.loadRange` receives an `AbortSignal`. A Collection binding is exactly one of static `items + getKey` or `dataSource` with its own canonical `getKey`; the declarations reject two simultaneous authorities or duplicate identity functions. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
 - Collection selection is a generation-stamped keyed mutation rather than a visible-node flag, so selection survives projection and eviction. Native Collection state maintains both a stable-key map and an explicit ordered-key vector with a synchronized position index. Host-side generic items never cross the ABI; transactions carry bounded typed projection descriptors containing stable keys, projected RuntimeNodes, and estimated heights.
@@ -138,6 +142,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Every directly executable fuzz verification uses the pinned target plus `-max_total_time=60`; longer CI campaigns may raise the declared duration through the owning script but never leave a ticket command unbounded.
 - Performance evidence publishes pinned versions, hardware, warmup, samples, statistics, raw schema-valid results, engine time, terminal-write time, and input-to-Surface time.
 - Benchmark evidence declares every non-core metric with a unit and value type, records per-sample values plus per-metric statistics, and carries named pass/fail checks for correctness properties such as timeout, reentrancy, exactly-once disposition, idle passes, animation accuracy, boundary calls, CPU overhead, and allocation behavior.
+- Benchmark percentiles use sorted nearest-rank without interpolation; means use binary64 arithmetic with the declared 1e-9 absolute-or-relative tolerance; exact, min, max, and sum follow `benchmark-validation.json`. Evidence builders never choose their own percentile or rounding convention.
 - Benchmark adaptation uses 120 Hz, 90 Hz, and 60 Hz tiers with hysteresis and an explicit degradation allowlist.
 
 ## Observability and privacy
@@ -160,6 +165,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Diagnostic snapshots encode the dense Surface as `row-major-rle-v1`. A cross-field validator requires every run count to be positive and their checked sum to equal `width × height`; reconstruction expands runs in row-major order and rejects overflow, underfill, or trailing cells. This keeps ordinary snapshots compact while still representing the 3,000 × 1,000 stretch Surface inside an explicit 512 MiB encoded/1 GiB decoded ceiling.
 - Historical schema files never change after publication. Readers consult `contracts/schema-migrations.json`, migrate only registered versions into the current in-memory model, and reject unknown versions before interpreting payload fields.
 - `validateApplicationReplay` rejects nonmonotonic event time and unreachable or duplicate zero-based expectation indexes. `validateBenchmarkResult` recomputes core/custom statistics and checks sample count, metric definitions, value types, and required named checks. Both validators run in `check:contracts`; the release-candidate gate additionally requires every release-gating check to pass.
+- `validateDiagnosticTraceRecords` applies the exact kind-selected payload contracts from `trace-validation.json`, rejects unknown fields, checks registered errors, and refuses runtime replay when a payload contract or migration is unavailable.
 
 ## Commits
 
@@ -215,7 +221,7 @@ cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- 
 cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode -- -max_total_time=60
 cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response -- -max_total_time=60
 cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60
-cargo audit
-cargo deny check
-bun audit --cwd ts
+cargo audit --file native/Cargo.lock
+cargo deny check --manifest-path native/Cargo.toml
+bun audit
 ```
