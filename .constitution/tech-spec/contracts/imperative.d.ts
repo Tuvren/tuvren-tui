@@ -60,6 +60,7 @@ export type {
   CollectionKey,
   CommandId,
   CommonProps,
+  ControllerEnqueueDisposition,
   ComponentId,
   ComponentPropsWithChildren,
   DataSource,
@@ -200,6 +201,10 @@ export type ImperativeRangeLoad<T> = Promise<
 export type ImperativeMutations<T> = AsyncIterable<
   import("./shared").CollectionMutation<T>
 >;
+export type ImperativeTranscriptProps = import("./shared").DistributiveOmit<
+  TranscriptProps,
+  "controller"
+>;
 
 export class Box extends Primitive<ImperativePrimitiveProps<BoxProps>> {
   constructor(props: ImperativePrimitiveProps<BoxProps>);
@@ -237,10 +242,10 @@ export class CollectionPrimitive<T = unknown> extends Primitive<
   );
 }
 export class TranscriptPrimitive extends Primitive<
-  ImperativePrimitiveProps<TranscriptProps>
+  ImperativePrimitiveProps<ImperativeTranscriptProps>
 > {
   readonly controller: import("./shared").TranscriptController;
-  constructor(props: ImperativePrimitiveProps<TranscriptProps>);
+  constructor(props: ImperativePrimitiveProps<ImperativeTranscriptProps>);
 }
 export class SplitPane extends Primitive<
   ImperativePrimitiveProps<SplitPaneProps>
@@ -266,10 +271,10 @@ export class Table<T = unknown> extends Component<
   );
 }
 export class Transcript extends Component<
-  ImperativeComponentProps<TranscriptProps>
+  ImperativeComponentProps<ImperativeTranscriptProps>
 > {
   readonly controller: import("./shared").TranscriptController;
-  constructor(props: ImperativeComponentProps<TranscriptProps>);
+  constructor(props: ImperativeComponentProps<ImperativeTranscriptProps>);
 }
 export class Button<A = void, E = never> extends Component<
   ImperativeComponentProps<ButtonProps<A, E, never>>

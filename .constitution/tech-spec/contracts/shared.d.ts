@@ -792,13 +792,15 @@ export type TranscriptOperation =
       readonly generation: number;
     };
 
+export type ControllerEnqueueDisposition = "accepted" | "unbound";
+
 export interface TranscriptController {
-  apply(operation: TranscriptOperation): void;
+  apply(operation: TranscriptOperation): ControllerEnqueueDisposition;
   scrollTo(
     id: TranscriptBlockId,
     alignment?: "start" | "center" | "end" | "nearest",
-  ): void;
-  followLiveEdge(enabled: boolean): void;
+  ): ControllerEnqueueDisposition;
+  followLiveEdge(enabled: boolean): ControllerEnqueueDisposition;
   lastVisibleRange(): VisibleRangeObservation | undefined;
 }
 export type SplitPaneProps = CommonProps<

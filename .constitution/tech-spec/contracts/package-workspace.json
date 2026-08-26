@@ -13,6 +13,7 @@
     "check:capability-map": "bun run scripts/check-capability-map.ts",
     "check:release-candidate": "bun run scripts/check-release-candidate.ts",
     "test:semantic": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-semantic.test.ts",
+    "test:host": "bun test ts/test-ffi.test.ts ts/test-jsx.test.ts ts/test-commands.test.ts ts/test-effect.test.ts ts/test-examples.test.ts ts/test-install.test.ts ts/test-runner.test.ts",
     "test:terminal": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-terminal.test.ts",
     "test:platform-smoke": "bun run scripts/test-platform-smoke.ts",
     "test:release-package": "bun run scripts/test-release-package.ts",
