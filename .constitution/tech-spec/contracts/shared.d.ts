@@ -489,6 +489,23 @@ export interface CollectionController<T> {
   focusKey(key: CollectionKey | undefined): void;
   visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
 }
+
+export interface VirtualCollectionBinding<
+  T,
+  LoadResult = never,
+  Mutations = never,
+> {
+  readonly items?: readonly T[];
+  readonly dataSource?: DataSource<T, LoadResult>;
+  readonly mutations?: Mutations;
+  readonly controller?: CollectionController<T>;
+  readonly estimatedCount?: number;
+  readonly onVisibleRangeChange?: (
+    range: Readonly<{ start: number; end: number; generation: number }>,
+  ) => void;
+  readonly onFocusChange?: (key: CollectionKey | undefined) => void;
+  readonly onReloadRequest?: (generation: number) => void;
+}
 export interface ScrollBoxProps extends CommonProps<
   "root" | "viewport" | "scrollbar"
 > {
@@ -507,22 +524,14 @@ export interface TableColumn<T = unknown> {
   readonly render: (item: T) => View;
   readonly width?: Dimension;
 }
-export interface TableProps<
-  T = unknown,
-  LoadResult = never,
-> extends CommonProps<"root" | "header" | "row" | "cell"> {
-  readonly items?: readonly T[];
-  readonly dataSource?: DataSource<T, LoadResult>;
-  readonly estimatedCount?: number;
+export interface TableProps<T = unknown, LoadResult = never, Mutations = never>
+  extends
+    CommonProps<"root" | "header" | "row" | "cell">,
+    VirtualCollectionBinding<T, LoadResult, Mutations> {
   readonly getKey: (item: T) => CollectionKey;
   readonly columns: readonly TableColumn<T>[];
   readonly selectedKeys?: readonly CollectionKey[];
   readonly onSelectionChange?: (keys: readonly CollectionKey[]) => void;
-  readonly onVisibleRangeChange?: (
-    range: Readonly<{ start: number; end: number; generation: number }>,
-  ) => void;
-  readonly onFocusChange?: (key: CollectionKey | undefined) => void;
-  readonly onReloadRequest?: (generation: number) => void;
 }
 export interface TranscriptBlock {
   readonly id: TranscriptBlockId;
@@ -540,6 +549,7 @@ export interface TranscriptProps extends CommonProps<
   readonly maxResidentBlocks?: number;
   readonly onRangeChange?: (start: number, end: number) => void;
   readonly onEvict?: (ids: readonly TranscriptBlockId[]) => void;
+  readonly onReloadRequest?: (request: RangeRequest) => void;
   readonly onVisibleRangeChange?: (
     range: Readonly<{ start: number; end: number; generation: number }>,
   ) => void;
@@ -547,7 +557,19 @@ export interface TranscriptProps extends CommonProps<
 
 export type TranscriptOperation =
   | { readonly type: "append"; readonly block: TranscriptBlock }
+  | {
+      readonly type: "insert";
+      readonly index: number;
+      readonly block: TranscriptBlock;
+    }
   | { readonly type: "replace"; readonly block: TranscriptBlock }
+  | {
+      readonly type: "patch";
+      readonly id: TranscriptBlockId;
+      readonly range: GraphemeRange;
+      readonly text: string;
+      readonly version: number;
+    }
   | { readonly type: "remove"; readonly id: TranscriptBlockId }
   | {
       readonly type: "stream";
@@ -563,7 +585,25 @@ export type TranscriptOperation =
   | {
       readonly type: "collapse";
       readonly id: TranscriptBlockId;
-      readonly collapsed: boolean;
+    }
+  | {
+      readonly type: "expand";
+      readonly id: TranscriptBlockId;
+    }
+  | {
+      readonly type: "clear";
+      readonly generation: number;
+    }
+  | {
+      readonly type: "evict";
+      readonly ids: readonly TranscriptBlockId[];
+      readonly generation: number;
+    }
+  | {
+      readonly type: "reload";
+      readonly start: number;
+      readonly blocks: readonly TranscriptBlock[];
+      readonly generation: number;
     }
   | {
       readonly type: "reset";
@@ -588,13 +628,10 @@ export interface SplitPaneProps extends CommonProps<
   readonly defaultRatio?: number;
   readonly onRatioChange?: (ratio: number) => void;
 }
-export interface SelectProps<
-  T = unknown,
-  LoadResult = never,
-> extends CommonProps<"root" | "trigger" | "list" | "option"> {
-  readonly items?: readonly T[];
-  readonly dataSource?: DataSource<T, LoadResult>;
-  readonly estimatedCount?: number;
+export interface SelectProps<T = unknown, LoadResult = never, Mutations = never>
+  extends
+    CommonProps<"root" | "trigger" | "list" | "option">,
+    VirtualCollectionBinding<T, LoadResult, Mutations> {
   readonly selectedKey?: CollectionKey;
   readonly defaultSelectedKey?: CollectionKey;
   readonly getKey: (item: T) => CollectionKey;
@@ -654,7 +691,13 @@ export interface ProgressProps extends CommonProps<
   readonly min?: number;
   readonly max?: number;
 }
-export interface MenuProps extends CommonProps<"root" | "item" | "separator"> {}
+export interface MenuProps<T = unknown, LoadResult = never, Mutations = never>
+  extends
+    CommonProps<"root" | "item" | "separator">,
+    VirtualCollectionBinding<T, LoadResult, Mutations> {
+  readonly getKey?: (item: T) => CollectionKey;
+  readonly renderItem?: (item: T) => View;
+}
 export interface MenuItemProps extends CommonProps<
   "root" | "label" | "keybinding"
 > {

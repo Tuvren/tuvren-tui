@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.3** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.4** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -53,7 +53,7 @@ The only documented install target is `tuvren-tui`. Platform packages are resolv
 
 There is no public `/effect` entrypoint. Root exports do not expose `@preact/signals-core`, raw FFI symbols, numeric RuntimeNode identities, platform package names, or internal ABI status codes.
 
-`contracts/package-workspace.json` is the raw target root manifest and owns every canonical `bun run` script. `contracts/package-public.json` is the raw target manifest for the documented package. It fixes the complete export map, `tuvren` binary, peer dependency, internal Reactivity dependency, optional platform packages, Bun engine, and published files. The five `contracts/package-platform-*.json` files are the exact private target manifests; `contracts/package-platforms.json` is their generation index. Together they fix every platform package name, `os`/`cpu`/`libc` selector, native filename, published file, and side-effect-free resolver module. Release tooling materializes those records without adding exports. The canonical package build is `bun run build:package`; it writes only `ts/dist/`, `packages/*/index.js`, `packages/*/native/<artifact>`, declaration maps, source maps, licenses, and target manifests before `bun run test:release-package` inspects the packed archives.
+`contracts/package-workspace.json` is the raw target root manifest and owns every canonical `bun run` script. `contracts/package-public.json` is the raw target manifest for the documented package. It fixes the complete export map, `tuvren` binary, peer dependency, internal Reactivity dependency, optional platform packages, Bun engine, and published files. The five `contracts/package-platform-*.json` files are the exact private target manifests; `contracts/package-platforms.json` is their generation index. Together they fix every platform package name, `os`/`cpu`/`libc` selector, native filename, published file, and side-effect-free resolver module. Each entry module converts its native file URL with `Bun.fileURLToPath()` so encoded paths and Windows drive letters resolve correctly. Release tooling materializes those records without adding exports. The canonical package build is `bun run build:package`; it writes only `ts/dist/`, `packages/*/index.js`, `packages/*/native/<artifact>`, declaration maps, source maps, licenses, and target manifests before `bun run test:release-package` inspects the packed archives.
 
 ## Native build and artifact matrix
 
@@ -102,7 +102,7 @@ Pre-`1.0` minor releases may break public SDK contracts only with a changelog, m
 
 JSON Schema validates each durable shape but cannot enforce cross-artifact equality. Release verification must additionally run `validateAtomicReleaseManifest` as defined by `contracts/release-validation.json`; that validator proves exact artifact membership, SemVer, package/artifact version equality, ABI equality, checksums, package manifests, source revisions, and provenance before any publish begins.
 
-`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes contract and capability checks; semantic, terminal, target, and package suites; every named fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, or nonconforming required result, checks every constituent artifact against the candidate source revision, and writes a human-readable release-candidate report plus the existing schema-valid atomic release manifest. It does not introduce a durable evidence-index format.
+`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes contract, native quality, and capability checks; semantic, terminal, target, and package suites; every named fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, or nonconforming required result, checks every constituent artifact against the candidate source revision, and writes a human-readable release-candidate report plus the existing schema-valid atomic release manifest. It does not introduce a durable evidence-index format.
 
 Diagnostic snapshots use `row-major-rle-v1` cell runs. `validateDiagnosticSnapshotRuns` in `contracts/snapshot-validation.json` performs the checked cross-field sum, exact dense reconstruction, and cursor bounds that JSON Schema cannot express.
 

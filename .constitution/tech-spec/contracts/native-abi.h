@@ -397,7 +397,13 @@ typedef enum TuvrenTranscriptMutationKind {
     TUVREN_TRANSCRIPT_FINISH = 5,
     TUVREN_TRANSCRIPT_COLLAPSE = 6,
     TUVREN_TRANSCRIPT_RESET = 7,
-    TUVREN_TRANSCRIPT_FOLLOW_LIVE = 8
+    TUVREN_TRANSCRIPT_FOLLOW_LIVE = 8,
+    TUVREN_TRANSCRIPT_INSERT = 9,
+    TUVREN_TRANSCRIPT_PATCH = 10,
+    TUVREN_TRANSCRIPT_EXPAND = 11,
+    TUVREN_TRANSCRIPT_CLEAR = 12,
+    TUVREN_TRANSCRIPT_EVICT = 13,
+    TUVREN_TRANSCRIPT_RELOAD = 14
 } TuvrenTranscriptMutationKind;
 
 typedef enum TuvrenTerminalRequestKind {
@@ -940,11 +946,31 @@ typedef struct TuvrenTranscriptMutationPayload {
     uint32_t block_id_length;
     uint32_t content_offset;
     uint32_t content_length;
+    uint32_t records_offset;
+    uint32_t record_count;
     uint64_t version;
     uint64_t generation;
+    uint64_t index;
+    TuvrenGraphemeRange range;
     uint32_t flags; /* TUVREN_TRANSCRIPT_* */
     uint32_t reserved;
 } TuvrenTranscriptMutationPayload;
+
+typedef struct TuvrenTranscriptBlockRecord {
+    uint32_t block_id_offset;
+    uint32_t block_id_length;
+    uint32_t content_offset;
+    uint32_t content_length;
+    uint64_t version;
+    uint32_t flags; /* TUVREN_TRANSCRIPT_* */
+    uint32_t reserved;
+} TuvrenTranscriptBlockRecord;
+
+/* APPEND/REPLACE/STREAM/FINISH/COLLAPSE/EXPAND/REMOVE use the single block
+ * fields. INSERT additionally uses index. PATCH uses range and UTF-8 content.
+ * CLEAR uses generation only. EVICT, RESET, and RELOAD use a packed array of
+ * TuvrenTranscriptBlockRecord; EVICT requires zero content fields in each
+ * record, while RELOAD additionally uses index as the resident start. */
 
 typedef struct TuvrenAnimationPayload {
     uint16_t size;
@@ -1179,7 +1205,8 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticPayload) == 16, "TuvrenSemanticPayload
 TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticEntry) == 24, "TuvrenSemanticEntry ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 32, "TuvrenTextEditPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 56, "TuvrenCollectionMutationPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 48, "TuvrenTranscriptMutationPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 72, "TuvrenTranscriptMutationPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptBlockRecord) == 32, "TuvrenTranscriptBlockRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalRequestPayload) == 40, "TuvrenTerminalRequestPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticConfigPayload) == 24, "TuvrenDiagnosticConfigPayload ABI size");

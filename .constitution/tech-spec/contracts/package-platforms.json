@@ -39,5 +39,5 @@
       "artifact": "tuvren_tui.dll"
     }
   ],
-  "entryModuleContract": "Each index.js exports nativeLibraryPath as new URL('./native/<artifact>', import.meta.url).pathname and has no side effects. Release tooling expands __TARGET_ARTIFACT__, copies the exact artifact, and writes one package.json per record."
+  "entryModuleContract": "Each index.js exports nativeLibraryPath as Bun.fileURLToPath(new URL('./native/<artifact>', import.meta.url)) and has no other side effects. Release tooling expands __TARGET_ARTIFACT__, copies the exact artifact, and writes one package.json per record."
 }

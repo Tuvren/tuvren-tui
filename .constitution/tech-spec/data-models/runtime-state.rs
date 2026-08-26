@@ -270,6 +270,7 @@ pub struct RuntimeNode {
     pub layout_spec: LayoutSpec,
     pub style_sheet: Option<u32>,
     pub style_slot: Option<u32>,
+    pub theme: Option<u32>,
     pub text_document: Option<TextDocumentId>,
     pub semantic: SemanticNode,
     pub state: RuntimeNodeState,
@@ -410,14 +411,41 @@ pub struct TranscriptState {
 }
 
 #[derive(Clone, Debug)]
+pub enum AnimationValue {
+    Number(f64),
+    ColorRgba(u32),
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AnimationEasing {
+    Linear,
+    EaseIn,
+    EaseOut,
+    EaseInOut,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AnimationTimelineMode {
+    Sequence,
+    Parallel,
+}
+
+#[derive(Clone, Debug)]
 pub struct AnimationState {
     pub id: u64,
     pub target: RuntimeNodeId,
     pub property: u16,
+    pub from: Option<AnimationValue>,
+    pub to: AnimationValue,
+    pub easing: AnimationEasing,
+    pub timeline_id: u64,
+    pub timeline_mode: AnimationTimelineMode,
+    pub sequence_index: u32,
     pub started_nanos: u64,
     pub duration_nanos: u64,
     pub delay_nanos: u64,
     pub repeat: u32,
+    pub repeat_infinite: bool,
     pub reverse: bool,
     pub reduced_motion: u8,
 }
@@ -460,6 +488,7 @@ pub struct RuntimeContext {
     pub nodes: BTreeMap<RuntimeNodeId, RuntimeNode>,
     pub style_sheets: BTreeMap<u32, RegisteredStyleSheet>,
     pub themes: BTreeMap<u32, ThemeState>,
+    pub default_theme: Option<u32>,
     pub text_documents: BTreeMap<TextDocumentId, TextDocument>,
     pub collections: BTreeMap<RuntimeNodeId, VirtualCollectionState>,
     pub transcripts: BTreeMap<RuntimeNodeId, TranscriptState>,
