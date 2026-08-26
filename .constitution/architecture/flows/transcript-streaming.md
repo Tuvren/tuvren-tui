@@ -20,9 +20,9 @@ sequenceDiagram
     Orch->>Exec: Submit Transcript transaction with block identity and generation
     Exec->>Content: Apply serialized Transcript update
     Content->>Content: Reject stale update and mutate bounded Resident Projection
-    EU->>Interact: Scroll, select, or return to live edge
-    Interact->>Exec: Enqueue keyed Transcript interaction intent
-    Exec->>Content: Update anchor, selection, or follow intent serially
+    EU->>Exec: Deliver normalized scroll, selection, or live-edge input
+    Exec->>Interact: Begin serialized hit-test and keyed Transcript intent derivation
+    Interact->>Content: Update anchor, selection, or follow intent inside the operation
     Content->>Content: Protect visible, anchored, selected, and streaming blocks
     Content-->>Orch: Emit resident-range, eviction, or reload Event
     Content-->>Present: Provide visible blocks and stable anchor projection

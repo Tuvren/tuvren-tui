@@ -2,6 +2,12 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.5] — 2026-08-26
+
+### Fixed
+
+- Routed normalized Collection and Transcript input into the UI Executor before hit-testing or keyed-intent derivation.
+
 ## [v4.0.4] — 2026-08-26
 
 ### Fixed
