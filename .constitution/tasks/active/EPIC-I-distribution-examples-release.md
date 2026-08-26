@@ -8,19 +8,19 @@ Turn the completed runtime into the one-command, five-target, evidence-backed `0
 - **Effort:** 8
 - **Dependencies:** TUI-A007
 - **Category:** Feature-Evolution
-- **Capabilities:** P0-O01–P0-O06
-- **Scope (In-Scope Files):** root `package.json`, `scripts/build-package.ts`, `ts/package.json`, `ts/dist/`, `packages/`, `ts/src/ffi/`
+- **Capabilities:** P0-O01–P0-O06, RES-02
+- **Scope (In-Scope Files):** root `package.json`, `scripts/build-package.ts`, `scripts/test-release-package.ts`, `ts/package.json`, `ts/dist/`, `packages/`, `ts/src/ffi/`, `ts/check-bundle.ts`
 - **Scope (Out-of-Scope Files):** documented platform-package installation, source builds outside proven checkouts, musl/Alpine
 - **Verification Command:** `bun run test:release-package`
 - **Expected Success Output:** packed public package installs and resolves each exact mocked target without native setup
 - **STOP Conditions:** STOP if emitted manifests differ from raw contracts or ordinary loading requires an environment variable/toolchain.
-- **Description:** Materialize the exact workspace, public, and five auxiliary manifests; compile ESM, declarations and maps; stage native artifacts and licenses; implement override → platform package → proven checkout → diagnostic resolver order and ABI equality.
+- **Description:** Materialize the exact workspace, public, and five auxiliary manifests; compile ESM, declarations and maps; stage native artifacts and licenses; enforce the 100 KB host bundle gate; and implement override → platform package → proven checkout → diagnostic resolver order and ABI equality.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Pack/install tests inspect exports, files, peers, optional packages, binary, source maps, license, resolver order, version mismatch, unsupported targets, and absence of private/raw symbols.
+Pack/install tests inspect exports, files, peers, optional packages, binary, source maps, license, resolver order, version mismatch, unsupported targets, and absence of private/raw symbols; `bun run ts/check-bundle.ts` reports at most 100 KB excluding approved peers and artifacts.
 ```
 
 #### TUI-I002 Ship the `tuvren` developer CLI and hard-restart watch workflow
@@ -33,15 +33,15 @@ Pack/install tests inspect exports, files, peers, optional packages, binary, sou
 - **Scope (In-Scope Files):** `ts/src/cli/`, CLI integration tests, package binary output
 - **Scope (Out-of-Scope Files):** network listeners, remote uploads, state-preserving reload
 - **Verification Command:** `bun run test:release-package`
-- **Expected Success Output:** help, run, dev, doctor, inspect, trace, replay, and version contracts pass from the packed package
+- **Expected Success Output:** help plus the exact `dev`, `doctor`, and `trace view` contracts pass from the packed package
 - **STOP Conditions:** STOP if watch mode preserves a context or CLI diagnostics disclose protected values.
-- **Description:** Implement the parseable CLI contract, terminal-native devtools entrypoints, source-mapped errors, diagnostic exit codes, trace confirmation, replay, and watch that tears down before restart.
+- **Description:** Implement the exact `contracts/cli.json` surface: `dev`, `doctor`, and `trace view`, including the terminal-native Inspect/Timeline/Issues workflow reached from development mode, source-mapped errors, diagnostic exit codes, trace confirmation, and hard-restart watch.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Packed CLI tests prove every command, option, exit code, no-network default, confirmation boundary, source maps, restoration, and fresh context identity on watch restart.
+Packed CLI tests prove every schema-declared command, option, exit code, no-network default, confirmation boundary, terminal-native inspector path, source maps, restoration, and fresh context identity on watch restart; undeclared `run`, `inspect`, `replay`, or `version` commands are not added.
 ```
 
 #### TUI-I003 Establish five-target CI, supply-chain, and artifact provenance gates
@@ -51,7 +51,7 @@ Packed CLI tests prove every command, option, exit code, no-network default, con
 - **Dependencies:** TUI-F005, TUI-G007, TUI-I001
 - **Category:** Security
 - **Capabilities:** P0-O03–P0-O12, OPS-01–OPS-02, SAFE-03
-- **Scope (In-Scope Files):** `.github/workflows/`, release scripts, audit policies, lockfiles and provenance fixtures
+- **Scope (In-Scope Files):** `.github/workflows/`, `scripts/test-platform-smoke.ts`, release scripts, audit policies, lockfiles and provenance fixtures
 - **Scope (Out-of-Scope Files):** cross-compile-only proof, mutable action tags, partial target release
 - **Verification Command:** `bun run test:platform-smoke`
 - **Expected Success Output:** all five native target jobs install, load, initialize, render headlessly, and shut down
@@ -69,7 +69,7 @@ Linux x64/arm64, macOS arm64/x64, and Windows x64 logs prove native execution fr
 
 - **Type:** Chore
 - **Effort:** 8
-- **Dependencies:** TUI-B006, TUI-B007, TUI-B008, TUI-C005, TUI-D006, TUI-E005, TUI-F005, TUI-G004
+- **Dependencies:** TUI-B009, TUI-D003, TUI-E005, TUI-F005, TUI-G004, TUI-I001
 - **Category:** Docs
 - **Capabilities:** P0-O13–P0-O14, OPS-03, DX-05–DX-06
 - **Scope (In-Scope Files):** `examples/flagship/`, `examples/capabilities/`, example tests, documentation, capability-map script
@@ -77,7 +77,7 @@ Linux x64/arm64, macOS arm64/x64, and Windows x64 logs prove native execution fr
 - **Verification Command:** `bun run check:capability-map`
 - **Expected Success Output:** 100% of P0 IDs map to a published-entrypoint example, automated evidence, architecture flow, and active ticket
 - **STOP Conditions:** STOP if an example requires raw native details, private packages, or a systems toolchain.
-- **Description:** Build representative dashboard/form, editor/inspector, streaming console, inline/split-footer, styling, accessibility, devtools, and focused capability examples with declarative and imperative parity evidence where required.
+- **Description:** Build and execute representative dashboard/form, editor/inspector, streaming console, inline/split-footer, styling, accessibility, devtools, and focused capability examples from installed packed artifacts after the complete catalog and OD-02 outcome are integrated.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -90,7 +90,7 @@ The machine-readable map covers every P0 ID exactly, examples execute from packe
 
 - **Type:** Feature
 - **Effort:** 8
-- **Dependencies:** TUI-D004, TUI-E005, TUI-H002, TUI-I004
+- **Dependencies:** TUI-D004, TUI-E005, TUI-H002, TUI-H006, TUI-I004
 - **Category:** DX
 - **Capabilities:** P0-O19, OPS-06
 - **Scope (In-Scope Files):** `examples/opencode-client/`, `examples/fixtures/`, OpenCode adapter and benchmark fixture
@@ -114,18 +114,18 @@ Replay is identical across 100 runs; live and replay workloads publish schema-va
 - **Dependencies:** TUI-D003, TUI-H003, TUI-H004, TUI-H005, TUI-I002, TUI-I003, TUI-I004, TUI-I005
 - **Category:** Correctness
 - **Capabilities:** P0-O13–P0-O19, OPS-01–OPS-06, SAFE-01–SAFE-03
-- **Scope (In-Scope Files):** release validation scripts, schema-valid evidence, release-candidate report and migration guide
+- **Scope (In-Scope Files):** `scripts/check-release-candidate.ts`, release validation scripts, schema-valid evidence, release-candidate report and migration guide
 - **Scope (Out-of-Scope Files):** weakening a gate for schedule, publishing final artifacts
-- **Verification Command:** `bun run test:release-package`
-- **Expected Success Output:** all P0 gates pass and `validateAtomicReleaseManifest` accepts exactly six matching artifacts
+- **Verification Command:** `bun run check:release-candidate`
+- **Expected Success Output:** every P0 command and evidence row passes and `validateAtomicReleaseManifest` accepts exactly six matching artifacts
 - **STOP Conditions:** STOP on any missing capability row, unresolved OD-01/OD-02 Evolution, target failure, performance failure, privacy/security failure, undocumented break, or version/provenance mismatch.
-- **Description:** Assemble capability, semantic, terminal, fuzz, benchmark, adoption, OpenCode, target, package, schema, migration, checksum, ABI, provenance, and restoration evidence into the final candidate.
+- **Description:** Implement and run the Stage 3 aggregate command over contract, capability-map, semantic, terminal, every named fuzz target, bundle, envelope, comparative, devtools, adoption, OpenCode, supply-chain, target, package, schema, migration, restoration, and atomic-manifest evidence.
 - **Acceptance:**
   - **Mode:** runbook_probe
   - **Evidence:**
 
 ```text
-A fresh candidate run produces one report and atomic manifest; every required command exits 0; all artifact versions equal the package version and source revision; no alpha artifact is represented as final.
+A fresh `check:release-candidate` run produces one evidence index and atomic manifest; no required subcommand is skipped or stale; all artifact versions equal the package version and source revision; no alpha artifact is represented as final.
 ```
 
 #### TUI-I007 Publish the atomic `0.1.0` package set and verify it from the registry

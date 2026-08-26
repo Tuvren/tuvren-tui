@@ -17,12 +17,12 @@
 
 ## Codebase baseline
 
-- **State today:** the PRD records provisional 5%, 15%, and 3× ambitions but intentionally does not make them release gates.
+- **State today:** the PRD records provisional 5%, 15%, and 3× ambitions but intentionally does not make them release gates. TUI-H006 supplies pinned competitor adapters, reproducer commands, and raw results; TUI-I005 supplies OpenCode evidence.
 - **Discovered constraints:** absolute p95 tiers remain binding; no implementation may use competitor-private shortcuts; terminal profiles, hardware, warmup, samples, statistics, and raw results are required.
 
 ## Options and trade-offs
 
-- Evaluate ratifying the provisional margins, adjusting each margin to the measured variance and workload coverage, or retaining only absolute gates. Analyze native Component promotion separately from marketing comparisons.
+- Analyze the TUI-H006 and TUI-I005 evidence for ratifying the provisional margins, adjusting each margin to measured variance and workload coverage, or retaining only absolute gates. Analyze native Component promotion separately from marketing comparisons.
 
 ## Recommendation
 

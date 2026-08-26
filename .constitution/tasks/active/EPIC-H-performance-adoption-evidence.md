@@ -6,9 +6,9 @@ Prove the binding absolute constraints first, optimize the native hot paths, and
 
 - **Type:** Chore
 - **Effort:** 5
-- **Dependencies:** TUI-A004, TUI-C001, TUI-E001, TUI-E004, TUI-F004
+- **Dependencies:** TUI-A004, TUI-C001, TUI-D002, TUI-E001, TUI-E004, TUI-F004
 - **Category:** Perf
-- **Capabilities:** P0-O13, PERF-01–PERF-05, RES-01–RES-03
+- **Capabilities:** P0-O13, PERF-01–PERF-05, RES-01, RES-03
 - **Scope (In-Scope Files):** `benchmarks/`, `ts/bench-ffi.ts`, `ts/bench-render.ts`, benchmark schema validation and reports
 - **Scope (Out-of-Scope Files):** comparative hard cuts, unpinned benchmark versions
 - **Verification Command:** `bun run bench:envelope`
@@ -35,7 +35,7 @@ Results publish hardware, OS, Terminal Profile, versions, warmup, samples, stati
 - **Verification Command:** `bun run bench:envelope`
 - **Expected Success Output:** no absolute release failure and documented tier adaptation with hysteresis
 - **STOP Conditions:** STOP if an optimization weakens Unicode, Event order, semantics, final state, privacy, or cleanup; route any public/native promotion change through OD-01 and Stage 3.
-- **Description:** Remove deep clones and repeated scans, hoist encoding, use indexed deltas and dirty regions, bound caches, prioritize input, and implement hysteretic 120/90/60 presentation density based on measured engine pressure.
+- **Description:** Remove deep clones and repeated scans, hoist encoding, use indexed deltas and dirty regions, bound caches, prioritize input, and implement hysteretic 120/90/60 presentation density based on the real normalized input path. TUI-I006 reruns the full envelope after the ratified OD-02 outcome lands through TUI-D003.
 - **Acceptance:**
   - **Mode:** benchmark
   - **Evidence:**
@@ -69,7 +69,7 @@ Raw paired results meet TOOL-01–TOOL-03, show no steady-state off allocation, 
 
 - **Type:** Spike
 - **Effort:** 3
-- **Dependencies:** TUI-H002, TUI-I005
+- **Dependencies:** TUI-D003, TUI-H002, TUI-H006, TUI-I005
 - **Category:** Perf
 - **Capabilities:** OD-01, OPS-06
 - **Scope (In-Scope Files):** `.constitution/spikes/SPK-TUI-H004.md`
@@ -77,13 +77,13 @@ Raw paired results meet TOOL-01–TOOL-03, show no steady-state off allocation, 
 - **Verification Command:** `bun run bench:comparative`
 - **Expected Success Output:** reproducible raw results and a Go/adjust/no-gate recommendation for each provisional comparison
 - **STOP Conditions:** STOP after the report; do not convert provisional margins into gates without the required Stage 1–3 Evolution passes.
-- **Description:** Measure current pinned OpenTUI, Ratatui, and representative host-only alternatives through equivalent public-API workloads and representative terminal profiles, including the OpenCode reference.
+- **Description:** Analyze the pinned, reproducible raw measurements produced by TUI-H006 and the OpenCode evidence from TUI-I005; decide which comparisons are fair enough to recommend as release gates.
 - **Acceptance:**
   - **Mode:** benchmark
   - **Evidence:**
 
 ```text
-The report separates engine/process/write costs, publishes raw schema-valid results, checks statistical comparability, analyzes the provisional 5%/15%/3× margins, recommends final cuts or rejection, and names all unblocked Evolution work.
+The report links the fixture sources and reproducer, separates engine/process/write costs, checks statistical comparability, analyzes the provisional 5%/15%/3× margins, recommends final cuts or rejection, and names all unblocked Evolution work.
 ```
 
 #### TUI-H005 Run the four moderated adoption studies
@@ -105,4 +105,25 @@ The report separates engine/process/write costs, publishes raw schema-valid resu
 
 ```text
 The result set records participant background, exact task start/end, interventions, failures, and whether every approved DX-01–DX-04 threshold passed.
+```
+
+#### TUI-H006 Build equivalent comparative workload adapters
+
+- **Type:** Chore
+- **Effort:** 5
+- **Dependencies:** TUI-H001, TUI-I004
+- **Category:** Perf
+- **Capabilities:** OD-01, OPS-06
+- **Scope (In-Scope Files):** `benchmarks/fixtures/comparative/`, pinned OpenTUI/Ratatui/host-only adapters, terminal profiles, schema-valid raw results and reproducer documentation
+- **Scope (Out-of-Scope Files):** comparative gate decisions, private competitor APIs, production SDK behavior
+- **Verification Command:** `bun run bench:comparative`
+- **Expected Success Output:** all equivalent public-API workloads reproduce across pinned implementations with separated engine/process/write results
+- **STOP Conditions:** STOP if a fixture cannot be made behaviorally equivalent through public APIs; record and exclude the incomparable row instead of biasing it.
+- **Description:** Implement and pin the dashboard/form, editor/inspector, streaming, hot-update, input, and OpenCode-representative adapters needed for fair comparative measurement, including warmup, samples, hardware, process isolation, and raw schema validation.
+- **Acceptance:**
+  - **Mode:** benchmark
+  - **Evidence:**
+
+```text
+One documented command builds and runs every comparable fixture, records exact versions and terminal profiles, separates engine/process/write costs, emits schema-valid raw results, and explains every excluded or adapted behavior without selecting final gates.
 ```

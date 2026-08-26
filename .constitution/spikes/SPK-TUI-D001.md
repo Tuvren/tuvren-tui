@@ -17,12 +17,12 @@
 
 ## Codebase baseline
 
-- **State today:** Brownfield Events are drained after native handling and cannot yet prove pre-default interception.
+- **State today:** Brownfield Events are drained after native handling and cannot yet prove pre-default interception. TUI-D007 must attach the isolated candidate/control source, pinned configuration, reproducer, and schema-valid raw results before this report begins.
 - **Discovered constraints:** Rust never calls TypeScript; the UI executor is the sole mutator; unblocked input p95 targets 8.33 ms, degrades at 11.11 ms, and fails above 16.67 ms.
 
 ## Options and trade-offs
 
-- Compare selective two-phase records, native-only defaults with post-observation, and a No-Go that triggers Stage 1 revision of P0-G03/G04. Measure fast-path and intercepted latency, timeout, handler failure, shutdown, and ordering.
+- Analyze the TUI-D007 measurements for selective two-phase records, native-only defaults with post-observation, and a No-Go that triggers Stage 1 revision of P0-G03/G04. Compare fast-path and intercepted latency, timeout, handler failure, shutdown, and ordering.
 
 ## Recommendation
 
@@ -33,6 +33,6 @@
 ## Downstream impact
 
 - **ADRs to write or update:** `.constitution/tech-spec/adrs/ADR-T58-conditional-event-arbitration.md` after any required Stage 1 and Stage 2 Evolution
-- **Tickets unblocked in `tasks/active/`:** `TUI-D003`
+- **Tickets unblocked in `tasks/active/`:** `TUI-D003`; TUI-D007 is the prerequisite evidence builder
 - **Tickets to add or split:** record any executor, Event ABI, or conformance split required by the ratified outcome
 - **Spec edits required:** Stage 1 through Stage 3 Evolution must close OD-02 before implementation

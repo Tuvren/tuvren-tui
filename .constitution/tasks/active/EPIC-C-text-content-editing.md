@@ -74,7 +74,7 @@ Allowlisted formatting survives; control operations and malformed sequences are 
 - **Capabilities:** P0-E03–P0-E05, P0-F01–P0-F08, P0-F10
 - **Scope (In-Scope Files):** `ts/src/`, `ts/src/imperative/`, text declaration and conformance tests
 - **Scope (Out-of-Scope Files):** raw UTF-16 coordinates, Promise-wrapped Effect services
-- **Verification Command:** `bun run test:semantic`
+- **Verification Command:** `bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** Effect and imperative text fixtures pass with identical snapshots
 - **STOP Conditions:** STOP if an adapter silently repairs malformed UTF-16 or exposes a code-unit index.
 - **Description:** Implement the declared TextDocumentService and imperative TextDocument, branded grapheme indices/ranges, cursor and selection operations, find/replace, undo/redo, and explicit UTF-8, UTF-16LE, and UTF-16BE import/export.
@@ -95,7 +95,7 @@ Declaration tests and round-trip fixtures prove typed Effect failures, imperativ
 - **Capabilities:** P0-E06–P0-E09, P0-F05–P0-F10
 - **Scope (In-Scope Files):** `ts/src/components/`, Text/Input/TextArea/CodeView/DiffView fixtures and examples
 - **Scope (Out-of-Scope Files):** advanced editor P1 scope, integrated Select filtering
-- **Verification Command:** `bun run test:semantic`
+- **Verification Command:** `bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all text Component fixtures pass through published entrypoints
 - **STOP Conditions:** STOP if a Component creates a second content authority or bypasses the active clipboard contract.
 - **Description:** Connect text presentation and editing Components to Text Documents, StyledText, validation, secure entry, wrapping, horizontal scroll, source adapters, and the shared clipboard service.

@@ -4,6 +4,18 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.1 — 2026-08-26
+
+### Added
+
+- Added separate source-migration and contract-validator tickets, a post-kernel Component catalog convergence gate with an ordinary external package fixture, reproducible OD-02 and comparative evidence builders, and the aggregate release-candidate command. The corrected active plan has 60 tickets and 374 points.
+
+### Fixed
+
+- Closed release dependency gaps for Collection-backed Components, bounded feedback, packed examples, Event arbitration, and the full P0 evidence set.
+- Replaced premature aggregate verification commands with existing narrow checks until the owning harness ticket lands; added the 100 KB bundle gate and post-OD-02 envelope rerun.
+- Restricted CLI work to `dev`, `doctor`, and `trace view`, separated structural Component shells from kernel integration, split the oversized initial migration ticket, and restored the approved median-only style-defect thresholds.
+
 ## v10.0.0 — 2026-08-26
 
 ### Added

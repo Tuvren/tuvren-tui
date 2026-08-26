@@ -11,7 +11,7 @@ Implement one causal observation surface and public proof harness for P0-N01–P
 - **Capabilities:** P0-N01, P0-N03, P0-N10, P0-N13–P0-N14, TOOL-05
 - **Scope (In-Scope Files):** `native/src/diagnostics/`, diagnostic ABI codec, correlation and wrap tests
 - **Scope (Out-of-Scope Files):** browser/server inspector, raw private identities in public output
-- **Verification Command:** `bun run test:semantic`
+- **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** every late Render Pass has a causal path or explicit unattributed-defect record
 - **STOP Conditions:** STOP if recording can grow beyond 64 MiB or silently discard the retained causal path.
 - **Description:** Connect input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, text, render, diff, terminal write, error, and cleanup identities in bounded deltas and periodic snapshots.
@@ -72,10 +72,10 @@ The same fixture passes through both harnesses; 100 deterministic replays produc
 - **Dependencies:** TUI-G003
 - **Category:** DX
 - **Capabilities:** P0-N01–P0-N04, P0-N12–P0-N14, TOOL-04–TOOL-05
-- **Scope (In-Scope Files):** `ts/src/devtools/`, diagnostic Components, source mapping and inspector fixtures
+- **Scope (In-Scope Files):** `ts/src/devtools/`, diagnostic Components, source mapping and inspector fixtures, `scripts/study-style-defect.ts`
 - **Scope (Out-of-Scope Files):** browser UI, network listener, remote upload, live state editing
 - **Verification Command:** `bun run study:style-defect`
-- **Expected Success Output:** median source-location time is under 60 seconds and no run reaches the 120-second fail threshold
+- **Expected Success Output:** median source-location time is under 60 seconds; a median of 120 seconds or more fails
 - **STOP Conditions:** STOP if inspector focus allows application input through or requires a public private-node identity.
 - **Description:** Build local Inspect, Timeline, and Issues views over the Diagnostic Graph, including geometry, clipping, scroll, style provenance, focus, Events, semantics, dirty regions, Render Passes, source links, actions, and explicit application-input pause.
 - **Acceptance:**
@@ -116,7 +116,7 @@ Given subtree, root, native, and watch failures, when recovery or restart runs, 
 - **Capabilities:** P0-N09–P0-N10, OPS-02
 - **Scope (In-Scope Files):** `ts/src/cli/`, diagnostic probes, seeded load-failure fixtures
 - **Scope (Out-of-Scope Files):** package publication, automatic destructive repair
-- **Verification Command:** `bun run test:release-package`
+- **Verification Command:** `bun test ts/test-install.test.ts`
 - **Expected Success Output:** every seeded cause receives the correct code and actionable remediation
 - **STOP Conditions:** STOP if a probe mutates an application context before compatibility checks complete.
 - **Description:** Implement doctor-style checks for host version, platform, package consistency, loading, headless operation, declarative integration, source maps, capabilities, and multiplexer effects using stable errors.
