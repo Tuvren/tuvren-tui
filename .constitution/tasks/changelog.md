@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.17 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.7 executor-delivered Interaction/Animation Events and TechSpec v9.0.18 Transcript teardown/rebind semantics, imperative prop separation, canonical host aggregation, and exact ABI status/output rules.
+- Kept the 62-ticket, 385-point, 155-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because existing runtime, interaction, animation, Transcript, and release tickets own the refinements.
+
 ## v10.0.16 — 2026-08-26
 
 ### Fixed

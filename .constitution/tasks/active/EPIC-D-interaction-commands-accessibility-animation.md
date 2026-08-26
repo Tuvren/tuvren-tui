@@ -119,13 +119,13 @@ Primitive and synthetic-component fixtures query by role and accessible properti
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** deterministic elapsed-time and manual-clock animation fixtures pass; TUI-H001 later owns timing benchmarks
 - **STOP Conditions:** STOP if dropped presentations slow logical time or suppress final state.
-- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, native cancellation and replacement that returns a distinct observable handle, typed completion, manual test time, global reduced motion, and accessible per-animation overrides.
+- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, native cancellation and replacement that returns a distinct observable handle, typed completion delivered as an Animation Event through the executor-owned drain before handle resolution, manual test time, global reduced motion, and accessible per-animation overrides.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Deterministic clock fixtures prove interpolation, missed-presentation completion, cancellation/replacement, reduced motion, and preserved final state; TUI-H001 measures PERF-04 across the presentation tiers.
+Deterministic clock fixtures prove interpolation, missed-presentation completion, cancellation/replacement, executor-delivered handle resolution with no native callback, reduced motion, and preserved final state; TUI-H001 measures PERF-04 across the presentation tiers.
 ```
 
 #### TUI-D007 Build the reproducible selective-arbitration experiment
