@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.20** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.21** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -114,7 +114,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - `contracts/native-abi.h` is the ABI source of truth. Native exports and the Bun symbol table must be generated from or mechanically checked against it.
 - All integers use fixed widths. Sizes and offsets are unsigned and checked before addition or multiplication. Floating values use IEEE-754 fields, never undocumented integer bit casts.
 - Transaction and Event batches use little-endian versioned records with trailing byte arenas. Decoders reject unknown major versions, invalid lengths, overlapping regions, duplicate identities where forbidden, and trailing garbage.
-- Validation converts each transaction command to its typed `ValidatedPayload` and preserves every behavior-bearing header/fixed-record field, including render request, initial generation, Collection indexes, Transcript flags, complete animation values/policy, terminal target/timeout, and diagnostic flags. Runtime mutation never reparses or receives a raw payload byte slice. Contract checks compare C fields to Rust validated-model ownership so a successful decode cannot silently discard semantics.
+- Validation converts each transaction command to its typed `ValidatedPayload` and preserves every behavior-bearing header/fixed-record field, including render request, initial generation, Collection indexes, Transcript flags, complete animation values/policy, terminal target/timeout, and diagnostic flags. It resolves every nested offset into typed dimensions, responsive layouts, style/token/rule values, semantic scalars and relationships, StyledText spans, validation rules, Collection items/identities, and Transcript blocks. Runtime mutation never reparses or receives a raw transaction-relative record slice; borrowing remains only for resolved UTF-8 strings and explicitly opaque terminal content. Contract checks compare C fields and nested records to Rust validated-model ownership so a successful decode cannot silently discard semantics.
 - Transaction-local node references have the high bit set. Rust allocates private IDs only while committing a fully validated transaction and returns caller-owned local-to-runtime mappings; no host-selected RuntimeNode ID is accepted.
 - Each opcode and property family uses the fixed record named by `native-abi.h`. Generic bytes are valid only for declared UTF-8 or opaque content fields, never as a substitute for layout, style, text-edit, Collection, Transcript, animation, terminal, or diagnostic records. Checked-in byte fixtures must decode identically in Rust and TypeScript.
 - Wire enums use the fixed numeric tables in `native-abi.h`, never C enum layout. Dimension constraints carry independently tagged minimum, preferred, and maximum atoms; Grid tracks carry typed dimension or minmax records. Numeric Collection keys are finite IEEE-754 values with negative zero normalized and NaN or infinity rejected.

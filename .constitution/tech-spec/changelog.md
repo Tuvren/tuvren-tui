@@ -2,6 +2,12 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.21] — 2026-08-26
+
+### Fixed
+
+- Replaced every behavior-bearing nested byte slice in the validated transaction model with resolved typed layout, style, semantic, span, validation, Collection, identity, and Transcript records.
+
 ## [v9.0.20] — 2026-08-26
 
 ### Fixed
