@@ -74,16 +74,16 @@ The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, vali
 - **Capabilities:** P0-A08, SAFE-01
 - **Scope (In-Scope Files):** `native/src/`, `native/Cargo.toml`, native module tests and one-wave forwarding modules
 - **Scope (Out-of-Scope Files):** public ABI or behavior changes, TypeScript source, forwarding beyond one migration wave
-- **Verification Command:** `cargo check --manifest-path native/Cargo.toml --locked && cargo test --manifest-path native/Cargo.toml --locked`
-- **Expected Success Output:** both commands exit 0 against the migrated native module graph
+- **Verification Command:** `bun run check:native`
+- **Expected Success Output:** rustfmt, Rust 1.98.0 locked Clippy with warnings denied, and locked native tests all exit 0
 - **STOP Conditions:** STOP if a move changes a Stage 3 ownership boundary, ABI record, or runtime behavior; route that change upstream instead of hiding it in the migration.
-- **Description:** Move Brownfield native source into context, transaction, composition, interaction, content, animation, presentation, terminal, and diagnostics ownership while preserving behavior and temporary migration forwarding only where permitted.
+- **Description:** Move Brownfield native source into context, transaction, composition, interaction, content, animation, presentation, terminal, and diagnostics ownership while preserving behavior; repair the Rust 1.98.0 lint diagnostics in the moved source; and retain temporary migration forwarding only where permitted.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Locked check and tests compile the complete native graph, module ownership matches the target tree, forwarding is acyclic and migration-scoped, no duplicate mutable authority appears, and ABI symbols remain mechanically identical.
+Rustfmt, locked Clippy with `-D warnings`, and locked tests pass the complete Rust 1.98.0 graph; module ownership matches the target tree; forwarding is acyclic and migration-scoped; no duplicate mutable authority appears; and ABI symbols remain mechanically identical.
 ```
 
 #### TUI-A002 Implement explicit contexts and the single UI executor
