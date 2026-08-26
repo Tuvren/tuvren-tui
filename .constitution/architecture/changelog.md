@@ -2,6 +2,13 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.4] — 2026-08-26
+
+### Fixed
+
+- Split Virtual Collection selection into application-controlled intent and bounded-local commit paths.
+- Split runtime replay from logical application replay so captured Events suppress current application handlers and captured transactions apply exactly once.
+
 ## [v4.0.3] — 2026-08-26
 
 ### Fixed

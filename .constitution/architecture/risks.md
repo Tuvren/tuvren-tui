@@ -2,7 +2,7 @@
 
 ## Version
 
-**v4.0.3** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
+**v4.0.4** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
 
 ## Structural risks and sensitivity points
 
