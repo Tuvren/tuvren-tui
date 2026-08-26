@@ -2,6 +2,15 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.11] — 2026-08-26
+
+### Fixed
+
+- Restricted runtime Trace replay to confirmed full-content artifacts carrying versioned exact Event, transaction, and mutation bytes; added ordered sequence/time and backward causal-link validation.
+- Added native-owned Collection scroll-position queries and observers independently of visible range.
+- Added discriminated imperative Command completion, interruption/rejection errors, and declarative TextArea binding to TextDocumentService without duplicate state authority.
+- Aligned semantic snapshot declarations and schema and required unique, rooted, acyclic, reachable child/relationship graphs.
+
 ## [v9.0.10] — 2026-08-26
 
 ### Fixed

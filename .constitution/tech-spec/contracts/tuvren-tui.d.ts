@@ -84,6 +84,7 @@ export type {
   DataSource,
   CollectionController,
   CollectionMutation,
+  CollectionScrollPosition,
   DialogProps,
   DiffViewProps,
   Dimension,
@@ -444,7 +445,21 @@ export function transcriptBlockId(
 export const Box: ComponentType<BoxProps>;
 export const Text: ComponentType<TextProps>;
 export const Input: ComponentType<InputProps>;
-export const TextArea: ComponentType<TextAreaProps>;
+export type DeclarativeTextAreaProps =
+  | (TextAreaProps & { readonly document?: never })
+  | (import("./shared").DistributiveOmit<
+      TextAreaProps,
+      | "value"
+      | "defaultValue"
+      | "onValueChange"
+      | keyof import("./shared").TextDocumentConfig
+    > & {
+      readonly document: TextDocumentService;
+      readonly value?: never;
+      readonly defaultValue?: never;
+      readonly onValueChange?: never;
+    });
+export const TextArea: ComponentType<DeclarativeTextAreaProps>;
 export const ScrollBox: ComponentType<ScrollBoxProps>;
 export const Overlay: ComponentType<OverlayProps>;
 export function Table<

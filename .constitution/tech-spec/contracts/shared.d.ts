@@ -495,6 +495,11 @@ export type TextAreaProps = InputProps & {
   readonly wrap?: "soft" | "none";
 };
 
+export type DistributiveOmit<
+  Shape,
+  Keys extends PropertyKey,
+> = Shape extends unknown ? Omit<Shape, Keys> : never;
+
 export interface TextDocumentSnapshot {
   readonly content: string;
   readonly cursor?: GraphemeIndex;
@@ -606,6 +611,14 @@ export interface CollectionController<T> {
   focusKey(key: CollectionKey | undefined): void;
   setSelection(keys: readonly CollectionKey[]): void;
   visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
+  scrollPosition(): CollectionScrollPosition;
+}
+
+export interface CollectionScrollPosition {
+  readonly anchor?: CollectionKey;
+  readonly offsetRows: number;
+  readonly offsetPixels?: number;
+  readonly generation: number;
 }
 
 export interface VirtualCollectionObservers<T> {
@@ -613,6 +626,9 @@ export interface VirtualCollectionObservers<T> {
   readonly estimatedCount?: number;
   readonly onVisibleRangeChange?: (
     range: Readonly<{ start: number; end: number; generation: number }>,
+  ) => void;
+  readonly onScrollPositionChange?: (
+    position: CollectionScrollPosition,
   ) => void;
   readonly onFocusChange?: (key: CollectionKey | undefined) => void;
   readonly onReloadRequest?: (generation: number) => void;
@@ -1034,6 +1050,8 @@ export type TuvrenErrorCode =
   | "TUVREN_QUEUE_SATURATED"
   | "TUVREN_COMMAND_NOT_REGISTERED"
   | "TUVREN_COMMAND_DISABLED"
+  | "TUVREN_COMMAND_INTERRUPTED"
+  | "TUVREN_COMMAND_REJECTED"
   | "TUVREN_CLIPBOARD_UNAVAILABLE"
   | "TUVREN_CLIPBOARD_DENIED"
   | "TUVREN_CLIPBOARD_BUSY"
@@ -1090,7 +1108,10 @@ export class TuvrenResourceError extends TuvrenError<
   readonly category: "resource";
 }
 export class TuvrenCommandError extends TuvrenError<
-  "TUVREN_COMMAND_NOT_REGISTERED" | "TUVREN_COMMAND_DISABLED"
+  | "TUVREN_COMMAND_NOT_REGISTERED"
+  | "TUVREN_COMMAND_DISABLED"
+  | "TUVREN_COMMAND_INTERRUPTED"
+  | "TUVREN_COMMAND_REJECTED"
 > {
   readonly category: "command";
 }

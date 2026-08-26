@@ -68,6 +68,18 @@
       "componentContext": true
     },
     {
+      "code": "TUVREN_COMMAND_INTERRUPTED",
+      "category": "command",
+      "operation": "command.interrupt",
+      "componentContext": true
+    },
+    {
+      "code": "TUVREN_COMMAND_REJECTED",
+      "category": "command",
+      "operation": "command.invoke",
+      "componentContext": true
+    },
+    {
       "code": "TUVREN_CLIPBOARD_UNAVAILABLE",
       "category": "clipboard",
       "operation": "clipboard.request",

@@ -263,7 +263,8 @@ typedef enum TuvrenQueryKind {
     TUVREN_QUERY_TEXT_ENCODE = 3,
     TUVREN_QUERY_COLLECTION_VISIBLE_RANGE = 4,
     TUVREN_QUERY_TRANSCRIPT_VISIBLE_RANGE = 5,
-    TUVREN_QUERY_TERMINAL_CAPABILITIES = 6
+    TUVREN_QUERY_TERMINAL_CAPABILITIES = 6,
+    TUVREN_QUERY_COLLECTION_SCROLL_POSITION = 7
 } TuvrenQueryKind;
 
 typedef enum TuvrenTextEncoding {
@@ -1192,6 +1193,18 @@ typedef struct TuvrenCollectionItemRecord {
     uint32_t reserved;
 } TuvrenCollectionItemRecord;
 
+typedef struct TuvrenCollectionScrollPositionPayload {
+    uint16_t size;
+    uint16_t key_tag; /* TuvrenCollectionKeyTag; zero when no anchor exists */
+    uint32_t key_offset;
+    uint32_t key_length;
+    uint32_t reserved;
+    double key_number;
+    int64_t offset_rows;
+    int64_t offset_pixels; /* INT64_MIN when pixel position is unavailable */
+    uint64_t generation;
+} TuvrenCollectionScrollPositionPayload;
+
 /* Numeric Collection keys are finite IEEE-754 doubles. Encoders normalize
  * negative zero to positive zero and reject NaN and infinities. UTF-8 keys use
  * key_offset/key_length; numeric keys require both fields to be zero. Host-side
@@ -1360,7 +1373,12 @@ typedef struct TuvrenQueryResult {
  * and returns the match range; no match returns UNAVAILABLE. TEXT_ENCODE uses
  * argument0 as TuvrenTextEncoding and writes encoded bytes. Collection and
  * Transcript visible-range queries write no bytes and return their generation
- * and resident range. TERMINAL_CAPABILITIES writes exactly one
+ * and resident range. COLLECTION_SCROLL_POSITION writes exactly one
+ * TuvrenCollectionScrollPositionPayload plus any UTF-8 anchor key in the same
+ * output buffer; key_offset is relative to the output-buffer start. A missing
+ * anchor uses key_tag/key offsets/key number zero. String and numeric anchors
+ * follow the same canonical key rules as Collection mutations.
+ * TERMINAL_CAPABILITIES writes exactly one
  * TuvrenTerminalCapabilitiesPayload. Every BUFFER_TOO_SMALL response reports
  * required_bytes and writes no partial semantic value. */
 
@@ -1559,6 +1577,7 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenTextValidationRuleRecord) == 32, "TuvrenTextVa
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 48, "TuvrenTextEditPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 80, "TuvrenCollectionMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionItemRecord) == 40, "TuvrenCollectionItemRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionScrollPositionPayload) == 48, "TuvrenCollectionScrollPositionPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 72, "TuvrenTranscriptMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptBlockRecord) == 32, "TuvrenTranscriptBlockRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");

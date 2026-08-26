@@ -10,6 +10,8 @@
     "createdAt",
     "terminalProfile",
     "redaction",
+    "replay",
+    "rootCorrelation",
     "records",
     "snapshots",
     "wrapCount"
@@ -35,11 +37,29 @@
       ],
       "properties": {
         "fullContent": { "type": "boolean" },
-        "input": { "const": "redacted" },
-        "clipboard": { "const": "redacted" },
-        "terminalPayloads": { "const": "redacted" },
+        "input": { "enum": ["redacted", "included"] },
+        "clipboard": { "enum": ["redacted", "included"] },
+        "terminalPayloads": { "enum": ["redacted", "included"] },
         "environment": { "const": "redacted" },
         "absolutePaths": { "const": "redacted" }
+      }
+    },
+    "replay": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["runtime", "applicationInput"],
+      "properties": {
+        "runtime": { "enum": ["available", "redacted"] },
+        "applicationInput": { "enum": ["available", "redacted"] }
+      }
+    },
+    "rootCorrelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contextId", "initialSequence"],
+      "properties": {
+        "contextId": { "type": "string", "minLength": 1 },
+        "initialSequence": { "type": "string", "pattern": "^[0-9]+$" }
       }
     },
     "wrapCount": { "type": "integer", "minimum": 0 },
@@ -93,14 +113,15 @@
         "correlation": {
           "type": "object",
           "additionalProperties": false,
+          "minProperties": 1,
           "properties": {
-            "contextId": { "type": "string" },
-            "eventId": { "type": "string" },
-            "commandId": { "type": "string" },
-            "effectSpanId": { "type": "string" },
-            "transactionId": { "type": "string" },
-            "renderRequestId": { "type": "string" },
-            "componentId": { "type": "string" }
+            "contextId": { "type": "string", "minLength": 1 },
+            "eventId": { "type": "string", "minLength": 1 },
+            "commandId": { "type": "string", "minLength": 1 },
+            "effectSpanId": { "type": "string", "minLength": 1 },
+            "transactionId": { "type": "string", "minLength": 1 },
+            "renderRequestId": { "type": "string", "minLength": 1 },
+            "componentId": { "type": "string", "minLength": 1 }
           }
         },
         "payload": {

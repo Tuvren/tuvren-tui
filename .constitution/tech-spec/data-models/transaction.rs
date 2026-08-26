@@ -212,6 +212,7 @@ pub enum QueryKind {
     CollectionVisibleRange,
     TranscriptVisibleRange,
     TerminalCapabilities,
+    CollectionScrollPosition,
 }
 
 #[derive(Clone, Debug)]
