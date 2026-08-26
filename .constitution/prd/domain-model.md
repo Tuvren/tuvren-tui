@@ -1,90 +1,118 @@
-# Domain Model
+# Domain model
 
-## 1. Conceptual Diagrams
-
-### 1.1 System Context
-
-```mermaid
-C4Context
-    title Tuvren TUI — System Context
-
-    Person(developer, "Developer", "TypeScript developer composing terminal interfaces")
-    Person(enduser, "End User", "Person interacting with the terminal application")
-
-    System(tuvren, "Tuvren TUI", "Composable terminal interface framework with native performance and Flexbox layout")
-
-    System_Ext(terminal, "Terminal Emulator", "Host application rendering the Surface")
-    System_Ext(runtime, "Script Runtime", "Host runtime executing Developer code via foreign function interface")
-    System_Ext(os, "Operating System", "Provides terminal I/O primitives and process lifecycle")
-
-    Rel(developer, tuvren, "Composes Widgets, defines Layout Constraints, handles Events")
-    Rel(enduser, terminal, "Provides keyboard and mouse input, reads visual output")
-    Rel(tuvren, terminal, "Writes to Surface via terminal escape sequences")
-    Rel(tuvren, runtime, "Exposes Widget API via foreign function interface")
-    Rel(terminal, os, "Terminal I/O")
-```
-
-### 1.2 Domain Model
+This model describes the product concepts Developers and End Users interact with. It does not prescribe implementation containers, processes, protocols, or deployment topology.
 
 ```mermaid
 classDiagram
-    class Widget {
-        identity
-        content
-        visibility
-    }
+    class Developer
+    class EndUser
+    class ComponentAuthor
+    class TerminalEnvironment
 
-    class CompositionTree {
-        root Widget
+    class DeclarativeSDK
+    class ImperativeSDK
+    class Component {
+        public properties
+        lifecycle behavior
+        stable style slots
     }
-
-    class LayoutConstraint {
-        direction
-        alignment
-        justification
-        gap
-        dimensional bounds
+    class Primitive {
+        native-backed behavior
+        semantic state
     }
-
-    class Style {
-        foreground color
-        background color
-        text decoration
-        border appearance
+    class CompositionTree
+    class Surface {
+        rows
+        columns
     }
-
-    class Theme {
-        name
-        style defaults
-    }
-
-    class Handle {
-        opaque reference
-    }
+    class LayoutConstraint
+    class StyleSpec
+    class StyleSheet
+    class ThemeToken
+    class ThemeRecipe
 
     class Event {
-        event type
-        input source
-        payload
+        identity
+        route
+        disposition
     }
-
-    class Surface {
-        dimensions
-        color capability
+    class Command {
+        stable identity
+        availability
+        concurrency policy
     }
+    class Keymap
+    class FocusScope
 
-    class RenderPass {
-        dirty regions
+    class StyledText
+    class TextDocument
+    class Transcript
+    class TranscriptBlock {
+        stable identity
+        lifecycle state
     }
+    class VirtualCollection
+    class DataSource
+    class ResidentProjection
 
-    CompositionTree "1" *-- "1..*" Widget : contains
-    Widget "1" -- "1" Handle : identified by
-    Widget "1" -- "0..1" LayoutConstraint : positioned by
-    Widget "1" -- "0..1" Style : decorated with
-    Widget "0..*" -- "0..1" Widget : nested in
-    Theme "1" -- "0..*" Style : provides defaults for
-    Theme "0..1" -- "0..*" Widget : applied to subtree
-    Surface "1" -- "0..*" RenderPass : updated via
-    RenderPass "1" ..> "1..*" Widget : renders changed
-    Event "0..*" ..> "1" Widget : targeted at
+    class SemanticTree
+    class TerminalCapability
+    class CapabilityTier
+    class ScreenMode
+    class RenderPass
+    class DiagnosticGraph
+    class DiagnosticTrace
+
+    Developer --> DeclarativeSDK : uses by default
+    Developer --> ImperativeSDK : uses explicitly
+    ComponentAuthor --> Component : packages
+    DeclarativeSDK --> Component : describes
+    ImperativeSDK --> Primitive : controls
+    Component *-- Primitive : composes
+    CompositionTree *-- Component : contains
+    CompositionTree *-- Primitive : contains
+    CompositionTree --> Surface : produces
+
+    Component --> LayoutConstraint : is arranged by
+    Primitive --> LayoutConstraint : is arranged by
+    Component --> StyleSheet : accepts
+    StyleSheet *-- StyleSpec : registers
+    ThemeRecipe --> Component : supplies defaults
+    ThemeRecipe --> ThemeToken : resolves
+
+    EndUser --> Event : originates
+    Event --> Component : targets
+    Event --> Primitive : targets
+    Command --> Component : updates presentation
+    Keymap --> Command : invokes
+    FocusScope --> Component : bounds navigation
+
+    StyledText --> Component : supplies content
+    TextDocument --> StyledText : presents as
+    Transcript *-- TranscriptBlock : orders
+    Transcript --> ResidentProjection : bounds
+    VirtualCollection --> DataSource : requests ranges from
+    VirtualCollection --> ResidentProjection : presents through
+
+    CompositionTree --> SemanticTree : describes meaning as
+    TerminalEnvironment --> TerminalCapability : reports
+    TerminalCapability --> CapabilityTier : selects
+    ScreenMode --> Surface : determines ownership of
+    RenderPass --> Surface : updates
+    CompositionTree --> RenderPass : supplies accepted changes to
+    DiagnosticGraph --> CompositionTree : explains
+    DiagnosticGraph --> Event : explains
+    DiagnosticGraph --> Command : explains
+    DiagnosticGraph --> RenderPass : explains
+    DiagnosticTrace --> DiagnosticGraph : records causality from
 ```
+
+## Ownership invariants
+
+- A Component is the public reusable authoring abstraction; a Primitive is the public low-level building block beneath it.
+- The internal RuntimeNode concept does not participate in the public problem-space model.
+- Each controlled or uncontrolled property has one authority at a time.
+- An application's durable data remains distinct from its bounded Resident Projection.
+- A Render Pass applies accepted changes to a Surface; it does not create a second source of application truth.
+- The Semantic Tree expresses meaning independently of the cells presented on a Surface.
+- Terminal Capabilities determine behavior through detection, and a Capability Tier groups the resulting guarantees.

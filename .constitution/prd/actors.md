@@ -1,54 +1,49 @@
 # Actors
 
-## 1. Primary Actor
+## Primary actors
 
-### The General-Purpose Terminal Application Builder
+### Terminal application Developer
 
-- **Role:** The General-Purpose Terminal Application Builder
-- **Operating Context:** Comfortable with TypeScript and terminal tooling, but unwilling to spend weeks learning a new paradigm or a systems language just to ship terminal applications with professional polish.
-- **Goals:**
-  - Build dashboards, inspectors, prompts, editors, and operator surfaces quickly
-  - Rely on strong defaults
-  - Reach a meaningful first application shape fast
-  - Trust the install and release path enough to recommend the framework to others
-- **Frictions:**
-  - Boilerplate-heavy frameworks
-  - Missing defaults
-  - Memory-heavy React-style solutions
-  - Unproductized install flows
-  - Any approach that makes the first real interface take more than roughly 30 minutes
-- **Current Workarounds:** Cobbled-together ANSI escape sequences, Ink with growing memory concerns, or leaving the terminal for a web dashboard that breaks the workflow.
+- **Operating context:** Builds interactive terminal products and knows a typed application language, but does not want to learn systems programming or terminal protocols to deliver a polished result.
+- **Goals:** Reach a first render in minutes; compose dashboards, forms, inspectors, editors, consoles, and agent clients; use one coherent action, styling, testing, and lifecycle model; distribute applications without asking End Users to install native tooling.
+- **Frictions:** Boilerplate-heavy lifecycle management, incomplete controls, unpredictable text or input behavior, excessive memory use, fragile native installation, and abstractions that collapse under demanding workloads.
 
----
+### Integrator
 
-## 2. Secondary Actor
+- **Operating context:** Adds Tuvren to an existing command-line tool, service client, developer tool, or long-running process with its own asynchronous work and shutdown rules.
+- **Goals:** Adopt a managed loop by default; use an advanced imperative embedding surface when necessary; preserve deterministic update ordering; handle application failures without corrupting the terminal; run in alternate, inline, split-footer, and headless modes.
+- **Frictions:** Competing event loops, hidden global state, unsafe cleanup, blocking application work, unbounded update queues, and runtime errors that expose native implementation details.
 
-### The Agentic Product Builder
+## Secondary actors
 
-- **Role:** The Agentic Product Builder
-- **Operating Context:** Building assistants, operator consoles, repo tooling, or other long-lived terminal products where streaming output, dense panes, and stable viewports are not edge cases but the product's normal workload.
-- **Goals:**
-  - Reuse the same framework for demanding agentic and developer-facing products
-  - Maintain viewport stability, inspectability, and performance under continuous updates
-- **Frictions:**
-  - Host-side tree explosion
-  - Fragile viewport behavior under streaming churn
-  - Weak diagnostics
-  - Framework stories that sound general-purpose but break down under real operator workloads
+### Component Author
 
----
+- **Operating context:** Builds reusable controls, recipes, Commands, Keymaps, and application services for a team or public package ecosystem.
+- **Goals:** Compose stable public Primitives; expose controlled and uncontrolled behavior; define stable styling slots; test semantics without a real terminal; publish ordinary packages without a privileged extension protocol.
+- **Frictions:** Private-tree dependencies, unstable state ownership, inconsistent declarative and imperative capabilities, missing accessibility hooks, and premature Plugin contracts.
 
-## 3. Tertiary Actor
+### End User
 
-### The Bun Ecosystem Native
+- **Operating context:** Uses a Tuvren application through a local terminal, a multiplexer, a remote shell, or a constrained compatibility environment.
+- **Goals:** Receive immediate and predictable feedback; navigate every workflow by keyboard; use pointer and clipboard features when available; retain readable output and a restored terminal after exit or failure; understand state without relying on color alone.
+- **Frictions:** Broken graphemes, lost focus, unstable scrolling, swallowed input, unsafe paste or clipboard behavior, inaccessible controls, visual corruption, and terminal modes left active after termination.
 
-- **Role:** The Bun Ecosystem Native
-- **Operating Context:** Already committed to Bun and wants tools that feel native to the runtime rather than ported from a Node.js or browser-first worldview.
-- **Goals:**
-  - Use a zero- or near-zero-dependency terminal UI framework
-  - Integrate cleanly with Bun's foreign-function model
-- **Frictions:**
-  - WASM layers
-  - Compatibility shims
-  - Polyfill-heavy stacks
-  - Tools that feel architecturally foreign to Bun
+### Release Maintainer
+
+- **Operating context:** Publishes the SDK and its native runtime across the supported platform matrix and must prove that each version is complete and reproducible.
+- **Goals:** Produce atomic matching releases; validate installation and headless operation on every target; publish representative examples and benchmark evidence; diagnose version or platform mismatches precisely.
+- **Frictions:** Cross-compilation mistaken for target validation, package drift, unverifiable performance claims, source-only success, and release gates that can be weakened to meet a date.
+
+## Non-human actors
+
+### Host Environment
+
+- **Operating context:** Runs application code, schedules concurrent work, loads the built-in runtime, and can terminate or interrupt the process.
+- **Goals:** Resolve one compatible release, serialize accepted UI changes, propagate cancellation, and complete cleanup under normal and abnormal shutdown.
+- **Frictions:** Incompatible artifacts, reentrant mutation, direct concurrent boundary calls, leaked resources, and unclear failure categories.
+
+### Terminal Environment
+
+- **Operating context:** Supplies dimensions, input, output, capability responses, permissions, scrollback, and lifecycle behavior that vary by terminal and intermediary.
+- **Goals:** Negotiate supported behavior, receive bounded valid output, retain a safe fallback, and return to its prior state after the application ends.
+- **Frictions:** Incorrect capability assumptions, malformed or unbounded control data, partial writes, disconnects, multiplexers, permission-gated clipboard access, and ambiguous text width.
