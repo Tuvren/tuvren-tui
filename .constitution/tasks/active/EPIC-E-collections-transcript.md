@@ -35,7 +35,7 @@ Generated mutations, moves, resets, evictions, and range races keep map/order/po
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all Collection-backed Components pass one shared behavior suite
 - **STOP Conditions:** STOP if a Component bypasses the Collection controller or duplicates native projection state.
-- **Description:** Retain generic application items in the Host Layer, enforce the exclusive static-items or Data-Source authority union and its single canonical key function, preserve Effect error/environment requirements in returned Views, render items to projected RuntimeNodes, encode typed projection descriptors, and wire incremental Streams/controllers, visible-range and focus callbacks, reload demand, controlled/local state, and shared selection semantics into every Collection-backed Component.
+- **Description:** Retain generic application items in the Host Layer, enforce the exclusive static-items or Data-Source authority union and its single canonical key function, preserve loader/Stream/renderer/child error and environment requirements in returned Views, render items to projected RuntimeNodes, encode typed projection descriptors, and wire incremental Streams/controllers, visible-range and focus callbacks, reload demand, mutually exclusive controlled/local state, and shared selection semantics into every Collection-backed Component.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**

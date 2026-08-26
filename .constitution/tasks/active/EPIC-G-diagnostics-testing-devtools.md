@@ -35,7 +35,7 @@ Sink fixtures verify causal linking, stable error metadata, forced ring wrap, pr
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** no malformed input escapes limits or privacy policy
 - **STOP Conditions:** STOP if a reader allocates or decompresses beyond preflight limits, or if saving full content lacks explicit confirmation.
-- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, kind-correlated and bounded replay payloads, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, trace/snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
+- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, kind-correlated replay payloads, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**

@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.9 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.10 mutually exclusive state authority, renderer/child/hook/Error Boundary requirements, typed Command IDs, grapheme-index construction, the closed error registry, exact Trace payload validation, pinned benchmark math, and corrected supply-chain commands.
+- Kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because existing runtime, Component, content, Command, Collection, diagnostic, evidence, and release tickets own the corrected obligations.
+
 ## v10.0.8 — 2026-08-26
 
 ### Fixed

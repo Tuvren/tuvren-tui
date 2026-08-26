@@ -56,7 +56,7 @@ The complete host source typechecks with zero errors, target ownership paths exi
 - **Verification Command:** `bun run check:contracts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if a contract cannot be checked mechanically; identify the missing Stage 3 artifact instead of embedding an undocumented rule.
-- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, the named snapshot, replay, benchmark, and atomic-release cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage.
+- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, the closed error-code registry, the named snapshot, trace, replay, benchmark, and atomic-release cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -161,7 +161,7 @@ Runner fixtures show zero unexplained idle passes, at most one Render Pass reque
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-effect.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if the root surface needs Promise-wrapped Effect APIs or exports Reactivity identity.
-- **Description:** Implement root Effect lifecycle, View-carried error/environment requirements, post-mount RenderSession failure retention, JSX syntax, private Reactivity, scopes, Streams, and services while exposing the complete advanced Imperative SDK only at `tuvren-tui/imperative` with no Rust knowledge required.
+- **Description:** Implement root Effect lifecycle, View-carried renderer/child/hook error and environment requirements, generic Error Boundary discharge, post-mount RenderSession failure retention, JSX syntax, private Reactivity, scopes, Streams, and services while exposing the complete advanced Imperative SDK only at `tuvren-tui/imperative` with no Rust knowledge required.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
