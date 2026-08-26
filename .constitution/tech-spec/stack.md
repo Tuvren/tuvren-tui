@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.6** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.7** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -25,7 +25,7 @@ Versions were checked against official release documentation or registries on 20
 | Native bridge | `bun:ffi` from Bun `1.4.0` | Trial | Private high-performance C ABI bridge. Bun documents it as experimental, so five-target loading, malformed-input fuzzing, panic containment, and ABI benchmarks are release gates. No callback from Rust into TypeScript is permitted. |
 | Layout | Taffy `0.14.0` | Adopt | Provides Flexbox and Grid. Enable only `std`, `taffy_tree`, `flexbox`, `grid`, `content_size`, and `detailed_layout_info`; browser block, float, and parser features remain disabled. |
 | Terminal I/O | Crossterm `0.29.0` | Adopt | Stable cross-platform baseline behind Tuvren's own Terminal Session and protocol decoders. |
-| Markdown | pulldown-cmark `0.13.4` | Adopt | Native CommonMark parser. Enable only the declared GitHub-Flavored Markdown options. |
+| Markdown | pulldown-cmark `0.13.4` | Adopt | Native CommonMark parser with exactly tables, GitHub-compatible footnotes, strikethrough, task lists, and `ENABLE_GFM`; all other option flags are disabled. The sanitization profile is fixed in `guidelines.md`. |
 | Syntax highlighting | syntect `5.3.0` | Adopt | Native code styling with default syntaxes and themes; regex backend remains explicit and benchmarked. |
 | Unicode segmentation | unicode-segmentation `1.13.3` | Adopt | Grapheme, word, and sentence boundaries; all public coordinates still use Tuvren grapheme indices. |
 | Terminal cell width | unicode-width `0.2.2` | Adopt | Default width model, overridden by negotiated terminal width policy where available. |

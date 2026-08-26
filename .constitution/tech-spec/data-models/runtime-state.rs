@@ -313,6 +313,8 @@ pub struct RuntimeNodeState {
     pub mixed: bool,
     pub expanded: bool,
     pub invalid: bool,
+    pub required: bool,
+    pub error: Option<String>,
     pub scroll_row: u32,
     pub scroll_column: u32,
 }
@@ -370,6 +372,12 @@ pub enum LineEnding {
     Crlf,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum IndentationStyle {
+    Tabs,
+    Spaces,
+}
+
 #[derive(Clone, Debug)]
 pub enum TextValidationRule {
     MinimumLength { graphemes: u64, message: String },
@@ -390,6 +398,8 @@ pub struct TextDocumentConfig {
     pub max_graphemes: Option<u64>,
     pub line_ending: LineEnding,
     pub tab_width: u32,
+    pub indentation_style: IndentationStyle,
+    pub indentation_width: u32,
     pub validation: Vec<TextValidationRule>,
 }
 

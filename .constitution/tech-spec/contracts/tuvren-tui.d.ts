@@ -3,16 +3,20 @@ import type * as Context from "effect/Context";
 import type * as Layer from "effect/Layer";
 import type * as Scope from "effect/Scope";
 import type * as Stream from "effect/Stream";
+import { TuvrenError } from "./shared";
 import type {
   BoxProps,
   BorderStyle,
   ButtonProps,
+  ClipboardMediaTypes,
   ClipboardPayload,
   ClipboardTarget,
   CheckboxProps,
   CodeViewProps,
   CommandPaletteProps,
   CommandId,
+  KeySequence,
+  KeyGrapheme,
   ComponentType,
   DialogProps,
   DiffViewProps,
@@ -40,7 +44,6 @@ import type {
   ToastProps,
   TranscriptProps,
   ToggleButtonProps,
-  TuvrenError,
   TuvrenEvent,
   View,
 } from "./shared";
@@ -55,6 +58,7 @@ export type {
   Brand,
   ButtonProps,
   CheckboxProps,
+  ClipboardMediaTypes,
   ClipboardPayload,
   ClipboardTarget,
   CodeViewProps,
@@ -80,8 +84,13 @@ export type {
   KeymapRebinding,
   KeymapScope,
   KeymapScopeId,
+  KeySequence,
+  KeyStroke,
+  KeyGrapheme,
+  NamedKey,
   ErrorBoundaryProps,
   ExternalOutputMode,
+  FormControlProps,
   FocusScopeProps,
   InputProps,
   LayoutSpec,
@@ -192,7 +201,7 @@ export interface Command<A = void, E = never, R = never> {
 
 export interface KeyBinding {
   readonly command: CommandId;
-  readonly keys: string;
+  readonly sequence: KeySequence;
   readonly scope?: import("./shared").KeymapScopeId;
   readonly when?: (context: CommandContext) => boolean;
 }
@@ -211,10 +220,13 @@ export interface CommandService {
   ): Effect.Effect<unknown, TuvrenError | RegisteredCommandError>;
 }
 
-export interface RegisteredCommandError {
+export class RegisteredCommandError extends TuvrenError {
   readonly _tag: "RegisteredCommandError";
+  readonly code: "TUVREN_COMMAND_NOT_REGISTERED";
+  readonly category: "command";
+  readonly operation: "command.invokeById";
   readonly command: CommandId;
-  readonly cause: unknown;
+  readonly remediation: "Register the Command in the active scope before invoking its ID.";
 }
 
 export interface KeymapService {
@@ -236,7 +248,7 @@ export interface KeymapService {
     rebinding: import("./shared").KeymapRebinding,
   ): Effect.Effect<void, TuvrenError>;
   resolve(
-    keys: string,
+    sequence: KeySequence,
     focusedScopes: readonly import("./shared").KeymapScopeId[],
     context?: Partial<CommandContext>,
   ): Effect.Effect<CommandId | undefined, TuvrenError>;
@@ -257,6 +269,16 @@ export interface TerminalService {
   ): Effect.Effect<ClipboardPayload, ClipboardError>;
   writeClipboard(
     payload: ClipboardPayload,
+    target?: ClipboardTarget,
+  ): Effect.Effect<void, ClipboardError>;
+  clipboardMediaTypes(
+    target?: ClipboardTarget,
+  ): Effect.Effect<ClipboardMediaTypes, ClipboardError>;
+  readClipboardText(
+    target?: ClipboardTarget,
+  ): Effect.Effect<string, ClipboardError>;
+  writeClipboardText(
+    text: string,
     target?: ClipboardTarget,
   ): Effect.Effect<void, ClipboardError>;
   announce(message: string): Effect.Effect<void, TuvrenError>;
@@ -376,6 +398,7 @@ export function toStyledText(
 export function componentId(value: string): import("./shared").ComponentId;
 export function commandId(value: string): CommandId;
 export function keymapScopeId(value: string): import("./shared").KeymapScopeId;
+export function keyGrapheme(value: string): import("./shared").KeyGrapheme;
 export function transcriptBlockId(
   value: string,
 ): import("./shared").TranscriptBlockId;

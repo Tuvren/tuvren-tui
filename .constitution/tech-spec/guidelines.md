@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.6** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.7** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -90,8 +90,8 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Reactivity is private. Public state hooks return Tuvren-owned interfaces and must not expose Signal identity, scheduling, equality, or disposal.
 - Validate `unknown` at public and durable-data boundaries. Do not introduce `any` to silence TypeScript 7 migration errors.
 - Public errors are tagged or classed `TuvrenError` variants and include stable code, category, operation, optional Component identity, cause, and remediation. Internal statuses never escape.
-- Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries bind a Command ID; they never duplicate the action body.
-- Keymaps use branded hierarchical scope identities; an unscoped binding belongs to the global root. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
+- Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries require a Command ID; they never duplicate the action body. Registry lookup failures are `TuvrenError` subclasses with the standard stable metadata.
+- Keymaps use branded hierarchical scope identities; omitted scope identifies the global root in bindings, rebindings, conflict reports, and queries. A Key Sequence is a nonempty ordered array of Key Strokes. Named keys use the lowercase names declared by `NamedKey`; text keys pass through `keyGrapheme`, which requires one NFC grapheme and lowercases logical alphabetic keys while Shift remains a modifier. Modifier fields are an order-independent set. When `physicalCode` is present, its USB HID usage ID is the match discriminator and `key` is the logical fallback for terminals without physical codes. Chords use array order, default to a 1,000 ms inter-stroke timeout, accept 50–5,000 ms, and reset on mismatch, timeout, scope change, focus change, or shutdown. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
 - `DataSource.loadRange` receives an `AbortSignal`. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
 - Collection selection is a generation-stamped keyed mutation rather than a visible-node flag, so selection survives projection and eviction. Controllers submit the same operation through the executor.
 - Animation creation returns an interruptible handle in both SDKs. Cancellation and replacement are native animation-registry operations, and completion reports `completed`, `cancelled`, or `replaced` without making dropped presentations part of logical time.
@@ -109,11 +109,19 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Callers own input and output buffers. The runtime never returns a pointer that outlives the call.
 - Public Text Document read operations and Collection or Transcript visible-range reads use the bounded `tui_query_copy` protocol. Result-bearing text mutations return indexed scalar command results from the same atomic transaction apply; the host never reconstructs native state from cached writes.
 - Every public TextContent form has an explicit wire discriminator. Styled spans carry typed style and validated-link records; Markdown and code parsing and ANSI sanitization remain native. Text Document configuration and bounded validation rules are serializable records enforced before native edits, never host callbacks from Rust.
+- Text Document indentation is either tabs or spaces with an explicit width; tab display width is independent. LF, tab indentation, and a tab display width of four are defaults. Tab and space widths accept 1–16. Applicable form controls share required, error, and submission properties. Text controls additionally support the declared native length and regex rules; other domain validation supplies controlled error state without a host callback from Rust.
 - Style values may carry typed Theme-token references. The transaction encodes token names and optional fallbacks explicitly, Theme payloads carry typed token records, and Rust resolves them against the active Theme during style evaluation. Resolution proceeds from runtime defaults through ThemeTokens, ThemeRecipes, the built-in Component recipe, the instance StyleSheet, the instance slot override, and finally the inline StyleSpec; later levels win. A token reference changes only the value, not this precedence order.
 - Strings are UTF-8 inside the ABI. TypeScript string conversion is transparent; explicit UTF-16LE and UTF-16BE adapters validate byte order and length.
 - Public positions are grapheme indices. Internal byte offsets may exist only beside the content epoch they were derived from.
 - ABI status values are private: success, buffer-too-small, invalid-input, stale-context, unavailable, and panic-contained. TypeScript copies details immediately and maps them to public errors.
 - Rust never invokes a TypeScript callback. Cancelable Event arbitration, if OD-02 is ratified, uses bounded request and disposition records through the executor.
+- Clipboard media discovery emits bounded typed chunks. Text helpers use validated UTF-8 and `text/plain;charset=utf-8` over the same permission-aware read/write protocol. Both SDKs query the current Terminal Capability snapshot through bounded native copy-out rather than relying on a prior Event.
+
+## Markdown and formatted-text profile
+
+- Markdown uses pulldown-cmark `0.13.4` with exactly `ENABLE_TABLES`, `ENABLE_FOOTNOTES`, `ENABLE_STRIKETHROUGH`, `ENABLE_TASKLISTS`, and `ENABLE_GFM`. All other option flags are disabled.
+- Raw HTML is rendered as escaped text. Links permit only `https`, `http`, and `mailto`; invalid or control-bearing destinations render as text and produce a diagnostic. Markdown images render their alt text and a validated link only because terminal image protocols are P1.
+- Sanitized ANSI accepts printable text plus SGR reset, bold, dim, italic, underline, inverse, and 16/256/true-color foreground/background styling. It strips and diagnoses cursor movement, erasure, modes, title, hyperlinks, clipboard, device-control, and every other control sequence.
 
 ## Tests and evidence
 
