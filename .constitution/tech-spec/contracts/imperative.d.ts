@@ -56,6 +56,7 @@ export type {
   DialogProps,
   DiffViewProps,
   Dimension,
+  DragEventPayload,
   FlexDirection,
   FlexWrap,
   AlignMode,
@@ -484,7 +485,7 @@ export interface ImperativeAnimationHandle {
   readonly id: bigint;
   readonly result: Promise<import("./shared").AnimationCompletion>;
   cancel(): void;
-  replace(spec: AnimationSpec | AnimationTimeline): void;
+  replace(spec: AnimationSpec | AnimationTimeline): ImperativeAnimationHandle;
 }
 
 export interface ImperativeApp {

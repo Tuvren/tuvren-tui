@@ -74,6 +74,7 @@ export type {
   DialogProps,
   DiffViewProps,
   Dimension,
+  DragEventPayload,
   FlexDirection,
   FlexWrap,
   AlignMode,
@@ -256,7 +257,8 @@ export interface KeymapService {
 
 export interface ClipboardError extends TuvrenError {
   readonly category: "clipboard";
-  readonly status: "unavailable" | "denied" | "busy" | "malformed" | "timeout";
+  readonly status:
+    "unavailable" | "denied" | "busy" | "malformed" | "timed-out";
 }
 
 export interface TerminalService {
@@ -332,7 +334,7 @@ export interface AnimationHandle {
   readonly cancel: Effect.Effect<void, TuvrenError>;
   replace(
     spec: AnimationSpec | AnimationTimeline,
-  ): Effect.Effect<void, TuvrenError>;
+  ): Effect.Effect<AnimationHandle, TuvrenError>;
 }
 export function animate(
   target: import("./shared").ComponentId,

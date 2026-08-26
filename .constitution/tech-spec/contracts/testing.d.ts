@@ -26,6 +26,47 @@ export interface SemanticElement {
   readonly children: readonly ComponentId[];
 }
 
+export interface DiagnosticIssue {
+  readonly code: string;
+  readonly category: string;
+  readonly operation: string;
+  readonly component?: string;
+  readonly phase:
+    | "input"
+    | "event"
+    | "command"
+    | "effect"
+    | "reconcile"
+    | "transaction"
+    | "mutation"
+    | "layout"
+    | "text"
+    | "render"
+    | "terminal"
+    | "cleanup";
+  readonly source: Readonly<{
+    kind: "application" | "sdk" | "native" | "terminal";
+    file?: string;
+    line?: number;
+    column?: number;
+  }>;
+  readonly cause: Readonly<{
+    kind: "error" | "panic" | "terminal" | "validation" | "unknown";
+    summary: string;
+  }>;
+  readonly preceding: Readonly<{
+    eventId?: string;
+    commandId?: string;
+  }> | null;
+  readonly traceInterval: Readonly<{
+    startSequence: string;
+    endSequence: string;
+  }>;
+  readonly message: string;
+  readonly remediation: string;
+  readonly actions: readonly ("report" | "trace" | "restart")[];
+}
+
 export interface DiagnosticSnapshot {
   readonly schemaVersion: "1.0.0";
   readonly snapshotId: string;
@@ -46,14 +87,7 @@ export interface DiagnosticSnapshot {
     cursor?: Readonly<{ x: number; y: number; visible: boolean }> | null;
   }>;
   readonly semanticTree: readonly SemanticElement[];
-  readonly issues?: readonly Readonly<{
-    code: string;
-    category: string;
-    operation: string;
-    component?: string;
-    message: string;
-    remediation: string;
-  }>[];
+  readonly issues?: readonly DiagnosticIssue[];
 }
 
 export interface DiagnosticTrace {

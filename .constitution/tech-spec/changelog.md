@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.8] — 2026-08-26
+
+### Fixed
+
+- Added explicit Virtual Collection order/position state and typed native projection descriptors while keeping generic application items in the Host Layer.
+- Required Transcript block mutations to embed discriminated TextContent, made animation replacement return an independently observable handle, and added retained drag/capture state with typed public and wire Events.
+- Extended benchmark evidence with typed metric definitions, per-metric summaries, and correctness checks; expanded durable Issues to the complete causal/action shape; unified clipboard timeout spelling.
+
 ## [v9.0.7] — 2026-08-26
 
 ### Fixed

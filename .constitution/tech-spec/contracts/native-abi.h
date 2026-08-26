@@ -67,6 +67,7 @@ extern "C" {
 #define TUVREN_TEXT_CONFIG_HAS_MAX_LENGTH 0x00000008u
 #define TUVREN_TEXT_VALIDATION_CASE_INSENSITIVE 0x00000001u
 #define TUVREN_TEXT_VALIDATION_MULTILINE 0x00000002u
+#define TUVREN_DRAG_CAPTURED 0x00000001u
 #define TUVREN_DIAGNOSTIC_REDACTED 0x00000001u
 #define TUVREN_DIAGNOSTIC_RING_WRAPPED 0x00000002u
 #define TUVREN_DIAGNOSTIC_SNAPSHOT_BOUNDARY 0x00000004u
@@ -588,8 +589,20 @@ typedef enum TuvrenEventType {
     TUVREN_EVENT_EVICTION = 12,
     TUVREN_EVENT_ANIMATION = 13,
     TUVREN_EVENT_ANNOUNCEMENT = 14,
-    TUVREN_EVENT_TERMINAL = 15
+    TUVREN_EVENT_TERMINAL = 15,
+    TUVREN_EVENT_DRAG_START = 16,
+    TUVREN_EVENT_DRAG = 17,
+    TUVREN_EVENT_DROP = 18,
+    TUVREN_EVENT_DRAG_END = 19,
+    TUVREN_EVENT_POINTER_CAPTURE = 20
 } TuvrenEventType;
+
+typedef enum TuvrenDragPhase {
+    TUVREN_DRAG_PHASE_START = 1,
+    TUVREN_DRAG_PHASE_MOVE = 2,
+    TUVREN_DRAG_PHASE_DROP = 3,
+    TUVREN_DRAG_PHASE_END = 4
+} TuvrenDragPhase;
 
 typedef enum TuvrenKeyAction {
     TUVREN_KEY_PRESS = 1,
@@ -699,6 +712,28 @@ typedef struct TuvrenWheelEventPayload {
     uint32_t modifiers;
     uint32_t reserved1;
 } TuvrenWheelEventPayload;
+
+typedef struct TuvrenDragEventPayload {
+    uint16_t size;
+    uint16_t phase; /* TuvrenDragPhase, matching the Event type */
+    uint32_t source;
+    uint32_t drop_target; /* zero when no target */
+    int32_t cell_x;
+    int32_t cell_y;
+    int32_t pixel_x;
+    int32_t pixel_y;
+    uint32_t button; /* TuvrenPointerButton */
+    uint32_t flags; /* TUVREN_DRAG_* */
+    uint32_t pointer_id; /* zero for terminals without pointer identity */
+} TuvrenDragEventPayload;
+
+typedef struct TuvrenPointerCaptureEventPayload {
+    uint16_t size;
+    uint16_t captured; /* zero or one */
+    uint32_t owner;
+    uint32_t pointer_id;
+    uint32_t button; /* TuvrenPointerButton */
+} TuvrenPointerCaptureEventPayload;
 
 typedef struct TuvrenResizeEventPayload {
     uint16_t size;
@@ -1133,8 +1168,9 @@ typedef struct TuvrenCollectionMutationPayload {
     uint32_t key_offset;
     uint32_t key_length;
     double key_number;
-    uint32_t item_offset;
-    uint32_t item_length;
+    uint32_t items_offset;
+    uint32_t item_count;
+    uint32_t item_record_bytes;
     uint32_t keys_offset;
     uint32_t key_count;
     uint32_t key_record_bytes;
@@ -1144,13 +1180,30 @@ typedef struct TuvrenCollectionMutationPayload {
     uint64_t generation;
 } TuvrenCollectionMutationPayload;
 
+typedef struct TuvrenCollectionItemRecord {
+    uint16_t size;
+    uint16_t key_tag; /* TuvrenCollectionKeyTag */
+    uint32_t key_offset;
+    uint32_t key_length;
+    double key_number;
+    uint32_t node_reference;
+    uint32_t estimated_height;
+    uint32_t flags; /* reserved; zero in ABI 2.0 */
+    uint32_t reserved;
+} TuvrenCollectionItemRecord;
+
 /* Numeric Collection keys are finite IEEE-754 doubles. Encoders normalize
  * negative zero to positive zero and reject NaN and infinities. UTF-8 keys use
- * key_offset/key_length; numeric keys require both fields to be zero.
+ * key_offset/key_length; numeric keys require both fields to be zero. Host-side
+ * T values never cross the ABI. INSERT and UPDATE use exactly one
+ * TuvrenCollectionItemRecord; RESET uses a packed record array. Each record
+ * carries the stable key, projected RuntimeNode reference, and estimated row
+ * height needed by the native projection. MOVE and REMOVE use the single key.
  * SELECTION uses a packed TuvrenIdentityRecord array in keys_offset/key_count,
  * requires key_record_bytes == sizeof(TuvrenIdentityRecord), and sets the
  * single-key and item fields to zero. Other mutations set all keys fields to
- * zero. */
+ * zero. item_record_bytes must equal sizeof(TuvrenCollectionItemRecord) when
+ * item_count is nonzero and be zero otherwise. */
 
 typedef struct TuvrenTranscriptMutationPayload {
     uint16_t size;
@@ -1179,11 +1232,15 @@ typedef struct TuvrenTranscriptBlockRecord {
     uint32_t reserved;
 } TuvrenTranscriptBlockRecord;
 
-/* APPEND/REPLACE/STREAM/FINISH/COLLAPSE/EXPAND/REMOVE use the single block
- * fields. INSERT additionally uses index. PATCH uses range and UTF-8 content.
- * CLEAR uses generation only. EVICT, RESET, and RELOAD use a packed array of
- * TuvrenTranscriptBlockRecord; EVICT requires zero content fields in each
- * record, while RELOAD additionally uses index as the resident start. */
+/* APPEND/INSERT/REPLACE content contains one exact TuvrenTextContentPayload;
+ * INSERT additionally uses index. STREAM and PATCH content is raw bounded UTF-8
+ * because it edits an existing Text Document, and PATCH additionally uses
+ * range. FINISH/COLLAPSE/EXPAND/REMOVE have zero content fields. CLEAR uses
+ * generation only. EVICT, RESET, and RELOAD use a packed array of
+ * TuvrenTranscriptBlockRecord; RESET and RELOAD record content contains one
+ * exact TuvrenTextContentPayload, EVICT requires zero content fields, and
+ * RELOAD additionally uses index as the resident start. All nested text-content
+ * offsets remain relative to the transaction start. */
 
 typedef struct TuvrenAnimationPayload {
     uint16_t size;
@@ -1260,6 +1317,8 @@ typedef struct TuvrenCommandResult {
 
 /* Successful REPLACE_ALL commands return their replacement count in value0;
  * successful UNDO and REDO commands return zero or one in value0. Commands
+ * ANIMATION_REPLACE returns its newly allocated animation ID in value0 so the
+ * replacement handle has an independently observable completion. Commands
  * without a scalar result do not produce a TuvrenCommandResult. Result and
  * node-mapping capacities are preflighted before mutation, so an undersized
  * caller buffer returns BUFFER_TOO_SMALL without applying the transaction. */
@@ -1336,7 +1395,9 @@ typedef struct TuvrenEventRecord {
  * WHEEL/WheelEventPayload, RESIZE/ResizeEventPayload, PASTE/PasteEventPayload,
  * CLIPBOARD/ClipboardEventPayload, RANGE/RangeEventPayload,
  * EVICTION/EvictionEventPayload, ANIMATION/AnimationEventPayload,
- * ANNOUNCEMENT/AnnouncementEventPayload, TERMINAL/TerminalEventPayload.
+ * ANNOUNCEMENT/AnnouncementEventPayload, TERMINAL/TerminalEventPayload,
+ * DRAG_START/DRAG/DROP/DRAG_END/DragEventPayload, and
+ * POINTER_CAPTURE/PointerCaptureEventPayload.
  * FOCUS and BLUR have payload_length 0. argument0..argument3 are reserved and
  * must be zero in ABI 2.0; typed data lives only in the named payload record.
  * Every nested offset is relative to the batch start and inside its arena. */
@@ -1496,7 +1557,8 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenStyledSpanRecord) == 24, "TuvrenStyledSpanReco
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextDocumentConfigPayload) == 32, "TuvrenTextDocumentConfigPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextValidationRuleRecord) == 32, "TuvrenTextValidationRuleRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 48, "TuvrenTextEditPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 72, "TuvrenCollectionMutationPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 80, "TuvrenCollectionMutationPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionItemRecord) == 40, "TuvrenCollectionItemRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 72, "TuvrenTranscriptMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptBlockRecord) == 32, "TuvrenTranscriptBlockRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");
@@ -1513,6 +1575,8 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEventPayload) == 12, "TuvrenTextEventPaylo
 TUVREN_STATIC_ASSERT(sizeof(TuvrenPointerMoveEventPayload) == 28, "TuvrenPointerMoveEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenPointerButtonEventPayload) == 28, "TuvrenPointerButtonEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenWheelEventPayload) == 36, "TuvrenWheelEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenDragEventPayload) == 40, "TuvrenDragEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenPointerCaptureEventPayload) == 16, "TuvrenPointerCaptureEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenResizeEventPayload) == 28, "TuvrenResizeEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenPasteEventPayload) == 12, "TuvrenPasteEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenClipboardEventPayload) == 40, "TuvrenClipboardEventPayload ABI size");

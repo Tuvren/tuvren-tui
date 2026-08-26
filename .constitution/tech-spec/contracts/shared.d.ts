@@ -264,6 +264,18 @@ export interface TerminalProfile {
   }>;
 }
 
+export interface DragEventPayload {
+  readonly source: ComponentId;
+  readonly dropTarget?: ComponentId;
+  readonly cellX: number;
+  readonly cellY: number;
+  readonly pixelX?: number;
+  readonly pixelY?: number;
+  readonly button: number;
+  readonly pointerId: number;
+  readonly captured: boolean;
+}
+
 export interface TuvrenEventPayloadMap {
   readonly key: Readonly<{
     action: "press" | "repeat" | "release";
@@ -297,6 +309,15 @@ export interface TuvrenEventPayloadMap {
     deltaPixelX?: number;
     deltaPixelY?: number;
     modifiers: readonly string[];
+  }>;
+  readonly dragStart: Readonly<DragEventPayload>;
+  readonly drag: Readonly<DragEventPayload>;
+  readonly drop: Readonly<DragEventPayload>;
+  readonly dragEnd: Readonly<DragEventPayload>;
+  readonly pointerCapture: Readonly<{
+    captured: boolean;
+    pointerId: number;
+    button: number;
   }>;
   readonly focus: Readonly<Record<never, never>>;
   readonly blur: Readonly<Record<never, never>>;
@@ -390,9 +411,13 @@ export interface CommonProps<Slot extends string = never> {
   readonly disabled?: boolean;
   readonly draggable?: boolean;
   readonly dropTarget?: boolean;
-  readonly onDragStart?: (event: TuvrenEvent) => void;
-  readonly onDrag?: (event: TuvrenEvent) => void;
-  readonly onDrop?: (event: TuvrenEvent) => void;
+  readonly onDragStart?: (event: TuvrenEvent<"dragStart">) => void;
+  readonly onDrag?: (event: TuvrenEvent<"drag">) => void;
+  readonly onDrop?: (event: TuvrenEvent<"drop">) => void;
+  readonly onDragEnd?: (event: TuvrenEvent<"dragEnd">) => void;
+  readonly onPointerCaptureChange?: (
+    event: TuvrenEvent<"pointerCapture">,
+  ) => void;
   readonly onEvent?: (event: TuvrenEvent) => void;
 }
 

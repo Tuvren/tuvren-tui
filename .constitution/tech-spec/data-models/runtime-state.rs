@@ -451,6 +451,7 @@ pub struct Surface {
 pub struct VirtualCollectionItem {
     pub key: CollectionKey,
     pub generation: u64,
+    pub projected_node: RuntimeNodeId,
     pub text_document: Option<TextDocumentId>,
     pub estimated_height: u32,
 }
@@ -458,6 +459,8 @@ pub struct VirtualCollectionItem {
 #[derive(Clone, Debug, Default)]
 pub struct VirtualCollectionState {
     pub items: BTreeMap<CollectionKey, VirtualCollectionItem>,
+    pub order: Vec<CollectionKey>,
+    pub positions: BTreeMap<CollectionKey, usize>,
     pub resident_start: u64,
     pub resident_end: u64,
     pub visible_start: u64,
@@ -466,6 +469,24 @@ pub struct VirtualCollectionState {
     pub focused: Option<CollectionKey>,
     pub request_generation: u64,
     pub usage: BoundedUsage,
+}
+
+#[derive(Clone, Debug)]
+pub struct PointerCaptureState {
+    pub owner: RuntimeNodeId,
+    pub pointer_id: u32,
+    pub button: u32,
+}
+
+#[derive(Clone, Debug)]
+pub struct DragState {
+    pub source: RuntimeNodeId,
+    pub drop_target: Option<RuntimeNodeId>,
+    pub pointer_id: u32,
+    pub button: u32,
+    pub start_cell: (i32, i32),
+    pub current_cell: (i32, i32),
+    pub current_pixel: Option<(i32, i32)>,
 }
 
 #[derive(Clone, Debug)]
@@ -542,6 +563,25 @@ pub struct DiagnosticRecord {
     pub payload: Vec<u8>,
 }
 
+#[derive(Clone, Debug)]
+pub struct DiagnosticIssue {
+    pub code: String,
+    pub category: String,
+    pub operation: String,
+    pub component: Option<RuntimeNodeId>,
+    pub phase: String,
+    pub source_kind: String,
+    pub source: Option<(String, u32, u32)>,
+    pub cause_kind: String,
+    pub cause_summary: String,
+    pub preceding_event_id: Option<u64>,
+    pub preceding_command_id: Option<String>,
+    pub trace_interval: (u64, u64),
+    pub message: String,
+    pub remediation: String,
+    pub actions: Vec<String>,
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct DiagnosticGraphState {
     pub records: VecDeque<DiagnosticRecord>,
@@ -549,6 +589,7 @@ pub struct DiagnosticGraphState {
     pub snapshot_byte_limit: usize,
     pub wrap_count: u64,
     pub next_sequence: u64,
+    pub issues: VecDeque<DiagnosticIssue>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -574,6 +615,8 @@ pub struct RuntimeContext {
     pub transcripts: BTreeMap<RuntimeNodeId, TranscriptState>,
     pub graphemes: GraphemePool,
     pub animations: BTreeMap<u64, AnimationState>,
+    pub pointer_capture: Option<PointerCaptureState>,
+    pub drag: Option<DragState>,
     pub terminal: TerminalSessionState,
     pub front_surface: Surface,
     pub back_surface: Surface,
