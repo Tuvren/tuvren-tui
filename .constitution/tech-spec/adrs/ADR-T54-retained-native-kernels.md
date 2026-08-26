@@ -1,0 +1,6 @@
+# ADR-T54: Deepen reusable native kernels instead of branded native controls
+
+- **Status:** accepted
+- **Context:** P0 adds Grid, restricted StyleSheets, a broad first-party Component catalog, Virtual Collections, Text Documents, Transcript modes, modal behavior, accessibility, and animation. A native node type per Component would expand the ABI without isolating the actual hot or correctness-sensitive work.
+- **Decision:** Retain a small Primitive set and implement composition and style, interaction, content and projection, animation and time, presentation, terminal, and diagnostic kernels in Rust. First-party Components remain TypeScript compositions with stable semantic and named-slot contracts. Taffy 0.14 provides Flexbox and Grid with browser block, float, and parser features disabled. Virtual Collections and Transcripts share stable-key, generation, resident-range, cancellation, and eviction machinery. Promote a Component only under the OD-01 evidence rule.
+- **Consequences:** Native code owns repeated state transitions and hot paths while public Component contracts remain replaceable. Kernel conformance tests become more important than enumerating branded native nodes. Existing legacy node types may be folded into reusable kernels during migration.

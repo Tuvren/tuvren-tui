@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tuvren.dev/schema/application-replay-1.json",
+  "title": "Tuvren application replay",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "name", "terminalProfile", "events"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+    "description": { "type": "string", "maxLength": 4096 },
+    "terminalProfile": {
+      "$ref": "https://tuvren.dev/schema/terminal-profile-1.json"
+    },
+    "events": {
+      "type": "array",
+      "maxItems": 1000000,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["atMilliseconds", "kind", "payload"],
+        "properties": {
+          "atMilliseconds": { "type": "number", "minimum": 0 },
+          "kind": {
+            "enum": [
+              "key",
+              "text",
+              "paste",
+              "pointer-move",
+              "pointer-button",
+              "wheel",
+              "focus",
+              "blur",
+              "resize",
+              "external-update",
+              "clock"
+            ]
+          },
+          "payload": { "type": "object" },
+          "redacted": { "type": "boolean", "default": false }
+        }
+      }
+    },
+    "expectations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["afterEvent", "snapshot"],
+        "properties": {
+          "afterEvent": { "type": "integer", "minimum": 0 },
+          "snapshot": {
+            "$ref": "https://tuvren.dev/schema/diagnostic-snapshot-1.json"
+          }
+        }
+      }
+    }
+  }
+}

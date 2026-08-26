@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tuvren.dev/schema/diagnostic-snapshot-1.json",
+  "title": "Tuvren diagnostic snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "snapshotId",
+    "contextId",
+    "transactionId",
+    "renderRequestId",
+    "surface",
+    "semanticTree"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "snapshotId": { "type": "string", "minLength": 1 },
+    "contextId": { "type": "string", "minLength": 1 },
+    "transactionId": { "type": "string", "pattern": "^[0-9]+$" },
+    "renderRequestId": { "type": "string", "pattern": "^[0-9]+$" },
+    "surface": { "$ref": "#/$defs/surface" },
+    "semanticTree": {
+      "type": "array",
+      "maxItems": 100000,
+      "items": { "$ref": "#/$defs/semanticNode" }
+    },
+    "issues": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": { "$ref": "#/$defs/issue" }
+    }
+  },
+  "$defs": {
+    "surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "cells"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "cells": {
+          "type": "array",
+          "maxItems": 100000000,
+          "items": { "$ref": "#/$defs/cell" }
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["x", "y", "visible"],
+              "properties": {
+                "x": { "type": "integer", "minimum": 0 },
+                "y": { "type": "integer", "minimum": 0 },
+                "visible": { "type": "boolean" }
+              }
+            },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "grapheme", "width", "continuation", "style"],
+      "properties": {
+        "x": { "type": "integer", "minimum": 0 },
+        "y": { "type": "integer", "minimum": 0 },
+        "grapheme": { "type": "string" },
+        "width": { "type": "integer", "minimum": 0, "maximum": 8 },
+        "continuation": { "type": "boolean" },
+        "style": { "type": "object" }
+      }
+    },
+    "semanticNode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "role", "children", "states"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "role": { "type": "string", "minLength": 1 },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "value": {
+          "anyOf": [
+            { "type": "string" },
+            { "type": "number" },
+            { "type": "null" }
+          ]
+        },
+        "states": { "type": "object" },
+        "children": {
+          "type": "array",
+          "items": { "type": "string" },
+          "uniqueItems": true
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "category", "operation", "message", "remediation"],
+      "properties": {
+        "code": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 },
+        "operation": { "type": "string", "minLength": 1 },
+        "component": { "type": "string" },
+        "message": { "type": "string" },
+        "remediation": { "type": "string" }
+      }
+    }
+  }
+}

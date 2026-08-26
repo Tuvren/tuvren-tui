@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tuvren.dev/schema/terminal-profile-1.json",
+  "title": "Tuvren terminal profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "name",
+    "tier",
+    "width",
+    "height",
+    "colorDepth",
+    "capabilities",
+    "multiplexer"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "tier": { "enum": ["modern", "compatible"] },
+    "width": { "type": "integer", "minimum": 1, "maximum": 10000 },
+    "height": { "type": "integer", "minimum": 1, "maximum": 10000 },
+    "cellWidthPixels": { "type": "integer", "minimum": 0, "maximum": 1000 },
+    "cellHeightPixels": { "type": "integer", "minimum": 0, "maximum": 1000 },
+    "colorDepth": { "enum": [16, 256, 16777216] },
+    "theme": { "enum": ["light", "dark", "unknown"] },
+    "multiplexer": { "enum": ["none", "tmux", "zellij", "screen", "unknown"] },
+    "ambiguousWidth": { "enum": [1, 2, "negotiated"] },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "synchronizedOutput",
+        "hyperlinks",
+        "enhancedKeyboard",
+        "pointer",
+        "focus",
+        "pasteEvents",
+        "richClipboard",
+        "pixelGeometry",
+        "themeDetection",
+        "paletteDetection",
+        "widthNegotiation"
+      ],
+      "properties": {
+        "synchronizedOutput": { "type": "boolean" },
+        "hyperlinks": { "type": "boolean" },
+        "enhancedKeyboard": { "type": "boolean" },
+        "pointer": { "type": "boolean" },
+        "focus": { "type": "boolean" },
+        "pasteEvents": { "type": "boolean" },
+        "richClipboard": { "type": "boolean" },
+        "pixelGeometry": { "type": "boolean" },
+        "themeDetection": { "type": "boolean" },
+        "paletteDetection": { "type": "boolean" },
+        "widthNegotiation": { "type": "boolean" }
+      }
+    }
+  }
+}

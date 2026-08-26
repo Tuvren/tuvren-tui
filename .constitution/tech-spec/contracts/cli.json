@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "executable": "tuvren",
+  "stdout": "human-readable primary output",
+  "stderr": "diagnostics and failures",
+  "exitCodes": {
+    "0": "success",
+    "1": "application or diagnostic failure",
+    "2": "invalid command usage",
+    "3": "unsupported host or target",
+    "4": "package or native runtime incompatibility",
+    "5": "trace or schema incompatibility"
+  },
+  "commands": [
+    {
+      "path": ["dev"],
+      "summary": "Run an application with local terminal-native devtools and hard-restart watch mode.",
+      "operands": [{ "name": "ENTRY", "required": true, "type": "path" }],
+      "options": [
+        { "name": "--inspect", "type": "boolean", "default": false },
+        { "name": "--record", "type": "boolean", "default": false },
+        { "name": "--terminal-profile", "type": "path", "required": false },
+        { "name": "--no-watch", "type": "boolean", "default": false }
+      ]
+    },
+    {
+      "path": ["doctor"],
+      "summary": "Diagnose host, target, package, ABI, loading, declarative peer, source-map, terminal, multiplexer, and capability state.",
+      "operands": [],
+      "options": [{ "name": "--json", "type": "boolean", "default": false }]
+    },
+    {
+      "path": ["trace", "view"],
+      "summary": "Inspect a local versioned Diagnostic Trace.",
+      "operands": [{ "name": "TRACE_FILE", "required": true, "type": "path" }],
+      "options": [
+        { "name": "--terminal-profile", "type": "path", "required": false },
+        { "name": "--allow-full-content", "type": "boolean", "default": false }
+      ]
+    }
+  ]
+}

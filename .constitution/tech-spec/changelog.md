@@ -1,109 +1,126 @@
 # Changelog
 
-Local Stage 3 Changelog. Tracks semantic versioning for the TechSpec layer.
+This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
----
+## [v9.0.0] — 2026-08-26
 
-## v8.1.0
+### Added
 
-- Bumped host bundle budget from 75KB to 100KB across `check-bundle.ts`, `test-runner.test.ts`, CI workflow, README, GatePolicy, PRD, and TechSpec to reflect framework growth from Epics R–T.
+- Added a version-pinned 2026 bill of materials with adoption posture, exact lock and upgrade policy, and explicit TypeScript 7 and Bun FFI evidence.
+- Added raw TypeScript declaration contracts for every public package entrypoint, a private C ABI header, and a parseable CLI command contract.
+- Added schema-valid durable models for Diagnostic Traces, snapshots, terminal profiles, application replay, benchmark results, and atomic release manifests.
+- Added target physical modules for the UI executor, explicit runtime contexts, transaction codec, native behavior kernels, full-grapheme cells, terminal state machine, diagnostics, and release validation.
+- Added ADRs for the toolchain and private bridge, Effect-first package surface, batched UI transactions, context isolation, grapheme cells, retained kernels, modern terminal protocol handling, diagnostics, distribution, and conditional Event arbitration.
 
-## v8.0.0
+### Changed
 
-- Ratified pre-GA plugin slot contract (Epic T): bounded extension contribution types (`CommandRegistry`, `KeymapRegistry`, palette, devtools, themes, examples), `ExtensionDiagnostic`, and `ExtensionContext` with `Pick<KeymapRegistry, "register" | "resolve">` to withhold `setRegistry` from extensions.
+- Replaced the fictional HTTP/OpenAPI host contract with ecosystem-native SDK declarations and a private native ABI contract.
+- Replaced the global implicit runtime context with explicit context identities owned by one UI executor thread.
+- Replaced per-call mutation as the target hot path with prevalidated transaction batches and one Render Pass request per transaction.
+- Made Effect 3 the required declarative peer major at the bare package entrypoint; moved the Imperative SDK to its approved explicit subpath and made Reactivity private.
+- Upgraded the target toolchain and direct dependency baselines while recording Brownfield migration rather than claiming those upgrades are already shipped.
+- Replaced single-scalar cells and byte-oriented public positions with full-grapheme cell payloads and grapheme-indexed public contracts.
+- Expanded terminal, clipboard, Screen Mode, StyleSheet, Grid, Component, accessibility, projection, diagnostic, testing, and release contracts to the complete P0 scope.
 
-## v7.9.0
+### Deprecated
 
-- Executed Epic S with the clarified package-first scope: `tuvren-tui/effect` now exposes a package-first authoring surface with `render()` / `testRender()`, JSX runtime exports, package-owned commands and keybindings, keyboard and terminal-size hooks, component tokens, retained advanced lifecycle helpers, updated package coverage, and a package-first `effect-counter.tsx` example over the same native runtime authority.
+- Deprecated root imperative exports, the `/effect` entrypoint, public Signals, Extension registries, global runtime access, numeric public identities, and direct per-property mutation calls.
 
-## v7.8.0
+### Removed
 
-- Marked Epic R shipped: `CommandRegistry`, `KeymapRegistry`, and `CommandDispatcher` implemented in the Host Layer; `CommandPalette` rebased to consume the registry; `commandDispatcher` option wired into `app.run()` and `createLoop()`; 46 focused command/keymap tests added.
+- Removed Plugin slots and background rendering from the target implementation contract.
+- Removed ephemeral runtime structs masquerading as durable schema artifacts.
 
-## v7.7.0
+### Security
 
-- Extended the implementation contract through Epics R-V: command/keymap services, Effect integration, pre-GA plugin slots, SDK productization, and first public npm publish as `0.1.0`.
+- Added ABI prevalidation, fuzz targets, strict terminal and durable-file decoding, diagnostic redaction, explicit clipboard requests, exact artifact matching, checksums, and provenance.
 
-## v7.6.0
+## [v8.1.0]
 
-- Activated the next productization contract: future public naming moves to Tuvren, native distribution moves toward auxiliary scoped platform packages behind one public package, and command/keymap plus Effect direction are recorded as the next framework-expansion path.
+### Changed
 
-## v7.4.1
+- Increased the prior host bundle budget from 75 KB to 100 KB.
 
-- Landed Epic O Brownfield updates: native terminal capability state, diagnostic query APIs, write-only OSC52, OSC8 text-buffer link spans, Kitty keyboard disambiguation negotiation, and conservative multiplexer degradation are now implemented.
+## [v8.0.0]
 
-## v7.4.0
+### Added
 
-- Activated the Epic O terminal-capability contract: capability discovery becomes detection-first, OSC52 is write-only, OSC8 hyperlinks are range-scoped, Kitty keyboard support is negotiated, and multiplexer variance is an explicit implementation concern.
+- Added the former pre-GA Plugin-slot contract, now superseded by v9.0.0.
 
-## v7.3.2
+## [v7.9.0]
 
-- Closed the last Epic N contract drift: `EditBuffer` coalescing and substrate-backed text surfaces are now documented as shipped Brownfield reality rather than pending target state.
+### Added
 
-## v7.3.1
+- Added the former separate declarative package surface, now superseded by the bare Effect-first entrypoint.
 
-- Completed the substrate authority cut for Epic N: transcript blocks now store substrate handles instead of mirrored mutable strings, the substrate benchmark suite is a first-class native gate, and the pre-public contract no longer preserves backward compatibility for its own sake.
+## [v7.8.0]
 
-## v7.3.0
+### Added
 
-- Reshaped Epic N around Brownfield reality: dirty ranges now record both pre- and post-replacement extents, the substrate benchmark gate explicitly lands before transcript rebase, and the getter ceiling notes now match the shipped explicit-overflow behavior.
+- Added the first host-side Command and Keymap implementation.
 
-## v7.2.11
+## [v7.7.0]
 
-- Tightened the substrate ABI and transcript rebase contract: oversized `usize` values now fail explicitly instead of truncating, and dirty-range semantics are documented as a deliberate CORE-N3 decision point rather than an implicit behavior.
+### Changed
 
-## v7.2.10
+- Extended the former contract through productization and first publish planning.
 
-- Reconciled ADR-T37 and the spike memo with the shipped substrate reality: flat-`String` backing is the current contract, the borrowed-`&str` payload path is authoritative, and the host FFI surface is mechanically exercised end to end.
+## [v7.6.0]
 
-## v7.2.9
+### Changed
 
-- Fixed `tui_text_view_get_cache_epoch` to refresh projections before reporting cache state and aligned the spike memo with the shipped one-copy payload path.
+- Activated the Tuvren naming and auxiliary-platform-package direction.
 
-## v7.2.8
+## [v7.4.1]
 
-- Wired the substrate ABI into the Bun FFI symbol table: every `tui_text_buffer_*` and `tui_text_view_*` substrate symbol is now listed in the §4.4 status-returning error-model entry; `tui_text_buffer_clear_dirty_ranges` is added to the drain API.
+### Added
 
-## v7.2.7
+- Recorded the shipped first terminal-capability implementation.
 
-- Two renderer correctness fixes: (1) cursor suppression at a soft-wrap boundary now also checks that the next visual row is within the rendered window; (2) tabs now excluded from the wide-glyph `glyph_clipped` path so clipped tab cells inside the rect are painted with the merged style.
+## [v7.4.0]
 
-## v7.2.6
+### Added
 
-- Two correctness fixes plus three hot-path optimizations: (1) `wrap_segment` recomputes tab advance after wrap reset; (2) cursor mapping agrees across `set_cursor`, `byte_to_visual`, and `ensure_projection` for word-wrap consumed-whitespace gaps; (3) `render_text_view` reads projection by reference instead of cloning; (4) `clear_last_error` peeks under a read lock first; (5) `read_utf8_payload` returns `&str` instead of `String` for single-copy boundary.
+- Added the earlier detection-first, write-only clipboard, hyperlink, and enhanced-keyboard contract.
 
-## v7.2.5
+## [v7.3.2]
 
-- Three substrate correctness fixes: `wrap_segment` now recomputes `run_col` after wrap-reset; renderer no longer double-draws cursor at soft-wrap boundary; left-clipped wide glyphs and tabs now fill visible trailing cells. Added `tui_text_buffer_clear_dirty_ranges` consumer drain ABI.
+### Fixed
 
-## v7.2.4
+- Reconciled the operation-based edit and native text substrate with Brownfield source.
 
-- Documents the implicit `u32::MAX` ceiling on substrate getters; renderer cursor `UNDERLINE` restricted to primary cell; word-wrap no longer emits phantom zero-length visual rows after consumed inter-word whitespace.
+## [v7.3.1]
 
-## v7.2.3
+### Changed
 
-- Substrate FFI clears `last_error` on every successful call; `byte_to_visual` and `set_cursor` both reject non-grapheme offsets; unified renderer fills every cell a tab grapheme advances through with the merged cell style.
+- Moved Transcript block content onto substrate identities.
 
-## v7.2.2
+## [v7.3.0]
 
-- Documents the substrate value-returning getters error model (return `0` on error, diagnostic via `tui_get_last_error()`); added explicit cursor-reconciliation invariant for width-changing buffer edits.
+### Changed
 
-## v7.2.1
+- Refined dirty-range, getter, and benchmark behavior.
 
-- Reconciled §3.4 storage shape with shipped flat-`String` `TextBuffer`; tightened §5.4.1 G3 row to describe the name-based source-grep gate.
+## [v7.2.0]
 
-## v7.2.0
+### Added
 
-- Promoted Native Text Substrate sections from target state to current Brownfield reality: `TextBuffer`, `TextView`, and unified text renderer have shipped under Epic M; `EditBuffer` remains target state pending CORE-N2.
+- Recorded the shipped native TextBuffer, TextView, and unified renderer.
 
-## v7.1.0
+## [v7.1.0]
 
-- Ratified the Native Text/Cell/View Substrate scope: added ADRs for substrate ownership, operation-based edit history, transcript content backing, and deferral of terminal capability hardening; added state, ABI, and structural acceptance gates for `TextBuffer`, `TextView`, and `EditBuffer`.
+### Added
 
-## v7.0.0
+- Added the former native text substrate, edit history, Transcript backing, ABI, and acceptance contracts.
 
-- Converted the prior forward-looking delta spec into the canonical brownfield implementation contract and reconciled transcript, devtools, split-pane, and flagship-example scope with the current source tree.
+## [v7.0.0]
 
-## v6.0.0
+### Changed
 
-- Reoriented the next planned phase around transcript-first UX, developer tooling, minimal native expansion, and flagship examples for developer and agent workflows.
+- Converted the earlier forward-looking specification into a Brownfield contract.
+
+## [v6.0.0]
+
+### Changed
+
+- Reoriented the prior contract around Transcript, devtools, minimal native expansion, and flagship examples.

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tuvren.dev/schema/diagnostic-trace-1.json",
+  "title": "Tuvren Diagnostic Trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "traceId",
+    "createdAt",
+    "terminalProfile",
+    "redaction",
+    "records",
+    "snapshots",
+    "wrapCount"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "traceId": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "sdkVersion": { "type": "string" },
+    "terminalProfile": {
+      "$ref": "https://tuvren.dev/schema/terminal-profile-1.json"
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "fullContent",
+        "input",
+        "clipboard",
+        "terminalPayloads",
+        "environment",
+        "absolutePaths"
+      ],
+      "properties": {
+        "fullContent": { "type": "boolean" },
+        "input": { "const": "redacted" },
+        "clipboard": { "const": "redacted" },
+        "terminalPayloads": { "const": "redacted" },
+        "environment": { "const": "redacted" },
+        "absolutePaths": { "const": "redacted" }
+      }
+    },
+    "wrapCount": { "type": "integer", "minimum": 0 },
+    "records": {
+      "type": "array",
+      "maxItems": 1000000,
+      "items": { "$ref": "#/$defs/record" }
+    },
+    "snapshots": {
+      "type": "array",
+      "maxItems": 10000,
+      "items": {
+        "$ref": "https://tuvren.dev/schema/diagnostic-snapshot-1.json"
+      }
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sequence",
+        "timestampNanos",
+        "kind",
+        "correlation",
+        "payload"
+      ],
+      "properties": {
+        "sequence": { "type": "string", "pattern": "^[0-9]+$" },
+        "timestampNanos": { "type": "string", "pattern": "^[0-9]+$" },
+        "kind": {
+          "enum": [
+            "input",
+            "event",
+            "command",
+            "effect-span",
+            "reconcile",
+            "transaction",
+            "mutation",
+            "dirty",
+            "layout",
+            "text",
+            "render",
+            "diff",
+            "terminal-write",
+            "error",
+            "cleanup",
+            "unattributed"
+          ]
+        },
+        "correlation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "contextId": { "type": "string" },
+            "eventId": { "type": "string" },
+            "commandId": { "type": "string" },
+            "effectSpanId": { "type": "string" },
+            "transactionId": { "type": "string" },
+            "renderRequestId": { "type": "string" },
+            "componentId": { "type": "string" }
+          }
+        },
+        "payload": { "type": "object" }
+      }
+    }
+  }
+}

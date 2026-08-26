@@ -2,5 +2,5 @@
 
 - **Status:** accepted
 - **Context:** Raw row offsets drift under streaming inserts, collapse toggles, and pane resize. Transcript and log workflows need deterministic sticky-bottom behavior and predictable detached reading.
-- **Decision:** Track transcript follow behavior through `FollowMode`, logical anchor semantics, unread anchors, and explicit jump commands rather than raw row offsets as the primary contract.
-- **Consequences:** Operators can remain detached from the tail without losing context. Transcript state must track viewport height and width, unread state, and anchor mode carefully. Replay fixtures and example tests become essential to prevent subtle regressions.
+- **Decision:** Track Transcript follow behavior through stable block identities, logical anchors, protected visible and selected ranges, unread state, and explicit live-edge commands rather than raw row offsets. Controlled mode keeps durable history in the application; bounded-local mode owns only its declared resident history.
+- **Consequences:** End Users can remain detached from the tail without losing context, and eviction cannot silently delete the application's only history. Generation, eviction, reload, resize, collapse, selection, and streaming cases require deterministic replay fixtures.

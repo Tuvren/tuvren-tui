@@ -1,0 +1,6 @@
+# ADR-T55: Centralize terminal protocols in a bounded session state machine
+
+- **Status:** accepted
+- **Context:** P0 requires modern and compatible tiers, four Screen Modes, enhanced input, rich clipboard, multiplexer passthrough, external-output policies, suspend, resume, restoration, and strict separation of terminal responses from End User input.
+- **Decision:** A Rust `TerminalSession` state machine owns initialization, capability queries, raw input decoding, pending request correlation, clipboard chunks, synchronized output, Screen Mode rows, external output, writes, suspend, resume, and cleanup. Crossterm remains the portability backend; Tuvren-owned typed protocol builders and parsers handle behavior it does not model. Capability state is evidence-derived per feature. Clipboard reads are explicit, bounded, timed, correlated, and never background polling; OSC 52 is text fallback.
+- **Consequences:** Protocol bytes cannot leak as keyboard Events and one unavailable feature does not demote the whole app. The terminal decoder, clipboard assembler, formatted-text sanitizer, and passthrough logic require fuzzing and real-terminal profiles. Terminal names are diagnostics, not allowlist authority.

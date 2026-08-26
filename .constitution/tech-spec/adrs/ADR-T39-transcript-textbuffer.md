@@ -2,5 +2,5 @@
 
 - **Status:** accepted
 - **Context:** `TranscriptBlock.content: String` was mutated in place by `patch_block` and cloned into render-local structures during render. This conflicted with the substrate goal that resize invalidates view projections rather than content storage.
-- **Decision:** Each transcript block's content is owned by a `TextBuffer`. Rendering consumes a `TextView` projection per visible block. `append_block`, `patch_block`, and `finish_block` operations mutate the buffer through the substrate's mutation API and bump the corresponding epoch. `DirtyRange` expands to carry both the replaced extent and the replacement extent.
-- **Consequences:** Transcript host-facing contract (anchors, follow modes, unread, collapse, hierarchy) is preserved unchanged. Internally, transcript code stops owning text-measurement logic and shares it with every other substantial text surface.
+- **Decision:** Each Transcript Block references a Text Document. Insert, stream, patch, finish, replace, collapse, expand, remove, clear, eviction, and reload operations use stable string identities and generations through the transaction codec. Rendering consumes bounded visible projections and shares the unified text path.
+- **Consequences:** Transcript code does not own a competing text or width model. Application-controlled history remains outside the runtime while the Resident Projection, selection, anchors, collapse, and streaming state remain native.
