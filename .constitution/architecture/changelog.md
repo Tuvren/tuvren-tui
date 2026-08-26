@@ -2,6 +2,12 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.8] — 2026-08-26
+
+### Fixed
+
+- Routed completed Composition change and semantic records through the UI Executor and Application Orchestration before SDK delivery.
+
 ## [v4.0.7] — 2026-08-26
 
 ### Fixed
