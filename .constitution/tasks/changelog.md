@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.12 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.4 controlled/local Collection selection and distinct runtime/application replay paths plus TechSpec v9.0.13 native diagnostic correlation, Menu selection, closed transaction status, exactly-once replay, and embedded snapshot/Issue validation.
+- Made TUI-A003 execute ABI parity before fuzzing and kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged.
+
 ## v10.0.11 — 2026-08-26
 
 ### Fixed

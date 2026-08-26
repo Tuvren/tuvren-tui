@@ -14,7 +14,7 @@ Implement one causal observation surface and public proof harness for P0-N01–P
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** bounded sink, identity, wrap, and unattributed-defect protocol fixtures pass; TUI-G008 owns producer-complete causal accounting
 - **STOP Conditions:** STOP if recording can grow beyond 64 MiB or silently discard the retained causal path.
-- **Description:** Implement the bounded Diagnostic Graph record/sink protocol, a unique owned `recordId` plus optional backward `parentRecordId` on every record, domain labels that never double as parent links, context-initialization identity, wrap behavior, and producer hook interface. TUI-G008 owns integration across producers after their kernels exist.
+- **Description:** Implement the bounded Diagnostic Graph record/sink protocol, a unique native `record_id` plus optional backward `parent_record_id` on every record, exact public `recordId`/`parentRecordId` serialization, domain labels that never double as parent links, context-initialization identity, wrap behavior, and producer hook interface. TUI-G008 owns integration across producers after their kernels exist.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -35,13 +35,13 @@ Sink fixtures verify unique owned identity, valid backward parent linking includ
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** no malformed input escapes limits or privacy policy
 - **STOP Conditions:** STOP if a reader allocates or decompresses beyond preflight limits, or if saving full content lacks explicit confirmation.
-- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, strict sequence/time order, unique owned record IDs and backward-only parent links, empty-context/no-wrap replay-start validation, exact Event and complete transaction replay batches, rooted typed-scalar Semantic Tree plus Issue-registry snapshot validation, wire-exact replay keys/wheel deltas, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
+- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, strict sequence/time order, unique owned record IDs and backward-only parent links, closed committed/rejected transaction status rules, empty-context/no-wrap replay-start validation, exact Event and complete transaction replay batches, validation of every embedded snapshot, rooted typed-scalar Semantic Tree plus Issue tuple/interval/retained-domain validation, wire-exact replay keys/wheel deltas, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Fuzz and golden tests reject unknown versions, expansion attacks, invalid Semantic Tree graphs/scalars or Issue tuples, unordered/duplicate/dangling Trace identities, missing or wrapped replay prefixes, unavailable payload migrations, bare offset-bearing mutation payloads, surrogate key codes, out-of-wire-range wheel deltas, and noncanonical replay batches; migrate only registry entries; preserve schema-valid data; and find zero protected values in default artifacts.
+Fuzz and golden tests reject unknown versions, expansion attacks, invalid Semantic Tree graphs/scalars or Issue tuples/intervals, unordered/duplicate/dangling Trace identities, unknown/inconsistent transaction status, invalid embedded snapshots or out-of-domain Issue intervals, missing or wrapped replay prefixes, unavailable payload migrations, bare offset-bearing mutation payloads, surrogate key codes, out-of-wire-range wheel deltas, and noncanonical replay batches; migrate only registry entries; preserve schema-valid data; and find zero protected values in default artifacts.
 ```
 
 #### TUI-G003 Implement Effect and imperative semantic test harnesses
@@ -56,13 +56,13 @@ Fuzz and golden tests reject unknown versions, expansion attacks, invalid Semant
 - **Verification Command:** `bun run test:semantic`
 - **Expected Success Output:** Effect and imperative harness suites pass shared fixtures
 - **STOP Conditions:** STOP if synthetic input bypasses the Event codec or cleanup cannot prove retained-resource counts.
-- **Description:** Implement typed semantic queries, complete interaction drivers including raw Events, Terminal Profiles, manual clock, visual idle, schema-exact stable snapshots and replay inputs, serializable bounded external updates, automatic failure traces, explicit context-initialization runtime-replay capture, runtime replay restricted to no-wrap replay-capable Traces, application replay, cleanup, and leak reports.
+- **Description:** Implement typed semantic queries, complete interaction drivers including raw Events, Terminal Profiles, manual clock, visual idle, schema-exact stable snapshots and replay inputs, serializable bounded external updates, automatic failure traces, explicit context-initialization runtime-replay capture, runtime replay restricted to no-wrap replay-capable Traces, logical application replay, cleanup, and leak reports. Runtime replay creates an empty native context without application handlers, feeds captured Events only to native interaction/default behavior with outward application delivery suppressed, and applies captured transactions once at their sequence positions. Logical application replay runs current handlers and never injects captured transactions.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-The same fixture passes through both harnesses; default and attached full-content Traces cannot typecheck as runtime replay input, capture must be confirmed before context creation, replay-capable Traces start at the empty context and apply exact versioned Event/transaction batches once, 100 deterministic replays produce identical cell/style/cursor/typed Semantic Tree snapshots, and cleanup reports zero leaked contexts, nodes, requests, or retained bytes.
+The same fixture passes through both harnesses; default and attached full-content Traces cannot typecheck as runtime replay input, capture must be confirmed before context creation, replay-capable Traces start at the empty context, suppress application handler delivery, and apply exact versioned Event/transaction batches once. A side-effecting handler fixture proves zero handler calls during runtime replay and normal calls during logical replay; 100 deterministic replays produce identical cell/style/cursor/typed Semantic Tree snapshots, and cleanup reports zero leaked contexts, nodes, requests, or retained bytes.
 ```
 
 #### TUI-G004 Build terminal-native Inspect, Timeline, and Issues views
