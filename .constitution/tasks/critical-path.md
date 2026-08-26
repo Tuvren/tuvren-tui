@@ -6,8 +6,8 @@
 
 ## Active backlog summary
 
-- **Total active story points:** 374 across 60 tickets. Completed and deferred work contributes 0.
-  - Epic A — Runtime foundation and public SDK boundary: 50
+- **Total active story points:** 377 across 61 tickets. Completed and deferred work contributes 0.
+  - Epic A — Runtime foundation and public SDK boundary: 53
   - Epic B — Composition, layout, styling, and Components: 69
   - Epic C — Text, rich content, and editing: 34
   - Epic D — Interaction, Commands, accessibility, and animation: 41
@@ -43,7 +43,7 @@ The path is the longest effort-weighted chain under the declared dependencies. T
 
 - This is a Brownfield replacement plan for the realigned PRD v3.0.0, Architecture v4.0.0, and TechSpec v9.0.1. It supersedes the prior Plugin-era active Epics U–Z instead of preserving incompatible work as active.
 - `.constitution/tasks/completed/` remains historical continuity and was listed, not read or modified. Superseded active files are removed rather than moved into completed history because they were plans, not delivered scope.
-- The current source remains useful Brownfield evidence, but target paths and commands follow Stage 3. TUI-A001 owns the root workspace, TUI-A008 owns the module/strict-source migration, and TUI-A009 owns contract validation.
+- The current source remains useful Brownfield evidence, but target paths and commands follow Stage 3. TUI-A001 owns the root workspace and developer environment, TUI-A008 owns host migration/strict repair, TUI-A010 owns native module migration, and TUI-A009 owns contract validation.
 - OD-02 uses evidence builder `TUI-D007`, report-only spike `TUI-D001`, and gated implementation `TUI-D003`. A No-Go requires Stage 1–3 Evolution and Stage 4 replanning; it does not authorize an improvised interaction contract.
 - OD-01 uses fixture builder `TUI-H006` and report-only spike `TUI-H004`. The 120/90/60 absolute tiers remain binding before and after it; comparative margins become gates only through Stage 1–3 Evolution.
 - `tuvren-tui@0.1.0` is the first public release. The OpenCode client is required release evidence through an application adapter and replay fixture, never a core integration contract.
@@ -81,6 +81,7 @@ flowchart LR
     A7[TUI-A007]
     A8[TUI-A008]
     A9[TUI-A009]
+    A10[TUI-A010]
   end
   subgraph B["B — Composition, layout, style"]
     B1[TUI-B001]
@@ -152,8 +153,10 @@ flowchart LR
 
   A1 --> A8
   A1 --> A9
+  A1 --> A10
   A8 --> A2
   A9 --> A2
+  A10 --> A2
   A2 --> A3
   A3 --> A4
   A4 --> A5
@@ -237,6 +240,8 @@ flowchart LR
   F5 --> G6
   G2 --> G7
   A3 --> G7
+  D2 --> G7
+  F2 --> G7
   C3 --> G7
   F3 --> G7
   A4 --> H1

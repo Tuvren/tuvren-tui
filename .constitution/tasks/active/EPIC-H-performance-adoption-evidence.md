@@ -114,7 +114,7 @@ The result set records participant background, exact task start/end, interventio
 - **Dependencies:** TUI-H001, TUI-I004
 - **Category:** Perf
 - **Capabilities:** OD-01, OPS-06
-- **Scope (In-Scope Files):** `benchmarks/fixtures/comparative/`, pinned OpenTUI/Ratatui/host-only adapters, terminal profiles, schema-valid raw results and reproducer documentation
+- **Scope (In-Scope Files):** `benchmarks/comparative.ts`, `benchmarks/fixtures/comparative/`, pinned OpenTUI/Ratatui/host-only adapters, terminal profiles, schema-valid raw results and reproducer documentation
 - **Scope (Out-of-Scope Files):** comparative gate decisions, private competitor APIs, production SDK behavior
 - **Verification Command:** `bun run bench:comparative`
 - **Expected Success Output:** all equivalent public-API workloads reproduce across pinned implementations with separated engine/process/write results

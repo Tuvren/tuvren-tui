@@ -9,10 +9,10 @@ Establish the Stage 3 physical contract before capability work builds on it. Thi
 - **Dependencies:** None
 - **Category:** Dependency-Upgrade
 - **Capabilities:** P0-A08, P0-O07, OPS-05
-- **Scope (In-Scope Files):** `rust-toolchain.toml`, `native/Cargo.toml`, `native/Cargo.lock`, root `package.json`, root `bun.lock`, `ts/package.json`, removal of `ts/bun.lock`
+- **Scope (In-Scope Files):** `rust-toolchain.toml`, `native/Cargo.toml`, `native/Cargo.lock`, root `package.json`, root `bun.lock`, `ts/package.json`, removal of `ts/bun.lock`, `devenv.nix`
 - **Scope (Out-of-Scope Files):** `.constitution/prd/`, `.constitution/architecture/`, public behavior beyond the Stage 3 contracts
-- **Verification Command:** `bun install --frozen-lockfile`
-- **Expected Success Output:** `exit 0`, exact target versions, and no competing nested host lock
+- **Verification Command:** `bun install --frozen-lockfile && bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile && cargo check --manifest-path native/Cargo.toml --locked`
+- **Expected Success Output:** every command exits 0 with exact target versions and no competing nested host lock
 - **STOP Conditions:** STOP if a pinned Stage 3 dependency cannot build on a supported target; report the compatibility evidence for a Stage 3 Evolution pass.
 - **Description:** Adopt the exact Rust and Bun workspace dependency baselines, move host dependency ownership to the root workspace, commit canonical locks, and preserve the independent contract-validation lock.
 - **Acceptance:**
@@ -20,22 +20,22 @@ Establish the Stage 3 physical contract before capability work builds on it. Thi
   - **Evidence:**
 
 ```text
-Frozen root and contract installs resolve the exact Stage 3 baselines; `cargo check --manifest-path native/Cargo.toml --locked` passes on Rust 1.98.0; no `ts/bun.lock` or unlocked direct dependency remains.
+Frozen root and contract installs resolve the exact Stage 3 baselines; locked Cargo check passes on Rust 1.98.0; `devenv shell` exposes the same toolchain; no `ts/bun.lock` or unlocked direct dependency remains.
 ```
 
-#### TUI-A008 Migrate the target module layout and repair the strict host baseline
+#### TUI-A008 Migrate the host module layout and repair the strict TypeScript baseline
 
 - **Type:** Chore
 - **Effort:** 5
 - **Dependencies:** TUI-A001
 - **Category:** Tech-Debt
 - **Capabilities:** P0-A08, DX-06
-- **Scope (In-Scope Files):** `ts/src/`, `native/src/`, `ts/tsconfig.json`, target module forwarding files and source tests
+- **Scope (In-Scope Files):** `ts/src/`, `ts/tsconfig.json`, host forwarding files and source tests
 - **Scope (Out-of-Scope Files):** new public behavior, weakened compiler options, compatibility forwarding beyond one migration wave
 - **Verification Command:** `bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit`
 - **Expected Success Output:** `exit 0` with the existing 188 strict errors resolved and no new suppressions
-- **STOP Conditions:** STOP if moving a module would change an approved public contract or native ownership boundary; route that change through Stage 3.
-- **Description:** Move Brownfield source into the Stage 3 target ownership layout, repair duplicate fields and unsafe FFI casts, retain temporary forwarding only where allowed, and keep strict/noUnchecked/exact-optional compilation enabled.
+- **STOP Conditions:** STOP if moving a host module would change an approved public contract or runtime ownership boundary; route that change through Stage 3.
+- **Description:** Move Brownfield TypeScript into the Stage 3 host ownership layout, repair duplicate fields and unsafe FFI casts, retain temporary forwarding only where allowed, and keep strict/noUnchecked/exact-optional compilation enabled.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -65,16 +65,37 @@ The complete host source typechecks with zero errors, target ownership paths exi
 The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, compiles every fixed record, decodes all byte fixtures identically, and fails on seeded drift.
 ```
 
+#### TUI-A010 Migrate native source into the target module ownership layout
+
+- **Type:** Chore
+- **Effort:** 3
+- **Dependencies:** TUI-A001
+- **Category:** Tech-Debt
+- **Capabilities:** P0-A08, SAFE-01
+- **Scope (In-Scope Files):** `native/src/`, `native/Cargo.toml`, native module tests and one-wave forwarding modules
+- **Scope (Out-of-Scope Files):** public ABI or behavior changes, TypeScript source, forwarding beyond one migration wave
+- **Verification Command:** `cargo check --manifest-path native/Cargo.toml --locked && cargo test --manifest-path native/Cargo.toml --locked`
+- **Expected Success Output:** both commands exit 0 against the migrated native module graph
+- **STOP Conditions:** STOP if a move changes a Stage 3 ownership boundary, ABI record, or runtime behavior; route that change upstream instead of hiding it in the migration.
+- **Description:** Move Brownfield native source into context, transaction, composition, interaction, content, animation, presentation, terminal, and diagnostics ownership while preserving behavior and temporary migration forwarding only where permitted.
+- **Acceptance:**
+  - **Mode:** invariant
+  - **Evidence:**
+
+```text
+Locked check and tests compile the complete native graph, module ownership matches the target tree, forwarding is acyclic and migration-scoped, no duplicate mutable authority appears, and ABI symbols remain mechanically identical.
+```
+
 #### TUI-A002 Implement explicit contexts and the single UI executor
 
 - **Type:** Feature
 - **Effort:** 8
-- **Dependencies:** TUI-A008, TUI-A009
+- **Dependencies:** TUI-A008, TUI-A009, TUI-A010
 - **Category:** Correctness
 - **Capabilities:** P0-A04–P0-A07, REL-03
 - **Scope (In-Scope Files):** `native/src/context.rs`, `ts/src/runtime/`, `ts/src/index.ts`, `ts/src/imperative/`
 - **Scope (Out-of-Scope Files):** Component catalog, terminal protocol decoders, background rendering
-- **Verification Command:** `bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if any context-bound ABI call can originate outside the owner executor thread.
 - **Description:** Replace implicit global mutation with explicit interactive and isolated headless contexts, one serialized executor queue, managed Effect scopes, manual imperative lifecycle, cancellation, coalescing, shutdown, and deterministic cleanup.
@@ -93,9 +114,9 @@ Saturation and lifecycle tests prove one writer, ordered accepted work, bounded 
 - **Dependencies:** TUI-A002
 - **Category:** Security
 - **Capabilities:** P0-A08–P0-A09, SAFE-01
-- **Scope (In-Scope Files):** `native/src/lib.rs`, `native/src/transaction.rs`, `ts/src/ffi/`, generated ABI checks
+- **Scope (In-Scope Files):** `native/src/lib.rs`, `native/src/transaction.rs`, `native/fuzz/Cargo.toml`, `native/fuzz/fuzz_targets/transaction_decode.rs`, transaction corpus, `ts/src/ffi/`, generated ABI checks
 - **Scope (Out-of-Scope Files):** public numeric identities, TypeScript callbacks from Rust, Event arbitration disposition records
-- **Verification Command:** `cargo fuzz run transaction_decode`
+- **Verification Command:** `cargo fuzz run --fuzz-dir native/fuzz transaction_decode`
 - **Expected Success Output:** no crash, panic escape, out-of-bounds access, or invariant violation for the maintained corpus and configured CI duration
 - **STOP Conditions:** STOP if the implementation requires exposing RuntimeNode IDs or relaxing full-batch prevalidation.
 - **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings, exact-version loading, panic containment, and one Render Pass request per committed batch.
@@ -116,7 +137,7 @@ Rust and TypeScript decode checked-in byte fixtures identically; malformed, misa
 - **Capabilities:** P0-A06–P0-A09, PERF-03, REL-03
 - **Scope (In-Scope Files):** `ts/src/runtime/`, `native/src/context.rs`, `native/src/presentation/`, executor saturation tests
 - **Scope (Out-of-Scope Files):** final 120/90/60 tuning, comparative performance cuts
-- **Verification Command:** `bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0` with idle-pass and transaction scheduling assertions enabled
 - **STOP Conditions:** STOP if coalescing would weaken Event order, final state, accessibility semantics, or cleanup.
 - **Description:** Connect dirty causes, transaction commits, priority input work, bounded queues, cancellation, coalescing, and explicit render requests without polling or idle presentation.
@@ -137,7 +158,7 @@ Runner fixtures show zero unexplained idle passes, at most one Render Pass reque
 - **Capabilities:** P0-A01–P0-A05, DX-05–DX-06
 - **Scope (In-Scope Files):** `ts/src/index.ts`, `ts/src/imperative/`, `ts/src/jsx/`, `ts/src/runtime/`, declaration build
 - **Scope (Out-of-Scope Files):** public Signals, `/effect`, raw FFI, separate declarative package
-- **Verification Command:** `bun test ts/test-effect.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-effect.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if the root surface needs Promise-wrapped Effect APIs or exports Reactivity identity.
 - **Description:** Implement root Effect lifecycle, JSX syntax, private Reactivity, scopes, Streams, and services while exposing the complete advanced Imperative SDK only at `tuvren-tui/imperative` with no Rust knowledge required.
@@ -158,7 +179,7 @@ Packed declarations match the raw contracts; the root has no imperative or Signa
 - **Capabilities:** P0-A04, P0-N07–P0-N11, P0-O09–P0-O11, P0-O18, REL-01
 - **Scope (In-Scope Files):** `ts/src/runtime/`, `ts/src/errors/`, `native/src/context.rs`, `native/src/terminal/`, lifecycle fault tests
 - **Scope (Out-of-Scope Files):** browser crash reporting, remote upload, process-global permanent failure
-- **Verification Command:** `bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0` across lifecycle fault fixtures; TUI-F005 later owns the terminal matrix
 - **STOP Conditions:** STOP if a recoverable failure would discard a healthy context or an unrecoverable failure would preserve mutable private identities.
 - **Description:** Map private statuses to stable public errors, preserve the last known-good Surface for recoverable failures, supervise unrecovered roots, restore terminal state, discard inconsistent contexts, and allow explicit restart.

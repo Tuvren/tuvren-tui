@@ -125,7 +125,7 @@ Replay is identical across 100 runs; live and replay workloads publish schema-va
   - **Evidence:**
 
 ```text
-A fresh `check:release-candidate` run produces one evidence index and atomic manifest; no required subcommand is skipped or stale; all artifact versions equal the package version and source revision; no alpha artifact is represented as final.
+A fresh `check:release-candidate` run produces one human-readable candidate report and the schema-valid atomic manifest; no required subcommand is skipped or stale against the source revision; all artifact versions equal the package version and source revision; no alpha artifact is represented as final.
 ```
 
 #### TUI-I007 Publish the atomic `0.1.0` package set and verify it from the registry
