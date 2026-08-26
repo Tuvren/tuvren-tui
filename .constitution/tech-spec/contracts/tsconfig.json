@@ -9,11 +9,7 @@
     "module": "preserve",
     "moduleResolution": "bundler",
     "skipLibCheck": false,
-    "noEmit": true,
-    "baseUrl": ".",
-    "paths": {
-      "effect/*": ["../../../ts/node_modules/effect/dist/dts/*"]
-    }
+    "noEmit": true
   },
   "include": ["*.d.ts", "conformance.ts"]
 }

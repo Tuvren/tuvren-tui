@@ -9,7 +9,7 @@ import {
   commandId,
   componentId,
   render,
-  type RangeResult,
+  type RangeLoadResult,
   type TuvrenError,
 } from "./tuvren-tui";
 import { jsx } from "./jsx-runtime";
@@ -28,7 +28,8 @@ const root = Box({
       dataSource: {
         getKey: (item: string) => item,
         loadRange: (request) =>
-          Effect.succeed<RangeResult<string>>({
+          Effect.succeed<RangeLoadResult<string>>({
+            state: "ready",
             generation: request.generation,
             start: request.start,
             totalCount: 1,

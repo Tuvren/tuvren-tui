@@ -1,0 +1,54 @@
+{
+  "name": "tuvren-tui",
+  "version": "0.1.0",
+  "type": "module",
+  "files": ["dist", "README.md", "LICENSE"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/jsx-runtime.d.ts",
+      "import": "./dist/jsx-runtime.js",
+      "default": "./dist/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/jsx-dev-runtime.d.ts",
+      "import": "./dist/jsx-dev-runtime.js",
+      "default": "./dist/jsx-dev-runtime.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js",
+      "default": "./dist/testing.js"
+    },
+    "./imperative": {
+      "types": "./dist/imperative.d.ts",
+      "import": "./dist/imperative.js",
+      "default": "./dist/imperative.js"
+    },
+    "./imperative/testing": {
+      "types": "./dist/imperative-testing.d.ts",
+      "import": "./dist/imperative-testing.js",
+      "default": "./dist/imperative-testing.js"
+    }
+  },
+  "bin": { "tuvren": "./dist/cli.js" },
+  "peerDependencies": { "effect": ">=3.22.1 <4" },
+  "dependencies": { "@preact/signals-core": "1.14.4" },
+  "optionalDependencies": {
+    "@tuvren/tuvren-tui-linux-x64": "0.1.0",
+    "@tuvren/tuvren-tui-linux-arm64": "0.1.0",
+    "@tuvren/tuvren-tui-darwin-arm64": "0.1.0",
+    "@tuvren/tuvren-tui-darwin-x64": "0.1.0",
+    "@tuvren/tuvren-tui-win32-x64": "0.1.0"
+  },
+  "engines": { "bun": ">=1.4.0 <1.5" },
+  "packageManager": "bun@1.4.0",
+  "scripts": {
+    "build": "bun run build:package",
+    "check": "bun run check:contracts"
+  }
+}

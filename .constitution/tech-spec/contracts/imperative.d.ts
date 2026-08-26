@@ -44,9 +44,17 @@ export type {
   CommonProps,
   ComponentId,
   DataSource,
+  CollectionController,
+  CollectionMutation,
   DialogProps,
   DiffViewProps,
   Dimension,
+  FlexDirection,
+  FlexWrap,
+  AlignMode,
+  JustifyMode,
+  GridTrack,
+  GridPlacement,
   ExternalOutputMode,
   FocusScopeProps,
   InputProps,
@@ -59,6 +67,7 @@ export type {
   RadioProps,
   RangeRequest,
   RangeResult,
+  RangeLoadResult,
   ResponsiveCondition,
   ScreenMode,
   ScrollBoxProps,
@@ -77,6 +86,13 @@ export type {
   TerminalCapabilities,
   TextAreaProps,
   TextContent,
+  TextDocument,
+  TextDocumentSnapshot,
+  TextEncoding,
+  TextMatch,
+  TextSearchOptions,
+  GraphemeIndex,
+  GraphemeRange,
   TextProps,
   Theme,
   ThemeRecipes,
@@ -86,6 +102,8 @@ export type {
   TranscriptBlock,
   TranscriptBlockId,
   TranscriptProps,
+  TranscriptController,
+  TranscriptOperation,
   TuvrenEvent,
   View,
   ViewChildren,
@@ -99,131 +117,265 @@ export interface ImperativeRunOptions {
   readonly reducedMotion?: boolean;
 }
 
+export type ImperativePrimitiveProps<Props extends object> = Omit<
+  Props,
+  "children"
+>;
+export type ImperativeComponentProps<Props extends object> = Omit<
+  Props,
+  "children"
+> & {
+  readonly children?: ImperativeChild | readonly ImperativeChild[];
+};
+
 export abstract class Primitive<Props extends object = object> {
   readonly props: Readonly<Props>;
   protected constructor(props: Props);
   update(next: Partial<Props>): void;
-  append(child: Primitive): void;
-  insert(index: number, child: Primitive): void;
-  remove(child: Primitive): void;
+  append(child: ImperativeChild): void;
+  insert(index: number, child: ImperativeChild): void;
+  remove(child: ImperativeChild): void;
   destroy(): void;
   animate(spec: AnimationSpec | AnimationTimeline): Promise<void>;
 }
 
-export class Box extends Primitive<BoxProps> {
-  constructor(props: BoxProps);
-}
-export class Text extends Primitive<TextProps> {
-  constructor(props: TextProps);
-}
-export class Input extends Primitive<InputProps> {
-  constructor(props: InputProps);
-}
-export class TextArea extends Primitive<TextAreaProps> {
-  constructor(props: TextAreaProps);
-}
-export class ScrollBox extends Primitive<ScrollBoxProps> {
-  constructor(props: ScrollBoxProps);
-}
-export class Overlay extends Primitive<OverlayProps> {
-  constructor(props: OverlayProps);
-}
-export class Table<T = unknown> extends Primitive<
-  TableProps<T, Promise<import("./shared").RangeResult<T>>>
-> {
-  constructor(props: TableProps<T, Promise<import("./shared").RangeResult<T>>>);
-}
-export class Transcript extends Primitive<TranscriptProps> {
-  constructor(props: TranscriptProps);
-}
-export class SplitPane extends Primitive<SplitPaneProps> {
-  constructor(props: SplitPaneProps);
-}
-export class FocusScope extends Primitive<FocusScopeProps> {
-  constructor(props: FocusScopeProps);
+export abstract class Component<Props extends object = object> {
+  readonly props: Readonly<Props>;
+  readonly root: Primitive;
+  protected constructor(props: Props);
+  update(next: Partial<Props>): void;
+  destroy(): void;
 }
 
-export class Button extends Primitive<ButtonProps> {
-  constructor(props: ButtonProps);
+export type ImperativeChild = Primitive | Component;
+
+export class Box extends Primitive<ImperativePrimitiveProps<BoxProps>> {
+  constructor(props: ImperativePrimitiveProps<BoxProps>);
 }
-export class ToggleButton extends Primitive<ToggleButtonProps> {
-  constructor(props: ToggleButtonProps);
+export class Text extends Primitive<ImperativePrimitiveProps<TextProps>> {
+  constructor(props: ImperativePrimitiveProps<TextProps>);
 }
-export class Checkbox extends Primitive<CheckboxProps> {
-  constructor(props: CheckboxProps);
+export class Input extends Primitive<ImperativePrimitiveProps<InputProps>> {
+  constructor(props: ImperativePrimitiveProps<InputProps>);
 }
-export class Radio extends Primitive<RadioProps> {
-  constructor(props: RadioProps);
-}
-export class RadioGroup extends Primitive<RadioGroupProps> {
-  constructor(props: RadioGroupProps);
-}
-export class ProgressBar extends Primitive<ProgressProps> {
-  constructor(props: ProgressProps);
-}
-export class Meter extends Primitive<ProgressProps> {
-  constructor(props: ProgressProps);
-}
-export class Spinner extends Primitive<ProgressProps> {
-  constructor(props: ProgressProps);
-}
-export class Menu extends Primitive<MenuProps> {
-  constructor(props: MenuProps);
-}
-export class MenuItem extends Primitive<MenuItemProps> {
-  constructor(props: MenuItemProps);
-}
-export class MenuBar extends Primitive<MenuProps> {
-  constructor(props: MenuProps);
-}
-export class ContextMenu extends Primitive<MenuProps> {
-  constructor(props: MenuProps);
-}
-export class Dialog extends Primitive<DialogProps> {
-  constructor(props: DialogProps);
-}
-export class AlertDialog extends Primitive<DialogProps> {
-  constructor(props: DialogProps);
-}
-export class Select<T = unknown> extends Primitive<
-  SelectProps<T, Promise<import("./shared").RangeResult<T>>>
+export class TextArea extends Primitive<
+  ImperativePrimitiveProps<TextAreaProps>
 > {
+  readonly document: import("./shared").TextDocument;
+  constructor(props: ImperativePrimitiveProps<TextAreaProps>);
+}
+export class ScrollBox extends Primitive<
+  ImperativePrimitiveProps<ScrollBoxProps>
+> {
+  constructor(props: ImperativePrimitiveProps<ScrollBoxProps>);
+}
+export class Overlay extends Primitive<ImperativePrimitiveProps<OverlayProps>> {
+  constructor(props: ImperativePrimitiveProps<OverlayProps>);
+}
+export class CollectionPrimitive<T = unknown> extends Primitive<
+  ImperativePrimitiveProps<
+    TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+  >
+> {
+  readonly controller: import("./shared").CollectionController<T>;
   constructor(
-    props: SelectProps<T, Promise<import("./shared").RangeResult<T>>>,
+    props: ImperativePrimitiveProps<
+      TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    >,
   );
 }
-export class ListBox<T = unknown> extends Primitive<
-  SelectProps<T, Promise<import("./shared").RangeResult<T>>>
+export class TranscriptPrimitive extends Primitive<
+  ImperativePrimitiveProps<TranscriptProps>
 > {
+  readonly controller: import("./shared").TranscriptController;
+  constructor(props: ImperativePrimitiveProps<TranscriptProps>);
+}
+export class SplitPane extends Primitive<
+  ImperativePrimitiveProps<SplitPaneProps>
+> {
+  constructor(props: ImperativePrimitiveProps<SplitPaneProps>);
+}
+export class FocusScope extends Component<
+  ImperativeComponentProps<FocusScopeProps>
+> {
+  constructor(props: ImperativeComponentProps<FocusScopeProps>);
+}
+
+export class Table<T = unknown> extends Component<
+  ImperativeComponentProps<
+    TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+  >
+> {
+  readonly controller: import("./shared").CollectionController<T>;
   constructor(
-    props: SelectProps<T, Promise<import("./shared").RangeResult<T>>>,
+    props: ImperativeComponentProps<
+      TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    >,
   );
 }
-export class Tabs extends Primitive<TabsProps> {
-  constructor(props: TabsProps);
+export class Transcript extends Component<
+  ImperativeComponentProps<TranscriptProps>
+> {
+  readonly controller: import("./shared").TranscriptController;
+  constructor(props: ImperativeComponentProps<TranscriptProps>);
 }
-export class CommandPalette<T = unknown> extends Primitive<
-  SelectProps<T, Promise<import("./shared").RangeResult<T>>>
+export class Button extends Component<ImperativeComponentProps<ButtonProps>> {
+  constructor(props: ImperativeComponentProps<ButtonProps>);
+}
+export class ToggleButton extends Component<
+  ImperativeComponentProps<ToggleButtonProps>
+> {
+  constructor(props: ImperativeComponentProps<ToggleButtonProps>);
+}
+export class Checkbox extends Component<
+  ImperativeComponentProps<CheckboxProps>
+> {
+  constructor(props: ImperativeComponentProps<CheckboxProps>);
+}
+export class Radio extends Component<ImperativeComponentProps<RadioProps>> {
+  constructor(props: ImperativeComponentProps<RadioProps>);
+}
+export class RadioGroup extends Component<
+  ImperativeComponentProps<RadioGroupProps>
+> {
+  constructor(props: ImperativeComponentProps<RadioGroupProps>);
+}
+export class ProgressBar extends Component<
+  ImperativeComponentProps<ProgressProps>
+> {
+  constructor(props: ImperativeComponentProps<ProgressProps>);
+}
+export class Meter extends Component<ImperativeComponentProps<ProgressProps>> {
+  constructor(props: ImperativeComponentProps<ProgressProps>);
+}
+export class Spinner extends Component<
+  ImperativeComponentProps<ProgressProps>
+> {
+  constructor(props: ImperativeComponentProps<ProgressProps>);
+}
+export class Menu extends Component<ImperativeComponentProps<MenuProps>> {
+  constructor(props: ImperativeComponentProps<MenuProps>);
+}
+export class MenuItem extends Component<
+  ImperativeComponentProps<MenuItemProps>
+> {
+  constructor(props: ImperativeComponentProps<MenuItemProps>);
+}
+export class MenuBar extends Component<ImperativeComponentProps<MenuProps>> {
+  constructor(props: ImperativeComponentProps<MenuProps>);
+}
+export class ContextMenu extends Component<
+  ImperativeComponentProps<MenuProps>
+> {
+  constructor(props: ImperativeComponentProps<MenuProps>);
+}
+export class Dialog extends Component<ImperativeComponentProps<DialogProps>> {
+  constructor(props: ImperativeComponentProps<DialogProps>);
+}
+export class AlertDialog extends Component<
+  ImperativeComponentProps<DialogProps>
+> {
+  constructor(props: ImperativeComponentProps<DialogProps>);
+}
+export class Select<T = unknown> extends Component<
+  ImperativeComponentProps<
+    SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+  >
 > {
   constructor(
-    props: SelectProps<T, Promise<import("./shared").RangeResult<T>>>,
+    props: ImperativeComponentProps<
+      SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    >,
   );
 }
-export class CodeView extends Primitive<CodeViewProps> {
-  constructor(props: CodeViewProps);
+export class ListBox<T = unknown> extends Component<
+  ImperativeComponentProps<
+    SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+  >
+> {
+  constructor(
+    props: ImperativeComponentProps<
+      SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    >,
+  );
 }
-export class DiffView extends Primitive<DiffViewProps> {
-  constructor(props: DiffViewProps);
+export class Tabs extends Component<ImperativeComponentProps<TabsProps>> {
+  constructor(props: ImperativeComponentProps<TabsProps>);
 }
-export class Toast extends Primitive<ToastProps> {
-  constructor(props: ToastProps);
+export class CommandPalette<T = unknown> extends Component<
+  ImperativeComponentProps<
+    SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+  >
+> {
+  constructor(
+    props: ImperativeComponentProps<
+      SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    >,
+  );
 }
-export class Notification extends Primitive<ToastProps> {
-  constructor(props: ToastProps);
+export class CodeView extends Component<
+  ImperativeComponentProps<CodeViewProps>
+> {
+  constructor(props: ImperativeComponentProps<CodeViewProps>);
+}
+export class DiffView extends Component<
+  ImperativeComponentProps<DiffViewProps>
+> {
+  constructor(props: ImperativeComponentProps<DiffViewProps>);
+}
+export class Toast extends Component<ImperativeComponentProps<ToastProps>> {
+  constructor(props: ImperativeComponentProps<ToastProps>);
+}
+export class Notification extends Component<
+  ImperativeComponentProps<ToastProps>
+> {
+  constructor(props: ImperativeComponentProps<ToastProps>);
+}
+
+export type ImperativeCommandConcurrency =
+  "reject" | "restart" | "queue" | "parallel";
+
+export interface ImperativeCommandContext {
+  readonly source: "programmatic" | "keymap" | "menu" | "button" | "palette";
+  readonly event?: TuvrenEvent;
+}
+
+export interface ImperativeCommand<A = void> {
+  readonly id: import("./shared").CommandId;
+  readonly title: string;
+  readonly description?: string;
+  readonly category?: string;
+  readonly concurrency: ImperativeCommandConcurrency;
+  readonly run: (context: ImperativeCommandContext) => A | Promise<A>;
+}
+
+export interface ImperativeCommandRegistry {
+  register<A>(command: ImperativeCommand<A>): () => void;
+  invoke<A>(
+    command: ImperativeCommand<A>,
+    context?: Partial<ImperativeCommandContext>,
+  ): Promise<A>;
+  invokeById(
+    id: import("./shared").CommandId,
+    context?: Partial<ImperativeCommandContext>,
+  ): Promise<unknown>;
+}
+
+export interface ImperativeKeyBinding {
+  readonly command: import("./shared").CommandId;
+  readonly keys: string;
+  readonly scope?: string;
+  readonly when?: (context: ImperativeCommandContext) => boolean;
+}
+
+export interface ImperativeKeymapRegistry {
+  register(binding: ImperativeKeyBinding): () => void;
 }
 
 export interface ImperativeApp {
-  setRoot(root: Primitive): void;
+  readonly commands: ImperativeCommandRegistry;
+  readonly keymaps: ImperativeKeymapRegistry;
+  setRoot(root: ImperativeChild): void;
   transaction(apply: () => void): void;
   render(): void;
   pollInput(timeoutMs?: number): number;
@@ -258,8 +410,15 @@ export function defineTheme(
 ): import("./shared").Theme;
 export function decodeText(
   bytes: Uint8Array,
-  encoding: "utf-8" | "utf-16le" | "utf-16be",
+  encoding: import("./shared").TextEncoding,
 ): string;
+export function encodeText(
+  text: string,
+  encoding?: import("./shared").TextEncoding,
+): Uint8Array;
+export function createTextDocument(
+  initial?: string,
+): import("./shared").TextDocument;
 export function toStyledText(
   value: unknown,
   adapter: (value: unknown) => import("./shared").StyledText,

@@ -22,7 +22,7 @@
     "surface": { "$ref": "#/$defs/surface" },
     "semanticTree": {
       "type": "array",
-      "maxItems": 100000,
+      "maxItems": 10000,
       "items": { "$ref": "#/$defs/semanticNode" }
     },
     "issues": {
@@ -37,11 +37,11 @@
       "additionalProperties": false,
       "required": ["width", "height", "cells"],
       "properties": {
-        "width": { "type": "integer", "minimum": 1, "maximum": 10000 },
-        "height": { "type": "integer", "minimum": 1, "maximum": 10000 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 500 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 200 },
         "cells": {
           "type": "array",
-          "maxItems": 100000000,
+          "maxItems": 100000,
           "items": { "$ref": "#/$defs/cell" }
         },
         "cursor": {
@@ -93,6 +93,7 @@
         "states": { "type": "object" },
         "children": {
           "type": "array",
+          "maxItems": 10000,
           "items": { "type": "string" },
           "uniqueItems": true
         }

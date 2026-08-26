@@ -26,6 +26,7 @@ import type {
   RadioGroupProps,
   RadioProps,
   RangeResult,
+  RangeLoadResult,
   ScrollBoxProps,
   SelectProps,
   SplitPaneProps,
@@ -58,9 +59,17 @@ export type {
   ComponentId,
   ComponentType,
   DataSource,
+  CollectionController,
+  CollectionMutation,
   DialogProps,
   DiffViewProps,
   Dimension,
+  FlexDirection,
+  FlexWrap,
+  AlignMode,
+  JustifyMode,
+  GridTrack,
+  GridPlacement,
   ErrorBoundaryProps,
   ExternalOutputMode,
   FocusScopeProps,
@@ -74,6 +83,7 @@ export type {
   RadioProps,
   RangeRequest,
   RangeResult,
+  RangeLoadResult,
   ResponsiveCondition,
   ScreenMode,
   ScrollBoxProps,
@@ -92,6 +102,13 @@ export type {
   TerminalCapabilities,
   TextAreaProps,
   TextContent,
+  TextDocument,
+  TextDocumentSnapshot,
+  TextEncoding,
+  TextMatch,
+  TextSearchOptions,
+  GraphemeIndex,
+  GraphemeRange,
   TextProps,
   Theme,
   ThemeRecipes,
@@ -101,6 +118,8 @@ export type {
   TranscriptBlock,
   TranscriptBlockId,
   TranscriptProps,
+  TranscriptController,
+  TranscriptOperation,
   TuvrenEvent,
   View,
   ViewChildren,
@@ -137,7 +156,7 @@ export interface CommandContext {
   readonly event?: TuvrenEvent;
 }
 
-export interface Command<E = never, R = never> {
+export interface Command<A = void, E = never, R = never> {
   readonly id: CommandId;
   readonly title: string;
   readonly description?: string;
@@ -146,7 +165,7 @@ export interface Command<E = never, R = never> {
   readonly enabled?: (context: CommandContext) => boolean;
   readonly when?: (context: CommandContext) => boolean;
   readonly concurrency: CommandConcurrency;
-  readonly run: (context: CommandContext) => Effect.Effect<void, E, R>;
+  readonly run: (context: CommandContext) => Effect.Effect<A, E, R>;
 }
 
 export interface KeyBinding {
@@ -157,13 +176,17 @@ export interface KeyBinding {
 }
 
 export interface CommandService {
-  register<E, R>(
-    command: Command<E, R>,
+  register<A, E, R>(
+    command: Command<A, E, R>,
   ): Effect.Effect<void, never, Scope.Scope>;
-  invoke(
+  invoke<A, E, R>(
+    command: Command<A, E, R>,
+    context?: Partial<CommandContext>,
+  ): Effect.Effect<A, E | TuvrenError, R>;
+  invokeById(
     id: CommandId,
     context?: Partial<CommandContext>,
-  ): Effect.Effect<void, TuvrenError>;
+  ): Effect.Effect<unknown, TuvrenError>;
 }
 
 export interface KeymapService {
@@ -202,7 +225,7 @@ export interface State<A> {
 }
 
 export function useState<A>(initial: A | (() => A)): State<A>;
-export function useCommand<E, R>(command: Command<E, R>): void;
+export function useCommand<A, E, R>(command: Command<A, E, R>): void;
 export function useKeymap(binding: KeyBinding): void;
 export function useStream<A, E>(
   stream: Stream.Stream<A, E, never>,
@@ -225,10 +248,58 @@ export function animate(
   target: import("./shared").ComponentId,
   spec: AnimationSpec | AnimationTimeline,
 ): Effect.Effect<void, TuvrenError>;
+export interface TextDocumentService {
+  readonly snapshot: Effect.Effect<import("./shared").TextDocumentSnapshot>;
+  readonly changes: Stream.Stream<import("./shared").TextDocumentSnapshot>;
+  setCursor(
+    index: import("./shared").GraphemeIndex,
+  ): Effect.Effect<void, TuvrenError>;
+  setSelection(
+    range: import("./shared").GraphemeRange | undefined,
+  ): Effect.Effect<void, TuvrenError>;
+  moveCursor(
+    unit: "grapheme" | "word" | "line" | "document",
+    direction: "backward" | "forward",
+    extendSelection?: boolean,
+  ): Effect.Effect<void, TuvrenError>;
+  insert(text: string): Effect.Effect<void, TuvrenError>;
+  delete(
+    range?: import("./shared").GraphemeRange,
+  ): Effect.Effect<void, TuvrenError>;
+  replace(
+    range: import("./shared").GraphemeRange,
+    text: string,
+  ): Effect.Effect<void, TuvrenError>;
+  find(
+    query: string,
+    options?: import("./shared").TextSearchOptions,
+  ): Effect.Effect<import("./shared").TextMatch | undefined, TuvrenError>;
+  replaceMatch(
+    match: import("./shared").TextMatch,
+    replacement: string,
+  ): Effect.Effect<void, TuvrenError>;
+  replaceAll(
+    query: string,
+    replacement: string,
+    options?: import("./shared").TextSearchOptions,
+  ): Effect.Effect<number, TuvrenError>;
+  readonly undo: Effect.Effect<boolean, TuvrenError>;
+  readonly redo: Effect.Effect<boolean, TuvrenError>;
+  encode(
+    encoding?: import("./shared").TextEncoding,
+  ): Effect.Effect<Uint8Array, TuvrenError>;
+}
+export function createTextDocument(
+  initial?: string,
+): Effect.Effect<TextDocumentService, TuvrenError, Scope.Scope>;
 export function decodeText(
   bytes: Uint8Array,
-  encoding: "utf-8" | "utf-16le" | "utf-16be",
+  encoding: import("./shared").TextEncoding,
 ): string;
+export function encodeText(
+  text: string,
+  encoding?: import("./shared").TextEncoding,
+): Uint8Array;
 export function toStyledText(
   value: unknown,
   adapter: (value: unknown) => import("./shared").StyledText,
@@ -246,9 +317,17 @@ export const TextArea: ComponentType<TextAreaProps>;
 export const ScrollBox: ComponentType<ScrollBoxProps>;
 export const Overlay: ComponentType<OverlayProps>;
 export function Table<T, E = never, R = never>(
-  props: TableProps<T, Effect.Effect<RangeResult<T>, E, R>>,
+  props: TableProps<T, Effect.Effect<RangeLoadResult<T>, E, R>> & {
+    readonly mutations?: Stream.Stream<
+      import("./shared").CollectionMutation<T>,
+      E,
+      R
+    >;
+    readonly controller?: import("./shared").CollectionController<T>;
+  },
 ): View;
 export const Transcript: ComponentType<TranscriptProps>;
+export function useTranscriptController(): import("./shared").TranscriptController;
 export const SplitPane: ComponentType<SplitPaneProps>;
 export const FocusScope: ComponentType<FocusScopeProps>;
 export const ErrorBoundary: ComponentType<ErrorBoundaryProps>;
@@ -267,14 +346,14 @@ export const ContextMenu: ComponentType<MenuProps>;
 export const Dialog: ComponentType<DialogProps>;
 export const AlertDialog: ComponentType<DialogProps>;
 export function Select<T, E = never, R = never>(
-  props: SelectProps<T, Effect.Effect<RangeResult<T>, E, R>>,
+  props: SelectProps<T, Effect.Effect<RangeLoadResult<T>, E, R>>,
 ): View;
 export function ListBox<T, E = never, R = never>(
-  props: SelectProps<T, Effect.Effect<RangeResult<T>, E, R>>,
+  props: SelectProps<T, Effect.Effect<RangeLoadResult<T>, E, R>>,
 ): View;
 export const Tabs: ComponentType<TabsProps>;
 export function CommandPalette<T, E = never, R = never>(
-  props: SelectProps<T, Effect.Effect<RangeResult<T>, E, R>>,
+  props: SelectProps<T, Effect.Effect<RangeLoadResult<T>, E, R>>,
 ): View;
 export const CodeView: ComponentType<CodeViewProps>;
 export const DiffView: ComponentType<DiffViewProps>;

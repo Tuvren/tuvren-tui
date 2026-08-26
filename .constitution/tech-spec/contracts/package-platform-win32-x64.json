@@ -1,0 +1,10 @@
+{
+  "name": "@tuvren/tuvren-tui-win32-x64",
+  "version": "0.1.0",
+  "type": "module",
+  "os": ["win32"],
+  "cpu": ["x64"],
+  "files": ["index.js", "native/tuvren_tui.dll", "README.md", "LICENSE"],
+  "exports": { ".": "./index.js", "./native": "./native/tuvren_tui.dll" },
+  "sideEffects": false
+}

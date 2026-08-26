@@ -1,0 +1,16 @@
+{
+  "description": "ABI 2.0 transaction 1 creates Box as transaction-local node 1",
+  "byteLength": 96,
+  "bytesHex": "545556520200000001000000000000000100000030000000280000005800000008000000000000000000000000000000010000000100008000000000000000005800000008000000000000000000000000000000000000000800010001000000",
+  "expected": {
+    "transactionId": "1",
+    "commands": [
+      {
+        "opcode": "CREATE_NODE",
+        "target": "local:1",
+        "primitive": "BOX",
+        "generation": 1
+      }
+    ]
+  }
+}

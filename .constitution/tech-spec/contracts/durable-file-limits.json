@@ -1,0 +1,41 @@
+{
+  "policyVersion": "1.0.0",
+  "limits": {
+    "terminal-profile": {
+      "maxEncodedBytes": 65536,
+      "maxDecodedBytes": 262144,
+      "maxDepth": 16,
+      "maxStringBytes": 16384
+    },
+    "diagnostic-snapshot": {
+      "maxEncodedBytes": 33554432,
+      "maxDecodedBytes": 134217728,
+      "maxDepth": 32,
+      "maxStringBytes": 8388608
+    },
+    "diagnostic-trace": {
+      "maxEncodedBytes": 67108864,
+      "maxDecodedBytes": 268435456,
+      "maxDepth": 32,
+      "maxStringBytes": 8388608
+    },
+    "application-replay": {
+      "maxEncodedBytes": 67108864,
+      "maxDecodedBytes": 268435456,
+      "maxDepth": 32,
+      "maxStringBytes": 8388608
+    },
+    "benchmark-result": {
+      "maxEncodedBytes": 268435456,
+      "maxDecodedBytes": 536870912,
+      "maxDepth": 32,
+      "maxStringBytes": 8388608
+    },
+    "release-manifest": {
+      "maxEncodedBytes": 1048576,
+      "maxDecodedBytes": 4194304,
+      "maxDepth": 16,
+      "maxStringBytes": 65536
+    }
+  }
+}

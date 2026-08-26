@@ -1,0 +1,10 @@
+{
+  "name": "@tuvren/tuvren-tui-darwin-arm64",
+  "version": "0.1.0",
+  "type": "module",
+  "os": ["darwin"],
+  "cpu": ["arm64"],
+  "files": ["index.js", "native/libtuvren_tui.dylib", "README.md", "LICENSE"],
+  "exports": { ".": "./index.js", "./native": "./native/libtuvren_tui.dylib" },
+  "sideEffects": false
+}

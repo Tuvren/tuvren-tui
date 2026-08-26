@@ -71,6 +71,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Runtime mutation checks the owner executor thread. Background workers may compute immutable application data but never mutate a runtime context.
 - Collections and Transcripts use stable keys and generations. Array positions and visible rows are never durable identities.
 - All caches and rings have count and byte limits plus observable eviction or wrap behavior.
+- The default hard limits are: transaction 8 MiB and 65,535 commands; Event queue 4,096 records and 4 MiB; Grapheme Pool 262,144 entries and 16 MiB; each Collection 10,000 resident items and 32 MiB; each Transcript 10,000 resident blocks and 64 MiB; Text Document 10 MiB by default and 100 MiB absolute; pending terminal requests 64 and 16 MiB combined; live diagnostics 64 MiB. Rejections, evictions, and wraps increment observable counters and emit bounded diagnostic records.
 - The cell buffer stores complete grapheme payloads or interned grapheme identities; a single scalar is not a conforming P0 cell representation.
 
 ## TypeScript standards
@@ -92,6 +93,8 @@ Migration may happen incrementally, but completed modules must follow this targe
 - `contracts/native-abi.h` is the ABI source of truth. Native exports and the Bun symbol table must be generated from or mechanically checked against it.
 - All integers use fixed widths. Sizes and offsets are unsigned and checked before addition or multiplication. Floating values use IEEE-754 fields, never undocumented integer bit casts.
 - Transaction and Event batches use little-endian versioned records with trailing byte arenas. Decoders reject unknown major versions, invalid lengths, overlapping regions, duplicate identities where forbidden, and trailing garbage.
+- Transaction-local node references have the high bit set. Rust allocates private IDs only while committing a fully validated transaction and returns caller-owned local-to-runtime mappings; no host-selected RuntimeNode ID is accepted.
+- Each opcode and property family uses the fixed record named by `native-abi.h`. Generic bytes are valid only for declared UTF-8 or opaque content fields, never as a substitute for layout, style, text-edit, Collection, Transcript, animation, terminal, or diagnostic records. Checked-in byte fixtures must decode identically in Rust and TypeScript.
 - Rust decoders read fields from bytes explicitly and never cast an untrusted or potentially unaligned buffer to a C or Rust struct. The C structs document layout for generated host codecs and conformance checks.
 - Callers own input and output buffers. The runtime never returns a pointer that outlives the call.
 - Strings are UTF-8 inside the ABI. TypeScript string conversion is transparent; explicit UTF-16LE and UTF-16BE adapters validate byte order and length.
@@ -126,6 +129,8 @@ Migration may happen incrementally, but completed modules must follow this targe
 - The migration removes root imperative exports, the `/effect` subpath, public Signals, Extension registries, and the legacy public-object name. It provides codemods for import paths and mechanical renames where practical.
 - Platform packages and ABI versions are exact-match implementation details; no cross-version ABI compatibility is promised.
 - Durable schema readers reject unknown major versions and may accept known older majors only through explicit migrations.
+- Before decompression or object allocation, durable readers enforce the encoded size from `contracts/durable-file-limits.json`. Streaming parsers enforce the decoded size, nesting depth, and per-string UTF-8 byte limit during parsing; decompression aborts at the decoded expansion bound. Schema array maxima are additional constraints, not substitutes for byte and depth limits.
+- Historical schema files never change after publication. Readers consult `contracts/schema-migrations.json`, migrate only registered versions into the current in-memory model, and reject unknown versions before interpreting payload fields.
 
 ## Commits
 
@@ -142,7 +147,6 @@ cargo test --manifest-path native/Cargo.toml --locked
 cargo fmt --manifest-path native/Cargo.toml -- --check
 cargo clippy --manifest-path native/Cargo.toml --locked -- -D warnings
 bun install --cwd ts --frozen-lockfile
-bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit
 bun test ts/test-ffi.test.ts
 bun test ts/test-jsx.test.ts
 bun test ts/test-commands.test.ts
@@ -161,6 +165,10 @@ Stage 4 must schedule these commands before relying on them as gates:
 
 ```bash
 bun run check:contracts          # Typecheck declarations, compile ABI header, validate every JSON Schema and contract file
+bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit # Brownfield: currently exits 2 with 188 errors; Stage 4 schedules repair
+bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile
+bun run --cwd .constitution/tech-spec/contracts check
+bun run build:package            # Emit the exact public and platform package layouts declared by the package contracts
 bun run check:capability-map     # Prove every P0 ID has an example, test, flow, and task
 bun run test:semantic            # Shared Effect and imperative semantic conformance
 bun run test:terminal            # Protocol, Screen Mode, restoration, and multiplexer profiles

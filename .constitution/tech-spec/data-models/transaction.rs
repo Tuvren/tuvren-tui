@@ -3,6 +3,9 @@
 pub const ABI_MAJOR: u16 = 2;
 pub const ABI_MINOR: u16 = 0;
 pub const TRANSACTION_MAGIC: u32 = 0x5256_5554;
+pub const MAX_TRANSACTION_BYTES: usize = 8 * 1024 * 1024;
+pub const MAX_TRANSACTION_COMMANDS: usize = 65_535;
+pub const LOCAL_NODE_REFERENCE_BIT: u32 = 0x8000_0000;
 
 #[repr(u16)]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -72,8 +75,98 @@ pub struct ValidatedCommand<'a> {
     pub argument1: u32,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum NodeReference {
+    Existing(u32),
+    TransactionLocal(u32),
+}
+
+#[derive(Clone, Debug)]
+pub enum ValidatedPayload<'a> {
+    None,
+    Create { local: NodeReference, primitive: u16 },
+    Child { parent: NodeReference, child: NodeReference, index: u32 },
+    ScalarU64 { property: u32, value: u64 },
+    ScalarI64 { property: u32, value: i64 },
+    ScalarF64 { property: u32, value: f64 },
+    Bytes { property: u32, value: &'a [u8] },
+    Layout(LayoutPayload<'a>),
+    Style(StylePayload<'a>),
+    TextEdit(TextEditPayload<'a>),
+    Collection(CollectionPayload<'a>),
+    Transcript(TranscriptPayload<'a>),
+    Animation(AnimationPayload),
+    Terminal(TerminalPayload<'a>),
+    Diagnostic(DiagnosticPayload),
+}
+
+#[derive(Clone, Debug)]
+pub struct LayoutPayload<'a> {
+    pub fixed_record: &'a [u8],
+    pub row_tracks: &'a [u8],
+    pub column_tracks: &'a [u8],
+    pub responsive_rules: &'a [u8],
+}
+
+#[derive(Clone, Debug)]
+pub struct StylePayload<'a> {
+    pub fixed_record: &'a [u8],
+    pub rules: &'a [u8],
+}
+
+#[derive(Clone, Debug)]
+pub struct TextEditPayload<'a> {
+    pub kind: u16,
+    pub start_grapheme: u32,
+    pub end_grapheme: u32,
+    pub utf8: &'a str,
+    pub content_epoch: u64,
+}
+
+#[derive(Clone, Debug)]
+pub struct CollectionPayload<'a> {
+    pub kind: u16,
+    pub key: &'a str,
+    pub item: &'a [u8],
+    pub generation: u64,
+}
+
+#[derive(Clone, Debug)]
+pub struct TranscriptPayload<'a> {
+    pub kind: u16,
+    pub block_id: &'a str,
+    pub content: &'a [u8],
+    pub version: u64,
+    pub generation: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct AnimationPayload {
+    pub property: u16,
+    pub animation_id: u64,
+    pub duration_nanos: u64,
+    pub delay_nanos: u64,
+}
+
+#[derive(Clone, Debug)]
+pub struct TerminalPayload<'a> {
+    pub kind: u16,
+    pub request_id: u64,
+    pub media_type: &'a str,
+    pub data: &'a [u8],
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct DiagnosticPayload {
+    pub mode: u16,
+    pub record_byte_limit: u64,
+    pub snapshot_byte_limit: u64,
+}
+
 // Decoder invariant: construct ValidatedTransaction only after checking magic,
 // ABI major, all offset arithmetic, exact command-byte length, arena bounds,
 // opcode/property/value compatibility, target identity, UTF-8, grapheme
-// coordinates, generations, and trailing bytes. Runtime mutation accepts only
-// ValidatedTransaction, never the untrusted byte slice.
+// coordinates, generations, exact fixed-record sizes, nested arena ranges, and
+// trailing bytes. It converts every command to ValidatedPayload and enforces
+// the opcode/property/value compatibility matrix in native-abi.h. Runtime
+// mutation accepts only ValidatedTransaction, never the untrusted byte slice.

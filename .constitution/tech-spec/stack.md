@@ -18,9 +18,9 @@ Versions were checked against official release documentation or registries on 20
 | :-- | :-- | :-- | :-- |
 | Rust toolchain | `1.98.0`, edition `2024` | Adopt | Current stable toolchain; one pinned `rust-toolchain.toml` drives local and CI builds. MSRV equals the pinned release until `1.0.0`. |
 | Host runtime | Bun `1.4.0` | Trial | Current stable host and package manager. The 1.4 runtime is a major internal rewrite; it must pass all five target, FFI, lifecycle, and benchmark gates before final `0.1.0`. |
-| Host language compiler | TypeScript `5.9.3` | Adopt | Verified against the current source and Effect 3. TypeScript `7.0.2` is Hold because an isolated migration check fails current FFI declarations and one extension diagnostic. |
+| Host language compiler | TypeScript `5.9.3` | Adopt | Contract declarations pass on this baseline. The Brownfield application source currently fails its own strict check with 188 errors, led by duplicate fields and unsafe Bun FFI casts; Stage 4 must schedule reconciliation. TypeScript `7.0.2` is Hold because its isolated migration check also fails. |
 | Declarative application model | Effect `3.22.1` | Adopt | Required peer range `>=3.22.1 <4`; CI and development pin `3.22.1`. Effect 4 prerelease builds are unsupported. |
-| Private Reactivity | `@preact/signals-core` `1.13.0` | Adopt internally | Used only inside reconciliation and hooks. No Signal type or constructor is exported publicly. |
+| Private Reactivity | `@preact/signals-core` `1.14.4` | Adopt internally | Current compatible minor, used only inside reconciliation and hooks. No Signal type or constructor is exported publicly; a scheduled lane tests the latest compatible minor. |
 | Native bridge | `bun:ffi` from Bun `1.4.0` | Trial | Private high-performance C ABI bridge. Bun documents it as experimental, so five-target loading, malformed-input fuzzing, panic containment, and ABI benchmarks are release gates. No callback from Rust into TypeScript is permitted. |
 | Layout | Taffy `0.14.0` | Adopt | Provides Flexbox and Grid. Enable only `std`, `taffy_tree`, `flexbox`, `grid`, `content_size`, and `detailed_layout_info`; browser block, float, and parser features remain disabled. |
 | Terminal I/O | Crossterm `0.29.0` | Adopt | Stable cross-platform baseline behind Tuvren's own Terminal Session and protocol decoders. |
@@ -51,6 +51,8 @@ The only documented install target is `tuvren-tui`. Platform packages are resolv
 | `tuvren-tui/imperative/testing` | Imperative semantic harness and drivers | `contracts/imperative-testing.d.ts` |
 
 There is no public `/effect` entrypoint. Root exports do not expose `@preact/signals-core`, raw FFI symbols, numeric RuntimeNode identities, platform package names, or internal ABI status codes.
+
+`contracts/package-public.json` is the raw target manifest for the documented package. It fixes the complete export map, `tuvren` binary, peer dependency, internal Reactivity dependency, optional platform packages, Bun engine, published files, and build scripts. The five `contracts/package-platform-*.json` files are the exact private target manifests; `contracts/package-platforms.json` is their generation index. Together they fix every platform package name, `os`/`cpu`/`libc` selector, native filename, published file, and side-effect-free resolver module. Release tooling materializes those records without adding exports. The canonical package build is `bun run build:package`; it writes only `ts/dist/`, `packages/*/index.js`, `packages/*/native/<artifact>`, declaration maps, source maps, licenses, and target manifests before `bun run test:release-package` inspects the packed archives.
 
 ## Native build and artifact matrix
 
@@ -95,13 +97,16 @@ The resolver order is:
 
 The SDK package and all platform packages publish atomically with the same exact version and release manifest. ABI compatibility is private and exact-version only. A mismatch rejects before context creation.
 
-Pre-`1.0` minor releases may break public SDK contracts only with a changelog, migration guide, one-minor deprecation when safe, and a codemod when practical. Diagnostic Trace, snapshot, terminal-profile, replay, benchmark-result, and release-manifest schemas version independently and never silently reinterpret incompatible data.
+Pre-`1.0` minor releases may break public SDK contracts only with a changelog, migration guide, one-minor deprecation when safe, and a codemod when practical. Diagnostic Trace, snapshot, terminal-profile, replay, benchmark-result, and release-manifest schemas version independently. Published schema documents are immutable. A schema major may break readers, a minor may add optional fields, and a patch may only correct validation or prose without changing accepted data. Readers dispatch on `schemaVersion` before parsing the payload, support the current major and the immediately previous major for one SDK minor through a named migrator, and reject all unregistered versions. `contracts/schema-migrations.json` is the executable migration registry.
+
+JSON Schema validates each durable shape but cannot enforce cross-artifact equality. Release verification must additionally run `validateAtomicReleaseManifest` as defined by `contracts/release-validation.json`; that validator proves exact artifact membership, SemVer, package/artifact version equality, ABI equality, checksums, package manifests, source revisions, and provenance before any publish begins.
 
 ## Dependency and upgrade policy
 
 - Commit `Cargo.lock` and `bun.lock`; CI uses frozen installs and `--locked` Cargo operations.
 - Production dependencies use explicit compatible ranges in manifests and exact versions in lockfiles. Toolchains and release automation use exact versions or immutable commit hashes.
 - One scheduled compatibility lane tests the latest patch of Rust stable, Bun stable, Effect 3, TypeScript 5.9, and every direct Rust dependency without updating the release lock.
+- Contract validation has its own frozen `contracts/bun.lock`, generated through Bun, and resolves the exact Effect `3.22.1`, TypeScript `5.9.3`, Reactivity `1.14.4`, and schema-validator baselines instead of borrowing the Brownfield application lock.
 - Major dependency upgrades require a TechSpec Evolution pass when they affect public types, the private ABI, terminal behavior, layout, Unicode, schemas, or performance evidence.
 - TypeScript 7 remains Hold until the public declarations, Bun FFI types, emitted declarations, and all examples pass with no suppression added solely for the upgrade.
 - Effect 4 remains unsupported until it is stable and a PRD-compatible Effect-native surface passes a dedicated TechSpec Evolution review.
