@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.4] — 2026-08-26
+
+### Fixed
+
+- Corrected Bun workspace discovery for scoped platform packages and required `Bun.fileURLToPath()` for platform-native library paths.
+- Added the executable stable-Rust native quality gate and enabled `isolatedModules` in declaration conformance.
+- Added declarative and imperative Theme activation, shared Collection bindings across Table/Select/ListBox/Menu/palette, the full approved Transcript operation set and ABI records, retained animation endpoints/timeline state, and cooperative imperative Command cancellation.
+
 ## [v9.0.3] — 2026-08-26
 
 ### Fixed

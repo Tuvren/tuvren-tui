@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.3** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.4** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -170,6 +170,7 @@ Stage 4 must schedule these commands before relying on them as gates:
 ```bash
 bun install --frozen-lockfile    # Install the target root workspace and produce no nested ts lock
 bun run check:contracts          # Typecheck declarations, compile ABI header, validate every JSON Schema and contract file
+bun run check:native             # Run rustfmt, locked Clippy with warnings denied, and locked native tests on Rust 1.98.0
 bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit # Brownfield: currently exits 2 with 188 errors; Stage 4 schedules repair
 bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile
 bun run --cwd .constitution/tech-spec/contracts check

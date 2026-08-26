@@ -1,13 +1,17 @@
 import * as Effect from "effect/Effect";
+import * as Stream from "effect/Stream";
 import {
   Box,
   Button,
   Commands,
+  Menu,
   Select,
   Terminal,
   Text,
   commandId,
   componentId,
+  defineTheme,
+  provideTheme,
   render,
   type RangeLoadResult,
   type TuvrenError,
@@ -38,11 +42,21 @@ const root = Box({
       },
       getKey: (item: string) => item,
       renderItem: (item: string) => Text({ content: item }),
+      mutations: Stream.empty,
+    }),
+    Menu({
+      items: ["open"],
+      getKey: (item: string) => item,
+      renderItem: (item: string) => Text({ content: item }),
+      mutations: Stream.empty,
     }),
   ],
 });
 
-const managed: Effect.Effect<void, TuvrenError> = render(root);
+const theme = defineTheme("contract", { accent: "#00ffff" }, {});
+const managed: Effect.Effect<void, TuvrenError> = render(
+  provideTheme(theme, root),
+);
 const jsxNode = jsx(Box, { children: "content" });
 const save = commandId("app.save");
 
@@ -52,6 +66,7 @@ const commandTag = Commands;
 const imperative: Promise<void> = runImperative((app) => {
   const box = new ImperativeBox({});
   box.append(new ImperativeText({ content: "Hello" }));
+  app.setTheme(theme);
   app.setRoot(box);
 });
 

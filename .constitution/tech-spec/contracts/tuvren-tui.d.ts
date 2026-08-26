@@ -125,6 +125,7 @@ export type {
   View,
   ViewChildren,
   ViewNode,
+  VirtualCollectionBinding,
 } from "./shared";
 
 export interface RenderOptions<E = never, R = never> {
@@ -132,6 +133,7 @@ export interface RenderOptions<E = never, R = never> {
   readonly externalOutput?:
     "capture" | "scrollback" | "passthrough" | "disabled";
   readonly reducedMotion?: boolean;
+  readonly theme?: import("./shared").Theme;
   readonly onEvent?: (event: TuvrenEvent) => Effect.Effect<void, E, R>;
 }
 
@@ -242,6 +244,10 @@ export function provideLayer<ROut, E, RIn>(
   layer: Layer.Layer<ROut, E, RIn>,
   child: View,
 ): View;
+export function provideTheme(
+  theme: import("./shared").Theme,
+  child: View,
+): View;
 export function createStyleSheet<Rule extends string>(
   name: string,
   rules: Readonly<Record<Rule, import("./shared").StyleSpec>>,
@@ -324,15 +330,15 @@ export const TextArea: ComponentType<TextAreaProps>;
 export const ScrollBox: ComponentType<ScrollBoxProps>;
 export const Overlay: ComponentType<OverlayProps>;
 export function Table<T, E = never, R = never>(
-  props: TableProps<T, Effect.Effect<RangeLoadResult<T>, E, R>> & {
-    readonly mutations?: Stream.Stream<
-      import("./shared").CollectionMutation<T>,
-      E,
-      R
-    >;
-    readonly controller?: import("./shared").CollectionController<T>;
-  },
+  props: TableProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
 ): View;
+export function useCollectionController<
+  T,
+>(): import("./shared").CollectionController<T>;
 export const Transcript: ComponentType<TranscriptProps>;
 export function useTranscriptController(): import("./shared").TranscriptController;
 export const SplitPane: ComponentType<SplitPaneProps>;
@@ -346,21 +352,51 @@ export const RadioGroup: ComponentType<RadioGroupProps>;
 export const ProgressBar: ComponentType<ProgressProps>;
 export const Meter: ComponentType<ProgressProps>;
 export const Spinner: ComponentType<ProgressProps>;
-export const Menu: ComponentType<MenuProps>;
+export function Menu<T, E = never, R = never>(
+  props: MenuProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
+): View;
 export const MenuItem: ComponentType<MenuItemProps>;
-export const MenuBar: ComponentType<MenuProps>;
-export const ContextMenu: ComponentType<MenuProps>;
+export function MenuBar<T, E = never, R = never>(
+  props: MenuProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
+): View;
+export function ContextMenu<T, E = never, R = never>(
+  props: MenuProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
+): View;
 export const Dialog: ComponentType<DialogProps>;
 export const AlertDialog: ComponentType<DialogProps>;
 export function Select<T, E = never, R = never>(
-  props: SelectProps<T, Effect.Effect<RangeLoadResult<T>, E, R>>,
+  props: SelectProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
 ): View;
 export function ListBox<T, E = never, R = never>(
-  props: SelectProps<T, Effect.Effect<RangeLoadResult<T>, E, R>>,
+  props: SelectProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
 ): View;
 export const Tabs: ComponentType<TabsProps>;
 export function CommandPalette<T, E = never, R = never>(
-  props: SelectProps<T, Effect.Effect<RangeLoadResult<T>, E, R>>,
+  props: SelectProps<
+    T,
+    Effect.Effect<RangeLoadResult<T>, E, R>,
+    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+  >,
 ): View;
 export const CodeView: ComponentType<CodeViewProps>;
 export const DiffView: ComponentType<DiffViewProps>;

@@ -142,8 +142,11 @@ pub struct TranscriptPayload<'a> {
     pub kind: u16,
     pub block_id: &'a str,
     pub content: &'a [u8],
+    pub records: &'a [u8],
     pub version: u64,
     pub generation: u64,
+    pub index: u64,
+    pub range: (u32, u32),
 }
 
 #[derive(Clone, Copy, Debug)]

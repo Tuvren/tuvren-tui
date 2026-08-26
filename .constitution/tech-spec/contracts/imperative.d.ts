@@ -109,6 +109,7 @@ export type {
   View,
   ViewChildren,
   ViewNode,
+  VirtualCollectionBinding,
 } from "./shared";
 
 export interface ImperativeRunOptions {
@@ -116,6 +117,7 @@ export interface ImperativeRunOptions {
   readonly externalOutput?:
     "capture" | "scrollback" | "passthrough" | "disabled";
   readonly reducedMotion?: boolean;
+  readonly theme?: import("./shared").Theme;
 }
 
 export type ImperativePrimitiveProps<Props extends object> = Omit<
@@ -149,6 +151,12 @@ export abstract class Component<Props extends object = object> {
 }
 
 export type ImperativeChild = Primitive | Component;
+export type ImperativeRangeLoad<T> = Promise<
+  import("./shared").RangeLoadResult<T>
+>;
+export type ImperativeMutations<T> = AsyncIterable<
+  import("./shared").CollectionMutation<T>
+>;
 
 export class Box extends Primitive<ImperativePrimitiveProps<BoxProps>> {
   constructor(props: ImperativePrimitiveProps<BoxProps>);
@@ -175,13 +183,13 @@ export class Overlay extends Primitive<ImperativePrimitiveProps<OverlayProps>> {
 }
 export class CollectionPrimitive<T = unknown> extends Primitive<
   ImperativePrimitiveProps<
-    TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    TableProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
   >
 > {
   readonly controller: import("./shared").CollectionController<T>;
   constructor(
     props: ImperativePrimitiveProps<
-      TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+      TableProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
     >,
   );
 }
@@ -204,13 +212,13 @@ export class FocusScope extends Component<
 
 export class Table<T = unknown> extends Component<
   ImperativeComponentProps<
-    TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    TableProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
   >
 > {
   readonly controller: import("./shared").CollectionController<T>;
   constructor(
     props: ImperativeComponentProps<
-      TableProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+      TableProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
     >,
   );
 }
@@ -254,21 +262,46 @@ export class Spinner extends Component<
 > {
   constructor(props: ImperativeComponentProps<ProgressProps>);
 }
-export class Menu extends Component<ImperativeComponentProps<MenuProps>> {
-  constructor(props: ImperativeComponentProps<MenuProps>);
+export class Menu<T = unknown> extends Component<
+  ImperativeComponentProps<
+    MenuProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+  >
+> {
+  readonly controller: import("./shared").CollectionController<T>;
+  constructor(
+    props: ImperativeComponentProps<
+      MenuProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+    >,
+  );
 }
 export class MenuItem extends Component<
   ImperativeComponentProps<MenuItemProps>
 > {
   constructor(props: ImperativeComponentProps<MenuItemProps>);
 }
-export class MenuBar extends Component<ImperativeComponentProps<MenuProps>> {
-  constructor(props: ImperativeComponentProps<MenuProps>);
-}
-export class ContextMenu extends Component<
-  ImperativeComponentProps<MenuProps>
+export class MenuBar<T = unknown> extends Component<
+  ImperativeComponentProps<
+    MenuProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+  >
 > {
-  constructor(props: ImperativeComponentProps<MenuProps>);
+  readonly controller: import("./shared").CollectionController<T>;
+  constructor(
+    props: ImperativeComponentProps<
+      MenuProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+    >,
+  );
+}
+export class ContextMenu<T = unknown> extends Component<
+  ImperativeComponentProps<
+    MenuProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+  >
+> {
+  readonly controller: import("./shared").CollectionController<T>;
+  constructor(
+    props: ImperativeComponentProps<
+      MenuProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+    >,
+  );
 }
 export class Dialog extends Component<ImperativeComponentProps<DialogProps>> {
   constructor(props: ImperativeComponentProps<DialogProps>);
@@ -280,23 +313,25 @@ export class AlertDialog extends Component<
 }
 export class Select<T = unknown> extends Component<
   ImperativeComponentProps<
-    SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    SelectProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
   >
 > {
+  readonly controller: import("./shared").CollectionController<T>;
   constructor(
     props: ImperativeComponentProps<
-      SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+      SelectProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
     >,
   );
 }
 export class ListBox<T = unknown> extends Component<
   ImperativeComponentProps<
-    SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    SelectProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
   >
 > {
+  readonly controller: import("./shared").CollectionController<T>;
   constructor(
     props: ImperativeComponentProps<
-      SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+      SelectProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
     >,
   );
 }
@@ -305,12 +340,13 @@ export class Tabs extends Component<ImperativeComponentProps<TabsProps>> {
 }
 export class CommandPalette<T = unknown> extends Component<
   ImperativeComponentProps<
-    SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+    SelectProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
   >
 > {
+  readonly controller: import("./shared").CollectionController<T>;
   constructor(
     props: ImperativeComponentProps<
-      SelectProps<T, Promise<import("./shared").RangeLoadResult<T>>>
+      SelectProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
     >,
   );
 }
@@ -339,6 +375,7 @@ export type ImperativeCommandConcurrency =
 export interface ImperativeCommandContext {
   readonly source: "programmatic" | "keymap" | "menu" | "button" | "palette";
   readonly event?: TuvrenEvent;
+  readonly signal: AbortSignal;
 }
 
 export interface ImperativeCommand<A = void> {
@@ -355,11 +392,17 @@ export interface ImperativeCommandRegistry {
   invoke<A>(
     command: ImperativeCommand<A>,
     context?: Partial<ImperativeCommandContext>,
-  ): Promise<A>;
+  ): ImperativeCommandInvocation<A>;
   invokeById(
     id: import("./shared").CommandId,
     context?: Partial<ImperativeCommandContext>,
-  ): Promise<unknown>;
+  ): ImperativeCommandInvocation<unknown>;
+}
+
+export interface ImperativeCommandInvocation<A> {
+  readonly result: Promise<A>;
+  readonly signal: AbortSignal;
+  cancel(reason?: unknown): void;
 }
 
 export interface ImperativeKeyBinding {
@@ -377,6 +420,7 @@ export interface ImperativeApp {
   readonly commands: ImperativeCommandRegistry;
   readonly keymaps: ImperativeKeymapRegistry;
   setRoot(root: ImperativeChild): void;
+  setTheme(theme: import("./shared").Theme): void;
   transaction(apply: () => void): void;
   render(): void;
   pollInput(timeoutMs?: number): number;
