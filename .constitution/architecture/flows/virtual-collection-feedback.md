@@ -17,8 +17,11 @@ sequenceDiagram
     participant Present as Presentation Pipeline
 
     EU->>Interact: Navigate, select, or scroll collection
+    Interact->>Exec: Enqueue keyed interaction intent
+    Exec->>Interact: Begin serialized executor-owned collection operation
     Interact->>Content: Update focus, selection, and requested visible range
-    Content-->>Orch: Emit keyed range demand with generation
+    Content-->>Exec: Commit projection state and keyed range demand
+    Exec-->>Orch: Emit keyed range demand with generation
     Orch->>App: Request range through Data Source
     App-->>Orch: Return keyed items or loading, empty, or error result
     Orch->>Exec: Submit range-result transaction with generation
@@ -31,4 +34,4 @@ sequenceDiagram
 
 ## Failure path
 
-Cancelled or stale range results do not alter the Resident Projection. Missing stable keys, duplicate keys, overflow, and invalid variable heights produce typed Issues. Loading, empty, and error states remain navigable and semantic rather than collapsing into absent content.
+Cancelled or stale range results do not alter the Resident Projection. Interaction and Content transitions occur only inside executor-owned operations. Missing stable keys, duplicate keys, overflow, and invalid variable heights produce typed Issues. Loading, empty, and error states remain navigable and semantic rather than collapsing into absent content.
