@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.5 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.1 and TechSpec v9.0.6 formatted-content, Text Document configuration, keyed Collection selection, Component animation, named-key replay, and typed replay-test contracts.
+- Added the missing TUI-D002 dependency and Interaction ownership to TUI-C005 so keyboard and pointer editing cannot complete without the declared Interaction-to-Content path. The active plan remains 61 tickets and 377 points with a 119-point critical path; the corrected graph has 139 edges.
+
 ## v10.0.4 — 2026-08-26
 
 ### Fixed
