@@ -138,7 +138,21 @@
       "required": ["action", "keyCode", "modifiers"],
       "properties": {
         "action": { "enum": ["press", "repeat", "release"] },
-        "keyCode": { "type": "integer", "minimum": 0, "maximum": 1114111 },
+        "keyCode": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0, "maximum": 1114111 },
+            {
+              "enum": [
+                1114112, 1114113, 1114114, 1114115, 1114116, 1114117, 1114118,
+                1114119, 1114120, 1114121, 1114122, 1114123, 1114124, 1114125,
+                1114369, 1114370, 1114371, 1114372, 1114373, 1114374, 1114375,
+                1114376, 1114377, 1114378, 1114379, 1114380, 1114381, 1114382,
+                1114383, 1114384, 1114385, 1114386, 1114387, 1114388, 1114389,
+                1114390, 1114391, 1114392
+              ]
+            }
+          ]
+        },
         "physicalCode": { "type": "integer", "minimum": 0, "maximum": 65535 },
         "text": { "type": "string", "maxLength": 64 },
         "modifiers": { "$ref": "#/$defs/modifiers" }

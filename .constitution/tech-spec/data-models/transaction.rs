@@ -94,6 +94,8 @@ pub enum ValidatedPayload<'a> {
     Bytes { property: u32, value: &'a [u8] },
     Layout(LayoutPayload<'a>),
     Style(StylePayload<'a>),
+    TextContent(TextContentPayload<'a>),
+    TextDocumentConfig(TextDocumentConfigPayload<'a>),
     TextEdit(TextEditPayload<'a>),
     Collection(CollectionPayload<'a>),
     Transcript(TranscriptPayload<'a>),
@@ -128,15 +130,34 @@ pub struct TextEditPayload<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct TextContentPayload<'a> {
+    pub kind: u16,
+    pub source: &'a str,
+    pub language: &'a str,
+    pub spans: &'a [u8],
+}
+
+#[derive(Clone, Debug)]
+pub struct TextDocumentConfigPayload<'a> {
+    pub flags: u32,
+    pub line_ending: u16,
+    pub tab_width: u32,
+    pub max_graphemes: u64,
+    pub validation_rules: &'a [u8],
+}
+
+#[derive(Clone, Debug)]
 pub struct CollectionPayload<'a> {
     pub kind: u16,
     pub key: ValidatedCollectionKey<'a>,
     pub item: &'a [u8],
+    pub keys: &'a [u8],
     pub generation: u64,
 }
 
 #[derive(Clone, Debug)]
 pub enum ValidatedCollectionKey<'a> {
+    None,
     Utf8(&'a str),
     CanonicalNumberBits(u64),
 }

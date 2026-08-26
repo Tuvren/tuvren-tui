@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.6] — 2026-08-26
+
+### Fixed
+
+- Added discriminated native records for plain, styled, Markdown, code, and sanitized ANSI content plus serializable Text Document constraints and validation rules.
+- Added generation-stamped keyed Collection selection, imperative Component animation, optional cursor consistency, mutually exclusive Button actions, named-key replay coverage, and typed Application Replay testing in both SDK workflows.
+- Mirrored layout `stretch` correctly and aligned implementation guidance with Architecture v4.0.1 executor-owned input transitions.
+
 ## [v9.0.5] — 2026-08-26
 
 ### Fixed

@@ -118,10 +118,12 @@ export type {
   TextAreaProps,
   TextContent,
   TextDocument,
+  TextDocumentConfig,
   TextDocumentSnapshot,
   TextEncoding,
   TextMatch,
   TextSearchOptions,
+  TextValidationRule,
   GraphemeIndex,
   GraphemeRange,
   TextProps,
@@ -357,6 +359,7 @@ export interface TextDocumentService {
 }
 export function createTextDocument(
   initial?: string,
+  config?: import("./shared").TextDocumentConfig,
 ): Effect.Effect<TextDocumentService, TuvrenError, Scope.Scope>;
 export function decodeText(
   bytes: Uint8Array,
