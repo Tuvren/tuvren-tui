@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.12** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.13** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -168,7 +168,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Diagnostic snapshots encode the dense Surface as `row-major-rle-v1`. A cross-field validator requires every run count to be positive and their checked sum to equal `width × height`; reconstruction expands runs in row-major order and rejects overflow, underfill, or trailing cells. It also proves Semantic Tree ID uniqueness, valid child and relationship targets, one rooted acyclic tree, reachability, exact tagged scalar values/states, and exact Issue code/category/operation registry tuples. This keeps ordinary snapshots compact while still representing the 3,000 × 1,000 stretch Surface inside an explicit 512 MiB encoded/1 GiB decoded ceiling.
 - Historical schema files never change after publication. Readers consult `contracts/schema-migrations.json`, migrate only registered versions into the current in-memory model, and reject unknown versions before interpreting payload fields.
 - `validateApplicationReplay` rejects nonmonotonic event time, unreachable or duplicate zero-based expectation indexes, surrogate key codes, and wheel deltas outside the exact signed-integer Event wire domain. `validateBenchmarkResult` recomputes core/custom statistics and checks sample count, metric definitions, value types, and required named checks. Both validators run in `check:contracts`; the release-candidate gate additionally requires every release-gating check to pass.
-- `validateDiagnosticTraceRecords` applies the exact kind-selected payload contracts from `trace-validation.json`, rejects unknown fields, checks registered errors, proves unsigned sequence uniqueness/order, timestamp order, unique owned record identities and backward-only `parentRecordId` references, and refuses runtime replay unless context creation enabled confirmed full-content capture from an empty context with no wrap/gap and exact versioned Event/transaction bytes plus available migrations.
+- `validateDiagnosticTraceRecords` applies the exact kind-selected payload contracts from `trace-validation.json`, rejects unknown fields, checks exact error tuples and closed transaction statuses, proves unsigned sequence uniqueness/order, timestamp order, unique owned record identities and backward-only `parentRecordId` references, validates every embedded snapshot and retained Issue interval, and refuses runtime replay unless context creation enabled confirmed full-content capture from an empty context with no wrap/gap and exact versioned Event/transaction bytes plus available migrations. Runtime replay suppresses outward application-handler delivery while captured Events drive native default behavior and captured transactions apply once; logical application replay runs current handlers and injects no captured transaction.
 
 ## Commits
 

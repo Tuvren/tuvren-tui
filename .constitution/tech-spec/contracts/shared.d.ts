@@ -878,7 +878,12 @@ export type MenuProps<
   RenderE = never,
   RenderR = never,
 > = CommonProps<"root" | "item" | "separator"> &
-  VirtualCollectionBinding<T, LoadResult, Mutations> & {
+  VirtualCollectionBinding<T, LoadResult, Mutations> &
+  SelectionAuthority<
+    CollectionKey | undefined,
+    "selectedKey",
+    "defaultSelectedKey"
+  > & {
     readonly renderItem: (item: T) => View<RenderE, RenderR>;
   };
 export interface MenuItemProps extends CommonProps<

@@ -1451,6 +1451,8 @@ typedef struct TuvrenEventRecord {
 typedef struct TuvrenDiagnosticRecord {
     uint64_t sequence;
     uint64_t timestamp_nanos;
+    uint64_t record_id;
+    uint64_t parent_record_id; /* zero only for a causal root */
     uint16_t kind; /* TuvrenDiagnosticKind */
     uint16_t flags; /* TUVREN_DIAGNOSTIC_* record flags */
     uint32_t reserved;
@@ -1461,6 +1463,11 @@ typedef struct TuvrenDiagnosticRecord {
     uint32_t payload_offset;
     uint32_t payload_length;
 } TuvrenDiagnosticRecord;
+
+/* record_id is unique inside one context and serializes as correlation.recordId.
+ * parent_record_id serializes as correlation.parentRecordId and must name an
+ * earlier retained record. The drained context supplies correlation.contextId;
+ * domain IDs label the current record and never substitute for parent_record_id. */
 
 typedef struct TuvrenRenderOptions {
     uint16_t size;
@@ -1630,7 +1637,7 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationEventPayload) == 16, "TuvrenAnimation
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnnouncementEventPayload) == 12, "TuvrenAnnouncementEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalEventPayload) == 16, "TuvrenTerminalEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalCapabilitiesPayload) == 48, "TuvrenTerminalCapabilitiesPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticRecord) == 64, "TuvrenDiagnosticRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticRecord) == 80, "TuvrenDiagnosticRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRenderOptions) == 16, "TuvrenRenderOptions ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRenderResult) == 40, "TuvrenRenderResult ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDrainResult) == 24, "TuvrenDrainResult ABI size");

@@ -611,6 +611,8 @@ pub struct AnimationState {
 pub struct DiagnosticRecord {
     pub sequence: u64,
     pub timestamp_nanos: u64,
+    pub record_id: u64,
+    pub parent_record_id: Option<u64>,
     pub kind: u16,
     pub event_id: Option<u64>,
     pub command_instance_id: Option<u64>,
