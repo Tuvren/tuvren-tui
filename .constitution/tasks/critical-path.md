@@ -2,7 +2,7 @@
 
 ## Version
 
-**v10.0.2** — corresponds to the latest entry in `.constitution/tasks/changelog.md`.
+**v10.0.3** — corresponds to the latest entry in `.constitution/tasks/changelog.md`.
 
 ## Active backlog summary
 
@@ -41,7 +41,7 @@ The path is the longest effort-weighted chain under the declared dependencies. T
 
 ## Planning assumptions
 
-- This is a Brownfield replacement plan for the realigned PRD v3.0.0, Architecture v4.0.0, and TechSpec v9.0.3. It supersedes the prior Plugin-era active Epics U–Z instead of preserving incompatible work as active.
+- This is a Brownfield replacement plan for the realigned PRD v3.0.0, Architecture v4.0.0, and TechSpec v9.0.4. It supersedes the prior Plugin-era active Epics U–Z instead of preserving incompatible work as active.
 - `.constitution/tasks/completed/` remains historical continuity and was listed, not read or modified. Superseded active files are removed rather than moved into completed history because they were plans, not delivered scope.
 - The current source remains useful Brownfield evidence, but target paths and commands follow Stage 3. TUI-A001 owns the root workspace and developer environment, TUI-A008 owns host migration/strict repair, TUI-A010 owns native module migration, and TUI-A009 owns contract validation.
 - OD-02 uses evidence builder `TUI-D007`, report-only spike `TUI-D001`, and gated implementation `TUI-D003`. A No-Go requires Stage 1–3 Evolution and Stage 4 replanning; it does not authorize an improvised interaction contract.

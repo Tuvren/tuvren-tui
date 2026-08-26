@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.3 — 2026-08-26
+
+### Fixed
+
+- Assigned the mandatory Rust 1.98.0 rustfmt, locked Clippy `-D warnings`, and locked native test gate to TUI-A010, including remediation of existing native diagnostics before downstream FFI-backed work.
+- Reconciled Stage 4 with TechSpec v9.0.4 Theme activation, shared Collection bindings, complete Transcript operations, retained animation state, imperative cancellation, scoped workspace resolution, and native path conversion corrections without changing the dependency graph.
+
 ## v10.0.2 — 2026-08-26
 
 ### Added
