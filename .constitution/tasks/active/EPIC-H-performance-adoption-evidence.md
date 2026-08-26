@@ -14,7 +14,7 @@ Prove the binding absolute constraints first, optimize the native hot paths, and
 - **Verification Command:** `bun run bench:envelope`
 - **Expected Success Output:** schema-valid raw results for every reference-envelope fixture and stretch analysis
 - **STOP Conditions:** STOP if engine, terminal-write, or input-to-Surface time cannot be measured separately.
-- **Description:** Build pinned headless and real-terminal fixtures for 300×100, 1,000 Primitives, 10,000 Transcript Blocks, 100 updates/second, 10 MiB text, 100,000 logical Collection items, composite panes, and 10× one-axis analysis; declare every additional timing, count, allocation, memory, accuracy, and pass/fail metric through the extensible evidence schema.
+- **Description:** Build pinned headless and real-terminal fixtures for 300×100, 1,000 Primitives, 10,000 Transcript Blocks, 100 updates/second, 10 MiB text, 100,000 logical Collection items, composite panes, and 10× one-axis analysis; declare every additional timing, count, allocation, memory, accuracy, and pass/fail metric through the extensible evidence schema and validate sample count, definitions, value types, statistics, and required checks before accepting output.
 - **Acceptance:**
   - **Mode:** benchmark
   - **Evidence:**

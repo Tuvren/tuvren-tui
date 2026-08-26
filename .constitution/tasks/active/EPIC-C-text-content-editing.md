@@ -53,7 +53,7 @@ State-machine tests generate edits, navigation, selection, undo/redo, find/repla
 - **Capabilities:** P0-E06–P0-E11, SAFE-01
 - **Scope (In-Scope Files):** `native/src/content/`, `native/src/presentation/`, formatted-content corpus and decoder cases owned by `native/fuzz/fuzz_targets/durable_files.rs`
 - **Scope (Out-of-Scope Files):** privileged parser extensions, arbitrary terminal control, image protocols
-- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** maintained formatted-content corpus produces no crash, escape, or unbounded allocation
 - **STOP Conditions:** STOP if sanitized content can perform cursor movement, title, clipboard, or terminal-mode control.
 - **Description:** Make StyledText canonical; implement the exact tables, GitHub-compatible footnotes, strikethrough, task-list, and GFM Markdown flags; apply the declared raw-HTML, link, image-alt, and ANSI sanitization policy; add code highlighting, bounded parse caches, and adapters for custom host formats.
