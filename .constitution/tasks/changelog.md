@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.13 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.14 bound Command View requirements, native Effect-span/Component/Text-Document diagnostic identities, the frozen ABI-parity script, and enclosing-context retained/wrap-baseline snapshot correlation.
+- Kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because TUI-A003/TUI-A009, TUI-B009, TUI-D004, TUI-G001/TUI-G002/TUI-G008, and TUI-I006 own the corrected obligations.
+
 ## v10.0.12 — 2026-08-26
 
 ### Fixed
