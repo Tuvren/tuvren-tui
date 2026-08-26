@@ -117,15 +117,15 @@ Replay is identical across 100 runs; live and replay workloads publish schema-va
 - **Scope (In-Scope Files):** `scripts/check-release-candidate.ts`, release validation scripts, schema-valid evidence, release-candidate report and migration guide
 - **Scope (Out-of-Scope Files):** weakening a gate for schedule, publishing final artifacts
 - **Verification Command:** `bun run check:release-candidate`
-- **Expected Success Output:** every P0 command, registered error, required benchmark check, trace payload, replay expectation, evidence row, and named cross-field validator passes and `validateAtomicReleaseManifest` accepts exactly six matching artifacts
+- **Expected Success Output:** every P0 command including a fresh `check:abi-parity`, registered error, required benchmark check, trace payload, replay expectation, evidence row, and named cross-field validator passes and `validateAtomicReleaseManifest` accepts exactly six matching artifacts
 - **STOP Conditions:** STOP on any missing capability row, unresolved OD-01/OD-02 Evolution, target failure, performance failure, privacy/security failure, undocumented break, or version/provenance mismatch.
-- **Description:** Implement and run the Stage 3 aggregate command over contract, capability-map, semantic, terminal, every named bounded fuzz target, bundle, envelope, comparative, devtools, adoption, OpenCode, supply-chain, target, package, schema, migration, restoration, error-registry and snapshot/trace/replay/benchmark cross-field validation, and atomic-manifest evidence. Seeded contract cases include Semantic Tree graph/scalar and Issue tuple/interval corruption, Trace ordering/identity-equality/instance-subject mapping/parent/domain/status/start/privacy/batch/wrap-reason/foreign-or-misbased-or-mis-inherited-snapshot corruption, runtime replay handler suppression and exactly-once transaction application, surrogate key and wheel-wire drift, all four bound Command failure/environment propagation paths, all Command completion variants, document-bound TextArea authority, controlled/local List/Table/Select/Menu/palette selection, and executor-cached Collection scroll-position observation.
+- **Description:** Implement and run the Stage 3 aggregate command over exact toolchain, contract, fresh ABI parity, capability-map, semantic, terminal, every named bounded fuzz target, bundle, envelope, comparative, devtools, adoption, OpenCode, supply-chain, target, package, schema, migration, restoration, error-registry and snapshot/trace/replay/benchmark cross-field validation, and atomic-manifest evidence. Seeded contract cases include Semantic Tree graph/scalar and Issue tuple/interval corruption, Trace ordering/identity-equality/instance-subject mapping/parent/domain/status/start/privacy/batch/wrap-boundary/foreign-or-misbased-or-mis-inherited-snapshot corruption, runtime replay handler suppression and exactly-once transaction application, surrogate key and wheel-wire drift, all four bound Command failure/environment propagation paths, all Command completion variants, document-bound TextArea authority, controlled/local List/Table/Select/Menu/palette selection, and executor-cached Collection scroll-position observation.
 - **Acceptance:**
   - **Mode:** runbook_probe
   - **Evidence:**
 
 ```text
-A fresh `check:release-candidate` run produces one human-readable candidate report and the schema-valid atomic manifest; no required subcommand is skipped or stale against the source revision; all artifact versions equal the package version and source revision; no alpha artifact is represented as final.
+A fresh `check:release-candidate` run executes `check:toolchain` and `check:abi-parity` against the candidate revision, produces one human-readable candidate report and the schema-valid atomic manifest, skips no required subcommand, and proves all artifact versions and source revisions match with no alpha artifact represented as final.
 ```
 
 #### TUI-I007 Publish the atomic `0.1.0` package set and verify it from the registry
@@ -135,10 +135,10 @@ A fresh `check:release-candidate` run produces one human-readable candidate repo
 - **Dependencies:** TUI-I006
 - **Category:** Feature-Evolution
 - **Capabilities:** P0-O01–P0-O06, P0-O15–P0-O16
-- **Scope (In-Scope Files):** release workflow, immutable release manifest and post-publish verification report
+- **Scope (In-Scope Files):** release workflow, `scripts/test-registry-package.ts`, immutable release manifest and post-publish verification report
 - **Scope (Out-of-Scope Files):** partial publish, post-`0.1.0` roadmap scope, v1 compatibility promises
-- **Verification Command:** `bun run test:platform-smoke`
-- **Expected Success Output:** registry-installed `0.1.0` passes all five target smokes with exact artifact matching
+- **Verification Command:** `bun run test:registry-package`
+- **Expected Success Output:** registry-installed `0.1.0` passes all five target-native smokes plus CLI, declarations, source maps, licenses, checksums, provenance, and exact artifact/version/ABI verification
 - **STOP Conditions:** STOP before publish unless TUI-I006 is clean; if any publish step fails, do not promote or describe the set as final until atomic consistency is restored.
 - **Description:** Publish `tuvren-tui` and all five platform packages at one exact version with provenance, then install from the registry and verify resolver, ABI, headless render, shutdown, CLI, declarations, maps, licenses, and checksums.
 - **Acceptance:**
@@ -146,5 +146,5 @@ A fresh `check:release-candidate` run produces one human-readable candidate repo
   - **Evidence:**
 
 ```text
-Registry metadata and target-native logs prove all six artifacts, exact version/ABI equality, checksums/provenance, ordinary one-command install, no native setup, and successful post-publish smoke.
+Registry metadata and target-native logs prove all six artifacts, exact version/ABI equality, checksums/provenance, ordinary one-command install, no native setup, successful CLI execution, loadable declarations and source maps, complete licenses, and headless render/shutdown on every target.
 ```

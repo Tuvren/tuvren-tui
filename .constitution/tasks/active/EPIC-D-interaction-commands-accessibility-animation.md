@@ -35,7 +35,7 @@ The report links pinned raw results and the reproducer command, records p95 inpu
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-ffi.test.ts`
 - **Expected Success Output:** normalized interaction fixtures pass deterministically
 - **STOP Conditions:** STOP if input routing requires a Rust-to-TypeScript callback or bypasses the UI executor.
-- **Description:** Normalize Events, route through hit-testing, focus and interaction roots, implement Focus Scopes, modal containment, focus restoration, retained pointer-capture/drag state, typed drag-start/motion/drop/end/capture Events, bounded queues, and handler-failure recovery.
+- **Description:** Normalize Events with one closed shift/control/alt/super modifier set across key, pointer, and wheel paths; route through executor-owned hit-testing, focus, and interaction roots; implement Focus Scopes, modal containment, focus restoration, retained pointer-capture/drag state, typed drag-start/motion/drop/end/capture Events, bounded queues, and handler-failure recovery.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
