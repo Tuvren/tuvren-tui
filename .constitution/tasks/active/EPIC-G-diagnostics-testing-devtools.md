@@ -14,13 +14,13 @@ Implement one causal observation surface and public proof harness for P0-N01–P
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** bounded sink, identity, wrap, and unattributed-defect protocol fixtures pass; TUI-G008 owns producer-complete causal accounting
 - **STOP Conditions:** STOP if recording can grow beyond 64 MiB or silently discard the retained causal path.
-- **Description:** Implement the bounded Diagnostic Graph record/sink protocol, a unique native `record_id` plus optional backward `parent_record_id` on every record, exact public `recordId`/`parentRecordId` serialization, domain labels that never double as parent links, context-initialization identity, wrap behavior, and producer hook interface. TUI-G008 owns integration across producers after their kernels exist.
+- **Description:** Implement the bounded Diagnostic Graph record/sink protocol, a unique native `record_id` plus optional backward `parent_record_id` on every record, exact public `recordId`/`parentRecordId` serialization, native Event/Command-instance/Effect-span/transaction/render identities, trace-scoped opaque diagnostic subjects that distinguish Component from standalone Text Document work without leaking runtime handles, domain labels that never double as parent links, context-initialization identity, wrap behavior, and producer hook interface. TUI-G008 owns integration across producers after their kernels exist.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Sink fixtures verify unique owned identity, valid backward parent linking including root Command/Effect spans, stable error metadata, forced ring wrap, preservation of the newest complete causal interval, and explicit unattributed-defect records; they do not claim producer-complete instrumentation before TUI-G008.
+Sink fixtures verify unique owned identity, valid backward parent linking including root Command/Effect spans, exact domain identity round trips including standalone Text Documents, stable error metadata, forced ring wrap, preservation of the newest complete causal interval, and explicit unattributed-defect records; they do not claim producer-complete instrumentation before TUI-G008.
 ```
 
 #### TUI-G002 Implement bounded durable codecs, migrations, and redaction
@@ -35,13 +35,13 @@ Sink fixtures verify unique owned identity, valid backward parent linking includ
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** no malformed input escapes limits or privacy policy
 - **STOP Conditions:** STOP if a reader allocates or decompresses beyond preflight limits, or if saving full content lacks explicit confirmation.
-- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, strict sequence/time order, unique owned record IDs and backward-only parent links, closed committed/rejected transaction status rules, empty-context/no-wrap replay-start validation, exact Event and complete transaction replay batches, validation of every embedded snapshot, rooted typed-scalar Semantic Tree plus Issue tuple/interval/retained-domain validation, wire-exact replay keys/wheel deltas, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
+- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, strict sequence/time order, unique owned record IDs and backward-only parent links, closed committed/rejected transaction status rules, empty-context/no-wrap replay-start validation, exact Event and complete transaction replay batches, validation of every embedded snapshot against the enclosing context and latest retained transaction/render basis, explicit retained versus wrap-baseline snapshot rules, rooted typed-scalar Semantic Tree plus Issue tuple/interval/retained-domain validation, wire-exact replay keys/wheel deltas, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Fuzz and golden tests reject unknown versions, expansion attacks, invalid Semantic Tree graphs/scalars or Issue tuples/intervals, unordered/duplicate/dangling Trace identities, unknown/inconsistent transaction status, invalid embedded snapshots or out-of-domain Issue intervals, missing or wrapped replay prefixes, unavailable payload migrations, bare offset-bearing mutation payloads, surrogate key codes, out-of-wire-range wheel deltas, and noncanonical replay batches; migrate only registry entries; preserve schema-valid data; and find zero protected values in default artifacts.
+Fuzz and golden tests reject unknown versions, expansion attacks, invalid Semantic Tree graphs/scalars or Issue tuples/intervals, unordered/duplicate/dangling Trace identities, unknown/inconsistent transaction status, foreign-context or incorrectly based embedded snapshots, invalid/multiple wrap baselines, out-of-domain Issue intervals, missing or wrapped replay prefixes, unavailable payload migrations, bare offset-bearing mutation payloads, surrogate key codes, out-of-wire-range wheel deltas, and noncanonical replay batches; migrate only registry entries; preserve schema-valid data; and find zero protected values in default artifacts.
 ```
 
 #### TUI-G003 Implement Effect and imperative semantic test harnesses
@@ -161,7 +161,7 @@ The machine-readable inventory maps 100% of boundaries to validators and named o
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** every required producer phase emits a bounded linked record and every late Render Pass has a causal path or explicit unattributed-defect record
 - **STOP Conditions:** STOP if instrumentation changes producer ordering, allocates on the diagnostic-off steady-state path, or retains sensitive content outside policy.
-- **Description:** Connect the G001 sink to context initialization, input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, text, Collection, Transcript, animation, render, diff, terminal, clipboard, error, and cleanup producers after their owning kernels exist. Confirmed replay capture retains canonical versioned Event and complete committed transaction batches from context creation; mutation records remain diagnostic metadata so replay never applies offset-bearing mutation payloads separately. Passive producers retain metadata only.
+- **Description:** Connect the G001 sink to context initialization, input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, Component- or Text-Document-owned text, Collection, Transcript, animation, render, diff, terminal, clipboard, error, and cleanup producers after their owning kernels exist. Confirmed replay capture retains canonical versioned Event and complete committed transaction batches from context creation; mutation records remain diagnostic metadata so replay never applies offset-bearing mutation payloads separately. Passive producers retain metadata only.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**

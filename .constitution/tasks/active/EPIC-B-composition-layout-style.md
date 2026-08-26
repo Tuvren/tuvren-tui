@@ -182,11 +182,11 @@ Shell fixtures prove controlled inputs, source and language metadata, stable slo
 - **Verification Command:** `bun run test:semantic`
 - **Expected Success Output:** every first-party Component and the external Component-package fixture pass the shared catalog matrix
 - **STOP Conditions:** STOP if a Component duplicates a shared kernel, exposes a private tree/identity, or the ordinary external package requires unpublished entrypoints.
-- **Description:** Bind structural shells to the shared interaction, Command, Collection, text, feedback, semantic, animation, and test kernels; prove stable slots and behavior; and pack/install a normal external package exporting Components, Commands, Keymaps, helpers, and application services.
+- **Description:** Bind structural shells to the shared interaction, Command, Collection, text, feedback, semantic, animation, and test kernels; preserve bound Command ID result/failure/environment requirements through Button, ToggleButton, MenuItem, and CommandPalette Views; prove stable slots and behavior; and pack/install a normal external package exporting Components, Commands, Keymaps, helpers, and application services.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Catalog-wide tests prove activation, disabled, validation, selection, focus, modal state, semantics, animation, controlled/local authority, named-slot overrides, cleanup, and declarative availability; the external package installs against packed public entrypoints and uses no privileged or private contract.
+Catalog-wide tests prove activation, disabled, validation, selection, focus, modal state, semantics, animation, controlled/local authority, bound Command requirement propagation, named-slot overrides, cleanup, and declarative availability; the external package installs against packed public entrypoints and uses no privileged or private contract.
 ```
