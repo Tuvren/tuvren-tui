@@ -77,7 +77,7 @@ Allowlisted formatting survives; control operations and malformed sequences are 
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** Effect and imperative text fixtures pass with identical snapshots
 - **STOP Conditions:** STOP if an adapter silently repairs malformed UTF-16 or exposes a code-unit index.
-- **Description:** Implement the declared TextDocumentService and imperative TextDocument, branded grapheme indices/ranges, cursor and selection operations, find/replace, undo/redo, and explicit UTF-8, UTF-16LE, and UTF-16BE import/export.
+- **Description:** Implement the declared TextDocumentService and imperative TextDocument over bounded native query and indexed transaction-result records, with branded grapheme indices/ranges, cursor and selection operations, find/replace, undo/redo, and explicit UTF-8, UTF-16LE, and UTF-16BE import/export.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**

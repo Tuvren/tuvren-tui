@@ -14,7 +14,7 @@ Implement the shared bounded projection machinery for P0-I01–P0-J07.
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** 100,000 logical-item state fixtures pass identity, mutation, stale-result, and resident-bound invariants; TUI-H001 later measures latency
 - **STOP Conditions:** STOP if visible rows or array positions become durable identities.
-- **Description:** Implement stable string/number keys, keyed range loading, insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, scroll and visible range, generation cancellation, stale rejection, and count/byte eviction.
+- **Description:** Implement stable string/number keys, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, scroll and queryable visible range, cancellation, stale rejection, and count/byte eviction.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**

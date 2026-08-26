@@ -35,7 +35,7 @@ Property tests cover arbitrary practical depth, add/remove/reorder/update, stabl
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if Taffy 0.14 cannot represent a declared LayoutSpec field without a Stage 3 contract change.
-- **Description:** Map the complete LayoutSpec to Taffy Flexbox and Grid, add absolute anchors, axis gaps, placement and spans, intrinsic and percentage dimensions, width and height responsive rules, automatic recomputation, and deterministic overflow policies.
+- **Description:** Map the complete LayoutSpec to Taffy with independent flex/grid display and relative/absolute positioning, add absolute anchors, axis gaps, placement and spans, intrinsic and percentage dimensions, width and height responsive rules, automatic recomputation, and deterministic overflow policies.
 - **Acceptance:**
   - **Mode:** visual_regression
   - **Evidence:**
@@ -56,7 +56,7 @@ Goldens cover all layout modes, cell and percentage breakpoints, unsatisfied con
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if an override cannot be expressed through Theme, instance StyleSheet, named slot, or inline StyleSpec without exposing private structure.
-- **Description:** Implement typed rules, state and environment conditions, ThemeTokens, ThemeRecipes, stable named slots, automatic invalidation, exact precedence, source provenance, and per-instance overrides.
+- **Description:** Implement typed rules, executable Theme-token references and fallbacks, state and environment conditions, ThemeRecipes, stable named slots, automatic invalidation, exact precedence, source provenance, and per-instance overrides.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -77,7 +77,7 @@ Generated combinations prove the seven-level precedence order and diagnostics id
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** every Primitive passes shared semantic fixtures through both workflows
 - **STOP Conditions:** STOP if a wrapper needs direct host mutation outside the UI executor.
-- **Description:** Implement keyed JSX reconciliation and imperative Primitive/Component wrappers over identical transactions, including failure-safe partial mount, fragment ordering, disposal, lifecycle ownership, and animation delegation.
+- **Description:** Implement keyed JSX reconciliation and imperative Primitive/Component wrappers over identical transactions, including failure-safe partial mount, fragment ordering, disposal, lifecycle ownership, private Component roots, and interruptible animation delegation.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**

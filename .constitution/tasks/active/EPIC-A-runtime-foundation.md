@@ -119,13 +119,13 @@ Saturation and lifecycle tests prove one writer, ordered accepted work, bounded 
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode`
 - **Expected Success Output:** no crash, panic escape, out-of-bounds access, or invariant violation for the maintained corpus and configured CI duration
 - **STOP Conditions:** STOP if the implementation requires exposing RuntimeNode IDs or relaxing full-batch prevalidation.
-- **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings, exact-version loading, panic containment, and one Render Pass request per committed batch.
+- **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings and indexed mutation results, bounded query/copy-out reads, exact-version loading, panic containment, and one Render Pass request per committed batch.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Rust and TypeScript decode checked-in byte fixtures identically; malformed, misaligned, overlapping, stale, oversized, or incompatible records are rejected before mutation; post-validation unexpected failure freezes and discards the context.
+Rust and TypeScript decode checked-in byte fixtures identically; query and transaction outputs preflight caller capacities and never expose retained pointers; malformed, misaligned, overlapping, stale, oversized, or incompatible records are rejected before mutation; post-validation unexpected failure freezes and discards the context.
 ```
 
 #### TUI-A004 Enforce transaction scheduling, backpressure, and render-request semantics

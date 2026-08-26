@@ -77,7 +77,7 @@ The checker proves one final disposition, no double default, bounded wait, deter
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-commands.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if registration loses the Command environment or ID invocation loses the typed failure envelope.
-- **Description:** Implement typed result/failure Commands, captured Effect environments, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, availability, hierarchical scopes, chords, conflict reports, rebinding, and precedence.
+- **Description:** Implement typed result/failure Commands, captured Effect environments, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, visibility/enablement/activation, Command-bound buttons/menu items/palette entries, hierarchical scopes, chords, conflict reports, rebinding, and deterministic precedence.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -119,7 +119,7 @@ Primitive and synthetic-component fixtures query by role and accessible properti
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** deterministic elapsed-time and manual-clock animation fixtures pass; TUI-H001 later owns timing benchmarks
 - **STOP Conditions:** STOP if dropped presentations slow logical time or suppress final state.
-- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, cancellation, replacement, completion, manual test time, global reduced motion, and accessible per-animation overrides.
+- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, native cancellation/replacement operations, typed completion, manual test time, global reduced motion, and accessible per-animation overrides.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
