@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.16** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.17** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -96,7 +96,7 @@ The resolver order is:
 3. The local Cargo release artifact, only when workspace markers prove a source checkout.
 4. A typed diagnostic failure.
 
-The SDK package and all platform packages publish atomically with the same exact version and release manifest. ABI compatibility is private and exact-version only. A mismatch rejects before context creation.
+The SDK package and all platform packages use the same exact version and release manifest. Publication first places all six immutable versions under one revision-scoped quarantine dist-tag that is not `latest`; `test:registry-package` verifies those exact registry bytes across all targets and artifact surfaces. Only a clean run promotes the same checksums to the final tag. A partial publish, verification, or tag update restores quarantine and is never represented as final. ABI compatibility is private and exact-version only. A mismatch rejects before context creation.
 
 Pre-`1.0` minor releases may break public SDK contracts only with a changelog, migration guide, one-minor deprecation when safe, and a codemod when practical. Diagnostic Trace, snapshot, terminal-profile, replay, benchmark-result, and release-manifest schemas version independently. Every exact schema version is a new immutable artifact with `$id` `https://tuvren.dev/schema/<family>/<semver>/schema.json`; its checked-in filename adds `-<semver>` once more than one version exists. A schema major may break readers, a minor may add optional fields, and a patch may only correct prose or narrow a validator defect through a newly versioned artifact—it never replaces a published file. Readers dispatch on `schemaVersion` before parsing the payload, support the current major and the immediately previous major for one SDK minor through a named migrator, and reject all unregistered versions. `contracts/schema-migrations.json` maps every supported version to its immutable artifact, exact `$id`, and named migration path.
 

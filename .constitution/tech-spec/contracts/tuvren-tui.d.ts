@@ -171,6 +171,7 @@ export type {
   TuvrenErrorCode,
   TuvrenErrorVariant,
   View,
+  VisibleRangeObservation,
   ViewChildren,
   ViewNode,
   VirtualCollectionBinding,

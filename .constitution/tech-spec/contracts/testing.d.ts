@@ -338,7 +338,7 @@ export interface ApplicationReplayPayloadMap {
     deltaColumns: number;
     deltaPixelX?: number;
     deltaPixelY?: number;
-    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly focus: Readonly<Record<never, never>>;
   readonly blur: Readonly<Record<never, never>>;

@@ -628,8 +628,16 @@ export interface CollectionController<T> {
   ): void;
   focusKey(key: CollectionKey | undefined): void;
   setSelection(keys: readonly CollectionKey[]): void;
-  visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
+  lastVisibleRange(): VisibleRangeObservation | undefined;
   lastScrollPosition(): CollectionScrollPosition | undefined;
+}
+
+export interface VisibleRangeObservation {
+  readonly start: number;
+  readonly end: number;
+  readonly generation: number;
+  readonly observedTransactionId: bigint;
+  readonly observedRenderRequestId: bigint;
 }
 
 export interface CollectionScrollPosition {
@@ -644,9 +652,7 @@ export interface CollectionScrollPosition {
 export interface VirtualCollectionObservers<T> {
   readonly controller?: CollectionController<T>;
   readonly estimatedCount?: number;
-  readonly onVisibleRangeChange?: (
-    range: Readonly<{ start: number; end: number; generation: number }>,
-  ) => void;
+  readonly onVisibleRangeChange?: (range: VisibleRangeObservation) => void;
   readonly onScrollPositionChange?: (
     position: CollectionScrollPosition,
   ) => void;
@@ -722,13 +728,12 @@ export type TranscriptProps = CommonProps<"root" | "block" | "liveIndicator"> &
         readonly defaultBlocks?: readonly TranscriptBlock[];
       }
   ) & {
+    readonly controller?: TranscriptController;
     readonly maxResidentBlocks?: number;
     readonly onRangeChange?: (start: number, end: number) => void;
     readonly onEvict?: (ids: readonly TranscriptBlockId[]) => void;
     readonly onReloadRequest?: (request: RangeRequest) => void;
-    readonly onVisibleRangeChange?: (
-      range: Readonly<{ start: number; end: number; generation: number }>,
-    ) => void;
+    readonly onVisibleRangeChange?: (range: VisibleRangeObservation) => void;
   };
 
 export type TranscriptOperation =
@@ -794,7 +799,7 @@ export interface TranscriptController {
     alignment?: "start" | "center" | "end" | "nearest",
   ): void;
   followLiveEdge(enabled: boolean): void;
-  visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
+  lastVisibleRange(): VisibleRangeObservation | undefined;
 }
 export type SplitPaneProps = CommonProps<
   "root" | "first" | "divider" | "second"
