@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.14 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.15 duplicate identity equality, stable Command-instance/subject mapping, typed ring-wrap records, wrap-baseline identity inheritance, complete bound-Command conformance, and the canonical ABI-parity command inventory.
+- Kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because the existing Command, diagnostic, contract, and release evidence tickets own these validator refinements.
+
 ## v10.0.13 — 2026-08-26
 
 ### Fixed

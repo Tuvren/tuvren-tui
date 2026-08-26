@@ -83,7 +83,7 @@ The checker proves one final disposition, no double default, bounded wait, deter
   - **Evidence:**
 
 ```text
-Registry-level adapters invoke one Command programmatically and through Keymap-, menu-, button-, and palette-shaped bindings without requiring Component shells; declaration probes prove Button/MenuItem/CommandPalette Views retain bound failure/environment requirements and reject erased assignments; concurrency, each cancellation/restart/shutdown/disabled/contextual/concurrency-rejection completion, typed results/failures, captured environments, precedence, and availability updates are deterministic. TUI-B009 owns real catalog binding.
+Registry-level adapters invoke one Command programmatically and through Keymap-, menu-, button-, and palette-shaped bindings without requiring Component shells; positive and negative declaration probes prove Button, ToggleButton, MenuItem, and CommandPalette Views retain bound failure/environment requirements and reject erased assignments; concurrency, each cancellation/restart/shutdown/disabled/contextual/concurrency-rejection completion, typed results/failures, captured environments, precedence, and availability updates are deterministic. TUI-B009 owns real catalog binding.
 ```
 
 #### TUI-D005 Implement the Semantic Tree and accessibility behavior
