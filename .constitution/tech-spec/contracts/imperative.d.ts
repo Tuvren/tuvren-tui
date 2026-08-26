@@ -445,6 +445,14 @@ export type ImperativeCommandCompletion<A, E> =
     }
   | {
       readonly status: "rejected";
+      readonly reason: "contextual";
+      readonly error: import("./shared").TuvrenCommandError & {
+        readonly code: "TUVREN_COMMAND_UNAVAILABLE";
+        readonly operation: "command.invoke";
+      };
+    }
+  | {
+      readonly status: "rejected";
       readonly reason: "concurrency";
       readonly error: import("./shared").TuvrenCommandError & {
         readonly code: "TUVREN_COMMAND_REJECTED";

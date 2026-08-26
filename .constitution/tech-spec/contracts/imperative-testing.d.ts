@@ -7,6 +7,7 @@ import type {
   FailureTrace,
   LeakReport,
   ReplayInput,
+  RuntimeReplayTrace,
   SemanticElement,
   SemanticMatch,
   SyntheticInput,
@@ -27,9 +28,21 @@ export interface ImperativeTestOptions {
   readonly height?: number;
   readonly terminal?: Partial<TerminalProfile>;
   readonly automaticTraceOnFailure?: boolean;
+  readonly runtimeReplayCapture?: never;
 }
 
-export interface ImperativeTestHarness {
+export interface ImperativeRuntimeReplayTestOptions extends Omit<
+  ImperativeTestOptions,
+  "runtimeReplayCapture"
+> {
+  readonly runtimeReplayCapture: Readonly<{
+    fullContent: true;
+    confirmed: true;
+    start: "context-initialization";
+  }>;
+}
+
+export interface ImperativeTestHarness<RuntimeReplay extends boolean = false> {
   readonly app: ImperativeApp;
   push(event: SyntheticInput): void;
   key(key: string): void;
@@ -54,10 +67,11 @@ export interface ImperativeTestHarness {
     options?: Omit<SemanticMatch, "role">,
   ): SemanticElement | undefined;
   snapshot(): DiagnosticSnapshot;
-  trace(): DiagnosticTrace<false>;
+  trace(): DiagnosticTrace<false, false>;
   trace(
     options: Readonly<{ fullContent: true; confirmed: true }>,
-  ): DiagnosticTrace<true>;
+  ): DiagnosticTrace<true, false>;
+  readonly replayTrace: RuntimeReplay extends true ? RuntimeReplayTrace : never;
   replay(input: ReplayInput): DiagnosticSnapshot;
   failureTrace(): FailureTrace | undefined;
   saveTrace(path: string): void;
@@ -70,6 +84,9 @@ export class ImperativeHarnessError extends Error {
   readonly cause: TuvrenError;
 }
 
+export function createTestHarness(
+  options: ImperativeRuntimeReplayTestOptions,
+): ImperativeTestHarness<true>;
 export function createTestHarness(
   options?: ImperativeTestOptions,
 ): ImperativeTestHarness;

@@ -30,6 +30,13 @@ import {
 } from "./tuvren-tui";
 import { jsx } from "./jsx-runtime";
 import {
+  testRender,
+  type DiagnosticTrace,
+  type ReplayInput,
+  type RuntimeReplayTrace,
+  type TestHarness,
+} from "./testing";
+import {
   Box as ImperativeBox,
   Text as ImperativeText,
   keyGrapheme as imperativeKeyGrapheme,
@@ -110,6 +117,8 @@ declare const requiredCell: View<"cell-error", Database>;
 declare const requiredStream: Stream.Stream<number, "stream-error", Database>;
 declare const commandService: CommandService;
 declare const textDocumentService: TextDocumentService;
+declare const defaultTrace: DiagnosticTrace<false, false>;
+declare const runtimeReplayTrace: RuntimeReplayTrace;
 const requiredView = Select<string, "load-error", Database>({
   dataSource: {
     getKey: (item) => item,
@@ -167,6 +176,21 @@ const idInvocation: Effect.Effect<
 > = commandService.invokeById(typedCommandId);
 const initialCursor = graphemeIndex(0);
 const boundTextArea = TextArea({ document: textDocumentService });
+const acceptedReplayTrace: ReplayInput = runtimeReplayTrace;
+const replayCaptureHarness: Effect.Effect<
+  TestHarness<true>,
+  TuvrenError,
+  Scope.Scope
+> = testRender(root, {
+  runtimeReplayCapture: {
+    fullContent: true,
+    confirmed: true,
+    start: "context-initialization",
+  },
+});
+
+// @ts-expect-error A redacted/default Trace cannot be used for runtime replay.
+const rejectedReplayTrace: ReplayInput = defaultTrace;
 
 // @ts-expect-error A bound TextArea cannot also declare string state authority.
 TextArea({ document: textDocumentService, value: "duplicate authority" });
@@ -182,6 +206,13 @@ Select({
   },
   getKey: (item: string) => item,
   renderItem: (item: string) => Text({ content: item }),
+});
+// @ts-expect-error Controlled Collection selection requires an intent handler.
+Select({
+  items: ["one"],
+  getKey: (item: string) => item,
+  renderItem: (item: string) => Text({ content: item }),
+  selectedKey: "one",
 });
 const imperativeSave: ImperativeCommand<number, "save-failed"> = {
   id: save,
@@ -224,4 +255,7 @@ void streamRender;
 void idInvocation;
 void initialCursor;
 void boundTextArea;
+void acceptedReplayTrace;
+void replayCaptureHarness;
+void rejectedReplayTrace;
 void imperative;

@@ -6,6 +6,8 @@ import type {
   ComponentId,
   TerminalProfile,
   TuvrenError,
+  TuvrenErrorCategory,
+  TuvrenErrorCode,
   View,
 } from "./shared";
 
@@ -28,8 +30,8 @@ export interface SemanticElement {
 }
 
 export interface DiagnosticIssue {
-  readonly code: string;
-  readonly category: string;
+  readonly code: TuvrenErrorCode;
+  readonly category: TuvrenErrorCategory;
   readonly operation: string;
   readonly component?: string;
   readonly phase:
@@ -91,7 +93,10 @@ export interface DiagnosticSnapshot {
   readonly issues?: readonly DiagnosticIssue[];
 }
 
-export interface DiagnosticTrace<FullContent extends boolean = boolean> {
+export interface DiagnosticTrace<
+  FullContent extends boolean = boolean,
+  RuntimeReplay extends boolean = false,
+> {
   readonly schemaVersion: "1.0.0";
   readonly traceId: string;
   readonly createdAt: string;
@@ -114,16 +119,28 @@ export interface DiagnosticTrace<FullContent extends boolean = boolean> {
         environment: "redacted";
         absolutePaths: "redacted";
       }>;
-  readonly replay: FullContent extends true
-    ? Readonly<{ runtime: "available"; applicationInput: "available" }>
-    : Readonly<{ runtime: "redacted"; applicationInput: "redacted" }>;
+  readonly replay: Readonly<{
+    runtime: RuntimeReplay extends true ? "available" : "redacted";
+    applicationInput: FullContent extends true ? "available" : "redacted";
+  }>;
+  readonly capture: RuntimeReplay extends true
+    ? Readonly<{
+        startedAt: "context-initialization";
+        completePrefix: true;
+      }>
+    : Readonly<{
+        startedAt: "context-initialization" | "attached";
+        completePrefix: false;
+      }>;
   readonly rootCorrelation: Readonly<{
     contextId: string;
     initialSequence: string;
+    initialRecordId: string;
   }>;
   readonly records: readonly Readonly<{
     sequence: string;
     kind:
+      | "context"
       | "input"
       | "event"
       | "command"
@@ -142,7 +159,9 @@ export interface DiagnosticTrace<FullContent extends boolean = boolean> {
       | "unattributed";
     timestampNanos: string;
     correlation: Readonly<{
-      contextId?: string;
+      recordId: string;
+      contextId: string;
+      parentRecordId?: string;
       eventId?: string;
       commandId?: string;
       effectSpanId?: string;
@@ -241,7 +260,7 @@ export interface ReplayFile {
   readonly file: string | URL;
 }
 
-export type RuntimeReplayTrace = DiagnosticTrace<true>;
+export type RuntimeReplayTrace = DiagnosticTrace<true, true>;
 export type ReplayInput = ApplicationReplay | RuntimeReplayTrace | ReplayFile;
 
 export interface FailureTrace {
@@ -301,7 +320,7 @@ export interface TestDriver {
   advanceTime(milliseconds: number): Effect.Effect<void>;
 }
 
-export interface TestHarness {
+export interface TestHarness<RuntimeReplay extends boolean = false> {
   readonly driver: TestDriver;
   readonly testClock: TestClock.TestClock;
   getByRole(
@@ -314,10 +333,13 @@ export interface TestHarness {
   ): Effect.Effect<SemanticElement | undefined>;
   waitForVisualIdle(): Effect.Effect<void, TuvrenError>;
   snapshot(): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
-  trace(): Effect.Effect<DiagnosticTrace<false>, TuvrenError>;
+  trace(): Effect.Effect<DiagnosticTrace<false, false>, TuvrenError>;
   trace(
     options: Readonly<{ fullContent: true; confirmed: true }>,
-  ): Effect.Effect<DiagnosticTrace<true>, TuvrenError>;
+  ): Effect.Effect<DiagnosticTrace<true, false>, TuvrenError>;
+  readonly replayTrace: RuntimeReplay extends true
+    ? Effect.Effect<RuntimeReplayTrace, TuvrenError>
+    : never;
   replay(input: ReplayInput): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
   failureTrace(): Effect.Effect<FailureTrace | undefined>;
   saveTrace(path: string): Effect.Effect<void, TuvrenError>;
@@ -330,7 +352,24 @@ export interface TestRenderOptions {
   readonly height?: number;
   readonly terminal?: Partial<TerminalProfile>;
   readonly automaticTraceOnFailure?: boolean;
+  readonly runtimeReplayCapture?: never;
 }
+
+export interface RuntimeReplayTestRenderOptions extends Omit<
+  TestRenderOptions,
+  "runtimeReplayCapture"
+> {
+  readonly runtimeReplayCapture: Readonly<{
+    fullContent: true;
+    confirmed: true;
+    start: "context-initialization";
+  }>;
+}
+
+export function testRender<E, R>(
+  view: View<E, R>,
+  options: RuntimeReplayTestRenderOptions,
+): Effect.Effect<TestHarness<true>, TuvrenError | E, Scope.Scope | R>;
 
 export function testRender<E, R>(
   view: View<E, R>,
