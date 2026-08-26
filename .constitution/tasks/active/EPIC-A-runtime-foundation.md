@@ -9,10 +9,10 @@ Establish the Stage 3 physical contract before capability work builds on it. Thi
 - **Dependencies:** None
 - **Category:** Dependency-Upgrade
 - **Capabilities:** P0-A08, P0-O07, OPS-05
-- **Scope (In-Scope Files):** `rust-toolchain.toml`, `native/Cargo.toml`, `native/Cargo.lock`, root `package.json`, root `bun.lock`, `ts/package.json`, removal of `ts/bun.lock`, `devenv.nix`
+- **Scope (In-Scope Files):** `rust-toolchain.toml`, `native/Cargo.toml`, `native/Cargo.lock`, root `package.json`, root `bun.lock`, `scripts/check-toolchain.ts`, `ts/package.json`, removal of `ts/bun.lock`, `devenv.nix`
 - **Scope (Out-of-Scope Files):** `.constitution/prd/`, `.constitution/architecture/`, public behavior beyond the Stage 3 contracts
-- **Verification Command:** `bun install --frozen-lockfile && bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile && cargo check --manifest-path native/Cargo.toml --locked && cargo +nightly-2026-08-20 --version && cargo +nightly-2026-08-20 fuzz --version && c++ --version`
-- **Expected Success Output:** every command exits 0 with exact production and fuzz tool versions and no competing nested host lock
+- **Verification Command:** `bun run check:toolchain && bun install --frozen-lockfile && bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile && cargo check --manifest-path native/Cargo.toml --locked`
+- **Expected Success Output:** the machine checker accepts only Bun 1.4.0, rustc 1.98.0, nightly-2026-08-20, cargo-fuzz 0.13.2, and GCC 15.2.0; frozen installs and locked Cargo check then exit 0 with no competing nested host lock
 - **STOP Conditions:** STOP if a pinned Stage 3 dependency cannot build on a supported target; report the compatibility evidence for a Stage 3 Evolution pass.
 - **Description:** Adopt the exact Rust and Bun workspace dependency baselines, move host dependency ownership to the root workspace, commit canonical locks, and preserve the independent contract-validation lock.
 - **Acceptance:**
@@ -20,7 +20,7 @@ Establish the Stage 3 physical contract before capability work builds on it. Thi
   - **Evidence:**
 
 ```text
-Frozen root and contract installs resolve the exact Stage 3 baselines; locked Cargo check uses stable Rust 1.98.0; the fuzz-only checks report nightly-2026-08-20, cargo-fuzz 0.13.2, and GCC 15.2.0; `devenv shell` exposes the same tools; no `ts/bun.lock` or unlocked direct dependency remains.
+`check:toolchain` parses each executable's machine-readable or stable version output and fails on any Bun, stable Rust, nightly, cargo-fuzz, or GCC mismatch before installation; frozen root and contract installs resolve the exact Stage 3 baselines; `devenv shell` exposes the same tools; no `ts/bun.lock` or unlocked direct dependency remains.
 ```
 
 #### TUI-A008 Migrate the host module layout and repair the strict TypeScript baseline

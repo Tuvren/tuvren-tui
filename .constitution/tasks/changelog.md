@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.15 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.5 executor-first Collection/Transcript intent derivation and TechSpec v9.0.16 authoritative wrap evidence, discriminated Trace records, closed Event modifiers, machine-checked toolchains, aggregate ABI parity, and full registry-package verification.
+- Kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because existing foundation, interaction, diagnostic, and release tickets own the additional evidence.
+
 ## v10.0.14 — 2026-08-26
 
 ### Fixed
