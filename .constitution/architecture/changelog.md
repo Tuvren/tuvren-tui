@@ -2,6 +2,12 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.7] — 2026-08-26
+
+### Fixed
+
+- Routed completed Interaction and Animation Events through the UI Executor before application or SDK delivery.
+
 ## [v4.0.6] — 2026-08-26
 
 ### Fixed

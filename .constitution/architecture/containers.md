@@ -2,7 +2,7 @@
 
 ## Version
 
-**v4.0.6** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
+**v4.0.7** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
 
 ## External actors and environments
 
@@ -196,7 +196,8 @@ flowchart LR
     EXEC -->|one render request per transaction| PRESENT
     SESSION -->|normalized bounded input| EXEC
     EXEC -->|serialized input operations| INTERACT
-    INTERACT -->|ordered in-process events| ORCH
+    INTERACT -->|completed Event records| EXEC
+    EXEC -->|post-completion Event delivery| ORCH
     INTERACT -->|executor-scoped default transitions| COMP
     COMP -->|retained state and dirty causes| PRESENT
     CONTENT -->|measured visible projection| PRESENT

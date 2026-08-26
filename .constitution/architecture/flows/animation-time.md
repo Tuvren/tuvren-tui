@@ -23,9 +23,10 @@ sequenceDiagram
         Time-->>Present: Apply current property values and dirty cause
         Present-->>Obs: Record tier and presentation
     end
-    Time-->>SDK: Emit completion or interruption
+    Time-->>Exec: Complete native operation with Animation Event
+    Exec-->>SDK: Deliver Event and resolve or interrupt handle after completion
 ```
 
 ## Failure path
 
-Invalid properties or timelines reject before activation. Under frame pressure, intermediate decorative presentations may be reduced, but elapsed duration, final state, completion, cancellation, and reduced-motion outcomes remain correct. Tests substitute deterministic manual time.
+Invalid properties or timelines reject before activation. The native Time kernel never resolves an SDK handle directly; completion returns as an Animation Event through the executor-owned drain after native work ends. Under frame pressure, intermediate decorative presentations may be reduced, but elapsed duration, final state, completion, cancellation, and reduced-motion outcomes remain correct. Tests substitute deterministic manual time.
