@@ -8,7 +8,7 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ### Added
 
-- Added separate source-migration and contract-validator tickets, a post-kernel Component catalog convergence gate with an ordinary external package fixture, reproducible OD-02 and comparative evidence builders, and the aggregate release-candidate command. The corrected active plan has 60 tickets and 374 points.
+- Added separate host/native source-migration and contract-validator tickets, a post-kernel Component catalog convergence gate with an ordinary external package fixture, reproducible OD-02 and comparative evidence builders, and the aggregate release-candidate command. The corrected active plan has 61 tickets and 377 points.
 
 ### Fixed
 
