@@ -447,7 +447,6 @@ Provide these commands:
 - `bunx tuvren dev ENTRY`
 - `bunx tuvren doctor`
 - `bunx tuvren trace view TRACE_FILE`
-- `bunx tuvren examples` or an equivalent no-clone browser.
 
 Register these rebindable framework Commands:
 
