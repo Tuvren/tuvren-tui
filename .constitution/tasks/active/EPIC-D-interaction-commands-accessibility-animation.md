@@ -41,7 +41,7 @@ The report links pinned raw results and the reproducer command, records p95 inpu
   - **Evidence:**
 
 ```text
-Synthetic and terminal-derived Event sequences preserve order, target, focus, capture, modal boundaries, overflow policy, and cleanup under handler failure and shutdown.
+Synthetic and terminal-derived Event sequences preserve order, target, the exact modifier mask, focus, capture, modal boundaries, overflow policy, and cleanup under handler failure and shutdown. Key, pointer-move, pointer-button, and wheel fixtures reject every bit outside `TUVREN_EVENT_MOD_MASK`.
 ```
 
 #### TUI-D003 Implement only the ratified Event arbitration outcome

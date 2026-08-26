@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.16 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.6 post-completion application delivery and TechSpec v9.0.17 correlated wrap evidence, Transcript controller binding, cached visible ranges, strict modifier masks, and quarantine-before-final registry verification.
+- Added TUI-D002 as the interaction prerequisite for TUI-E005, increasing the graph to 155 edges while retaining 62 tickets, 385 points, the 127-point critical path, and 152/152 P0 coverage.
+
 ## v10.0.15 — 2026-08-26
 
 ### Fixed

@@ -139,12 +139,12 @@ A fresh `check:release-candidate` run executes `check:toolchain` and `check:abi-
 - **Scope (Out-of-Scope Files):** partial publish, post-`0.1.0` roadmap scope, v1 compatibility promises
 - **Verification Command:** `bun run test:registry-package`
 - **Expected Success Output:** registry-installed `0.1.0` passes all five target-native smokes plus CLI, declarations, source maps, licenses, checksums, provenance, and exact artifact/version/ABI verification
-- **STOP Conditions:** STOP before publish unless TUI-I006 is clean; if any publish step fails, do not promote or describe the set as final until atomic consistency is restored.
-- **Description:** Publish `tuvren-tui` and all five platform packages at one exact version with provenance, then install from the registry and verify resolver, ABI, headless render, shutdown, CLI, declarations, maps, licenses, and checksums.
+- **STOP Conditions:** STOP before quarantined publish unless TUI-I006 is clean; never attach the final `latest` tag unless registry verification passes for all six exact artifacts; if publish, verification, or tag promotion partially fails, restore quarantine tags and do not describe the set as final until atomic consistency is restored.
+- **Description:** Publish `tuvren-tui` and all five platform packages at exact version `0.1.0` with provenance under one revision-scoped quarantine dist-tag that is not `latest`. Install those exact quarantined registry bytes and verify resolver, ABI, headless render, shutdown, CLI, declarations, maps, licenses, checksums, and provenance on all targets. Only after success, promote the same six immutable versions to the final tag; no rebuild or byte substitution is allowed between verification and promotion.
 - **Acceptance:**
   - **Mode:** runbook_probe
   - **Evidence:**
 
 ```text
-Registry metadata and target-native logs prove all six artifacts, exact version/ABI equality, checksums/provenance, ordinary one-command install, no native setup, successful CLI execution, loadable declarations and source maps, complete licenses, and headless render/shutdown on every target.
+Quarantine-tag metadata and target-native logs prove all six artifacts, exact version/ABI equality, checksums/provenance, ordinary one-command install, no native setup, successful CLI execution, loadable declarations and source maps, complete licenses, and headless render/shutdown on every target. Final-tag metadata is created only afterward and resolves to the identical verified checksums for all six versions.
 ```
