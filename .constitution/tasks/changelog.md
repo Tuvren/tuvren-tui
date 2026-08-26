@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.4 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.5 layout separation, native query and mutation-result paths, complete Command and scoped-Keymap parity, Theme-token wire records, cancellable generation-aware Collections, interruptible animation handles, and correlated replay payloads.
+- Kept the existing 61-ticket, 377-point dependency graph unchanged because TUI-A003, TUI-A009, TUI-B002–TUI-B004, TUI-C002 and TUI-C004, TUI-D004, TUI-D006, TUI-E001, and TUI-G002 already own these corrected contract obligations.
+
 ## v10.0.3 — 2026-08-26
 
 ### Fixed
