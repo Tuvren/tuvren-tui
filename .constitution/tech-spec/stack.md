@@ -101,9 +101,11 @@ Pre-`1.0` minor releases may break public SDK contracts only with a changelog, m
 
 JSON Schema validates each durable shape but cannot enforce cross-artifact equality. Release verification must additionally run `validateAtomicReleaseManifest` as defined by `contracts/release-validation.json`; that validator proves exact artifact membership, SemVer, package/artifact version equality, ABI equality, checksums, package manifests, source revisions, and provenance before any publish begins.
 
+Diagnostic snapshots use `row-major-rle-v1` cell runs. `validateDiagnosticSnapshotRuns` in `contracts/snapshot-validation.json` performs the checked cross-field sum, exact dense reconstruction, and cursor bounds that JSON Schema cannot express.
+
 ## Dependency and upgrade policy
 
-- Commit `Cargo.lock` and `bun.lock`; CI uses frozen installs and `--locked` Cargo operations.
+- Commit `native/Cargo.lock`, the root `bun.lock`, and the independent `.constitution/tech-spec/contracts/bun.lock`; CI uses frozen Bun workspace and contract installs plus `--locked` Cargo operations. Remove the competing `ts/bun.lock` during workspace migration.
 - Production dependencies use explicit compatible ranges in manifests and exact versions in lockfiles. Toolchains and release automation use exact versions or immutable commit hashes.
 - One scheduled compatibility lane tests the latest patch of Rust stable, Bun stable, Effect 3, TypeScript 5.9, and every direct Rust dependency without updating the release lock.
 - Contract validation has its own frozen `contracts/bun.lock`, generated through Bun, and resolves the exact Effect `3.22.1`, TypeScript `5.9.3`, Reactivity `1.14.4`, and schema-validator baselines instead of borrowing the Brownfield application lock.

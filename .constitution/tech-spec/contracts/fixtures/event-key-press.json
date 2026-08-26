@@ -1,0 +1,21 @@
+{
+  "description": "ABI 2.0 Event batch contains a cancelable Control+A key press with USB HID physical code 4 and UTF-8 text a",
+  "byteLength": 105,
+  "bytesHex": "545556450200000001000000200000003000000050000000190000000000000001000000000000000200000000000000010001000300000050000000180000000000000000000000000000000000000018000100020000004100000004000000680000000100000061",
+  "expected": {
+    "events": [
+      {
+        "eventId": "1",
+        "timestampNanos": "2",
+        "type": "KEY",
+        "target": 3,
+        "cancelable": true,
+        "action": "PRESS",
+        "modifiers": ["CONTROL"],
+        "keyCode": 65,
+        "physicalCode": 4,
+        "text": "a"
+      }
+    ]
+  }
+}

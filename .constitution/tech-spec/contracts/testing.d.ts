@@ -29,9 +29,9 @@ export interface DiagnosticSnapshot {
   readonly surface: Readonly<{
     width: number;
     height: number;
-    cells: readonly Readonly<{
-      x: number;
-      y: number;
+    cellEncoding: "row-major-rle-v1";
+    cellRuns: readonly Readonly<{
+      count: number;
       grapheme: string;
       width: number;
       continuation: boolean;

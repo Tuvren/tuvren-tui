@@ -35,14 +35,16 @@
     "surface": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["width", "height", "cells"],
+      "required": ["width", "height", "cellEncoding", "cellRuns"],
       "properties": {
         "width": { "type": "integer", "minimum": 1, "maximum": 3000 },
         "height": { "type": "integer", "minimum": 1, "maximum": 1000 },
-        "cells": {
+        "cellEncoding": { "const": "row-major-rle-v1" },
+        "cellRuns": {
           "type": "array",
-          "maxItems": 100000,
-          "items": { "$ref": "#/$defs/cell" }
+          "minItems": 1,
+          "maxItems": 3000000,
+          "items": { "$ref": "#/$defs/cellRun" }
         },
         "cursor": {
           "anyOf": [
@@ -61,13 +63,12 @@
         }
       }
     },
-    "cell": {
+    "cellRun": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["x", "y", "grapheme", "width", "continuation", "style"],
+      "required": ["count", "grapheme", "width", "continuation", "style"],
       "properties": {
-        "x": { "type": "integer", "minimum": 0 },
-        "y": { "type": "integer", "minimum": 0 },
+        "count": { "type": "integer", "minimum": 1, "maximum": 3000000 },
         "grapheme": { "type": "string" },
         "width": { "type": "integer", "minimum": 0, "maximum": 8 },
         "continuation": { "type": "boolean" },
