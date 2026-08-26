@@ -50,6 +50,11 @@
         "statistic": { "enum": ["p50", "p95", "p99", "mean"] }
       }
     },
+    "metricDefinitions": {
+      "type": "object",
+      "maxProperties": 256,
+      "additionalProperties": { "$ref": "#/$defs/metricDefinition" }
+    },
     "samples": {
       "type": "array",
       "minItems": 1,
@@ -67,7 +72,12 @@
           "engineNanos": { "type": "integer", "minimum": 0 },
           "writeNanos": { "type": "integer", "minimum": 0 },
           "inputToSurfaceNanos": { "type": "integer", "minimum": 0 },
-          "residentBytes": { "type": "integer", "minimum": 0 }
+          "residentBytes": { "type": "integer", "minimum": 0 },
+          "metrics": {
+            "type": "object",
+            "maxProperties": 256,
+            "additionalProperties": { "$ref": "#/$defs/metricSampleValue" }
+          }
         }
       }
     },
@@ -84,7 +94,74 @@
         "engineNanos": { "type": "number", "minimum": 0 },
         "writeNanos": { "type": "number", "minimum": 0 },
         "inputToSurfaceNanos": { "type": "number", "minimum": 0 },
-        "residentBytes": { "type": "number", "minimum": 0 }
+        "residentBytes": { "type": "number", "minimum": 0 },
+        "metrics": {
+          "type": "object",
+          "maxProperties": 256,
+          "additionalProperties": { "$ref": "#/$defs/metricSummary" }
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "maxItems": 1000,
+      "items": { "$ref": "#/$defs/evidenceCheck" }
+    }
+  },
+  "$defs": {
+    "metricDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["unit", "valueType", "description"],
+      "properties": {
+        "unit": {
+          "enum": [
+            "nanoseconds",
+            "bytes",
+            "count",
+            "ratio",
+            "percent",
+            "calls",
+            "allocations",
+            "boolean"
+          ]
+        },
+        "valueType": { "enum": ["number", "integer", "boolean"] },
+        "description": { "type": "string", "minLength": 1, "maxLength": 1024 }
+      }
+    },
+    "metricSampleValue": {
+      "oneOf": [{ "type": "number", "minimum": 0 }, { "type": "boolean" }]
+    },
+    "metricSummary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["statistic", "value"],
+      "properties": {
+        "statistic": {
+          "enum": ["p50", "p95", "p99", "mean", "min", "max", "sum", "exact"]
+        },
+        "value": { "$ref": "#/$defs/metricSampleValue" }
+      }
+    },
+    "jsonScalar": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string", "maxLength": 4096 }
+      ]
+    },
+    "evidenceCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "passed"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "passed": { "type": "boolean" },
+        "actual": { "$ref": "#/$defs/jsonScalar" },
+        "expected": { "$ref": "#/$defs/jsonScalar" },
+        "message": { "type": "string", "maxLength": 4096 }
       }
     }
   }

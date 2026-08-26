@@ -2,6 +2,7 @@ import type { TerminalProfile, TuvrenError } from "./shared";
 import type { ImperativeApp } from "./imperative";
 import type {
   DiagnosticSnapshot,
+  DiagnosticIssue,
   DiagnosticTrace,
   FailureTrace,
   LeakReport,

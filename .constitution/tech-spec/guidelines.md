@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.7** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.8** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -93,8 +93,9 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries require a Command ID; they never duplicate the action body. Registry lookup failures are `TuvrenError` subclasses with the standard stable metadata.
 - Keymaps use branded hierarchical scope identities; omitted scope identifies the global root in bindings, rebindings, conflict reports, and queries. A Key Sequence is a nonempty ordered array of Key Strokes. Named keys use the lowercase names declared by `NamedKey`; text keys pass through `keyGrapheme`, which requires one NFC grapheme and lowercases logical alphabetic keys while Shift remains a modifier. Modifier fields are an order-independent set. When `physicalCode` is present, its USB HID usage ID is the match discriminator and `key` is the logical fallback for terminals without physical codes. Chords use array order, default to a 1,000 ms inter-stroke timeout, accept 50–5,000 ms, and reset on mismatch, timeout, scope change, focus change, or shutdown. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
 - `DataSource.loadRange` receives an `AbortSignal`. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
-- Collection selection is a generation-stamped keyed mutation rather than a visible-node flag, so selection survives projection and eviction. Controllers submit the same operation through the executor.
-- Animation creation returns an interruptible handle in both SDKs. Cancellation and replacement are native animation-registry operations, and completion reports `completed`, `cancelled`, or `replaced` without making dropped presentations part of logical time.
+- Collection selection is a generation-stamped keyed mutation rather than a visible-node flag, so selection survives projection and eviction. Native Collection state maintains both a stable-key map and an explicit ordered-key vector with a synchronized position index. Host-side generic items never cross the ABI; transactions carry bounded typed projection descriptors containing stable keys, projected RuntimeNodes, and estimated heights.
+- Transcript append, insert, replace, reset, and reload records embed the same discriminated TextContent payload used by Text Components. Patch and stream chunks are bounded UTF-8 edits against the existing block Text Document.
+- Animation creation returns an interruptible handle in both SDKs. Cancellation and replacement are native animation-registry operations, and completion reports `completed`, `cancelled`, or `replaced` without making dropped presentations part of logical time. Replacement resolves the old handle as `replaced` and returns a new handle with a distinct ID and completion lifecycle.
 - Primitive and Component imperative wrappers both delegate animation to the same native registry; private Component roots remain inaccessible.
 
 ## ABI and codec standards
@@ -115,6 +116,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Public positions are grapheme indices. Internal byte offsets may exist only beside the content epoch they were derived from.
 - ABI status values are private: success, buffer-too-small, invalid-input, stale-context, unavailable, and panic-contained. TypeScript copies details immediately and maps them to public errors.
 - Rust never invokes a TypeScript callback. Cancelable Event arbitration, if OD-02 is ratified, uses bounded request and disposition records through the executor.
+- Pointer capture and drag-and-drop retain source, current drop target, button, pointer identity, coordinates, and capture ownership in the Interaction Kernel. Drag start, motion, drop, end, and capture changes use discriminated public and wire Events and are cleared on release, cancellation, focus loss, or shutdown.
 - Clipboard media discovery emits bounded typed chunks. Text helpers use validated UTF-8 and `text/plain;charset=utf-8` over the same permission-aware read/write protocol. Both SDKs query the current Terminal Capability snapshot through bounded native copy-out rather than relying on a prior Event.
 
 ## Markdown and formatted-text profile
@@ -133,6 +135,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Property tests cover transaction atomicity, Event order, Command concurrency, stale generation, eviction protection, grapheme coordinates, and style precedence.
 - Fuzz targets cover transaction batches, Event batches, formatted text, terminal responses, clipboard chunks, Diagnostic Traces, snapshots, profiles, and replay fixtures.
 - Performance evidence publishes pinned versions, hardware, warmup, samples, statistics, raw schema-valid results, engine time, terminal-write time, and input-to-Surface time.
+- Benchmark evidence declares every non-core metric with a unit and value type, records per-sample values plus per-metric statistics, and carries named pass/fail checks for correctness properties such as timeout, reentrancy, exactly-once disposition, idle passes, animation accuracy, boundary calls, CPU overhead, and allocation behavior.
 - Benchmark adaptation uses 120 Hz, 90 Hz, and 60 Hz tiers with hysteresis and an explicit degradation allowlist.
 
 ## Observability and privacy
@@ -141,6 +144,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Diagnostic-off code performs no steady-state diagnostic allocation and remains below 1% CPU overhead.
 - Passive metadata remains below 3%; full trace remains below 10%, uses bounded memory, and reports visible overhead.
 - Raw input, clipboard content, terminal payloads, environment values, and absolute paths are redacted by default. Full-content traces require confirmation.
+- Recoverable Issues persist phase, stable error, Component, source, bounded cause summary, preceding Event or Command, trace interval, remediation, and available report/trace/restart actions in snapshots and replay.
 - Temporary debug output uses the ticket-scoped prefix required by the execution workflow and must not remain in a milestone commit.
 
 ## Compatibility and migration

@@ -103,14 +103,94 @@
     "issue": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["code", "category", "operation", "message", "remediation"],
+      "required": [
+        "code",
+        "category",
+        "operation",
+        "phase",
+        "source",
+        "cause",
+        "preceding",
+        "traceInterval",
+        "message",
+        "remediation",
+        "actions"
+      ],
       "properties": {
         "code": { "type": "string", "minLength": 1 },
         "category": { "type": "string", "minLength": 1 },
         "operation": { "type": "string", "minLength": 1 },
         "component": { "type": "string" },
+        "phase": {
+          "enum": [
+            "input",
+            "event",
+            "command",
+            "effect",
+            "reconcile",
+            "transaction",
+            "mutation",
+            "layout",
+            "text",
+            "render",
+            "terminal",
+            "cleanup"
+          ]
+        },
+        "source": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind"],
+          "properties": {
+            "kind": { "enum": ["application", "sdk", "native", "terminal"] },
+            "file": { "type": "string" },
+            "line": { "type": "integer", "minimum": 1 },
+            "column": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "cause": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "summary"],
+          "properties": {
+            "kind": {
+              "enum": ["error", "panic", "terminal", "validation", "unknown"]
+            },
+            "summary": { "type": "string", "maxLength": 4096 }
+          }
+        },
+        "preceding": {
+          "anyOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "properties": {
+                "eventId": { "type": "string", "pattern": "^[0-9]+$" },
+                "commandId": { "type": "string", "minLength": 1 }
+              }
+            }
+          ]
+        },
+        "traceInterval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["startSequence", "endSequence"],
+          "properties": {
+            "startSequence": { "type": "string", "pattern": "^[0-9]+$" },
+            "endSequence": { "type": "string", "pattern": "^[0-9]+$" }
+          }
+        },
         "message": { "type": "string" },
-        "remediation": { "type": "string" }
+        "remediation": { "type": "string" },
+        "actions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "enum": ["report", "trace", "restart"] }
+        }
       }
     }
   }

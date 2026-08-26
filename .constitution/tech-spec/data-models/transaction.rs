@@ -152,7 +152,7 @@ pub struct TextDocumentConfigPayload<'a> {
 pub struct CollectionPayload<'a> {
     pub kind: u16,
     pub key: ValidatedCollectionKey<'a>,
-    pub item: &'a [u8],
+    pub item_descriptors: &'a [u8],
     pub keys: &'a [u8],
     pub generation: u64,
 }
@@ -168,12 +168,19 @@ pub enum ValidatedCollectionKey<'a> {
 pub struct TranscriptPayload<'a> {
     pub kind: u16,
     pub block_id: &'a str,
-    pub content: &'a [u8],
+    pub content: ValidatedTranscriptContent<'a>,
     pub records: &'a [u8],
     pub version: u64,
     pub generation: u64,
     pub index: u64,
     pub range: (u32, u32),
+}
+
+#[derive(Clone, Debug)]
+pub enum ValidatedTranscriptContent<'a> {
+    None,
+    Text(TextContentPayload<'a>),
+    Utf8(&'a str),
 }
 
 #[derive(Clone, Copy, Debug)]
