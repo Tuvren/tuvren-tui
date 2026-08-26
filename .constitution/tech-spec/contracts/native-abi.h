@@ -928,6 +928,12 @@ typedef struct TuvrenDimensionAtom {
     float value;
 } TuvrenDimensionAtom;
 
+/* CELLS atoms are finite nonnegative cell units. PERCENT atoms use percentage
+ * points: public "50%" encodes as 50.0, never 0.5, and values must be finite in
+ * [0, 100]. AUTO/MIN_CONTENT/MAX_CONTENT require value +0.0. An atom whose bit
+ * is absent from its owning present_mask is all-zero. Negative zero is
+ * normalized to positive zero before encoding. */
+
 typedef struct TuvrenDimension {
     uint16_t size;
     uint16_t present_mask;
@@ -945,6 +951,12 @@ typedef struct TuvrenGridTrack {
     TuvrenDimension maximum;
 } TuvrenGridTrack;
 
+/* GRID_TRACK_DIMENSION stores its Dimension in minimum and requires fraction
+ * +0.0 and maximum all-zero. GRID_TRACK_FRACTION stores a finite positive value
+ * in fraction and requires minimum/maximum all-zero. GRID_TRACK_MINMAX stores
+ * minimum and maximum, requires fraction +0.0, and validates minimum <= maximum
+ * whenever both resolve to comparable fixed units. All unused fields are zero. */
+
 typedef struct TuvrenResponsiveCondition {
     uint32_t present_mask;
     float min_width_cells;
@@ -956,6 +968,11 @@ typedef struct TuvrenResponsiveCondition {
     float min_height_percent;
     float max_height_percent;
 } TuvrenResponsiveCondition;
+
+/* Responsive cell thresholds are finite nonnegative cell units. Responsive
+ * percentage thresholds use the same [0, 100] percentage-point unit as
+ * Dimension atoms. Fields absent from present_mask are +0.0; paired minimums
+ * cannot exceed maximums. */
 
 typedef struct TuvrenLayoutPayload {
     uint16_t size;
@@ -1058,7 +1075,8 @@ typedef struct TuvrenStylePayload {
     uint32_t theme_token_count;
 } TuvrenStylePayload;
 
-/* StyleValue literal_bits stores packed RGBA for COLOR, IEEE-754 bits for
+/* StyleValue literal_bits stores packed RGBA for COLOR as 0xRRGGBBAA (red in
+ * bits 31..24, alpha in bits 7..0), IEEE-754 bits for
  * NUMBER, and zero/one for BOOLEAN. TOKEN requires a nonempty UTF-8 name; its
  * fallback uses literal_bits only when HAS_FALLBACK is set. Boolean attribute
  * tokens use a packed TuvrenStyleAttributeTokenRecord array. Border and uniform
@@ -1307,7 +1325,9 @@ typedef struct TuvrenAnimationPayload {
 
 /* Animation value_tag is F64 for opacity/position/dimension/scroll and U64 for
  * packed RGBA color. from fields are read only with TUVREN_ANIMATION_HAS_FROM.
- * repeat_count is ignored with REPEAT_INFINITE. */
+ * repeat_count is ignored with REPEAT_INFINITE. ANIMATION_CANCEL requires only
+ * size and animation_id; every other field is zero and decodes to the distinct
+ * validated cancellation payload rather than a value-bearing animation. */
 
 typedef struct TuvrenTerminalRequestPayload {
     uint16_t size;
@@ -1322,7 +1342,8 @@ typedef struct TuvrenTerminalRequestPayload {
 } TuvrenTerminalRequestPayload;
 
 /* READ_CLIPBOARD uses target and zero data fields; WRITE_CLIPBOARD requires
- * target, media type, and data; ANNOUNCE requires UTF-8 data with target 0;
+ * target, media type, and opaque data; ANNOUNCE requires bounded validated UTF-8
+ * data with target and media type fields zero;
  * DISCOVER_CLIPBOARD_MEDIA_TYPES uses target and zero data fields, then emits
  * one Clipboard Event per media type and marks the final chunk; an empty result
  * emits one completed final Event with an empty media type. SUSPEND,

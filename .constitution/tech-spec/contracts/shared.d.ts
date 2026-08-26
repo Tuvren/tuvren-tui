@@ -37,6 +37,7 @@ export interface TextMatch {
   readonly text: string;
 }
 
+/** Accepts only #RRGGBB, #RRGGBBAA, or integer 0..255 channels; alpha defaults to 255. */
 export type Color =
   | string
   | {
