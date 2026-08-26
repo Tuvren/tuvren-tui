@@ -51,18 +51,18 @@ The complete host source typechecks with zero errors, target ownership paths exi
 - **Dependencies:** TUI-A001
 - **Category:** Correctness
 - **Capabilities:** P0-A08, P0-O07, OPS-05
-- **Scope (In-Scope Files):** `scripts/check-contracts.ts`, generated ABI/symbol checks, root `package.json`, contract validation fixtures
+- **Scope (In-Scope Files):** `scripts/check-contracts.ts`, root `package.json`, frozen Stage 3 declarations/schemas/registries/model artifacts, contract validation fixtures
 - **Scope (Out-of-Scope Files):** application behavior, release-candidate aggregation
 - **Verification Command:** `bun run check:contracts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if a contract cannot be checked mechanically; identify the missing Stage 3 artifact instead of embedding an undocumented rule.
-- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, the closed error-code registry, the named snapshot, trace, replay, benchmark, and atomic-release cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage. Snapshot validation includes rooted Semantic Tree integrity; Trace validation includes strict sequence/time ordering, required backward causal links, privacy/replay coupling, and canonical exact ABI payload bytes.
+- **Description:** Implement the pre-implementation self-validator for public declarations, exact package manifests, immutable schemas and registries, the closed error-code registry, named snapshot/trace/replay/benchmark/atomic-release cross-field validators, and standalone C11/C++17 ABI plus Rust model compilation. Snapshot validation includes rooted Semantic Tree and Issue-registry integrity; Trace validation includes strict sequence/time ordering, owned-versus-parent correlation, privacy/replay-start coupling, and canonical exact ABI payload bytes. Production symbol coverage and cross-language byte parity belong to TUI-A003 after the target ABI exists.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, executes every named cross-field validator including seeded sample-count/metric/replay-index, Semantic Tree graph, Trace order/correlation/privacy/payload drift, compiles every fixed record, decodes all byte fixtures identically, and fails on seeded drift.
+The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, executes every named cross-field validator including seeded sample-count/metric/replay-index, Issue registry, Semantic Tree graph, and Trace order/correlation/privacy/start/payload drift, compiles each frozen C and Rust model independently, and fails on seeded contract drift without claiming parity with code that TUI-A003 has not built yet.
 ```
 
 #### TUI-A010 Migrate native source into the target module ownership layout
@@ -114,18 +114,18 @@ Saturation and lifecycle tests prove one writer, ordered accepted work, bounded 
 - **Dependencies:** TUI-A002
 - **Category:** Security
 - **Capabilities:** P0-A08–P0-A09, SAFE-01
-- **Scope (In-Scope Files):** `native/src/lib.rs`, `native/src/transaction.rs`, `native/fuzz/Cargo.toml`, `native/fuzz/fuzz_targets/transaction_decode.rs`, transaction corpus, `ts/src/ffi/`, generated ABI checks
+- **Scope (In-Scope Files):** `native/src/lib.rs`, `native/src/transaction.rs`, `native/fuzz/Cargo.toml`, `native/fuzz/fuzz_targets/transaction_decode.rs`, transaction corpus, `ts/src/ffi/`, generated ABI/symbol checks and cross-language byte fixtures
 - **Scope (Out-of-Scope Files):** public numeric identities, TypeScript callbacks from Rust, Event arbitration disposition records
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- -max_total_time=60`
 - **Expected Success Output:** no crash, panic escape, out-of-bounds access, or invariant violation for the maintained corpus and configured CI duration
 - **STOP Conditions:** STOP if the implementation requires exposing RuntimeNode IDs or relaxing full-batch prevalidation.
-- **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings and indexed mutation results, bounded query/copy-out reads, exact-version loading, panic containment, and one Render Pass request per committed batch.
+- **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings and indexed mutation results, bounded query/copy-out reads, exact-version loading, panic containment, generated production symbol coverage, TypeScript/Rust byte-fixture parity, and one Render Pass request per committed batch.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Rust and TypeScript decode checked-in byte fixtures identically; query and transaction outputs preflight caller capacities and never expose retained pointers; malformed, misaligned, overlapping, stale, oversized, or incompatible records are rejected before mutation; post-validation unexpected failure freezes and discards the context.
+Generated checks cover every implemented ABI symbol; Rust and TypeScript decode checked-in byte fixtures identically; query and transaction outputs preflight caller capacities and never expose retained pointers; malformed, misaligned, overlapping, stale, oversized, or incompatible records are rejected before mutation; post-validation unexpected failure freezes and discards the context.
 ```
 
 #### TUI-A004 Enforce transaction scheduling, backpressure, and render-request semantics
