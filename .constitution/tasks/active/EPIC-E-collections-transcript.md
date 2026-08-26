@@ -98,11 +98,11 @@ State-machine and instrumentation fixtures prove every operation, stale rejectio
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** both workflows produce identical Transcript state and viewport snapshots
 - **STOP Conditions:** STOP if the SDK retains duplicate block content or shifts an End User away from their anchor.
-- **Description:** Expose every versioned Transcript operation, resident range, eviction and reload Event, live-edge controls, executor-cached `lastVisibleRange()`, and anchor-aware viewport behavior through thin SDK surfaces. Declarative controllers bind through one Transcript's `controller` prop, reject simultaneous double binding, unbind on teardown, and isolate two live Transcript targets.
+- **Description:** Expose every versioned Transcript operation, resident range, eviction and reload Event, live-edge controls, executor-cached `lastVisibleRange()`, and anchor-aware viewport behavior through thin SDK surfaces. Declarative controllers return `unbound` without retaining operations until attached through one Transcript's `controller` prop, return `accepted` only for current-target enqueue, reject simultaneous double binding, cancel pending operations and clear caches before teardown unbind, and isolate later rebinds. Imperative constructors omit controller injection and expose only their own controller.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Controlled and local fixtures stream above and below the viewport, select and collapse Blocks, evict under pressure, reload history, reject stale patches, return undefined then committed visible-range observations without public ABI calls, preserve the End User anchor until explicit live-edge return, and prove two controller-bound Transcripts cannot cross-route or share one live controller.
+Controlled and local fixtures stream above and below the viewport, select and collapse Blocks, evict under pressure, reload history, reject stale patches, return undefined then committed visible-range observations without public ABI calls, preserve the End User anchor until explicit live-edge return, and prove unbound disposition plus bind → observe/enqueue → teardown → cache clear/cancel → rebind isolation across two Transcripts.
 ```

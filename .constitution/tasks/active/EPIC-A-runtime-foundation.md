@@ -56,7 +56,7 @@ The complete host source typechecks with zero errors, target ownership paths exi
 - **Verification Command:** `bun run check:contracts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if a contract cannot be checked mechanically; identify the missing Stage 3 artifact instead of embedding an undocumented rule.
-- **Description:** Implement the pre-implementation self-validator for public declarations, exact package manifests and scripts, immutable schemas and registries, the closed error-code registry, named snapshot/trace/replay/benchmark/atomic-release cross-field validators, and standalone C11/C++17 ABI plus Rust model compilation. Snapshot validation includes rooted Semantic Tree, exact Issue registry tuples, and ordered unsigned intervals; Trace validation includes strict sequence/time ordering, owned-versus-parent correlation, duplicate identity equality and stable mappings, typed wrap boundaries, closed transaction status, every embedded snapshot, enclosing-context/transaction/render or inherited wrap-baseline basis, retained Issue domains, privacy/replay-start coupling, and canonical exact ABI payload bytes. Production symbol coverage and cross-language byte parity belong to TUI-A003 after the target ABI exists.
+- **Description:** Implement the pre-implementation self-validator for public declarations, exact package manifests and scripts, immutable schemas and registries, the closed error-code registry, named snapshot/trace/replay/benchmark/atomic-release cross-field validators, standalone C11/C++17 ABI plus Rust model compilation, and static completeness of the ABI status/output matrix. Snapshot validation includes rooted Semantic Tree, exact Issue registry tuples, and ordered unsigned intervals; Trace validation includes strict sequence/time ordering, owned-versus-parent correlation, duplicate identity equality and stable mappings, typed wrap boundaries, closed transaction status, every embedded snapshot, enclosing-context/transaction/render or inherited wrap-baseline basis, retained Issue domains, privacy/replay-start coupling, and canonical exact ABI payload bytes. Production status fixtures, symbol coverage, and cross-language byte parity belong to TUI-A003 after the target ABI exists.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -119,13 +119,13 @@ Saturation and lifecycle tests prove one writer, ordered accepted work, bounded 
 - **Verification Command:** `bun run check:abi-parity && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- -max_total_time=60`
 - **Expected Success Output:** generated production-symbol coverage and every TypeScript/Rust byte fixture pass before the bounded fuzz target completes with no crash, panic escape, out-of-bounds access, or invariant violation
 - **STOP Conditions:** STOP if the implementation requires exposing RuntimeNode IDs or relaxing full-batch prevalidation.
-- **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings and indexed mutation results, bounded query/copy-out reads, exact-version loading, panic containment, generated production symbol coverage, TypeScript/Rust byte-fixture parity, and one Render Pass request per committed batch.
+- **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings and indexed mutation results, bounded query/copy-out reads, exact-version loading, panic containment, the exact public `TuvrenStatus` return/result initialization matrix and no-command sentinel, generated production symbol coverage, TypeScript/Rust byte-fixture parity, and one Render Pass request per committed batch.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Generated checks cover every implemented ABI symbol; Rust and TypeScript decode checked-in byte fixtures identically; query and transaction outputs preflight caller capacities and never expose retained pointers; malformed, misaligned, overlapping, stale, oversized, or incompatible records are rejected before mutation; post-validation unexpected failure freezes and discards the context.
+Generated checks cover every implemented ABI symbol; Rust and TypeScript decode checked-in success, buffer-too-small, invalid, stale, unavailable, and panic-contained status/output fixtures identically; return and result statuses agree; failure outputs are fully initialized; query and transaction outputs preflight caller capacities and never expose retained pointers; malformed, misaligned, overlapping, stale, oversized, or incompatible records are rejected before mutation; post-validation unexpected failure freezes and discards the context.
 ```
 
 #### TUI-A004 Enforce transaction scheduling, backpressure, and render-request semantics
