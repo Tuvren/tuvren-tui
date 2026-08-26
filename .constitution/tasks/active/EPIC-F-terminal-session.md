@@ -11,7 +11,7 @@ Deliver detection-first modern-terminal behavior and a safe compatible tier for 
 - **Capabilities:** P0-K01–P0-K03, P0-K08, P0-K12, P0-K15
 - **Scope (In-Scope Files):** `native/src/terminal/`, Terminal Profile codec, capability fixtures
 - **Scope (Out-of-Scope Files):** terminal-name allowlists, built-in remote sessions
-- **Verification Command:** `bun run test:terminal`
+- **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** modern, compatible, remote-shell, and multiplexer profiles pass independently
 - **STOP Conditions:** STOP if one unavailable capability demotes unrelated supported behavior or response bytes leak into input Events.
 - **Description:** Implement negotiation, detection-first capability state, modern and compatible tiers, color/palette/theme/geometry/width results, per-capability degradation, bounded pending requests, correlation, and restoration states.
@@ -53,7 +53,7 @@ Protocol fixtures and fuzzing prove exact normalized Events, partial-read recove
 - **Capabilities:** P0-F09, P0-K04–P0-K06, P0-K13–P0-K15
 - **Scope (In-Scope Files):** `native/src/terminal/`, clipboard transaction/Event codec, SDK terminal services and security tests
 - **Scope (Out-of-Scope Files):** clipboard polling, image presentation, raw clipboard tracing
-- **Verification Command:** `bun run test:terminal`
+- **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** read/write/fallback/status fixtures pass with bounded request storage
 - **STOP Conditions:** STOP if a read can start without an explicit application request or content can enter default diagnostics.
 - **Description:** Implement clipboard and primary selection, media discovery, bounded binary chunks, typed correlated statuses, OSC-compatible paths, richer Kitty-level behavior where available, paste Events, text convenience, timeout, validation, and fallback.
@@ -74,7 +74,7 @@ Given available, denied, busy, malformed, timed-out, compatible-only, and rich-c
 - **Capabilities:** P0-K07–P0-K12, P0-K16, REL-01
 - **Scope (In-Scope Files):** `native/src/terminal/`, `ts/src/runtime/`, Screen Mode and pseudo-terminal fixtures
 - **Scope (Out-of-Scope Files):** default global output capture, remote-rendering service
-- **Verification Command:** `bun run test:terminal`
+- **Verification Command:** `bun test ts/test-runner.test.ts`
 - **Expected Success Output:** all mode/output combinations restore deterministically
 - **STOP Conditions:** STOP if inline or split-footer output corrupts scrollback or suspend/resume loses negotiated state without revalidation.
 - **Description:** Implement four Screen Modes, capture/scrollback/passthrough/disabled external output, opt-in global capture, sanitized captured formatting, deterministic suspend/resume, and disconnect cleanup.
