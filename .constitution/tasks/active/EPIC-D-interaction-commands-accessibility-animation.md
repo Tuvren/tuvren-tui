@@ -32,7 +32,7 @@ The report links pinned raw results and the reproducer command, records p95 inpu
 - **Capabilities:** P0-G01–P0-G02, P0-G05–P0-G08
 - **Scope (In-Scope Files):** `native/src/interaction/`, Event ABI codec, `ts/src/runtime/`, interaction fixtures
 - **Scope (Out-of-Scope Files):** OD-02 arbitration, browser input APIs
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-ffi.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-ffi.test.ts`
 - **Expected Success Output:** normalized interaction fixtures pass deterministically
 - **STOP Conditions:** STOP if input routing requires a Rust-to-TypeScript callback or bypasses the UI executor.
 - **Description:** Normalize Events, route through hit-testing, focus and interaction roots, implement Focus Scopes, modal containment, focus restoration, pointer capture, drag-and-drop, bounded queues, and handler-failure recovery.
@@ -74,7 +74,7 @@ The checker proves one final disposition, no double default, bounded wait, deter
 - **Capabilities:** P0-H01–P0-H08
 - **Scope (In-Scope Files):** `ts/src/commands/`, `ts/src/index.ts`, `ts/src/imperative/`, command and Keymap fixtures
 - **Scope (Out-of-Scope Files):** Plugin contribution registries, duplicated action logic in Components
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-commands.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-commands.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if registration loses the Command environment or ID invocation loses the typed failure envelope.
 - **Description:** Implement typed result/failure Commands, captured Effect environments, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, availability, hierarchical scopes, chords, conflict reports, rebinding, and precedence.
@@ -95,7 +95,7 @@ Registry-level adapters invoke one Command programmatically and through Keymap-,
 - **Capabilities:** P0-L01–P0-L07, P0-N15
 - **Scope (In-Scope Files):** `native/src/composition/`, `native/src/interaction/`, semantic snapshot and Primitive conformance fixtures
 - **Scope (Out-of-Scope Files):** operating-system screen-reader bridges, color-only semantics
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-jsx.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** Semantic Tree, keyboard traversal, focus-indicator, and announcement kernel fixtures pass
 - **STOP Conditions:** STOP if semantic queries require private runtime identities or rendered-cell scraping.
 - **Description:** Build roles, names, descriptions, values, states, relationships, keyboard traversal, visible focus primitives, non-color metadata, bounded announcements, and an independently observable Semantic Tree; TUI-B009 applies them across the final catalog.

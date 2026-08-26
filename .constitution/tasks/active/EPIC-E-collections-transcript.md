@@ -32,7 +32,7 @@ Generated mutations and range races preserve key identity, authority, selection/
 - **Capabilities:** P0-I01–P0-I08
 - **Scope (In-Scope Files):** `ts/src/components/`, `ts/src/runtime/`, shared Collection conformance fixtures
 - **Scope (Out-of-Scope Files):** separate loading or selection models per Component
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-jsx.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all Collection-backed Components pass one shared behavior suite
 - **STOP Conditions:** STOP if a Component bypasses the Collection controller or duplicates native projection state.
 - **Description:** Wire Data Sources, incremental Streams/controllers, visible-range and focus callbacks, reload demand, controlled/local state, and shared selection semantics into every Collection-backed Component.
@@ -53,7 +53,7 @@ Identical fixtures exercise loading, empty, error, retry, mutation, variable hei
 - **Capabilities:** P0-I07, P0-L03–P0-L07
 - **Scope (In-Scope Files):** `ts/src/components/`, feedback queue, semantic and manual-clock fixtures
 - **Scope (Out-of-Scope Files):** operating-system notifications, unbounded queues
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-jsx.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** feedback ordering, bounds, focus, announcements, and time behavior pass
 - **STOP Conditions:** STOP if feedback steals focus or disappears without an accessible state signal.
 - **Description:** Compose transient feedback over Overlay, bounded queues, Commands, Semantic announcements, and deterministic time with replacement and dismissal policies.
@@ -95,7 +95,7 @@ State-machine and instrumentation fixtures prove every operation, stale rejectio
 - **Capabilities:** P0-J01–P0-J07
 - **Scope (In-Scope Files):** `ts/src/components/`, Transcript controller, Effect/imperative fixtures and examples
 - **Scope (Out-of-Scope Files):** application storage, OpenCode-specific contracts
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-jsx.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** both workflows produce identical Transcript state and viewport snapshots
 - **STOP Conditions:** STOP if the SDK retains duplicate block content or shifts an End User away from their anchor.
 - **Description:** Expose every versioned Transcript operation, resident range, eviction and reload Event, live-edge controls, and anchor-aware viewport behavior through thin SDK surfaces.

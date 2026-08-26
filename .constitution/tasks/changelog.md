@@ -4,11 +4,22 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.2 — 2026-08-26
+
+### Added
+
+- Added a separate native-module migration ticket and complete fuzz-only environment verification for nightly-2026-08-20, cargo-fuzz 0.13.2, rust-src, and GCC 15.2.0. The active plan now has 61 tickets and 377 points.
+
+### Fixed
+
+- Made every FFI-backed host check rebuild the locked current native release artifact, made parser hardening wait for final Event/input decoders and run all four named fuzz targets, and assigned every fuzz harness/corpus to an owning ticket.
+- Corrected cargo-fuzz root commands, locked canonical release builds, nested the animation acceptance mode correctly, assigned the comparative runner path, and completed `devenv.nix` ownership.
+
 ## v10.0.1 — 2026-08-26
 
 ### Added
 
-- Added separate host/native source-migration and contract-validator tickets, a post-kernel Component catalog convergence gate with an ordinary external package fixture, reproducible OD-02 and comparative evidence builders, and the aggregate release-candidate command. The corrected active plan has 61 tickets and 377 points.
+- Added separate host source-migration and contract-validator tickets, a post-kernel Component catalog convergence gate with an ordinary external package fixture, reproducible OD-02 and comparative evidence builders, and the aggregate release-candidate command. The corrected active plan has 60 tickets and 374 points.
 
 ### Fixed
 

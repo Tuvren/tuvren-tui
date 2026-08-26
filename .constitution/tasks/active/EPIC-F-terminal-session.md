@@ -32,7 +32,7 @@ Profile tests cover success, absence, partial responses, tmux/zellij/screen pass
 - **Capabilities:** P0-G01, P0-K02–P0-K03, P0-K15
 - **Scope (In-Scope Files):** `native/src/terminal/`, `native/src/interaction/`, `native/fuzz/fuzz_targets/terminal_response.rs`, terminal corpus and protocol fixtures
 - **Scope (Out-of-Scope Files):** application Event handlers, terminal-name inference
-- **Verification Command:** `cargo fuzz run --fuzz-dir native/fuzz terminal_response`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response`
 - **Expected Success Output:** maintained corpus has no crash, control injection, unbounded allocation, or response/input confusion
 - **STOP Conditions:** STOP if a partial or ambiguous sequence cannot be resolved within documented bounds.
 - **Description:** Decode Kitty-level keyboard events, repetition and release, text, pointer, focus, bounded paste, and resize while preserving compatible fallbacks and strict response channel ownership.
@@ -74,7 +74,7 @@ Given available, denied, busy, malformed, timed-out, compatible-only, and rich-c
 - **Capabilities:** P0-K07–P0-K12, P0-K16, REL-01
 - **Scope (In-Scope Files):** `native/src/terminal/`, `ts/src/runtime/`, Screen Mode and pseudo-terminal fixtures
 - **Scope (Out-of-Scope Files):** default global output capture, remote-rendering service
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** all mode/output combinations restore deterministically
 - **STOP Conditions:** STOP if inline or split-footer output corrupts scrollback or suspend/resume loses negotiated state without revalidation.
 - **Description:** Implement four Screen Modes, capture/scrollback/passthrough/disabled external output, opt-in global capture, sanitized captured formatting, deterministic suspend/resume, and disconnect cleanup.

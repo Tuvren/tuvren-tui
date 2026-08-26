@@ -32,7 +32,7 @@ Causality fixtures traverse every phase, verify stable error metadata, force rin
 - **Capabilities:** P0-N04–P0-N05, P0-O07–P0-O08, P0-O12, P0-O17, SAFE-02, OPS-05
 - **Scope (In-Scope Files):** `native/src/diagnostics/`, `native/fuzz/fuzz_targets/durable_files.rs`, durable corpora, schema codecs, migration registry, redaction fixtures
 - **Scope (Out-of-Scope Files):** silent schema reinterpretation, implicit full-content capture
-- **Verification Command:** `cargo fuzz run --fuzz-dir native/fuzz durable_files`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files`
 - **Expected Success Output:** no malformed input escapes limits or privacy policy
 - **STOP Conditions:** STOP if a reader allocates or decompresses beyond preflight limits, or if saving full content lacks explicit confirmation.
 - **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, trace/snapshot/profile/replay/benchmark/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
@@ -95,7 +95,7 @@ Moderated seeded-defect runs record median time under 60 seconds; focus-isolatio
 - **Capabilities:** P0-N07–P0-N08, P0-N11, P0-N16, P0-O09–P0-O10, P0-O18
 - **Scope (In-Scope Files):** `ts/src/runtime/`, `ts/src/devtools/`, recovery and watch fixtures
 - **Scope (Out-of-Scope Files):** soft reload preserving runtime IDs, continuing an inconsistent context
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if a watch restart or failed context reuses private runtime identity.
 - **Description:** Add declarative error boundaries, recoverable last-good overlays, root supervisor fallback, bounded failure evidence, explicit restart, and watch mode that tears down and creates a fresh context.
@@ -116,7 +116,7 @@ Given subtree, root, native, and watch failures, when recovery or restart runs, 
 - **Capabilities:** P0-N09–P0-N10, OPS-02
 - **Scope (In-Scope Files):** `ts/src/cli/`, diagnostic probes, seeded load-failure fixtures
 - **Scope (Out-of-Scope Files):** package publication, automatic destructive repair
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-install.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-install.test.ts`
 - **Expected Success Output:** every seeded cause receives the correct code and actionable remediation
 - **STOP Conditions:** STOP if a probe mutates an application context before compatibility checks complete.
 - **Description:** Implement doctor-style checks for host version, platform, package consistency, loading, headless operation, declarative integration, source maps, capabilities, and multiplexer effects using stable errors.
@@ -137,7 +137,7 @@ Seed host, target, artifact, version, load, initialization, render, source-map, 
 - **Capabilities:** P0-O07–P0-O12, SAFE-01–SAFE-02
 - **Scope (In-Scope Files):** all `native/fuzz/fuzz_targets/`, all maintained corpora/artifacts policy, parser inventories, malformed-input tests, CI fuzz jobs
 - **Scope (Out-of-Scope Files):** network services, unsupported parsers
-- **Verification Command:** `cargo fuzz run --fuzz-dir native/fuzz transaction_decode && cargo fuzz run --fuzz-dir native/fuzz event_decode && cargo fuzz run --fuzz-dir native/fuzz terminal_response && cargo fuzz run --fuzz-dir native/fuzz durable_files`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files`
 - **Expected Success Output:** every maintained target/corpus completes its configured CI duration without memory unsafety, panic escape, control injection, privacy leak, or unbounded allocation
 - **STOP Conditions:** STOP release progression if any external content/control boundary lacks a named validator, limit, timeout/correlation rule where applicable, and test owner.
 - **Description:** Inventory and fuzz transactions, Events, formatted text, terminal responses, clipboard chunks, traces, snapshots, profiles, replay, and release evidence under the declared resource and privacy limits.

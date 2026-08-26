@@ -11,8 +11,8 @@ Establish the Stage 3 physical contract before capability work builds on it. Thi
 - **Capabilities:** P0-A08, P0-O07, OPS-05
 - **Scope (In-Scope Files):** `rust-toolchain.toml`, `native/Cargo.toml`, `native/Cargo.lock`, root `package.json`, root `bun.lock`, `ts/package.json`, removal of `ts/bun.lock`, `devenv.nix`
 - **Scope (Out-of-Scope Files):** `.constitution/prd/`, `.constitution/architecture/`, public behavior beyond the Stage 3 contracts
-- **Verification Command:** `bun install --frozen-lockfile && bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile && cargo check --manifest-path native/Cargo.toml --locked`
-- **Expected Success Output:** every command exits 0 with exact target versions and no competing nested host lock
+- **Verification Command:** `bun install --frozen-lockfile && bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile && cargo check --manifest-path native/Cargo.toml --locked && cargo +nightly-2026-08-20 --version && cargo +nightly-2026-08-20 fuzz --version && c++ --version`
+- **Expected Success Output:** every command exits 0 with exact production and fuzz tool versions and no competing nested host lock
 - **STOP Conditions:** STOP if a pinned Stage 3 dependency cannot build on a supported target; report the compatibility evidence for a Stage 3 Evolution pass.
 - **Description:** Adopt the exact Rust and Bun workspace dependency baselines, move host dependency ownership to the root workspace, commit canonical locks, and preserve the independent contract-validation lock.
 - **Acceptance:**
@@ -20,7 +20,7 @@ Establish the Stage 3 physical contract before capability work builds on it. Thi
   - **Evidence:**
 
 ```text
-Frozen root and contract installs resolve the exact Stage 3 baselines; locked Cargo check passes on Rust 1.98.0; `devenv shell` exposes the same toolchain; no `ts/bun.lock` or unlocked direct dependency remains.
+Frozen root and contract installs resolve the exact Stage 3 baselines; locked Cargo check uses stable Rust 1.98.0; the fuzz-only checks report nightly-2026-08-20, cargo-fuzz 0.13.2, and GCC 15.2.0; `devenv shell` exposes the same tools; no `ts/bun.lock` or unlocked direct dependency remains.
 ```
 
 #### TUI-A008 Migrate the host module layout and repair the strict TypeScript baseline
@@ -95,7 +95,7 @@ Locked check and tests compile the complete native graph, module ownership match
 - **Capabilities:** P0-A04–P0-A07, REL-03
 - **Scope (In-Scope Files):** `native/src/context.rs`, `ts/src/runtime/`, `ts/src/index.ts`, `ts/src/imperative/`
 - **Scope (Out-of-Scope Files):** Component catalog, terminal protocol decoders, background rendering
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if any context-bound ABI call can originate outside the owner executor thread.
 - **Description:** Replace implicit global mutation with explicit interactive and isolated headless contexts, one serialized executor queue, managed Effect scopes, manual imperative lifecycle, cancellation, coalescing, shutdown, and deterministic cleanup.
@@ -116,7 +116,7 @@ Saturation and lifecycle tests prove one writer, ordered accepted work, bounded 
 - **Capabilities:** P0-A08–P0-A09, SAFE-01
 - **Scope (In-Scope Files):** `native/src/lib.rs`, `native/src/transaction.rs`, `native/fuzz/Cargo.toml`, `native/fuzz/fuzz_targets/transaction_decode.rs`, transaction corpus, `ts/src/ffi/`, generated ABI checks
 - **Scope (Out-of-Scope Files):** public numeric identities, TypeScript callbacks from Rust, Event arbitration disposition records
-- **Verification Command:** `cargo fuzz run --fuzz-dir native/fuzz transaction_decode`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode`
 - **Expected Success Output:** no crash, panic escape, out-of-bounds access, or invariant violation for the maintained corpus and configured CI duration
 - **STOP Conditions:** STOP if the implementation requires exposing RuntimeNode IDs or relaxing full-batch prevalidation.
 - **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings, exact-version loading, panic containment, and one Render Pass request per committed batch.
@@ -137,7 +137,7 @@ Rust and TypeScript decode checked-in byte fixtures identically; malformed, misa
 - **Capabilities:** P0-A06–P0-A09, PERF-03, REL-03
 - **Scope (In-Scope Files):** `ts/src/runtime/`, `native/src/context.rs`, `native/src/presentation/`, executor saturation tests
 - **Scope (Out-of-Scope Files):** final 120/90/60 tuning, comparative performance cuts
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0` with idle-pass and transaction scheduling assertions enabled
 - **STOP Conditions:** STOP if coalescing would weaken Event order, final state, accessibility semantics, or cleanup.
 - **Description:** Connect dirty causes, transaction commits, priority input work, bounded queues, cancellation, coalescing, and explicit render requests without polling or idle presentation.
@@ -158,7 +158,7 @@ Runner fixtures show zero unexplained idle passes, at most one Render Pass reque
 - **Capabilities:** P0-A01–P0-A05, DX-05–DX-06
 - **Scope (In-Scope Files):** `ts/src/index.ts`, `ts/src/imperative/`, `ts/src/jsx/`, `ts/src/runtime/`, declaration build
 - **Scope (Out-of-Scope Files):** public Signals, `/effect`, raw FFI, separate declarative package
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-effect.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-effect.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if the root surface needs Promise-wrapped Effect APIs or exports Reactivity identity.
 - **Description:** Implement root Effect lifecycle, JSX syntax, private Reactivity, scopes, Streams, and services while exposing the complete advanced Imperative SDK only at `tuvren-tui/imperative` with no Rust knowledge required.
@@ -179,7 +179,7 @@ Packed declarations match the raw contracts; the root has no imperative or Signa
 - **Capabilities:** P0-A04, P0-N07–P0-N11, P0-O09–P0-O11, P0-O18, REL-01
 - **Scope (In-Scope Files):** `ts/src/runtime/`, `ts/src/errors/`, `native/src/context.rs`, `native/src/terminal/`, lifecycle fault tests
 - **Scope (Out-of-Scope Files):** browser crash reporting, remote upload, process-global permanent failure
-- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-runner.test.ts`
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** `exit 0` across lifecycle fault fixtures; TUI-F005 later owns the terminal matrix
 - **STOP Conditions:** STOP if a recoverable failure would discard a healthy context or an unrecoverable failure would preserve mutable private identities.
 - **Description:** Map private statuses to stable public errors, preserve the last known-good Surface for recoverable failures, supervise unrecovered roots, restore terminal state, discard inconsistent contexts, and allow explicit restart.
