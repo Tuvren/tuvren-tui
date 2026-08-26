@@ -5,6 +5,10 @@
     "each cellRuns item has count greater than zero",
     "checked sum of cellRuns[*].count equals checked surface.width multiplied by surface.height",
     "runs expand consecutively in row-major order with no omitted or trailing cells",
-    "cursor coordinates, when present, are inside the Surface"
+    "cursor coordinates, when present, are inside the Surface",
+    "semanticTree ids are unique and every child and relationship target names an existing semanticTree id",
+    "a nonempty semanticTree has exactly one root, every other node has exactly one parent, and child edges contain no self-edge or cycle",
+    "every semanticTree node is reachable from the root and no child appears twice under one parent",
+    "Semantic value and state entries match the exact scalar declaration contract"
   ]
 }

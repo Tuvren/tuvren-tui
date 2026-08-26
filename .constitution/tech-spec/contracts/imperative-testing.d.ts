@@ -18,6 +18,7 @@ export type {
   ApplicationReplayPayloadMap,
   ReplayFile,
   ReplayInput,
+  RuntimeReplayTrace,
 } from "./testing";
 export { jsonNumber } from "./testing";
 
@@ -53,7 +54,10 @@ export interface ImperativeTestHarness {
     options?: Omit<SemanticMatch, "role">,
   ): SemanticElement | undefined;
   snapshot(): DiagnosticSnapshot;
-  trace(): DiagnosticTrace;
+  trace(): DiagnosticTrace<false>;
+  trace(
+    options: Readonly<{ fullContent: true; confirmed: true }>,
+  ): DiagnosticTrace<true>;
   replay(input: ReplayInput): DiagnosticSnapshot;
   failureTrace(): FailureTrace | undefined;
   saveTrace(path: string): void;

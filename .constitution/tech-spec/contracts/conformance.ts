@@ -11,6 +11,7 @@ import {
   Select,
   Terminal,
   Text,
+  TextArea,
   commandId,
   componentId,
   defineTheme,
@@ -24,6 +25,7 @@ import {
   type CommandService,
   type RangeLoadResult,
   type TuvrenError,
+  type TextDocumentService,
   type View,
 } from "./tuvren-tui";
 import { jsx } from "./jsx-runtime";
@@ -107,6 +109,7 @@ declare const failingHandler: Effect.Effect<void, "event-handler-error">;
 declare const requiredCell: View<"cell-error", Database>;
 declare const requiredStream: Stream.Stream<number, "stream-error", Database>;
 declare const commandService: CommandService;
+declare const textDocumentService: TextDocumentService;
 const requiredView = Select<string, "load-error", Database>({
   dataSource: {
     getKey: (item) => item,
@@ -163,6 +166,10 @@ const idInvocation: Effect.Effect<
   Database
 > = commandService.invokeById(typedCommandId);
 const initialCursor = graphemeIndex(0);
+const boundTextArea = TextArea({ document: textDocumentService });
+
+// @ts-expect-error A bound TextArea cannot also declare string state authority.
+TextArea({ document: textDocumentService, value: "duplicate authority" });
 
 // @ts-expect-error A control cannot have simultaneous authorities.
 Input({ value: "controlled", defaultValue: "uncontrolled" });
@@ -216,4 +223,5 @@ void recoveredRender;
 void streamRender;
 void idInvocation;
 void initialCursor;
+void boundTextArea;
 void imperative;

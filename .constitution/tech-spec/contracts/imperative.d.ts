@@ -65,6 +65,7 @@ export type {
   DataSource,
   CollectionController,
   CollectionMutation,
+  CollectionScrollPosition,
   CommandPaletteProps,
   DialogProps,
   DiffViewProps,
@@ -422,6 +423,35 @@ export type ImperativeResult<A, E> =
   | { readonly ok: true; readonly value: A }
   | { readonly ok: false; readonly error: E };
 
+export type ImperativeCommandCompletion<A, E> =
+  | { readonly status: "succeeded"; readonly value: A }
+  | { readonly status: "failed"; readonly error: E }
+  | {
+      readonly status: "interrupted";
+      readonly reason: "cancelled" | "restarted" | "shutdown";
+      readonly cause?: unknown;
+      readonly error: import("./shared").TuvrenCommandError & {
+        readonly code: "TUVREN_COMMAND_INTERRUPTED";
+        readonly operation: "command.interrupt";
+      };
+    }
+  | {
+      readonly status: "rejected";
+      readonly reason: "disabled";
+      readonly error: import("./shared").TuvrenCommandError & {
+        readonly code: "TUVREN_COMMAND_DISABLED";
+        readonly operation: "command.invoke";
+      };
+    }
+  | {
+      readonly status: "rejected";
+      readonly reason: "concurrency";
+      readonly error: import("./shared").TuvrenCommandError & {
+        readonly code: "TUVREN_COMMAND_REJECTED";
+        readonly operation: "command.invoke";
+      };
+    };
+
 export interface ImperativeCommand<A = void, E = never> {
   readonly id: import("./shared").CommandId<A, E, never>;
   readonly title: string;
@@ -459,7 +489,7 @@ export class ImperativeRegisteredCommandError extends TuvrenError {
 
 export interface ImperativeCommandInvocation<A, E> {
   readonly result: Promise<
-    ImperativeResult<A, E | import("./shared").TuvrenError>
+    ImperativeCommandCompletion<A, E | import("./shared").TuvrenError>
   >;
   readonly signal: AbortSignal;
   cancel(reason?: unknown): void;

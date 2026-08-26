@@ -3,8 +3,13 @@
   "unknownFields": "reject",
   "contracts": {
     "input": {
-      "required": { "inputKind": "string", "redacted": "boolean" },
-      "optional": { "byteLength": "integer" }
+      "required": {
+        "payloadVersion": { "type": "string", "const": "1.0.0" },
+        "inputKind": "string",
+        "redacted": "boolean",
+        "byteLength": "integer"
+      },
+      "optional": { "encodedEventBatchBase64": "string" }
     },
     "event": {
       "required": { "eventType": "string", "cancelable": "boolean" },
@@ -27,16 +32,29 @@
       "optional": { "source": "string" }
     },
     "transaction": {
-      "required": { "status": "string", "commandCount": "integer" },
-      "optional": { "failedCommandIndex": "integer" }
+      "required": {
+        "payloadVersion": { "type": "string", "const": "1.0.0" },
+        "status": "string",
+        "commandCount": "integer",
+        "redacted": "boolean"
+      },
+      "optional": {
+        "failedCommandIndex": "integer",
+        "encodedTransactionBase64": "string"
+      }
     },
     "mutation": {
       "required": {
+        "payloadVersion": { "type": "string", "const": "1.0.0" },
         "resource": "string",
         "operation": "string",
-        "generation": "integer"
+        "generation": "integer",
+        "redacted": "boolean"
       },
-      "optional": { "identity": "string" }
+      "optional": {
+        "identity": "string",
+        "encodedMutationBase64": "string"
+      }
     },
     "dirty": {
       "required": { "cause": "string" },
@@ -92,6 +110,14 @@
     "integer payload values are nonnegative safe integers unless the selected field explicitly allows signed values",
     "error-code and error-category values exist in error-codes.json and correspond",
     "input content remains redacted unless trace.redaction.fullContent is true",
+    "record.sequence values are unique and strictly increasing as unsigned 64-bit integers",
+    "when records is nonempty rootCorrelation.initialSequence equals the first retained record sequence; when records is empty it identifies the next root sequence; every record belongs to rootCorrelation.contextId directly or through an earlier causal identity",
+    "record.timestampNanos values are nondecreasing in record order",
+    "each correlation object contains the kind-required identity: context for input, eventId for Event, commandId for Command, effectSpanId for Effect span, transactionId for transaction or mutation, componentId for reconcile/layout/text, renderRequestId for render/diff/terminal write, and at least one causal identity for error or cleanup",
+    "every correlation identity references an earlier retained record or an explicit root identity declared by the Trace header; links cannot point forward",
+    "wrapCount greater than zero permits missing predecessors only before the first retained sequence and requires one unattributed boundary record",
+    "redaction.fullContent true requires input, clipboard, and terminalPayloads to equal included; replay.runtime and replay.applicationInput to equal available; and encoded Event batches, committed transaction bytes, and mutation values; fullContent false requires those redaction fields and both replay states to equal redacted and forbids encoded fields",
+    "encoded replay fields decode from canonical base64 into exact ABI 2.0 Event batches, transaction batches, or resource-specific mutation payloads and pass the same validators used by live input",
     "runtime replay rejects a record kind whose registered payload contract or migration is unavailable"
   ]
 }

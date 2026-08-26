@@ -467,6 +467,9 @@ pub struct VirtualCollectionState {
     pub visible_end: u64,
     pub selected: Vec<CollectionKey>,
     pub focused: Option<CollectionKey>,
+    pub scroll_anchor: Option<CollectionKey>,
+    pub scroll_offset_rows: i64,
+    pub scroll_offset_pixels: Option<i64>,
     pub request_generation: u64,
     pub usage: BoundedUsage,
 }

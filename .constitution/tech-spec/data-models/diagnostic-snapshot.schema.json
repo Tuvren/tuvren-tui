@@ -78,25 +78,41 @@
     "semanticNode": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["id", "role", "children", "states"],
+      "required": ["id", "role", "children", "states", "relationships"],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "role": { "type": "string", "minLength": 1 },
         "name": { "type": "string" },
         "description": { "type": "string" },
         "value": {
-          "anyOf": [
-            { "type": "string" },
-            { "type": "number" },
-            { "type": "null" }
-          ]
+          "anyOf": [{ "type": "string" }, { "type": "number" }]
         },
-        "states": { "type": "object" },
+        "states": {
+          "type": "object",
+          "maxProperties": 128,
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "boolean" },
+              { "type": "string" },
+              { "type": "number" }
+            ]
+          }
+        },
         "children": {
           "type": "array",
           "maxItems": 10000,
           "items": { "type": "string" },
           "uniqueItems": true
+        },
+        "relationships": {
+          "type": "object",
+          "maxProperties": 128,
+          "additionalProperties": {
+            "type": "array",
+            "maxItems": 10000,
+            "items": { "type": "string", "minLength": 1 },
+            "uniqueItems": true
+          }
         }
       }
     },

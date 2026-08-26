@@ -24,6 +24,7 @@ export interface SemanticElement {
   readonly value?: string | number;
   readonly states: Readonly<Record<string, boolean | string | number>>;
   readonly children: readonly ComponentId[];
+  readonly relationships: Readonly<Record<string, readonly ComponentId[]>>;
 }
 
 export interface DiagnosticIssue {
@@ -90,19 +91,35 @@ export interface DiagnosticSnapshot {
   readonly issues?: readonly DiagnosticIssue[];
 }
 
-export interface DiagnosticTrace {
+export interface DiagnosticTrace<FullContent extends boolean = boolean> {
   readonly schemaVersion: "1.0.0";
   readonly traceId: string;
   readonly createdAt: string;
   readonly sdkVersion?: string;
   readonly terminalProfile: TerminalProfile;
-  readonly redaction: Readonly<{
-    fullContent: boolean;
-    input: "redacted";
-    clipboard: "redacted";
-    terminalPayloads: "redacted";
-    environment: "redacted";
-    absolutePaths: "redacted";
+  readonly redaction: FullContent extends true
+    ? Readonly<{
+        fullContent: true;
+        input: "included";
+        clipboard: "included";
+        terminalPayloads: "included";
+        environment: "redacted";
+        absolutePaths: "redacted";
+      }>
+    : Readonly<{
+        fullContent: false;
+        input: "redacted";
+        clipboard: "redacted";
+        terminalPayloads: "redacted";
+        environment: "redacted";
+        absolutePaths: "redacted";
+      }>;
+  readonly replay: FullContent extends true
+    ? Readonly<{ runtime: "available"; applicationInput: "available" }>
+    : Readonly<{ runtime: "redacted"; applicationInput: "redacted" }>;
+  readonly rootCorrelation: Readonly<{
+    contextId: string;
+    initialSequence: string;
   }>;
   readonly records: readonly Readonly<{
     sequence: string;
@@ -224,7 +241,8 @@ export interface ReplayFile {
   readonly file: string | URL;
 }
 
-export type ReplayInput = ApplicationReplay | DiagnosticTrace | ReplayFile;
+export type RuntimeReplayTrace = DiagnosticTrace<true>;
+export type ReplayInput = ApplicationReplay | RuntimeReplayTrace | ReplayFile;
 
 export interface FailureTrace {
   readonly error: TuvrenError;
@@ -296,7 +314,10 @@ export interface TestHarness {
   ): Effect.Effect<SemanticElement | undefined>;
   waitForVisualIdle(): Effect.Effect<void, TuvrenError>;
   snapshot(): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
-  trace(): Effect.Effect<DiagnosticTrace, TuvrenError>;
+  trace(): Effect.Effect<DiagnosticTrace<false>, TuvrenError>;
+  trace(
+    options: Readonly<{ fullContent: true; confirmed: true }>,
+  ): Effect.Effect<DiagnosticTrace<true>, TuvrenError>;
   replay(input: ReplayInput): Effect.Effect<DiagnosticSnapshot, TuvrenError>;
   failureTrace(): Effect.Effect<FailureTrace | undefined>;
   saveTrace(path: string): Effect.Effect<void, TuvrenError>;
