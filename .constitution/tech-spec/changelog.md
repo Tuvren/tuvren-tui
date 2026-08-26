@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.2] — 2026-08-26
+
+### Fixed
+
+- Removed the undeclared durable evidence-index promise from the aggregate release gate; the command now emits a human-readable candidate report and the existing schema-valid atomic manifest while checking constituent evidence freshness directly.
+- Made every root-invoked cargo-fuzz command select the declared `native/fuzz/` project explicitly with `--fuzz-dir`.
+- Made semantic, terminal, and benchmark workspace scripts rebuild the current native release artifact before any Bun process loads it.
+
 ## [v9.0.1] — 2026-08-26
 
 ### Fixed

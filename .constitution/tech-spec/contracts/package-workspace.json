@@ -9,13 +9,13 @@
     "check:contracts": "bun run scripts/check-contracts.ts",
     "check:capability-map": "bun run scripts/check-capability-map.ts",
     "check:release-candidate": "bun run scripts/check-release-candidate.ts",
-    "test:semantic": "bun test ts/test-semantic.test.ts",
-    "test:terminal": "bun test ts/test-terminal.test.ts",
+    "test:semantic": "cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-semantic.test.ts",
+    "test:terminal": "cargo build --manifest-path native/Cargo.toml --release && bun test ts/test-terminal.test.ts",
     "test:platform-smoke": "bun run scripts/test-platform-smoke.ts",
     "test:release-package": "bun run scripts/test-release-package.ts",
-    "bench:envelope": "bun run benchmarks/envelope.ts",
-    "bench:comparative": "bun run benchmarks/comparative.ts",
-    "bench:devtools": "bun run benchmarks/devtools.ts",
+    "bench:envelope": "cargo build --manifest-path native/Cargo.toml --release && bun run benchmarks/envelope.ts",
+    "bench:comparative": "cargo build --manifest-path native/Cargo.toml --release && bun run benchmarks/comparative.ts",
+    "bench:devtools": "cargo build --manifest-path native/Cargo.toml --release && bun run benchmarks/devtools.ts",
     "study:onboarding": "bun run scripts/study-onboarding.ts",
     "study:style-defect": "bun run scripts/study-style-defect.ts"
   }
