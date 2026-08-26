@@ -1,4 +1,4 @@
-import type { TerminalCapabilities, TuvrenError } from "./shared";
+import type { TerminalProfile, TuvrenError } from "./shared";
 import type { ImperativeApp } from "./imperative";
 import type {
   DiagnosticSnapshot,
@@ -13,7 +13,7 @@ import type {
 export interface ImperativeTestOptions {
   readonly width?: number;
   readonly height?: number;
-  readonly terminal?: Partial<TerminalCapabilities>;
+  readonly terminal?: Partial<TerminalProfile>;
   readonly automaticTraceOnFailure?: boolean;
 }
 
@@ -28,6 +28,9 @@ export interface ImperativeTestHarness {
   drag(from: readonly [number, number], to: readonly [number, number]): void;
   scroll(deltaRows: number): void;
   resize(width: number, height: number): void;
+  focus(): void;
+  blur(): void;
+  rawEvent(event: Readonly<Record<string, unknown>>): void;
   advanceTime(milliseconds: number): void;
   waitForVisualIdle(): void;
   getByRole(

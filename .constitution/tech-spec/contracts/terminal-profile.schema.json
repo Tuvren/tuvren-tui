@@ -1,5 +1,5 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://tuvren.dev/contract/terminal-profile-1.json",
-  "$ref": "https://tuvren.dev/schema/terminal-profile-1.json"
+  "$ref": "https://tuvren.dev/schema/terminal-profile/1.0.0/schema.json"
 }

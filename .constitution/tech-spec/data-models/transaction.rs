@@ -126,9 +126,15 @@ pub struct TextEditPayload<'a> {
 #[derive(Clone, Debug)]
 pub struct CollectionPayload<'a> {
     pub kind: u16,
-    pub key: &'a str,
+    pub key: ValidatedCollectionKey<'a>,
     pub item: &'a [u8],
     pub generation: u64,
+}
+
+#[derive(Clone, Debug)]
+pub enum ValidatedCollectionKey<'a> {
+    Utf8(&'a str),
+    CanonicalNumberBits(u64),
 }
 
 #[derive(Clone, Debug)]
@@ -167,6 +173,8 @@ pub struct DiagnosticPayload {
 // ABI major, all offset arithmetic, exact command-byte length, arena bounds,
 // opcode/property/value compatibility, target identity, UTF-8, grapheme
 // coordinates, generations, exact fixed-record sizes, nested arena ranges, and
-// trailing bytes. It converts every command to ValidatedPayload and enforces
+// trailing bytes. Numeric Collection keys must be finite; negative zero is
+// canonicalized to positive-zero bits and NaN or infinity is rejected. It
+// converts every command to ValidatedPayload and enforces
 // the opcode/property/value compatibility matrix in native-abi.h. Runtime
 // mutation accepts only ValidatedTransaction, never the untrusted byte slice.

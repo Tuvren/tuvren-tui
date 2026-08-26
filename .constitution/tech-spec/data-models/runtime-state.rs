@@ -33,7 +33,10 @@ pub struct TextDocumentId(pub u32);
 pub struct GraphemeId(pub u32);
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
-pub struct CollectionKey(pub String);
+pub enum CollectionKey {
+    Utf8(String),
+    CanonicalNumberBits(u64),
+}
 
 #[derive(Clone, Debug, Eq, Ord, PartialEq, PartialOrd)]
 pub struct TranscriptBlockId(pub String);
@@ -64,12 +67,19 @@ pub enum GridTrack { Dimension(DimensionSpec), Fraction(f32), MinMax(DimensionSp
 pub struct GridPlacement { pub row: Option<u32>, pub column: Option<u32>, pub row_span: u32, pub column_span: u32 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum DimensionSpec {
+pub enum DimensionAtom {
     Cells(f32),
     Percent(f32),
     Auto,
     MinContent,
     MaxContent,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub struct DimensionSpec {
+    pub minimum: Option<DimensionAtom>,
+    pub preferred: DimensionAtom,
+    pub maximum: Option<DimensionAtom>,
 }
 
 #[derive(Clone, Debug)]
@@ -145,6 +155,7 @@ pub struct StyleCondition {
     pub mode: Option<u8>,
     pub reduced_motion: Option<bool>,
     pub capability_tier: Option<u8>,
+    pub minimum_colors: Option<u32>,
     pub responsive: ResponsiveCondition,
 }
 

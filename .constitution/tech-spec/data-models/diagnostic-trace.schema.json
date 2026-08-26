@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tuvren.dev/schema/diagnostic-trace-1.json",
+  "$id": "https://tuvren.dev/schema/diagnostic-trace/1.0.0/schema.json",
   "title": "Tuvren Diagnostic Trace",
   "type": "object",
   "additionalProperties": false,
@@ -20,7 +20,7 @@
     "createdAt": { "type": "string", "format": "date-time" },
     "sdkVersion": { "type": "string" },
     "terminalProfile": {
-      "$ref": "https://tuvren.dev/schema/terminal-profile-1.json"
+      "$ref": "https://tuvren.dev/schema/terminal-profile/1.0.0/schema.json"
     },
     "redaction": {
       "type": "object",
@@ -52,7 +52,7 @@
       "type": "array",
       "maxItems": 256,
       "items": {
-        "$ref": "https://tuvren.dev/schema/diagnostic-snapshot-1.json"
+        "$ref": "https://tuvren.dev/schema/diagnostic-snapshot/1.0.0/schema.json"
       }
     }
   },

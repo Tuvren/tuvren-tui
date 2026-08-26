@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tuvren.dev/schema/diagnostic-snapshot-1.json",
+  "$id": "https://tuvren.dev/schema/diagnostic-snapshot/1.0.0/schema.json",
   "title": "Tuvren diagnostic snapshot",
   "type": "object",
   "additionalProperties": false,
@@ -37,8 +37,8 @@
       "additionalProperties": false,
       "required": ["width", "height", "cells"],
       "properties": {
-        "width": { "type": "integer", "minimum": 1, "maximum": 500 },
-        "height": { "type": "integer", "minimum": 1, "maximum": 200 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 3000 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 1000 },
         "cells": {
           "type": "array",
           "maxItems": 100000,

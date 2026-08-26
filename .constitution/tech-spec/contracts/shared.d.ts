@@ -206,8 +206,43 @@ export interface TerminalCapabilities {
   readonly pasteEvents: boolean;
   readonly richClipboard: boolean;
   readonly pixelGeometry: boolean;
+  readonly cellWidthPixels?: number;
+  readonly cellHeightPixels?: number;
+  readonly terminalWidthPixels?: number;
+  readonly terminalHeightPixels?: number;
   readonly themeDetection: boolean;
+  readonly paletteDetection: boolean;
+  readonly detectedTheme: "light" | "dark" | "unknown";
+  readonly ambiguousWidth: 1 | 2 | "negotiated";
+  readonly multiplexer: "none" | "tmux" | "zellij" | "screen" | "unknown";
   readonly widthNegotiation: boolean;
+}
+
+export interface TerminalProfile {
+  readonly schemaVersion: "1.0.0";
+  readonly name: string;
+  readonly tier: "modern" | "compatible";
+  readonly width: number;
+  readonly height: number;
+  readonly cellWidthPixels?: number;
+  readonly cellHeightPixels?: number;
+  readonly colorDepth: 16 | 256 | 16_777_216;
+  readonly theme?: "light" | "dark" | "unknown";
+  readonly multiplexer: "none" | "tmux" | "zellij" | "screen" | "unknown";
+  readonly ambiguousWidth?: 1 | 2 | "negotiated";
+  readonly capabilities: Readonly<{
+    synchronizedOutput: boolean;
+    hyperlinks: boolean;
+    enhancedKeyboard: boolean;
+    pointer: boolean;
+    focus: boolean;
+    pasteEvents: boolean;
+    richClipboard: boolean;
+    pixelGeometry: boolean;
+    themeDetection: boolean;
+    paletteDetection: boolean;
+    widthNegotiation: boolean;
+  }>;
 }
 
 export interface TuvrenEvent<Payload = unknown> {

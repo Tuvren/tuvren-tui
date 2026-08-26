@@ -100,6 +100,7 @@ export type {
   TableProps,
   TabsProps,
   TerminalCapabilities,
+  TerminalProfile,
   TextAreaProps,
   TextContent,
   TextDocument,
@@ -178,7 +179,7 @@ export interface KeyBinding {
 export interface CommandService {
   register<A, E, R>(
     command: Command<A, E, R>,
-  ): Effect.Effect<void, never, Scope.Scope>;
+  ): Effect.Effect<void, never, Scope.Scope | R>;
   invoke<A, E, R>(
     command: Command<A, E, R>,
     context?: Partial<CommandContext>,
@@ -186,7 +187,13 @@ export interface CommandService {
   invokeById(
     id: CommandId,
     context?: Partial<CommandContext>,
-  ): Effect.Effect<unknown, TuvrenError>;
+  ): Effect.Effect<unknown, TuvrenError | RegisteredCommandError>;
+}
+
+export interface RegisteredCommandError {
+  readonly _tag: "RegisteredCommandError";
+  readonly command: CommandId;
+  readonly cause: unknown;
 }
 
 export interface KeymapService {
