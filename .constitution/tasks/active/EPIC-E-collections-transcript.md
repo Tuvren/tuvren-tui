@@ -14,7 +14,7 @@ Implement the shared bounded projection machinery for P0-I01–P0-J07.
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** 100,000 logical-item state fixtures pass identity, mutation, stale-result, and resident-bound invariants; TUI-H001 later measures latency
 - **STOP Conditions:** STOP if visible rows or array positions become durable identities.
-- **Description:** Implement stable string/number keys, synchronized ordered-key and position indexes, typed native projection descriptors rather than serialized generic items, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, native-owned scroll position with stable anchor/signed row/optional pixel offsets, an executor-only native position query, committed transaction/render observation identities, cancellation, stale rejection, and count/byte eviction.
+- **Description:** Implement stable string/number keys, synchronized ordered-key and position indexes, typed native projection descriptors rather than serialized generic items, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, native-owned scroll position with stable anchor/signed row/optional pixel offsets, executor-only native position and visible-range queries, committed transaction/render observation identities, cancellation, stale rejection, and count/byte eviction.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -35,7 +35,7 @@ Generated mutations, moves, resets, evictions, and range races keep map/order/po
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all Collection-backed Components pass one shared behavior suite
 - **STOP Conditions:** STOP if a Component bypasses the Collection controller or duplicates native projection state.
-- **Description:** Retain generic application items in the Host Layer, enforce the exclusive static-items or Data-Source authority union and its single canonical key function, preserve loader/Stream/renderer/child error and environment requirements in returned Views, render items to projected RuntimeNodes, encode typed projection descriptors, and wire incremental Streams/controllers, independent cached scroll-position/visible-range and focus callbacks, reload demand, mutually exclusive controlled/local state, and shared selection semantics into List, Table, Select, Menu, and palette. The executor populates `lastScrollPosition()` only after a committed observation. Each selection-capable surface declares controlled or local authority; in controlled mode interaction, controller calls, and mutation Streams emit intent without native commit until the controlling prop transaction arrives, while local mode commits then notifies.
+- **Description:** Retain generic application items in the Host Layer, enforce the exclusive static-items or Data-Source authority union and its single canonical key function, preserve loader/Stream/renderer/child error and environment requirements in returned Views, render items to projected RuntimeNodes, encode typed projection descriptors, and wire incremental Streams/controllers, independent cached scroll-position/visible-range and focus callbacks, reload demand, mutually exclusive controlled/local state, and shared selection semantics into List, Table, Select, Menu, and palette. The executor populates `lastScrollPosition()` and `lastVisibleRange()` only after committed observations; both return undefined initially and never call the ABI from application code. Each selection-capable surface declares controlled or local authority; in controlled mode interaction, controller calls, and mutation Streams emit intent without native commit until the controlling prop transaction arrives, while local mode commits then notifies.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -90,19 +90,19 @@ State-machine and instrumentation fixtures prove every operation, stale rejectio
 
 - **Type:** Feature
 - **Effort:** 5
-- **Dependencies:** TUI-A005, TUI-E004
+- **Dependencies:** TUI-A005, TUI-D002, TUI-E004
 - **Category:** Feature-Evolution
 - **Capabilities:** P0-J01–P0-J07
-- **Scope (In-Scope Files):** `ts/src/components/`, Transcript controller, Effect/imperative fixtures and examples
+- **Scope (In-Scope Files):** `native/src/interaction/`, `ts/src/components/`, Transcript controller, Effect/imperative fixtures and examples
 - **Scope (Out-of-Scope Files):** application storage, OpenCode-specific contracts
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** both workflows produce identical Transcript state and viewport snapshots
 - **STOP Conditions:** STOP if the SDK retains duplicate block content or shifts an End User away from their anchor.
-- **Description:** Expose every versioned Transcript operation, resident range, eviction and reload Event, live-edge controls, and anchor-aware viewport behavior through thin SDK surfaces.
+- **Description:** Expose every versioned Transcript operation, resident range, eviction and reload Event, live-edge controls, executor-cached `lastVisibleRange()`, and anchor-aware viewport behavior through thin SDK surfaces. Declarative controllers bind through one Transcript's `controller` prop, reject simultaneous double binding, unbind on teardown, and isolate two live Transcript targets.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Controlled and local fixtures stream above and below the viewport, select and collapse Blocks, evict under pressure, reload history, reject stale patches, and preserve the End User anchor until explicit live-edge return.
+Controlled and local fixtures stream above and below the viewport, select and collapse Blocks, evict under pressure, reload history, reject stale patches, return undefined then committed visible-range observations without public ABI calls, preserve the End User anchor until explicit live-edge return, and prove two controller-bound Transcripts cannot cross-route or share one live controller.
 ```

@@ -140,7 +140,7 @@ Seed host, target, artifact, version, load, initialization, render, source-map, 
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- -max_total_time=60 && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode -- -max_total_time=60 && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response -- -max_total_time=60 && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** every maintained target/corpus completes its configured CI duration without memory unsafety, panic escape, control injection, privacy leak, or unbounded allocation
 - **STOP Conditions:** STOP release progression if any external content/control boundary lacks a named validator, limit, timeout/correlation rule where applicable, and test owner.
-- **Description:** Inventory and fuzz transactions, Events, formatted text, terminal responses, clipboard chunks, traces, snapshots, profiles, replay, and release evidence under the declared resource and privacy limits.
+- **Description:** Inventory and fuzz transactions, Events, formatted text, terminal responses, clipboard chunks, traces, snapshots, profiles, replay, and release evidence under the declared resource and privacy limits. Event corpora include unknown modifier bits in key, pointer-move, pointer-button, and wheel records and require rejection before dispatch or replay.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
