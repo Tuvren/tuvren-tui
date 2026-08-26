@@ -35,7 +35,7 @@ The report links pinned raw results and the reproducer command, records p95 inpu
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-ffi.test.ts`
 - **Expected Success Output:** normalized interaction fixtures pass deterministically
 - **STOP Conditions:** STOP if input routing requires a Rust-to-TypeScript callback or bypasses the UI executor.
-- **Description:** Normalize Events, route through hit-testing, focus and interaction roots, implement Focus Scopes, modal containment, focus restoration, pointer capture, drag-and-drop, bounded queues, and handler-failure recovery.
+- **Description:** Normalize Events, route through hit-testing, focus and interaction roots, implement Focus Scopes, modal containment, focus restoration, retained pointer-capture/drag state, typed drag-start/motion/drop/end/capture Events, bounded queues, and handler-failure recovery.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -119,7 +119,7 @@ Primitive and synthetic-component fixtures query by role and accessible properti
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** deterministic elapsed-time and manual-clock animation fixtures pass; TUI-H001 later owns timing benchmarks
 - **STOP Conditions:** STOP if dropped presentations slow logical time or suppress final state.
-- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, native cancellation/replacement operations, typed completion, manual test time, global reduced motion, and accessible per-animation overrides.
+- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, native cancellation and replacement that returns a distinct observable handle, typed completion, manual test time, global reduced motion, and accessible per-animation overrides.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -146,5 +146,5 @@ Deterministic clock fixtures prove interpolation, missed-presentation completion
   - **Evidence:**
 
 ```text
-One documented command reproduces the candidate and controls against PERF-02, including no-interceptor p95, intercepted p95, timeout, handler failure, reentrancy, shutdown, coalescing, exactly-once disposition, and default-action counts in schema-valid raw results.
+One documented command reproduces the candidate and controls against PERF-02 using declared typed metrics and named evidence checks, including no-interceptor p95, intercepted p95, timeout, handler failure, reentrancy, shutdown, coalescing, exactly-once disposition, and default-action counts in schema-valid raw results.
 ```

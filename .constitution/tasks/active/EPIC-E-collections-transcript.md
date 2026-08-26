@@ -14,13 +14,13 @@ Implement the shared bounded projection machinery for P0-I01–P0-J07.
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** 100,000 logical-item state fixtures pass identity, mutation, stale-result, and resident-bound invariants; TUI-H001 later measures latency
 - **STOP Conditions:** STOP if visible rows or array positions become durable identities.
-- **Description:** Implement stable string/number keys, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, scroll and queryable visible range, cancellation, stale rejection, and count/byte eviction.
+- **Description:** Implement stable string/number keys, synchronized ordered-key and position indexes, typed native projection descriptors rather than serialized generic items, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, scroll and queryable visible range, cancellation, stale rejection, and count/byte eviction.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Generated mutations and range races preserve key identity, authority, selection/focus, visible range, stale rejection, cancellation, and declared 10,000-item/32 MiB resident limits.
+Generated mutations, moves, resets, evictions, and range races keep map/order/position state synchronized while preserving key identity, authority, selection/focus, visible range, stale rejection, cancellation, and declared 10,000-item/32 MiB resident limits.
 ```
 
 #### TUI-E002 Integrate Collection services across List, Table, Select, Menu, and palette
@@ -35,7 +35,7 @@ Generated mutations and range races preserve key identity, authority, selection/
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all Collection-backed Components pass one shared behavior suite
 - **STOP Conditions:** STOP if a Component bypasses the Collection controller or duplicates native projection state.
-- **Description:** Wire Data Sources, incremental Streams/controllers, visible-range and focus callbacks, reload demand, controlled/local state, and shared selection semantics into every Collection-backed Component.
+- **Description:** Retain generic application items in the Host Layer, render them to projected RuntimeNodes, encode typed projection descriptors, and wire Data Sources, incremental Streams/controllers, visible-range and focus callbacks, reload demand, controlled/local state, and shared selection semantics into every Collection-backed Component.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -77,7 +77,7 @@ Given saturated feedback while another control is focused, when notices arrive, 
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** 10,000-block and 100-update/second state fixtures pass operation and bounded-memory invariants; TUI-H001 later measures latency
 - **STOP Conditions:** STOP if eviction removes visible, anchored, selected, or actively streaming content out of precedence.
-- **Description:** Implement controlled durable and bounded-local modes, stable Block IDs, insert/stream/patch/finish/replace/collapse/expand/remove/clear/evict/reload, version rejection, protected eviction, and observable resident demand.
+- **Description:** Implement controlled durable and bounded-local modes, stable Block IDs, discriminated TextContent for whole-block insert/replace/reset/reload, bounded UTF-8 patch/stream edits, finish/collapse/expand/remove/clear/evict/reload, version rejection, protected eviction, and observable resident demand.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**

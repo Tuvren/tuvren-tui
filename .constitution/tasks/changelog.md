@@ -4,6 +4,17 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.7 — 2026-08-26
+
+### Added
+
+- Added TUI-G008 as the explicit cross-producer causal instrumentation milestone after the required runtime, content, interaction, animation, Collection, Transcript, terminal, clipboard, Command, and Effect producers exist.
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.3 executor-owned accessibility/Transcript flows and TechSpec v9.0.8 ordered Collection projections, discriminated Transcript content, replacement handles, drag/capture Events, extensible benchmark evidence, durable Issues, and unified clipboard timeout status.
+- Updated the executable graph to 62 tickets, 385 points, 154 declared and diagrammed edges, and a 127-point critical path while preserving 152/152 P0 coverage.
+
 ## v10.0.6 — 2026-08-26
 
 ### Fixed
