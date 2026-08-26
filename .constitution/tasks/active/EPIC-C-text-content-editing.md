@@ -98,11 +98,11 @@ Declaration tests and round-trip fixtures prove typed Effect failures, imperativ
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all text Component fixtures pass through published entrypoints
 - **STOP Conditions:** STOP if a Component creates a second content authority or bypasses the active clipboard contract.
-- **Description:** Connect text presentation and editing Components to Text Documents, StyledText, validation, secure entry, wrapping, horizontal scroll, source adapters, the shared clipboard service, and executor-owned keyboard/pointer selection routing from the Interaction Kernel.
+- **Description:** Connect text presentation and editing Components to Text Documents, StyledText, validation, secure entry, wrapping, horizontal scroll, source adapters, the shared clipboard service, and executor-owned keyboard/pointer selection routing from the Interaction Kernel. Declarative TextArea accepts a TextDocumentService binding as its sole content authority and retrieves snapshots/changes through that service; its type contract rejects simultaneous value/defaultValue/onValueChange authority.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Representative form, editor, code, diff, structured-data, log, keyboard/pointer selection, validation, clipboard, and cleanup scenarios match between public SDK workflows and prove the Interaction-to-Content editing path.
+Representative form, document-bound editor, code, diff, structured-data, log, keyboard/pointer selection, validation, clipboard, and cleanup scenarios match between public SDK workflows and prove the Interaction-to-Content editing path without duplicate content authority.
 ```

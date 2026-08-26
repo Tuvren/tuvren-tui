@@ -77,13 +77,13 @@ The checker proves one final disposition, no double default, bounded wait, deter
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-commands.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if registration loses the Command environment or ID invocation loses the typed failure envelope.
-- **Description:** Implement typed `CommandId<A, E, R>` result/failure/environment contracts preserved by ID lookup and bound activation, registered `TuvrenError` failures, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, visibility/enablement/activation, Command-bound buttons/menu items/palette entries, hierarchical and global scopes, structured normalized Key Sequences, bounded chord timing, conflict reports, rebinding, and deterministic precedence.
+- **Description:** Implement typed `CommandId<A, E, R>` result/failure/environment contracts preserved by ID lookup and bound activation, registered `TuvrenError` failures, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, visibility/enablement/activation, Command-bound buttons/menu items/palette entries, hierarchical and global scopes, structured normalized Key Sequences, bounded chord timing, conflict reports, rebinding, and deterministic precedence. Imperative invocation completion discriminates succeeded, failed, interrupted (cancelled/restarted/shutdown), and rejected (disabled/concurrency) outcomes and maps interruption/rejection through the closed error registry.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Registry-level adapters invoke one Command programmatically and through Keymap-, menu-, button-, and palette-shaped bindings without requiring Component shells; concurrency, interruption, typed results/failures, captured environments, precedence, and availability updates are deterministic. TUI-B009 owns real catalog binding.
+Registry-level adapters invoke one Command programmatically and through Keymap-, menu-, button-, and palette-shaped bindings without requiring Component shells; concurrency, each cancellation/restart/shutdown/rejection completion, typed results/failures, captured environments, precedence, and availability updates are deterministic. TUI-B009 owns real catalog binding.
 ```
 
 #### TUI-D005 Implement the Semantic Tree and accessibility behavior
@@ -104,7 +104,7 @@ Registry-level adapters invoke one Command programmatically and through Keymap-,
   - **Evidence:**
 
 ```text
-Primitive and synthetic-component fixtures query by role and accessible properties, traverse focus by keyboard, verify focus indicators and announcements, and compare semantics independently of cells; no catalog-wide claim is made before TUI-B009.
+Primitive and synthetic-component fixtures query by role and accessible properties, traverse focus by keyboard, verify focus indicators and announcements, and compare semantics independently of cells. Snapshot fixtures reject duplicate IDs, missing child/relationship targets, multiple parents/roots, cycles, and unreachable nodes; no catalog-wide claim is made before TUI-B009.
 ```
 
 #### TUI-D006 Implement elapsed-time animation and reduced-motion policy

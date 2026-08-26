@@ -14,13 +14,13 @@ Implement the shared bounded projection machinery for P0-I01–P0-J07.
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** 100,000 logical-item state fixtures pass identity, mutation, stale-result, and resident-bound invariants; TUI-H001 later measures latency
 - **STOP Conditions:** STOP if visible rows or array positions become durable identities.
-- **Description:** Implement stable string/number keys, synchronized ordered-key and position indexes, typed native projection descriptors rather than serialized generic items, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, scroll and queryable visible range, cancellation, stale rejection, and count/byte eviction.
+- **Description:** Implement stable string/number keys, synchronized ordered-key and position indexes, typed native projection descriptors rather than serialized generic items, AbortSignal-aware keyed range loading, generation-stamped insert/update/remove/move/reset, loading/empty/error states, variable heights, selection, focus, native-owned scroll position with stable anchor/signed row/optional pixel offsets, separately queryable scroll position and visible range, cancellation, stale rejection, and count/byte eviction.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Generated mutations, moves, resets, evictions, and range races keep map/order/position state synchronized while preserving key identity, authority, selection/focus, visible range, stale rejection, cancellation, and declared 10,000-item/32 MiB resident limits.
+Generated mutations, moves, resets, evictions, and range races keep map/order/position state synchronized while preserving key identity, authority, selection/focus, independently queryable generation-stamped scroll position and visible range, stale rejection, cancellation, and declared 10,000-item/32 MiB resident limits.
 ```
 
 #### TUI-E002 Integrate Collection services across List, Table, Select, Menu, and palette
@@ -35,13 +35,13 @@ Generated mutations, moves, resets, evictions, and range races keep map/order/po
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all Collection-backed Components pass one shared behavior suite
 - **STOP Conditions:** STOP if a Component bypasses the Collection controller or duplicates native projection state.
-- **Description:** Retain generic application items in the Host Layer, enforce the exclusive static-items or Data-Source authority union and its single canonical key function, preserve loader/Stream/renderer/child error and environment requirements in returned Views, render items to projected RuntimeNodes, encode typed projection descriptors, and wire incremental Streams/controllers, visible-range and focus callbacks, reload demand, mutually exclusive controlled/local state, and shared selection semantics into every Collection-backed Component.
+- **Description:** Retain generic application items in the Host Layer, enforce the exclusive static-items or Data-Source authority union and its single canonical key function, preserve loader/Stream/renderer/child error and environment requirements in returned Views, render items to projected RuntimeNodes, encode typed projection descriptors, and wire incremental Streams/controllers, independent scroll-position/visible-range and focus callbacks, reload demand, mutually exclusive controlled/local state, and shared selection semantics into every Collection-backed Component.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Identical fixtures exercise loading, empty, error, retry, mutation, variable height, selection, focus, scroll, cancellation, stale result, and cleanup across all applicable Components.
+Identical fixtures exercise loading, empty, error, retry, mutation, variable height, selection, focus, exact scroll-position query/observation independently of visible range, cancellation, stale result, and cleanup across all applicable Components.
 ```
 
 #### TUI-E003 Implement bounded Toast and Notification feedback

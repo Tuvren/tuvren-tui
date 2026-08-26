@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.10 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.11 replay-safe Trace payloads and causal validation, native Collection scroll-position observation, typed imperative Command completion, document-bound declarative TextArea authority, and rooted Semantic Tree snapshot validation.
+- Kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because TUI-A009, TUI-C005, TUI-D004–TUI-D005, TUI-E001–TUI-E002, TUI-G002–TUI-G003, TUI-G008, and TUI-I006 own the corrected obligations.
+
 ## v10.0.9 — 2026-08-26
 
 ### Fixed

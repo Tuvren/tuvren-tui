@@ -35,13 +35,13 @@ Sink fixtures verify causal linking, stable error metadata, forced ring wrap, pr
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** no malformed input escapes limits or privacy policy
 - **STOP Conditions:** STOP if a reader allocates or decompresses beyond preflight limits, or if saving full content lacks explicit confirmation.
-- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, kind-correlated replay payloads, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
+- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, exact kind-selected Diagnostic Trace payload validation, strict sequence/time order and backward-only causal links, exact ABI replay payloads, rooted Semantic Tree snapshot validation, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Fuzz and golden tests reject unknown versions and expansion attacks, migrate only registry entries, preserve schema-valid data, and find zero protected values in default artifacts.
+Fuzz and golden tests reject unknown versions, expansion attacks, invalid Semantic Tree graphs, unordered or dangling Trace correlations, unavailable payload migrations, and noncanonical replay bytes; migrate only registry entries; preserve schema-valid data; and find zero protected values in default artifacts.
 ```
 
 #### TUI-G003 Implement Effect and imperative semantic test harnesses
@@ -56,13 +56,13 @@ Fuzz and golden tests reject unknown versions and expansion attacks, migrate onl
 - **Verification Command:** `bun run test:semantic`
 - **Expected Success Output:** Effect and imperative harness suites pass shared fixtures
 - **STOP Conditions:** STOP if synthetic input bypasses the Event codec or cleanup cannot prove retained-resource counts.
-- **Description:** Implement typed semantic queries, complete interaction drivers including raw Events, Terminal Profiles, manual clock, visual idle, schema-exact stable snapshots and replay inputs, serializable bounded external updates, automatic failure traces, runtime/application replay, cleanup, and leak reports.
+- **Description:** Implement typed semantic queries, complete interaction drivers including raw Events, Terminal Profiles, manual clock, visual idle, schema-exact stable snapshots and replay inputs, serializable bounded external updates, automatic failure traces, confirmed full-content Trace capture, runtime replay restricted to replay-capable Traces, application replay, cleanup, and leak reports.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-The same fixture passes through both harnesses; 100 deterministic replays produce identical cell/style/cursor/Semantic Tree snapshots; cleanup reports zero leaked contexts, nodes, requests, or retained bytes.
+The same fixture passes through both harnesses; default Traces cannot typecheck as runtime replay input, confirmed full-content Traces replay exact versioned input/transaction/mutation payloads, 100 deterministic replays produce identical cell/style/cursor/Semantic Tree snapshots, and cleanup reports zero leaked contexts, nodes, requests, or retained bytes.
 ```
 
 #### TUI-G004 Build terminal-native Inspect, Timeline, and Issues views
@@ -161,7 +161,7 @@ The machine-readable inventory maps 100% of boundaries to validators and named o
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
 - **Expected Success Output:** every required producer phase emits a bounded linked record and every late Render Pass has a causal path or explicit unattributed-defect record
 - **STOP Conditions:** STOP if instrumentation changes producer ordering, allocates on the diagnostic-off steady-state path, or retains sensitive content outside policy.
-- **Description:** Connect the G001 sink to input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, text, Collection, Transcript, animation, render, diff, terminal, clipboard, error, and cleanup producers after their owning kernels exist.
+- **Description:** Connect the G001 sink to input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, text, Collection, Transcript, animation, render, diff, terminal, clipboard, error, and cleanup producers after their owning kernels exist. Full-content producers retain canonical versioned Event batches, committed transaction bytes, and value-bearing mutations required by runtime replay; passive producers retain metadata only.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
