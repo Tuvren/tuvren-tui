@@ -2,6 +2,13 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.3] — 2026-08-26
+
+### Fixed
+
+- Added the fuzz-only `nightly-2026-08-20` toolchain, rust-src, cargo-fuzz 0.13.2, C++11 compiler, supported worker policy, and explicit dated-toolchain commands without changing the stable production MSRV.
+- Added `--locked` to every canonical native release build executed by semantic, terminal, and benchmark workspace scripts.
+
 ## [v9.0.2] — 2026-08-26
 
 ### Fixed

@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.2** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.3** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -63,6 +63,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 
 - Read and apply the repository's Rust core standard before authoring or reviewing Rust.
 - Use Rust 2024 idioms and `rustfmt`; `cargo clippy -- -D warnings` is mandatory.
+- Use stable `1.98.0` for production code. Fuzz jobs alone use pinned `nightly-2026-08-20` with `rust-src`, cargo-fuzz `0.13.2`, and the C++11 compiler provisioned by `devenv.nix`; every fuzz command names the dated toolchain and `native/fuzz` directory explicitly.
 - `native/src/lib.rs` contains `extern "C"` entrypoints and delegates immediately. Business logic lives in the owning module.
 - Every FFI entrypoint catches unwinding. No panic, borrowed pointer, reference, slice, Rust enum, trait object, or allocator-owned buffer crosses the ABI.
 - Unsafe code is limited to audited boundary adapters. Each unsafe block states its preconditions and is covered by malformed-input tests or fuzz targets.
@@ -144,7 +145,7 @@ Use Conventional Commits with a descriptive subject and body when the change has
 ### Brownfield commands that exist before migration
 
 ```bash
-cargo build --manifest-path native/Cargo.toml --release
+cargo build --manifest-path native/Cargo.toml --release --locked
 cargo check --manifest-path native/Cargo.toml --locked
 cargo test --manifest-path native/Cargo.toml --locked
 cargo fmt --manifest-path native/Cargo.toml -- --check
@@ -184,10 +185,10 @@ bun run bench:comparative        # OD-01 fixtures and raw results
 bun run bench:devtools           # Off, passive, and full-trace overhead
 bun run study:onboarding         # 5/10/30/10-minute adoption tasks
 bun run study:style-defect       # Median source-location task
-cargo fuzz run --fuzz-dir native/fuzz transaction_decode
-cargo fuzz run --fuzz-dir native/fuzz event_decode
-cargo fuzz run --fuzz-dir native/fuzz terminal_response
-cargo fuzz run --fuzz-dir native/fuzz durable_files
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files
 cargo audit
 cargo deny check
 bun audit --cwd ts
