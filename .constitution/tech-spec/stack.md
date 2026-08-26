@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.2** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.3** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -17,6 +17,7 @@ Versions were checked against official release documentation or registries on 20
 | Area | Exact baseline | Posture | Reason and compatibility rule |
 | :-- | :-- | :-- | :-- |
 | Rust toolchain | `1.98.0`, edition `2024` | Adopt | Current stable toolchain; one pinned `rust-toolchain.toml` drives local and CI builds. MSRV equals the pinned release until `1.0.0`. |
+| Fuzz-only Rust toolchain | `nightly-2026-08-20` with `rust-src`; cargo-fuzz `0.13.2`; GCC `15.2.0` C++ compiler | Adopt for fuzz jobs only | The dated nightly exists in the official Rust distribution. cargo-fuzz requires nightly, LLVM sanitizer support, and a C++11 compiler; `devenv.nix` provisions and verifies this isolated toolchain without changing the stable production MSRV. Release-gating fuzz jobs run on Linux x64 and arm64 workers. |
 | Host runtime | Bun `1.4.0` | Trial | Current stable host and package manager. The 1.4 runtime is a major internal rewrite; it must pass all five target, FFI, lifecycle, and benchmark gates before final `0.1.0`. |
 | Host language compiler | TypeScript `5.9.3` | Adopt | Contract declarations pass on this baseline. The Brownfield application source currently fails its own strict check with 188 errors, led by duplicate fields and unsafe Bun FFI casts; Stage 4 must schedule reconciliation. TypeScript `7.0.2` is Hold because its isolated migration check also fails. |
 | Declarative application model | Effect `3.22.1` | Adopt | Required peer range `>=3.22.1 <4`; CI and development pin `3.22.1`. Effect 4 prerelease builds are unsupported. |
@@ -107,7 +108,7 @@ Diagnostic snapshots use `row-major-rle-v1` cell runs. `validateDiagnosticSnapsh
 
 ## Dependency and upgrade policy
 
-- Commit `native/Cargo.lock`, the root `bun.lock`, and the independent `.constitution/tech-spec/contracts/bun.lock`; CI uses frozen Bun workspace and contract installs plus `--locked` Cargo operations. Remove the competing `ts/bun.lock` during workspace migration.
+- Commit `native/Cargo.lock`, the root `bun.lock`, and the independent `.constitution/tech-spec/contracts/bun.lock`; CI uses frozen Bun workspace and contract installs plus `--locked` Cargo operations. Remove the competing `ts/bun.lock` during workspace migration. Production builds use stable `1.98.0`; fuzz commands select `+nightly-2026-08-20` explicitly and never determine the MSRV.
 - Production dependencies use explicit compatible ranges in manifests and exact versions in lockfiles. Toolchains and release automation use exact versions or immutable commit hashes.
 - One scheduled compatibility lane tests the latest patch of Rust stable, Bun stable, Effect 3, TypeScript 5.9, and every direct Rust dependency without updating the release lock.
 - Contract validation has its own frozen `contracts/bun.lock`, generated through Bun, and resolves the exact Effect `3.22.1`, TypeScript `5.9.3`, Reactivity `1.14.4`, and schema-validator baselines instead of borrowing the Brownfield application lock.
