@@ -109,6 +109,11 @@ pub enum ValidatedPayload<'a> {
         property: u32,
         value: f64,
     },
+    GraphemeRange {
+        property: u32,
+        start: u32,
+        end: u32,
+    },
     Utf8 {
         property: u32,
         value: &'a str,
@@ -122,6 +127,9 @@ pub enum ValidatedPayload<'a> {
     Collection(CollectionPayload<'a>),
     Transcript(TranscriptPayload<'a>),
     Animation(AnimationPayload),
+    AnimationCancel {
+        animation_id: u64,
+    },
     Terminal(TerminalPayload<'a>),
     Diagnostic(DiagnosticPayload),
 }
@@ -317,7 +325,7 @@ pub struct TextContentPayload<'a> {
 #[derive(Clone, Debug)]
 pub struct StyledSpan<'a> {
     pub text: &'a str,
-    pub style: StylePayload<'a>,
+    pub style: Option<StylePayload<'a>>,
     pub link: Option<&'a str>,
 }
 
@@ -480,13 +488,41 @@ pub struct QueryResult {
 }
 
 #[derive(Clone, Debug)]
-pub struct TerminalPayload<'a> {
-    pub kind: u16,
-    pub target: u32,
-    pub request_id: u64,
-    pub timeout_nanos: u64,
-    pub media_type: &'a str,
-    pub data: &'a [u8],
+pub enum TerminalPayload<'a> {
+    ReadClipboard {
+        target: u32,
+        request_id: u64,
+        timeout_nanos: u64,
+    },
+    WriteClipboard {
+        target: u32,
+        request_id: u64,
+        timeout_nanos: u64,
+        media_type: &'a str,
+        data: &'a [u8],
+    },
+    Announce {
+        request_id: u64,
+        timeout_nanos: u64,
+        text: &'a str,
+    },
+    Suspend {
+        request_id: u64,
+        timeout_nanos: u64,
+    },
+    Resume {
+        request_id: u64,
+        timeout_nanos: u64,
+    },
+    QueryCapabilities {
+        request_id: u64,
+        timeout_nanos: u64,
+    },
+    DiscoverClipboardMediaTypes {
+        target: u32,
+        request_id: u64,
+        timeout_nanos: u64,
+    },
 }
 
 #[derive(Clone, Copy, Debug)]

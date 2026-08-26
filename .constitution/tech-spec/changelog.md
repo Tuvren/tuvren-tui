@@ -2,6 +2,18 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.23] — 2026-08-26
+
+### Fixed
+
+- Canonicalized Grid-track field use, percentage-point units/ranges, and public Color validation plus `0xRRGGBBAA` packing.
+
+## [v9.0.22] — 2026-08-26
+
+### Fixed
+
+- Added typed grapheme-range properties, optional StyledSpan styles, identity-only animation cancellation, and discriminated UTF-8 announcement versus opaque clipboard terminal payloads.
+
 ## [v9.0.21] — 2026-08-26
 
 ### Fixed
