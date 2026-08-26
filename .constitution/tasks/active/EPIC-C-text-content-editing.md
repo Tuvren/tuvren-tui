@@ -35,7 +35,7 @@ Joined emoji, flags, modifiers, combining marks, keycaps, CJK, ambiguous widths,
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if editing requires full-document snapshots for undo or exposes byte/code-unit positions publicly.
-- **Description:** Implement grapheme, word, line, and document navigation; pointer and keyboard selection; operation history; find/replace; wrap or horizontal scroll; tabs, indentation, line endings; limits; validation; secure entry; and single-authority controlled/local state.
+- **Description:** Implement grapheme, word, line, and document navigation and selection commands consumed by the Interaction Kernel; operation history; find/replace; wrap or horizontal scroll; tabs, indentation, line endings; limits; validation; secure entry; and single-authority controlled/local state.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -90,19 +90,19 @@ Declaration tests and round-trip fixtures prove typed Effect failures, imperativ
 
 - **Type:** Feature
 - **Effort:** 5
-- **Dependencies:** TUI-B008, TUI-C003, TUI-C004, TUI-F003
+- **Dependencies:** TUI-B008, TUI-C003, TUI-C004, TUI-D002, TUI-F003
 - **Category:** Feature-Evolution
 - **Capabilities:** P0-E06–P0-E09, P0-F05–P0-F10
-- **Scope (In-Scope Files):** `ts/src/components/`, Text/Input/TextArea/CodeView/DiffView fixtures and examples
+- **Scope (In-Scope Files):** `native/src/interaction/`, `ts/src/components/`, Text/Input/TextArea/CodeView/DiffView fixtures and examples
 - **Scope (Out-of-Scope Files):** advanced editor P1 scope, integrated Select filtering
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** all text Component fixtures pass through published entrypoints
 - **STOP Conditions:** STOP if a Component creates a second content authority or bypasses the active clipboard contract.
-- **Description:** Connect text presentation and editing Components to Text Documents, StyledText, validation, secure entry, wrapping, horizontal scroll, source adapters, and the shared clipboard service.
+- **Description:** Connect text presentation and editing Components to Text Documents, StyledText, validation, secure entry, wrapping, horizontal scroll, source adapters, the shared clipboard service, and executor-owned keyboard/pointer selection routing from the Interaction Kernel.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Representative form, editor, code, diff, structured-data, log, selection, validation, clipboard, and cleanup scenarios match between public SDK workflows.
+Representative form, editor, code, diff, structured-data, log, keyboard/pointer selection, validation, clipboard, and cleanup scenarios match between public SDK workflows and prove the Interaction-to-Content editing path.
 ```
