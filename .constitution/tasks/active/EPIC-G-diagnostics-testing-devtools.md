@@ -56,7 +56,7 @@ Fuzz and golden tests reject unknown versions and expansion attacks, migrate onl
 - **Verification Command:** `bun run test:semantic`
 - **Expected Success Output:** Effect and imperative harness suites pass shared fixtures
 - **STOP Conditions:** STOP if synthetic input bypasses the Event codec or cleanup cannot prove retained-resource counts.
-- **Description:** Implement typed semantic queries, complete interaction drivers including raw Events, Terminal Profiles, manual clock, visual idle, stable snapshots, automatic failure traces, runtime/application replay, cleanup, and leak reports.
+- **Description:** Implement typed semantic queries, complete interaction drivers including raw Events, Terminal Profiles, manual clock, visual idle, schema-exact stable snapshots and replay inputs, serializable bounded external updates, automatic failure traces, runtime/application replay, cleanup, and leak reports.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**

@@ -98,13 +98,13 @@ Shared fixtures prove create, update, reorder, destroy, failure cleanup, and sem
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-jsx.test.ts`
 - **Expected Success Output:** structural shell and controlled/local authority fixtures pass
 - **STOP Conditions:** STOP if any mutable property has two simultaneous authorities.
-- **Description:** Compose the structural shells, public props, controlled/local state boundaries, stable slots, and native-kernel attachment points for Button, ToggleButton, Checkbox, Radio, RadioGroup, ProgressBar, Meter, and Spinner.
+- **Description:** Compose the structural shells, public props, controlled/local state boundaries, stable slots, and native-kernel attachment points for Command-only Button/ToggleButton, Checkbox, Radio, RadioGroup, ProgressBar, Meter, and Spinner; applicable form controls share required, error, and submission behavior.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-A generated shell matrix proves one state authority, prop-to-transaction mapping, stable slot names, deterministic composition, update/disposal behavior, and no duplicated interaction, semantic, or animation state.
+A generated shell matrix proves one state authority, shared form validation/submission behavior, Command-only activation, prop-to-transaction mapping, stable slot names, deterministic composition, update/disposal behavior, and no duplicated interaction, semantic, or animation state.
 ```
 
 #### TUI-B006 Build the menu and dialog Component families

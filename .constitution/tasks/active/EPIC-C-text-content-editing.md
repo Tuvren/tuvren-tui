@@ -35,7 +35,7 @@ Joined emoji, flags, modifiers, combining marks, keycaps, CJK, ambiguous widths,
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if editing requires full-document snapshots for undo or exposes byte/code-unit positions publicly.
-- **Description:** Implement grapheme, word, line, and document navigation and selection commands consumed by the Interaction Kernel; operation history; find/replace; wrap or horizontal scroll; tabs, indentation, line endings; limits; validation; secure entry; and single-authority controlled/local state.
+- **Description:** Implement grapheme, word, line, and document navigation and selection commands consumed by the Interaction Kernel; operation history; find/replace; wrap or horizontal scroll; independent tab display width, tabs/spaces indentation and indentation width, line endings; limits; validation; secure entry; and single-authority controlled/local state.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -56,7 +56,7 @@ State-machine tests generate edits, navigation, selection, undo/redo, find/repla
 - **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files`
 - **Expected Success Output:** maintained formatted-content corpus produces no crash, escape, or unbounded allocation
 - **STOP Conditions:** STOP if sanitized content can perform cursor movement, title, clipboard, or terminal-mode control.
-- **Description:** Make StyledText canonical, add declared CommonMark/GFM, code highlighting, sanitized ANSI styling and validated links, bounded parse caches, and adapters for custom host formats.
+- **Description:** Make StyledText canonical; implement the exact tables, GitHub-compatible footnotes, strikethrough, task-list, and GFM Markdown flags; apply the declared raw-HTML, link, image-alt, and ANSI sanitization policy; add code highlighting, bounded parse caches, and adapters for custom host formats.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
