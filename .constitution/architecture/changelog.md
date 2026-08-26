@@ -2,6 +2,12 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.3] — 2026-08-26
+
+### Fixed
+
+- Routed accessibility focus and Transcript interaction through executor-owned operations and corrected the container diagram so normalized Terminal input enters the UI Executor before the Interaction Kernel.
+
 ## [v4.0.2] — 2026-08-26
 
 ### Fixed

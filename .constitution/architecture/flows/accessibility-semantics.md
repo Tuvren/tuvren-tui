@@ -12,6 +12,7 @@ sequenceDiagram
     actor EU as End User
     participant SDK as Public SDK Facade
     participant Exec as UI Executor
+    participant Session as Terminal Session
     participant Comp as Composition and Style Kernel
     participant Interact as Interaction Kernel
     participant Obs as Diagnostic and Test Observation
@@ -19,8 +20,10 @@ sequenceDiagram
     Dev->>SDK: Declare role, name, description, value, state, relationships, and announcement
     SDK->>Exec: Submit validated semantic transaction
     Exec->>Comp: Update Semantic Tree on runtime timeline
-    EU->>Interact: Navigate by keyboard
-    Interact->>Comp: Move focus within declared Focus Scope
+    EU->>Session: Navigate by keyboard
+    Session->>Exec: Enqueue normalized navigation input
+    Exec->>Interact: Begin serialized executor-owned focus operation
+    Interact->>Comp: Move focus within declared Focus Scope inside operation
     Comp->>Comp: Resolve visible focus and non-color state cues
     Comp-->>Obs: Expose Semantic Tree and bounded announcement
     Obs-->>SDK: Provide semantic queries and snapshots
