@@ -56,13 +56,13 @@ The complete host source typechecks with zero errors, target ownership paths exi
 - **Verification Command:** `bun run check:contracts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if a contract cannot be checked mechanically; identify the missing Stage 3 artifact instead of embedding an undocumented rule.
-- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, the closed error-code registry, the named snapshot, trace, replay, benchmark, and atomic-release cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage.
+- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, the closed error-code registry, the named snapshot, trace, replay, benchmark, and atomic-release cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage. Snapshot validation includes rooted Semantic Tree integrity; Trace validation includes strict sequence/time ordering, required backward causal links, privacy/replay coupling, and canonical exact ABI payload bytes.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, executes every named cross-field validator including seeded sample-count/metric/replay-index drift, compiles every fixed record, decodes all byte fixtures identically, and fails on seeded drift.
+The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, executes every named cross-field validator including seeded sample-count/metric/replay-index, Semantic Tree graph, Trace order/correlation/privacy/payload drift, compiles every fixed record, decodes all byte fixtures identically, and fails on seeded drift.
 ```
 
 #### TUI-A010 Migrate native source into the target module ownership layout
