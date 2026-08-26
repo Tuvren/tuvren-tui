@@ -2,6 +2,20 @@
 
 use std::collections::{BTreeMap, VecDeque};
 
+pub const EVENT_QUEUE_MAX_RECORDS: usize = 4_096;
+pub const EVENT_QUEUE_MAX_BYTES: usize = 4 * 1024 * 1024;
+pub const GRAPHEME_POOL_MAX_ENTRIES: usize = 262_144;
+pub const GRAPHEME_POOL_MAX_BYTES: usize = 16 * 1024 * 1024;
+pub const COLLECTION_MAX_RESIDENT_ITEMS: usize = 10_000;
+pub const COLLECTION_MAX_RESIDENT_BYTES: usize = 32 * 1024 * 1024;
+pub const TRANSCRIPT_MAX_RESIDENT_BLOCKS: usize = 10_000;
+pub const TRANSCRIPT_MAX_RESIDENT_BYTES: usize = 64 * 1024 * 1024;
+pub const TEXT_DOCUMENT_DEFAULT_MAX_BYTES: usize = 10 * 1024 * 1024;
+pub const TEXT_DOCUMENT_HARD_MAX_BYTES: usize = 100 * 1024 * 1024;
+pub const TERMINAL_MAX_PENDING_REQUESTS: usize = 64;
+pub const TERMINAL_MAX_PENDING_BYTES: usize = 16 * 1024 * 1024;
+pub const DIAGNOSTIC_MAX_LIVE_BYTES: usize = 64 * 1024 * 1024;
+
 #[repr(transparent)]
 #[derive(Clone, Copy, Debug, Default, Eq, Ord, PartialEq, PartialOrd)]
 pub struct ContextId(pub u32);
@@ -31,6 +45,24 @@ pub enum DisplayMode {
     Absolute,
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FlexDirection { Row, RowReverse, Column, ColumnReverse }
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FlexWrap { NoWrap, Wrap, WrapReverse }
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum AlignMode { Start, End, Center, Stretch, Baseline }
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum JustifyMode { Start, End, Center, SpaceBetween, SpaceAround, SpaceEvenly }
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum GridTrack { Dimension(DimensionSpec), Fraction(f32), MinMax(DimensionSpec, DimensionSpec) }
+
+#[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
+pub struct GridPlacement { pub row: Option<u32>, pub column: Option<u32>, pub row_span: u32, pub column_span: u32 }
+
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum DimensionSpec {
     Cells(f32),
@@ -51,8 +83,22 @@ pub struct LayoutSpec {
     pub max_height: Option<DimensionSpec>,
     pub grow: f32,
     pub shrink: f32,
+    pub flex_basis: DimensionSpec,
+    pub flex_direction: FlexDirection,
+    pub flex_wrap: FlexWrap,
+    pub align_items: AlignMode,
+    pub align_self: Option<AlignMode>,
+    pub align_content: Option<JustifyMode>,
+    pub justify_content: JustifyMode,
     pub row_gap: f32,
     pub column_gap: f32,
+    pub grid_template_rows: Vec<GridTrack>,
+    pub grid_template_columns: Vec<GridTrack>,
+    pub grid_placement: GridPlacement,
+    pub top: Option<DimensionSpec>,
+    pub right: Option<DimensionSpec>,
+    pub bottom: Option<DimensionSpec>,
+    pub left: Option<DimensionSpec>,
     pub aspect_ratio: Option<f32>,
     pub overflow: OverflowPolicy,
     pub responsive_rules: Vec<ResponsiveLayoutRule>,
@@ -79,6 +125,8 @@ pub struct ResponsiveCondition {
     pub max_height_cells: Option<u32>,
     pub min_width_percent: Option<f32>,
     pub max_width_percent: Option<f32>,
+    pub min_height_percent: Option<f32>,
+    pub max_height_percent: Option<f32>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -161,6 +209,14 @@ pub struct PendingTerminalRequest {
     pub received_bytes: usize,
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct BoundedUsage {
+    pub count: usize,
+    pub bytes: usize,
+    pub evictions: u64,
+    pub rejected: u64,
+}
+
 #[derive(Clone, Debug)]
 pub struct TerminalSessionState {
     pub status: TerminalSessionStatus,
@@ -171,6 +227,7 @@ pub struct TerminalSessionState {
     pub screen_mode: u8,
     pub output_mode: u8,
     pub pending_requests: BTreeMap<u64, PendingTerminalRequest>,
+    pub pending_usage: BoundedUsage,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -243,6 +300,8 @@ pub struct TextDocument {
     pub cursor: Option<u32>,
     pub edit_history: Vec<EditOperation>,
     pub undo_cursor: usize,
+    pub byte_limit: usize,
+    pub rejected_edits: u64,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -270,6 +329,7 @@ pub struct EditOperation {
 pub struct GraphemePool {
     pub values: Vec<String>,
     pub lookup: BTreeMap<String, GraphemeId>,
+    pub usage: BoundedUsage,
 }
 
 #[derive(Clone, Copy, Debug, Default)]
@@ -306,6 +366,7 @@ pub struct VirtualCollectionState {
     pub selected: Vec<CollectionKey>,
     pub focused: Option<CollectionKey>,
     pub request_generation: u64,
+    pub usage: BoundedUsage,
 }
 
 #[derive(Clone, Debug)]
@@ -327,6 +388,7 @@ pub struct TranscriptState {
     pub anchor: Option<TranscriptBlockId>,
     pub live_edge: bool,
     pub request_generation: u64,
+    pub usage: BoundedUsage,
 }
 
 #[derive(Clone, Debug)]
@@ -363,6 +425,14 @@ pub struct DiagnosticGraphState {
     pub next_sequence: u64,
 }
 
+#[derive(Clone, Debug, Default)]
+pub struct BoundedRecordQueue {
+    pub records: VecDeque<Vec<u8>>,
+    pub usage: BoundedUsage,
+    pub max_records: usize,
+    pub max_bytes: usize,
+}
+
 #[derive(Clone, Debug)]
 pub struct RuntimeContext {
     pub id: ContextId,
@@ -380,7 +450,7 @@ pub struct RuntimeContext {
     pub terminal: TerminalSessionState,
     pub front_surface: Surface,
     pub back_surface: Surface,
-    pub events: VecDeque<Vec<u8>>,
+    pub events: BoundedRecordQueue,
     pub diagnostic_graph: DiagnosticGraphState,
     pub last_transaction_id: u64,
     pub last_render_request_id: u64,

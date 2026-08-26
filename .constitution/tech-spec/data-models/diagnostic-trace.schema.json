@@ -45,12 +45,12 @@
     "wrapCount": { "type": "integer", "minimum": 0 },
     "records": {
       "type": "array",
-      "maxItems": 1000000,
+      "maxItems": 262144,
       "items": { "$ref": "#/$defs/record" }
     },
     "snapshots": {
       "type": "array",
-      "maxItems": 10000,
+      "maxItems": 256,
       "items": {
         "$ref": "https://tuvren.dev/schema/diagnostic-snapshot-1.json"
       }

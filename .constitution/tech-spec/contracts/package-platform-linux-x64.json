@@ -1,0 +1,11 @@
+{
+  "name": "@tuvren/tuvren-tui-linux-x64",
+  "version": "0.1.0",
+  "type": "module",
+  "os": ["linux"],
+  "cpu": ["x64"],
+  "libc": ["glibc"],
+  "files": ["index.js", "native/libtuvren_tui.so", "README.md", "LICENSE"],
+  "exports": { ".": "./index.js", "./native": "./native/libtuvren_tui.so" },
+  "sideEffects": false
+}

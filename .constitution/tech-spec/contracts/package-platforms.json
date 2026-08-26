@@ -1,0 +1,43 @@
+{
+  "version": "0.1.0",
+  "common": {
+    "type": "module",
+    "files": ["index.js", "native", "README.md", "LICENSE"],
+    "exports": { ".": "./index.js", "./native": "./native/__TARGET_ARTIFACT__" }
+  },
+  "packages": [
+    {
+      "name": "@tuvren/tuvren-tui-linux-x64",
+      "os": ["linux"],
+      "cpu": ["x64"],
+      "libc": ["glibc"],
+      "artifact": "libtuvren_tui.so"
+    },
+    {
+      "name": "@tuvren/tuvren-tui-linux-arm64",
+      "os": ["linux"],
+      "cpu": ["arm64"],
+      "libc": ["glibc"],
+      "artifact": "libtuvren_tui.so"
+    },
+    {
+      "name": "@tuvren/tuvren-tui-darwin-arm64",
+      "os": ["darwin"],
+      "cpu": ["arm64"],
+      "artifact": "libtuvren_tui.dylib"
+    },
+    {
+      "name": "@tuvren/tuvren-tui-darwin-x64",
+      "os": ["darwin"],
+      "cpu": ["x64"],
+      "artifact": "libtuvren_tui.dylib"
+    },
+    {
+      "name": "@tuvren/tuvren-tui-win32-x64",
+      "os": ["win32"],
+      "cpu": ["x64"],
+      "artifact": "tuvren_tui.dll"
+    }
+  ],
+  "entryModuleContract": "Each index.js exports nativeLibraryPath as new URL('./native/<artifact>', import.meta.url).pathname and has no side effects. Release tooling expands __TARGET_ARTIFACT__, copies the exact artifact, and writes one package.json per record."
+}

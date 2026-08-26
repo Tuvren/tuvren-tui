@@ -1,0 +1,13 @@
+{
+  "validator": "validateAtomicReleaseManifest",
+  "invariants": [
+    "packageVersion is valid SemVer",
+    "artifacts contains exactly public-package, linux-x64, linux-arm64, darwin-arm64, darwin-x64, and win32-x64",
+    "every artifact.version equals packageVersion",
+    "every artifact.sha256 is a lowercase 64-digit SHA-256 digest",
+    "every platform artifact package name and native filename equals package-platforms.json",
+    "the public package manifest equals package-public.json after replacing its version",
+    "abiMajor and abiMinor equal native-abi.h",
+    "every artifact has build provenance and sourceRevision equals the release sourceCommit"
+  ]
+}

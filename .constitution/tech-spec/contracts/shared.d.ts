@@ -3,7 +3,28 @@ export type Brand<T, Name extends string> = T & { readonly __brand: Name };
 export type ComponentId = Brand<string, "ComponentId">;
 export type CommandId = Brand<string, "CommandId">;
 export type TranscriptBlockId = Brand<string, "TranscriptBlockId">;
+export type GraphemeIndex = Brand<number, "GraphemeIndex">;
 export type CollectionKey = string | number;
+
+export interface GraphemeRange {
+  readonly start: GraphemeIndex;
+  readonly end: GraphemeIndex;
+}
+
+export type TextEncoding = "utf-8" | "utf-16le" | "utf-16be";
+export type TextSearchDirection = "forward" | "backward";
+
+export interface TextSearchOptions {
+  readonly from?: GraphemeIndex;
+  readonly direction?: TextSearchDirection;
+  readonly caseSensitive?: boolean;
+  readonly wholeWord?: boolean;
+}
+
+export interface TextMatch {
+  readonly range: GraphemeRange;
+  readonly text: string;
+}
 
 export type Color =
   | string
@@ -21,9 +42,9 @@ export type Dimension =
   | "min-content"
   | "max-content"
   | {
-      readonly min?: number;
+      readonly min?: number | `${number}%`;
       readonly preferred?: number | `${number}%`;
-      readonly max?: number;
+      readonly max?: number | `${number}%`;
     };
 
 export interface ResponsiveCondition {
@@ -33,6 +54,30 @@ export interface ResponsiveCondition {
   readonly maxHeightCells?: number;
   readonly minWidthPercent?: number;
   readonly maxWidthPercent?: number;
+  readonly minHeightPercent?: number;
+  readonly maxHeightPercent?: number;
+}
+
+export type FlexDirection = "row" | "row-reverse" | "column" | "column-reverse";
+export type FlexWrap = "nowrap" | "wrap" | "wrap-reverse";
+export type AlignMode = "start" | "end" | "center" | "stretch" | "baseline";
+export type JustifyMode =
+  | "start"
+  | "end"
+  | "center"
+  | "space-between"
+  | "space-around"
+  | "space-evenly";
+export type GridTrack =
+  | Dimension
+  | { readonly fraction: number }
+  | { readonly minmax: readonly [Dimension, Dimension] };
+
+export interface GridPlacement {
+  readonly row?: number;
+  readonly column?: number;
+  readonly rowSpan?: number;
+  readonly columnSpan?: number;
 }
 
 export interface LayoutSpec {
@@ -45,7 +90,23 @@ export interface LayoutSpec {
   readonly maxHeight?: Dimension;
   readonly grow?: number;
   readonly shrink?: number;
+  readonly flexBasis?: Dimension;
+  readonly flexDirection?: FlexDirection;
+  readonly flexWrap?: FlexWrap;
+  readonly alignItems?: AlignMode;
+  readonly alignSelf?: AlignMode | "auto";
+  readonly alignContent?: JustifyMode | "stretch";
+  readonly justifyContent?: JustifyMode;
   readonly gap?: number;
+  readonly rowGap?: number;
+  readonly columnGap?: number;
+  readonly gridTemplateRows?: readonly GridTrack[];
+  readonly gridTemplateColumns?: readonly GridTrack[];
+  readonly gridPlacement?: GridPlacement;
+  readonly top?: Dimension;
+  readonly right?: Dimension;
+  readonly bottom?: Dimension;
+  readonly left?: Dimension;
   readonly aspectRatio?: number;
   readonly overflow?: "clip" | "scroll" | "minimum-size-error";
   readonly responsive?: readonly {
@@ -209,6 +270,40 @@ export interface TextAreaProps extends InputProps {
   readonly tabWidth?: number;
   readonly lineEnding?: "lf" | "crlf";
 }
+
+export interface TextDocumentSnapshot {
+  readonly content: string;
+  readonly cursor: GraphemeIndex;
+  readonly selection?: GraphemeRange;
+  readonly canUndo: boolean;
+  readonly canRedo: boolean;
+  readonly version: number;
+}
+
+export interface TextDocument {
+  snapshot(): TextDocumentSnapshot;
+  setCursor(index: GraphemeIndex): void;
+  setSelection(range: GraphemeRange | undefined): void;
+  moveCursor(
+    unit: "grapheme" | "word" | "line" | "document",
+    direction: "backward" | "forward",
+    extendSelection?: boolean,
+  ): void;
+  insert(text: string): void;
+  delete(range?: GraphemeRange): void;
+  replace(range: GraphemeRange, text: string): void;
+  find(query: string, options?: TextSearchOptions): TextMatch | undefined;
+  replaceMatch(match: TextMatch, replacement: string): void;
+  replaceAll(
+    query: string,
+    replacement: string,
+    options?: TextSearchOptions,
+  ): number;
+  undo(): boolean;
+  redo(): boolean;
+  encode(encoding?: TextEncoding): Uint8Array;
+}
+
 export interface RangeRequest {
   readonly start: number;
   readonly count: number;
@@ -220,9 +315,47 @@ export interface RangeResult<T> {
   readonly start: number;
   readonly items: readonly T[];
 }
+export type RangeLoadResult<T> =
+  | { readonly state: "loading"; readonly generation: number }
+  | {
+      readonly state: "empty";
+      readonly generation: number;
+      readonly totalCount: 0;
+    }
+  | ({ readonly state: "ready" } & RangeResult<T>)
+  | {
+      readonly state: "error";
+      readonly generation: number;
+      readonly message: string;
+      readonly retryable: boolean;
+    };
+
+export type CollectionMutation<T> =
+  | { readonly type: "insert"; readonly index: number; readonly item: T }
+  | { readonly type: "update"; readonly key: CollectionKey; readonly item: T }
+  | { readonly type: "remove"; readonly key: CollectionKey }
+  | { readonly type: "move"; readonly key: CollectionKey; readonly to: number }
+  | {
+      readonly type: "reset";
+      readonly items: readonly T[];
+      readonly generation: number;
+    };
+
 export interface DataSource<T, LoadResult> {
   readonly getKey: (item: T) => CollectionKey;
   readonly loadRange: (request: RangeRequest) => LoadResult;
+  readonly reload?: (generation: number) => LoadResult;
+}
+
+export interface CollectionController<T> {
+  apply(mutation: CollectionMutation<T>): void;
+  reload(): void;
+  scrollToKey(
+    key: CollectionKey,
+    alignment?: "start" | "center" | "end" | "nearest",
+  ): void;
+  focusKey(key: CollectionKey | undefined): void;
+  visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
 }
 export interface ScrollBoxProps extends CommonProps<
   "root" | "viewport" | "scrollbar"
@@ -253,6 +386,11 @@ export interface TableProps<
   readonly columns: readonly TableColumn<T>[];
   readonly selectedKeys?: readonly CollectionKey[];
   readonly onSelectionChange?: (keys: readonly CollectionKey[]) => void;
+  readonly onVisibleRangeChange?: (
+    range: Readonly<{ start: number; end: number; generation: number }>,
+  ) => void;
+  readonly onFocusChange?: (key: CollectionKey | undefined) => void;
+  readonly onReloadRequest?: (generation: number) => void;
 }
 export interface TranscriptBlock {
   readonly id: TranscriptBlockId;
@@ -270,6 +408,45 @@ export interface TranscriptProps extends CommonProps<
   readonly maxResidentBlocks?: number;
   readonly onRangeChange?: (start: number, end: number) => void;
   readonly onEvict?: (ids: readonly TranscriptBlockId[]) => void;
+  readonly onVisibleRangeChange?: (
+    range: Readonly<{ start: number; end: number; generation: number }>,
+  ) => void;
+}
+
+export type TranscriptOperation =
+  | { readonly type: "append"; readonly block: TranscriptBlock }
+  | { readonly type: "replace"; readonly block: TranscriptBlock }
+  | { readonly type: "remove"; readonly id: TranscriptBlockId }
+  | {
+      readonly type: "stream";
+      readonly id: TranscriptBlockId;
+      readonly chunk: string;
+      readonly version: number;
+    }
+  | {
+      readonly type: "finish";
+      readonly id: TranscriptBlockId;
+      readonly version: number;
+    }
+  | {
+      readonly type: "collapse";
+      readonly id: TranscriptBlockId;
+      readonly collapsed: boolean;
+    }
+  | {
+      readonly type: "reset";
+      readonly blocks: readonly TranscriptBlock[];
+      readonly generation: number;
+    };
+
+export interface TranscriptController {
+  apply(operation: TranscriptOperation): void;
+  scrollTo(
+    id: TranscriptBlockId,
+    alignment?: "start" | "center" | "end" | "nearest",
+  ): void;
+  followLiveEdge(enabled: boolean): void;
+  visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
 }
 export interface SplitPaneProps extends CommonProps<
   "root" | "first" | "divider" | "second"

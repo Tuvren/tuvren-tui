@@ -1,0 +1,18 @@
+{
+  "description": "ABI 2.0 transaction 1 replaces graphemes [2,4) in runtime node 42 with UTF-8 é🙂 at content epoch 7",
+  "byteLength": 126,
+  "bytesHex": "5455565202000000010000000000000001000000300000002800000058000000260000000000000000000000000000000a0000002a00000000000000000000005800000026000000000000000000000007000000000000002000030002000000040000007800000006000000000000000700000000000000c3a9f09f9982",
+  "expected": {
+    "transactionId": "1",
+    "commands": [
+      {
+        "opcode": "TEXT_EDIT",
+        "target": 42,
+        "kind": "REPLACE",
+        "range": [2, 4],
+        "utf8": "é🙂",
+        "contentEpoch": "7"
+      }
+    ]
+  }
+}
