@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.18** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.19** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -217,7 +217,8 @@ bun run build:package            # Emit the exact public and platform package la
 bun run check:capability-map     # Prove every P0 ID has an example, test, flow, and task
 bun run check:release-candidate  # Run every P0 contract, semantic, terminal, fuzz, bundle, benchmark, adoption, target, package, OpenCode, and atomic-manifest gate
 bun run test:semantic            # Shared Effect and imperative semantic conformance
-bun run test:host                # Strict FFI, JSX, Command, Effect, example, install, and runner host suites
+bun run test:host                # Strict FFI, JSX, Command, Effect, animation, example, install, and runner host suites
+bun run test:animation           # Effect and imperative executor-drain completion ordering with deterministic time
 bun run test:terminal            # Protocol, Screen Mode, restoration, and multiplexer profiles
 bun run test:platform-smoke      # Install/load/init/headless-render/shutdown on all five targets
 bun run test:release-package     # Pack, install, exact-version resolve, declarations, source maps, CLI, and licenses

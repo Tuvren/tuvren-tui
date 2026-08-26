@@ -2,6 +2,12 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.19] — 2026-08-26
+
+### Fixed
+
+- Added a deterministic Effect/imperative host animation suite that proves handles resolve only after executor-owned Animation Event drain, and included it in the strict host aggregate.
+
 ## [v9.0.18] — 2026-08-26
 
 ### Fixed
