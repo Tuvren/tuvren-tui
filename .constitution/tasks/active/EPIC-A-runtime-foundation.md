@@ -56,13 +56,13 @@ The complete host source typechecks with zero errors, target ownership paths exi
 - **Verification Command:** `bun run check:contracts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if a contract cannot be checked mechanically; identify the missing Stage 3 artifact instead of embedding an undocumented rule.
-- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage.
+- **Description:** Implement one frozen check for public declarations, exact package manifests, immutable schemas and registries, the named snapshot, replay, benchmark, and atomic-release cross-field validators, C11/C++17 ABI layout, Rust mirror models, TypeScript/Rust byte-fixture parity, and generated symbol coverage.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, compiles every fixed record, decodes all byte fixtures identically, and fails on seeded drift.
+The command uses Effect 3.22.1 and TypeScript 5.9.3 from the contract lock, validates every raw contract and schema, executes every named cross-field validator including seeded sample-count/metric/replay-index drift, compiles every fixed record, decodes all byte fixtures identically, and fails on seeded drift.
 ```
 
 #### TUI-A010 Migrate native source into the target module ownership layout
@@ -116,7 +116,7 @@ Saturation and lifecycle tests prove one writer, ordered accepted work, bounded 
 - **Capabilities:** P0-A08–P0-A09, SAFE-01
 - **Scope (In-Scope Files):** `native/src/lib.rs`, `native/src/transaction.rs`, `native/fuzz/Cargo.toml`, `native/fuzz/fuzz_targets/transaction_decode.rs`, transaction corpus, `ts/src/ffi/`, generated ABI checks
 - **Scope (Out-of-Scope Files):** public numeric identities, TypeScript callbacks from Rust, Event arbitration disposition records
-- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- -max_total_time=60`
 - **Expected Success Output:** no crash, panic escape, out-of-bounds access, or invariant violation for the maintained corpus and configured CI duration
 - **STOP Conditions:** STOP if the implementation requires exposing RuntimeNode IDs or relaxing full-batch prevalidation.
 - **Description:** Implement ABI 2.0 decoding, opcode/property/value compatibility, typed complex payloads, transaction-local node references, caller-owned mappings and indexed mutation results, bounded query/copy-out reads, exact-version loading, panic containment, and one Render Pass request per committed batch.
@@ -161,13 +161,13 @@ Runner fixtures show zero unexplained idle passes, at most one Render Pass reque
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-effect.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if the root surface needs Promise-wrapped Effect APIs or exports Reactivity identity.
-- **Description:** Implement root Effect lifecycle, JSX syntax, private Reactivity, scopes, Streams, and services while exposing the complete advanced Imperative SDK only at `tuvren-tui/imperative` with no Rust knowledge required.
+- **Description:** Implement root Effect lifecycle, View-carried error/environment requirements, post-mount RenderSession failure retention, JSX syntax, private Reactivity, scopes, Streams, and services while exposing the complete advanced Imperative SDK only at `tuvren-tui/imperative` with no Rust knowledge required.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
 
 ```text
-Packed declarations match the raw contracts; the root has no imperative or Signal leakage; both workflows render, update, fail with typed errors, and clean up through the same runtime authority.
+Packed declarations match the raw contracts; strict probes prove loader/Stream requirements survive nested View composition and handler failures survive through awaitExit; the root has no imperative or Signal leakage; both workflows render, update, fail with typed errors, and clean up through the same runtime authority.
 ```
 
 #### TUI-A006 Implement failure supervision, stable errors, and terminal-safe lifecycle exits

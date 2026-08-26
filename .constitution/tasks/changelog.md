@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.8 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.9 View/RenderSession requirement retention, exclusive Collection authority, bounded fuzz execution, replay/benchmark cross-field validators, and distinct Transcript content-version/request-generation clocks.
+- Kept the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage unchanged because TUI-A005, TUI-A009, TUI-E002, TUI-G002, TUI-G007, TUI-H001, and TUI-I006 own the corrected obligations.
+
 ## v10.0.7 — 2026-08-26
 
 ### Added

@@ -32,10 +32,10 @@ Sink fixtures verify causal linking, stable error metadata, forced ring wrap, pr
 - **Capabilities:** P0-N04–P0-N05, P0-O07–P0-O08, P0-O12, P0-O17, SAFE-02, OPS-05
 - **Scope (In-Scope Files):** `native/src/diagnostics/`, `native/fuzz/fuzz_targets/durable_files.rs`, durable corpora, schema codecs, migration registry, redaction fixtures
 - **Scope (Out-of-Scope Files):** silent schema reinterpretation, implicit full-content capture
-- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** no malformed input escapes limits or privacy policy
 - **STOP Conditions:** STOP if a reader allocates or decompresses beyond preflight limits, or if saving full content lacks explicit confirmation.
-- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, kind-correlated and bounded replay payloads, trace/snapshot/profile/benchmark/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
+- **Description:** Implement exact-version schema dispatch, registered migration, encoded/decoded/depth/string bounds, kind-correlated and bounded replay payloads, zero-based reachable replay expectations, benchmark sample/definition/type/statistic consistency, trace/snapshot/profile/release codecs, default redaction, explicit full-content confirmation, and atomic writes.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
@@ -137,7 +137,7 @@ Seed host, target, artifact, version, load, initialization, render, source-map, 
 - **Capabilities:** P0-O07–P0-O12, SAFE-01–SAFE-02
 - **Scope (In-Scope Files):** all `native/fuzz/fuzz_targets/`, all maintained corpora/artifacts policy, parser inventories, malformed-input tests, CI fuzz jobs
 - **Scope (Out-of-Scope Files):** network services, unsupported parsers
-- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files`
+- **Verification Command:** `cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- -max_total_time=60 && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode -- -max_total_time=60 && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response -- -max_total_time=60 && cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60`
 - **Expected Success Output:** every maintained target/corpus completes its configured CI duration without memory unsafety, panic escape, control injection, privacy leak, or unbounded allocation
 - **STOP Conditions:** STOP release progression if any external content/control boundary lacks a named validator, limit, timeout/correlation rule where applicable, and test owner.
 - **Description:** Inventory and fuzz transactions, Events, formatted text, terminal responses, clipboard chunks, traces, snapshots, profiles, replay, and release evidence under the declared resource and privacy limits.
