@@ -285,13 +285,15 @@ export interface DragEventPayload {
   readonly captured: boolean;
 }
 
+export type EventModifier = "shift" | "control" | "alt" | "super";
+
 export interface TuvrenEventPayloadMap {
   readonly key: Readonly<{
     action: "press" | "repeat" | "release";
     keyCode: number;
     physicalCode?: number;
     text?: string;
-    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly text: Readonly<{ text: string }>;
   readonly pointerMove: Readonly<{
@@ -300,7 +302,7 @@ export interface TuvrenEventPayloadMap {
     pixelX?: number;
     pixelY?: number;
     buttons: readonly number[];
-    modifiers: readonly string[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly pointerButton: Readonly<{
     action: "press" | "release";
@@ -308,7 +310,7 @@ export interface TuvrenEventPayloadMap {
     cellY: number;
     button: number;
     clickCount: number;
-    modifiers: readonly string[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly wheel: Readonly<{
     cellX: number;
@@ -317,7 +319,7 @@ export interface TuvrenEventPayloadMap {
     deltaColumns: number;
     deltaPixelX?: number;
     deltaPixelY?: number;
-    modifiers: readonly string[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly dragStart: Readonly<DragEventPayload>;
   readonly drag: Readonly<DragEventPayload>;

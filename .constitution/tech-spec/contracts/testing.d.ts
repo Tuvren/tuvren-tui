@@ -4,6 +4,7 @@ import type * as TestClock from "effect/TestClock";
 import type {
   Brand,
   ComponentId,
+  EventModifier,
   TerminalProfile,
   TuvrenError,
   TuvrenErrorCategory,
@@ -106,6 +107,155 @@ export type EmbeddedDiagnosticSnapshot = DiagnosticSnapshot & {
   readonly traceBasis: DiagnosticSnapshotTraceBasis;
 };
 
+export interface DiagnosticTraceCorrelation {
+  readonly recordId: string;
+  readonly contextId: string;
+  readonly parentRecordId?: string;
+  readonly eventId?: string;
+  readonly commandId?: string;
+  readonly commandInstanceId?: string;
+  readonly effectSpanId?: string;
+  readonly transactionId?: string;
+  readonly renderRequestId?: string;
+  readonly componentId?: string;
+  readonly subjectId?: string;
+  readonly subjectKind?: "component" | "text-document";
+}
+
+export type DiagnosticTransactionPayload =
+  | Readonly<{
+      payloadVersion: "1.0.0";
+      status: "committed";
+      commandCount: number;
+      redacted: boolean;
+      failedCommandIndex?: never;
+      encodedTransactionBase64?: string;
+    }>
+  | Readonly<{
+      payloadVersion: "1.0.0";
+      status: "rejected";
+      commandCount: number;
+      redacted: boolean;
+      failedCommandIndex?: number;
+      encodedTransactionBase64?: never;
+    }>;
+
+export interface DiagnosticTracePayloadMap {
+  readonly context: Readonly<{
+    phase: "initialized";
+    abiMajor: number;
+    abiMinor: number;
+  }>;
+  readonly input: Readonly<{
+    payloadVersion: "1.0.0";
+    inputKind: string;
+    redacted: boolean;
+    byteLength: number;
+    encodedEventBatchBase64?: string;
+  }>;
+  readonly event: Readonly<{
+    eventType: string;
+    cancelable: boolean;
+    target?: string;
+    disposition?: string;
+  }>;
+  readonly command: Readonly<{
+    commandId: string;
+    phase: string;
+    status: string;
+    concurrency?: string;
+  }>;
+  readonly "effect-span": Readonly<{
+    spanId: string;
+    phase: string;
+    parentSpanId?: string;
+  }>;
+  readonly reconcile: Readonly<{
+    operation: string;
+    component: string;
+    source?: string;
+  }>;
+  readonly transaction: DiagnosticTransactionPayload;
+  readonly mutation: Readonly<{
+    payloadVersion: "1.0.0";
+    resource: string;
+    operation: string;
+    generation: number;
+    redacted: boolean;
+    identity?: string;
+  }>;
+  readonly dirty: Readonly<{
+    cause: string;
+    component?: string;
+    cellCount?: number;
+  }>;
+  readonly layout: Readonly<{
+    component: string;
+    durationNanos: number;
+    changedNodes?: number;
+  }>;
+  readonly text: Readonly<{
+    operation: string;
+    startGrapheme: number;
+    endGrapheme: number;
+    contentEpoch?: number;
+  }>;
+  readonly render: Readonly<{
+    dirtyCells: number;
+    engineNanos: number;
+    presentationTierHz?: number;
+  }>;
+  readonly diff: Readonly<{
+    changedCells: number;
+    bytes: number;
+    fullRedraw?: boolean;
+  }>;
+  readonly "terminal-write": Readonly<{
+    bytes: number;
+    durationNanos: number;
+    status: string;
+  }>;
+  readonly error: Readonly<{
+    code: TuvrenErrorCode;
+    category: TuvrenErrorCategory;
+    operation: string;
+    component?: string;
+  }>;
+  readonly cleanup: Readonly<{
+    resource: string;
+    count: number;
+    retainedBytes?: number;
+  }>;
+  readonly unattributed:
+    | Readonly<{
+        reason: "ring-wrap";
+        description: string;
+        boundaryTransactionId: string;
+        boundaryRenderRequestId: string;
+        phase?: string;
+      }>
+    | Readonly<{
+        reason: "tooling-defect";
+        description: string;
+        boundaryTransactionId?: never;
+        boundaryRenderRequestId?: never;
+        phase?: string;
+      }>;
+}
+
+export type DiagnosticTraceRecord<
+  Kind extends keyof DiagnosticTracePayloadMap =
+    keyof DiagnosticTracePayloadMap,
+> = {
+  readonly [Selected in Kind]: Readonly<{
+    sequence: string;
+    kind: Selected;
+    timestampNanos: string;
+    correlation: Readonly<DiagnosticTraceCorrelation>;
+    payload: DiagnosticTracePayloadMap[Selected];
+  }>;
+}[Kind];
+
 export interface DiagnosticTrace<
   FullContent extends boolean = boolean,
   RuntimeReplay extends boolean = false,
@@ -150,43 +300,7 @@ export interface DiagnosticTrace<
     initialSequence: string;
     initialRecordId: string;
   }>;
-  readonly records: readonly Readonly<{
-    sequence: string;
-    kind:
-      | "context"
-      | "input"
-      | "event"
-      | "command"
-      | "effect-span"
-      | "reconcile"
-      | "transaction"
-      | "mutation"
-      | "dirty"
-      | "layout"
-      | "text"
-      | "render"
-      | "diff"
-      | "terminal-write"
-      | "error"
-      | "cleanup"
-      | "unattributed";
-    timestampNanos: string;
-    correlation: Readonly<{
-      recordId: string;
-      contextId: string;
-      parentRecordId?: string;
-      eventId?: string;
-      commandId?: string;
-      commandInstanceId?: string;
-      effectSpanId?: string;
-      transactionId?: string;
-      renderRequestId?: string;
-      componentId?: string;
-      subjectId?: string;
-      subjectKind?: "component" | "text-document";
-    }>;
-    payload: Readonly<Record<string, unknown>>;
-  }>[];
+  readonly records: readonly DiagnosticTraceRecord[];
   readonly snapshots: readonly EmbeddedDiagnosticSnapshot[];
   readonly wrapCount: number;
 }
@@ -197,7 +311,7 @@ export interface ApplicationReplayPayloadMap {
     keyCode: number;
     physicalCode?: number;
     text?: string;
-    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly text: Readonly<{ text: string }>;
   readonly paste: Readonly<{ text: string; truncated: boolean }>;
@@ -207,7 +321,7 @@ export interface ApplicationReplayPayloadMap {
     pixelX?: number;
     pixelY?: number;
     buttons: readonly number[];
-    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly "pointer-button": Readonly<{
     action: "press" | "release";
@@ -215,7 +329,7 @@ export interface ApplicationReplayPayloadMap {
     cellY: number;
     button: number;
     clickCount: number;
-    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+    modifiers: readonly EventModifier[];
   }>;
   readonly wheel: Readonly<{
     cellX: number;

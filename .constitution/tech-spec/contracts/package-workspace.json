@@ -6,6 +6,7 @@
   "workspaces": ["ts", "packages/@tuvren/*"],
   "scripts": {
     "build:package": "bun run scripts/build-package.ts",
+    "check:toolchain": "bun run scripts/check-toolchain.ts",
     "check:abi-parity": "bun run scripts/check-abi-parity.ts",
     "check:contracts": "bun run scripts/check-contracts.ts",
     "check:native": "cargo fmt --manifest-path native/Cargo.toml -- --check && cargo clippy --manifest-path native/Cargo.toml --locked -- -D warnings && cargo test --manifest-path native/Cargo.toml --locked",
@@ -15,6 +16,7 @@
     "test:terminal": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-terminal.test.ts",
     "test:platform-smoke": "bun run scripts/test-platform-smoke.ts",
     "test:release-package": "bun run scripts/test-release-package.ts",
+    "test:registry-package": "bun run scripts/test-registry-package.ts",
     "bench:envelope": "cargo build --manifest-path native/Cargo.toml --release --locked && bun run benchmarks/envelope.ts",
     "bench:comparative": "cargo build --manifest-path native/Cargo.toml --release --locked && bun run benchmarks/comparative.ts",
     "bench:devtools": "cargo build --manifest-path native/Cargo.toml --release --locked && bun run benchmarks/devtools.ts",
