@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.14** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.15** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 

@@ -95,7 +95,11 @@ export interface DiagnosticSnapshot {
 }
 
 export type DiagnosticSnapshotTraceBasis =
-  | Readonly<{ kind: "retained"; atSequence: string }>
+  | Readonly<{
+      kind: "retained";
+      atSequence: string;
+      baselineSnapshotId?: string;
+    }>
   | Readonly<{ kind: "wrap-baseline"; boundarySequence: string }>;
 
 export type EmbeddedDiagnosticSnapshot = DiagnosticSnapshot & {
