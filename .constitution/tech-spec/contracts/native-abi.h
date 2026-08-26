@@ -19,6 +19,7 @@ extern "C" {
 #define TUVREN_TX_MAGIC 0x52565554u /* "TUVR" in little endian */
 #define TUVREN_EVENT_MAGIC 0x45565554u /* "TUVE" in little endian */
 #define TUVREN_DIAGNOSTIC_MAGIC 0x44565554u /* "TUVD" in little endian */
+#define TUVREN_QUERY_MAGIC 0x51565554u /* "TUVQ" in little endian */
 #define TUVREN_TX_FLAG_REQUEST_RENDER 0x00000001u
 #define TUVREN_EVENT_FLAG_CANCELABLE 0x0001u
 #define TUVREN_EVENT_FLAG_COALESCED 0x0002u
@@ -50,6 +51,16 @@ extern "C" {
 #define TUVREN_ANIMATION_HAS_FROM 0x00000001u
 #define TUVREN_ANIMATION_REPEAT_INFINITE 0x00000002u
 #define TUVREN_ANIMATION_REVERSE 0x00000004u
+#define TUVREN_STYLE_VALUE_HAS_FALLBACK 0x0001u
+#define TUVREN_QUERY_FIND_BACKWARD 0x00000001u
+#define TUVREN_QUERY_FIND_CASE_SENSITIVE 0x00000002u
+#define TUVREN_QUERY_FIND_WHOLE_WORD 0x00000004u
+#define TUVREN_QUERY_RESULT_CAN_UNDO 0x00000001ull
+#define TUVREN_QUERY_RESULT_CAN_REDO 0x00000002ull
+#define TUVREN_QUERY_RESULT_HAS_SELECTION 0x00000004ull
+#define TUVREN_TEXT_EDIT_FIND_BACKWARD 0x00000001u
+#define TUVREN_TEXT_EDIT_FIND_CASE_SENSITIVE 0x00000002u
+#define TUVREN_TEXT_EDIT_FIND_WHOLE_WORD 0x00000004u
 #define TUVREN_DIAGNOSTIC_REDACTED 0x00000001u
 #define TUVREN_DIAGNOSTIC_RING_WRAPPED 0x00000002u
 #define TUVREN_DIAGNOSTIC_SNAPSHOT_BOUNDARY 0x00000004u
@@ -89,6 +100,7 @@ extern "C" {
 #define TUVREN_NODE_REF_LOCAL_BIT 0x80000000u
 #define TUVREN_MAX_TRANSACTION_BYTES (8u * 1024u * 1024u)
 #define TUVREN_MAX_TRANSACTION_COMMANDS 65535u
+#define TUVREN_MAX_QUERY_INPUT_BYTES (8u * 1024u * 1024u)
 
 #ifdef __cplusplus
 #define TUVREN_STATIC_ASSERT(condition, message) static_assert(condition, message)
@@ -143,7 +155,9 @@ typedef enum TuvrenTransactionOpcode {
     TUVREN_TX_TRANSCRIPT_APPLY = 12,
     TUVREN_TX_ANIMATION_APPLY = 13,
     TUVREN_TX_TERMINAL_REQUEST = 14,
-    TUVREN_TX_DIAGNOSTIC_CONFIGURE = 15
+    TUVREN_TX_DIAGNOSTIC_CONFIGURE = 15,
+    TUVREN_TX_ANIMATION_CANCEL = 16,
+    TUVREN_TX_ANIMATION_REPLACE = 17
 } TuvrenTransactionOpcode;
 
 typedef enum TuvrenValueTag {
@@ -169,9 +183,13 @@ typedef enum TuvrenDimensionTag {
 
 typedef enum TuvrenDisplayMode {
     TUVREN_DISPLAY_FLEX = 1,
-    TUVREN_DISPLAY_GRID = 2,
-    TUVREN_DISPLAY_ABSOLUTE = 3
+    TUVREN_DISPLAY_GRID = 2
 } TuvrenDisplayMode;
+
+typedef enum TuvrenPositionMode {
+    TUVREN_POSITION_RELATIVE = 1,
+    TUVREN_POSITION_ABSOLUTE = 2
+} TuvrenPositionMode;
 
 typedef enum TuvrenFlexDirection {
     TUVREN_FLEX_ROW = 1,
@@ -217,6 +235,32 @@ typedef enum TuvrenStylePayloadKind {
     TUVREN_STYLE_SLOT = 3,
     TUVREN_STYLE_THEME = 4
 } TuvrenStylePayloadKind;
+
+typedef enum TuvrenStyleValueKind {
+    TUVREN_STYLE_VALUE_LITERAL = 1,
+    TUVREN_STYLE_VALUE_TOKEN = 2
+} TuvrenStyleValueKind;
+
+typedef enum TuvrenThemeTokenValueTag {
+    TUVREN_THEME_TOKEN_COLOR = 1,
+    TUVREN_THEME_TOKEN_NUMBER = 2,
+    TUVREN_THEME_TOKEN_UTF8 = 3,
+    TUVREN_THEME_TOKEN_BOOLEAN = 4
+} TuvrenThemeTokenValueTag;
+
+typedef enum TuvrenQueryKind {
+    TUVREN_QUERY_TEXT_SNAPSHOT = 1,
+    TUVREN_QUERY_TEXT_FIND = 2,
+    TUVREN_QUERY_TEXT_ENCODE = 3,
+    TUVREN_QUERY_COLLECTION_VISIBLE_RANGE = 4,
+    TUVREN_QUERY_TRANSCRIPT_VISIBLE_RANGE = 5
+} TuvrenQueryKind;
+
+typedef enum TuvrenTextEncoding {
+    TUVREN_TEXT_ENCODING_UTF8 = 1,
+    TUVREN_TEXT_ENCODING_UTF16_LE = 2,
+    TUVREN_TEXT_ENCODING_UTF16_BE = 3
+} TuvrenTextEncoding;
 
 typedef enum TuvrenThemeMode {
     TUVREN_THEME_ANY = 0,
@@ -375,7 +419,8 @@ typedef enum TuvrenTextEditKind {
     TUVREN_TEXT_SET_CURSOR = 4,
     TUVREN_TEXT_SET_SELECTION = 5,
     TUVREN_TEXT_UNDO = 6,
-    TUVREN_TEXT_REDO = 7
+    TUVREN_TEXT_REDO = 7,
+    TUVREN_TEXT_REPLACE_ALL = 8
 } TuvrenTextEditKind;
 
 typedef enum TuvrenCollectionMutationKind {
@@ -443,6 +488,7 @@ typedef enum TuvrenProperty {
     TUVREN_PROP_LAYOUT_GRID = 0x010D,
     TUVREN_PROP_LAYOUT_RESPONSIVE = 0x010E,
     TUVREN_PROP_LAYOUT_SPEC = 0x010F,
+    TUVREN_PROP_LAYOUT_POSITION = 0x0110,
     TUVREN_PROP_STYLE_SHEET = 0x0201,
     TUVREN_PROP_STYLE_SLOT = 0x0202,
     TUVREN_PROP_STYLE_INLINE = 0x0203,
@@ -468,7 +514,7 @@ typedef enum TuvrenProperty {
 
 /* Command compatibility matrix (all other combinations are invalid):
  * CREATE_NODE/CreateNodePayload; DESTROY_NODE, SET_ROOT/no payload;
- * INSERT_CHILD, REMOVE_CHILD/ChildPayload; layout 0x0101..0x010F requires
+ * INSERT_CHILD, REMOVE_CHILD/ChildPayload; layout 0x0101..0x0110 requires
  * SET_PROPERTY_BYTES + VALUE_LAYOUT/LayoutPayload; style 0x0201..0x0204
  * requires SET_PROPERTY_BYTES + VALUE_STYLE/StylePayload; TEXT_CONTENT,
  * SEMANTIC_ROLE, NAME, DESCRIPTION, VALUE require SET_PROPERTY_BYTES +
@@ -477,8 +523,9 @@ typedef enum TuvrenProperty {
  * 0x0401..0x0406 require SET_PROPERTY_U64 + VALUE_U64; semantic states and
  * relationships require SET_PROPERTY_BYTES + VALUE_SEMANTIC/SemanticPayload;
  * TEXT_EDIT/TextEditPayload; COLLECTION_APPLY/CollectionMutationPayload;
- * TRANSCRIPT_APPLY/TranscriptMutationPayload;
- * ANIMATION_APPLY/AnimationPayload; TERMINAL_REQUEST/TerminalRequestPayload;
+ * TRANSCRIPT_APPLY/TranscriptMutationPayload; ANIMATION_APPLY and
+ * ANIMATION_REPLACE/AnimationPayload; ANIMATION_CANCEL/AnimationPayload with
+ * only animation_id set; TERMINAL_REQUEST/TerminalRequestPayload;
  * DIAGNOSTIC_CONFIGURE/DiagnosticConfigPayload. Each fixed payload's size
  * field must equal sizeof(record); nested offsets are relative to the start of
  * the transaction, aligned to four bytes, disjoint, and wholly inside arena.
@@ -815,6 +862,7 @@ typedef struct TuvrenResponsiveCondition {
 typedef struct TuvrenLayoutPayload {
     uint16_t size;
     uint16_t display; /* TuvrenDisplayMode */
+    uint16_t position; /* TuvrenPositionMode */
     uint16_t flex_direction; /* TuvrenFlexDirection */
     uint16_t flex_wrap; /* TuvrenFlexWrap */
     uint16_t align_items; /* TuvrenAlignMode */
@@ -856,22 +904,71 @@ typedef struct TuvrenResponsiveLayoutRule {
     uint32_t layout_length;
 } TuvrenResponsiveLayoutRule;
 
+typedef struct TuvrenStyleValue {
+    uint16_t size;
+    uint16_t kind; /* TuvrenStyleValueKind */
+    uint16_t value_tag; /* TuvrenThemeTokenValueTag */
+    uint16_t flags; /* TUVREN_STYLE_VALUE_* */
+    uint32_t token_offset;
+    uint32_t token_length;
+    uint64_t literal_bits;
+} TuvrenStyleValue;
+
+typedef struct TuvrenThemeTokenRecord {
+    uint32_t name_offset;
+    uint32_t name_length;
+    uint16_t value_tag; /* TuvrenThemeTokenValueTag */
+    uint16_t reserved;
+    uint32_t value_offset;
+    uint32_t value_length;
+    uint64_t scalar_bits;
+} TuvrenThemeTokenRecord;
+
+typedef struct TuvrenStyleAttributeTokenRecord {
+    uint32_t attribute; /* exactly one TUVREN_STYLE_ATTR_* bit */
+    uint32_t token_offset;
+    uint32_t token_length;
+    uint32_t flags; /* TUVREN_STYLE_VALUE_* */
+    uint32_t fallback_value; /* zero or one */
+    uint32_t reserved;
+} TuvrenStyleAttributeTokenRecord;
+
 typedef struct TuvrenStylePayload {
     uint16_t size;
     uint16_t kind; /* TuvrenStylePayloadKind */
     uint32_t present_mask;
-    uint32_t foreground_rgba;
-    uint32_t background_rgba;
+    TuvrenStyleValue foreground;
+    TuvrenStyleValue background;
     uint32_t attributes; /* TUVREN_STYLE_ATTR_* */
+    uint32_t attribute_tokens_offset;
+    uint32_t attribute_token_count;
     uint32_t border; /* TuvrenBorderKind */
+    uint32_t border_token_offset;
+    uint32_t border_token_length;
+    uint32_t border_token_flags; /* TUVREN_STYLE_VALUE_* */
     uint16_t padding_top;
     uint16_t padding_right;
     uint16_t padding_bottom;
     uint16_t padding_left;
-    float opacity;
+    uint32_t padding_token_offset;
+    uint32_t padding_token_length;
+    uint32_t padding_token_flags; /* TUVREN_STYLE_VALUE_* */
+    TuvrenStyleValue opacity;
     uint32_t rules_offset;
     uint32_t rule_count;
+    uint32_t theme_tokens_offset;
+    uint32_t theme_token_count;
 } TuvrenStylePayload;
+
+/* StyleValue literal_bits stores packed RGBA for COLOR, IEEE-754 bits for
+ * NUMBER, and zero/one for BOOLEAN. TOKEN requires a nonempty UTF-8 name; its
+ * fallback uses literal_bits only when HAS_FALLBACK is set. Boolean attribute
+ * tokens use a packed TuvrenStyleAttributeTokenRecord array. Border and uniform
+ * padding tokens use their dedicated UTF-8 name and flag fields; their literal
+ * fields act as the fallback when HAS_FALLBACK is set. Theme StylePayload
+ * records a packed TuvrenThemeTokenRecord array.
+ * UTF8 token values use the record's value offset and length; scalar values
+ * require both to be zero. */
 
 typedef struct TuvrenStyleRulePayload {
     uint64_t state_mask; /* TUVREN_STYLE_STATE_* */
@@ -917,8 +1014,17 @@ typedef struct TuvrenTextEditPayload {
     TuvrenGraphemeRange range;
     uint32_t utf8_offset;
     uint32_t utf8_length;
+    uint32_t replacement_offset;
+    uint32_t replacement_length;
+    uint32_t search_flags; /* TUVREN_TEXT_EDIT_FIND_* */
+    uint32_t reserved;
     uint64_t content_epoch;
 } TuvrenTextEditPayload;
+
+/* REPLACE_ALL uses UTF-8 as the query, replacement_offset/replacement_length as
+ * replacement text, range.start as the optional starting grapheme, and search
+ * flags as its options. Other text edits require replacement and search fields
+ * to be zero. UNDO and REDO require all text and range fields to be zero. */
 
 typedef struct TuvrenCollectionMutationPayload {
     uint16_t size;
@@ -1030,7 +1136,62 @@ typedef struct TuvrenApplyResult {
     uint64_t render_request_id;
     uint32_t mapping_count;
     uint32_t required_mapping_count;
+    uint32_t command_result_count;
+    uint32_t required_command_result_count;
 } TuvrenApplyResult;
+
+typedef struct TuvrenCommandResult {
+    uint32_t command_index;
+    uint32_t value_tag; /* TuvrenValueTag */
+    uint64_t value0;
+    uint64_t value1;
+} TuvrenCommandResult;
+
+/* Successful REPLACE_ALL commands return their replacement count in value0;
+ * successful UNDO and REDO commands return zero or one in value0. Commands
+ * without a scalar result do not produce a TuvrenCommandResult. Result and
+ * node-mapping capacities are preflighted before mutation, so an undersized
+ * caller buffer returns BUFFER_TOO_SMALL without applying the transaction. */
+
+typedef struct TuvrenQueryRequest {
+    uint32_t magic;
+    uint16_t size;
+    uint16_t kind; /* TuvrenQueryKind */
+    uint32_t target;
+    uint32_t flags; /* query-kind-specific TUVREN_QUERY_* */
+    uint32_t argument0;
+    uint32_t payload_offset;
+    uint32_t payload_length;
+    uint32_t reserved;
+    uint64_t generation;
+    TuvrenGraphemeRange range;
+} TuvrenQueryRequest;
+
+typedef struct TuvrenQueryResult {
+    uint16_t size;
+    uint16_t status; /* TuvrenStatus */
+    uint32_t value_tag; /* TuvrenValueTag */
+    uint64_t generation;
+    TuvrenGraphemeRange range;
+    uint64_t value0;
+    uint64_t value1;
+    uint64_t required_bytes;
+    uint64_t written_bytes;
+} TuvrenQueryResult;
+
+/* Query input and output are caller-owned and never retained. payload_offset
+ * is relative to query_input and payload_length is bounded by both
+ * query_input_length and TUVREN_MAX_QUERY_INPUT_BYTES. TEXT_SNAPSHOT writes
+ * UTF-8 content, returns document version in generation, cursor (or UINT64_MAX)
+ * in value0, canUndo/canRedo/hasSelection bits in value1, and selection in
+ * range only when HAS_SELECTION is set. TEXT_FIND
+ * reads its UTF-8 search term from the payload, uses argument0 as its starting
+ * grapheme and TUVREN_QUERY_FIND_* flags as options, then writes matched UTF-8
+ * and returns the match range; no match returns UNAVAILABLE. TEXT_ENCODE uses
+ * argument0 as TuvrenTextEncoding and writes encoded bytes. Collection and
+ * Transcript visible-range queries write no bytes and return their generation
+ * and resident range. Every BUFFER_TOO_SMALL response reports required_bytes
+ * and writes no partial semantic value. */
 
 typedef struct TuvrenRecordBatchHeader {
     uint32_t magic;
@@ -1127,7 +1288,19 @@ TUVREN_API int32_t tui_transaction_apply(
     size_t transaction_length,
     TuvrenNodeMapping *node_mappings,
     size_t node_mapping_capacity,
+    TuvrenCommandResult *command_results,
+    size_t command_result_capacity,
     TuvrenApplyResult *out_result
+);
+
+TUVREN_API int32_t tui_query_copy(
+    TuvrenContextId context,
+    const TuvrenQueryRequest *request,
+    const uint8_t *query_input,
+    size_t query_input_length,
+    uint8_t *output,
+    size_t output_capacity,
+    TuvrenQueryResult *out_result
 );
 
 TUVREN_API int32_t tui_input_poll(TuvrenContextId context, uint32_t timeout_millis);
@@ -1196,21 +1369,27 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenDimensionAtom) == 8, "TuvrenDimensionAtom ABI 
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDimension) == 28, "TuvrenDimension ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenGridTrack) == 68, "TuvrenGridTrack ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenResponsiveCondition) == 36, "TuvrenResponsiveCondition ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenLayoutPayload) == 388, "TuvrenLayoutPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenLayoutPayload) == 392, "TuvrenLayoutPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenResponsiveLayoutRule) == 44, "TuvrenResponsiveLayoutRule ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenStylePayload) == 44, "TuvrenStylePayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenStyleValue) == 24, "TuvrenStyleValue ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenThemeTokenRecord) == 32, "TuvrenThemeTokenRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenStyleAttributeTokenRecord) == 24, "TuvrenStyleAttributeTokenRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenStylePayload) == 144, "TuvrenStylePayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenStyleRulePayload) == 80, "TuvrenStyleRulePayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenGraphemeRange) == 8, "TuvrenGraphemeRange ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticPayload) == 16, "TuvrenSemanticPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticEntry) == 24, "TuvrenSemanticEntry ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 32, "TuvrenTextEditPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 48, "TuvrenTextEditPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 56, "TuvrenCollectionMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 72, "TuvrenTranscriptMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptBlockRecord) == 32, "TuvrenTranscriptBlockRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalRequestPayload) == 40, "TuvrenTerminalRequestPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticConfigPayload) == 24, "TuvrenDiagnosticConfigPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenApplyResult) == 32, "TuvrenApplyResult ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenApplyResult) == 40, "TuvrenApplyResult ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenCommandResult) == 24, "TuvrenCommandResult ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenQueryRequest) == 48, "TuvrenQueryRequest ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenQueryResult) == 56, "TuvrenQueryResult ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRecordBatchHeader) == 32, "TuvrenRecordBatchHeader ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenEventRecord) == 48, "TuvrenEventRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenKeyEventPayload) == 24, "TuvrenKeyEventPayload ABI size");

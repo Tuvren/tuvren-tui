@@ -25,6 +25,8 @@ pub enum TransactionOpcode {
     AnimationApply = 13,
     TerminalRequest = 14,
     DiagnosticConfigure = 15,
+    AnimationCancel = 16,
+    AnimationReplace = 17,
 }
 
 #[repr(C)]
@@ -120,6 +122,8 @@ pub struct TextEditPayload<'a> {
     pub start_grapheme: u32,
     pub end_grapheme: u32,
     pub utf8: &'a str,
+    pub replacement: &'a str,
+    pub search_flags: u32,
     pub content_epoch: u64,
 }
 
@@ -159,6 +163,45 @@ pub struct AnimationPayload {
     pub sequence_index: u32,
     pub duration_nanos: u64,
     pub delay_nanos: u64,
+}
+
+#[repr(C)]
+#[derive(Clone, Copy, Debug, Default)]
+pub struct CommandResult {
+    pub command_index: u32,
+    pub value_tag: u32,
+    pub value0: u64,
+    pub value1: u64,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum QueryKind {
+    TextSnapshot,
+    TextFind,
+    TextEncode,
+    CollectionVisibleRange,
+    TranscriptVisibleRange,
+}
+
+#[derive(Clone, Debug)]
+pub struct ValidatedQuery<'a> {
+    pub kind: QueryKind,
+    pub target: u32,
+    pub flags: u32,
+    pub argument0: u32,
+    pub generation: u64,
+    pub range: (u32, u32),
+    pub payload: &'a [u8],
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct QueryResult {
+    pub generation: u64,
+    pub range: (u32, u32),
+    pub value_tag: u32,
+    pub value0: u64,
+    pub value1: u64,
+    pub output: Vec<u8>,
 }
 
 #[derive(Clone, Debug)]

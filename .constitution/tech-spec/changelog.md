@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.5] — 2026-08-26
+
+### Fixed
+
+- Separated flex/grid display from relative/absolute positioning and added bounded native query and transaction-result records for public Text Document and visible-range reads.
+- Completed declarative and imperative parity for typed Commands, private Component composition, hierarchical Keymaps, Command-bound buttons and palettes, interruptible animations, cancellable range loads, and generation-stamped Collection mutations.
+- Made Theme-token references executable through typed style and Theme wire records, and correlated every application-replay event kind with a bounded payload schema.
+
 ## [v9.0.4] — 2026-08-26
 
 ### Fixed

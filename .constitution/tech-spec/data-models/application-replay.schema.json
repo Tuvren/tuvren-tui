@@ -38,7 +38,75 @@
           },
           "payload": { "type": "object" },
           "redacted": { "type": "boolean", "default": false }
-        }
+        },
+        "oneOf": [
+          {
+            "properties": {
+              "kind": { "const": "key" },
+              "payload": { "$ref": "#/$defs/keyPayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "text" },
+              "payload": { "$ref": "#/$defs/textPayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "paste" },
+              "payload": { "$ref": "#/$defs/pastePayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "pointer-move" },
+              "payload": { "$ref": "#/$defs/pointerMovePayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "pointer-button" },
+              "payload": { "$ref": "#/$defs/pointerButtonPayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "wheel" },
+              "payload": { "$ref": "#/$defs/wheelPayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "focus" },
+              "payload": { "$ref": "#/$defs/emptyPayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "blur" },
+              "payload": { "$ref": "#/$defs/emptyPayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "resize" },
+              "payload": { "$ref": "#/$defs/resizePayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "external-update" },
+              "payload": { "$ref": "#/$defs/externalUpdatePayload" }
+            }
+          },
+          {
+            "properties": {
+              "kind": { "const": "clock" },
+              "payload": { "$ref": "#/$defs/clockPayload" }
+            }
+          }
+        ]
       }
     },
     "expectations": {
@@ -54,6 +122,145 @@
             "$ref": "https://tuvren.dev/schema/diagnostic-snapshot/1.0.0/schema.json"
           }
         }
+      }
+    }
+  },
+  "$defs": {
+    "modifiers": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": { "enum": ["shift", "control", "alt", "super"] }
+    },
+    "keyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action", "keyCode", "modifiers"],
+      "properties": {
+        "action": { "enum": ["press", "repeat", "release"] },
+        "keyCode": { "type": "integer", "minimum": 0, "maximum": 1114111 },
+        "physicalCode": { "type": "integer", "minimum": 0, "maximum": 65535 },
+        "text": { "type": "string", "maxLength": 64 },
+        "modifiers": { "$ref": "#/$defs/modifiers" }
+      }
+    },
+    "textPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": { "text": { "type": "string", "maxLength": 8388608 } }
+    },
+    "pastePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "truncated"],
+      "properties": {
+        "text": { "type": "string", "maxLength": 8388608 },
+        "truncated": { "type": "boolean" }
+      }
+    },
+    "pointerMovePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cellX", "cellY", "buttons", "modifiers"],
+      "properties": {
+        "cellX": { "type": "integer", "minimum": 0, "maximum": 2999 },
+        "cellY": { "type": "integer", "minimum": 0, "maximum": 999 },
+        "pixelX": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "pixelY": { "type": "integer", "minimum": 0, "maximum": 1000000 },
+        "buttons": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "type": "integer", "minimum": 1, "maximum": 5 }
+        },
+        "modifiers": { "$ref": "#/$defs/modifiers" }
+      }
+    },
+    "pointerButtonPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "action",
+        "cellX",
+        "cellY",
+        "button",
+        "clickCount",
+        "modifiers"
+      ],
+      "properties": {
+        "action": { "enum": ["press", "release"] },
+        "cellX": { "type": "integer", "minimum": 0, "maximum": 2999 },
+        "cellY": { "type": "integer", "minimum": 0, "maximum": 999 },
+        "button": { "type": "integer", "minimum": 1, "maximum": 5 },
+        "clickCount": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "modifiers": { "$ref": "#/$defs/modifiers" }
+      }
+    },
+    "wheelPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cellX", "cellY", "deltaRows", "deltaColumns", "modifiers"],
+      "properties": {
+        "cellX": { "type": "integer", "minimum": 0, "maximum": 2999 },
+        "cellY": { "type": "integer", "minimum": 0, "maximum": 999 },
+        "deltaRows": { "type": "number" },
+        "deltaColumns": { "type": "number" },
+        "deltaPixelX": { "type": "number" },
+        "deltaPixelY": { "type": "number" },
+        "modifiers": { "$ref": "#/$defs/modifiers" }
+      }
+    },
+    "emptyPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "maxProperties": 0
+    },
+    "resizePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["widthCells", "heightCells"],
+      "properties": {
+        "widthCells": { "type": "integer", "minimum": 1, "maximum": 3000 },
+        "heightCells": { "type": "integer", "minimum": 1, "maximum": 1000 },
+        "widthPixels": { "type": "integer", "minimum": 1, "maximum": 1000000 },
+        "heightPixels": { "type": "integer", "minimum": 1, "maximum": 1000000 }
+      }
+    },
+    "externalScalar": {
+      "oneOf": [
+        { "type": "null" },
+        { "type": "boolean" },
+        { "type": "number" },
+        { "type": "string", "maxLength": 65536 }
+      ]
+    },
+    "externalValue": {
+      "oneOf": [
+        { "$ref": "#/$defs/externalScalar" },
+        {
+          "type": "array",
+          "maxItems": 1024,
+          "items": { "$ref": "#/$defs/externalScalar" }
+        },
+        {
+          "type": "object",
+          "maxProperties": 64,
+          "additionalProperties": { "$ref": "#/$defs/externalScalar" }
+        }
+      ]
+    },
+    "externalUpdatePayload": {
+      "type": "object",
+      "maxProperties": 256,
+      "additionalProperties": { "$ref": "#/$defs/externalValue" }
+    },
+    "clockPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["elapsedMilliseconds"],
+      "properties": {
+        "elapsedMilliseconds": { "type": "number", "minimum": 0 }
       }
     }
   }
