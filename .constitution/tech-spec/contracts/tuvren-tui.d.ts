@@ -67,6 +67,7 @@ export type {
   CommandPaletteProps,
   CommonProps,
   ComponentId,
+  ComponentPropsWithChildren,
   ComponentType,
   DataSource,
   CollectionController,
@@ -166,20 +167,20 @@ export interface RenderOptions<E = never, R = never> {
   readonly onEvent?: (event: TuvrenEvent) => Effect.Effect<void, E, R>;
 }
 
-export interface RenderSession {
+export interface RenderSession<E = never> {
   readonly events: Stream.Stream<TuvrenEvent, TuvrenError>;
   readonly interrupt: Effect.Effect<void>;
-  readonly awaitExit: Effect.Effect<void, TuvrenError>;
+  readonly awaitExit: Effect.Effect<void, TuvrenError | E>;
 }
 
-export function render<E = never, R = never>(
-  view: View,
-  options?: RenderOptions<E, R>,
-): Effect.Effect<void, TuvrenError | E, R>;
-export function mount<E = never, R = never>(
-  view: View,
-  options?: RenderOptions<E, R>,
-): Effect.Effect<RenderSession, TuvrenError | E, Scope.Scope | R>;
+export function render<VE, VR, EE = never, ER = never>(
+  view: View<VE, VR>,
+  options?: RenderOptions<EE, ER>,
+): Effect.Effect<void, TuvrenError | VE | EE, VR | ER>;
+export function mount<VE, VR, EE = never, ER = never>(
+  view: View<VE, VR>,
+  options?: RenderOptions<EE, ER>,
+): Effect.Effect<RenderSession<VE | EE>, TuvrenError, Scope.Scope | VR | ER>;
 
 export type CommandConcurrency = "reject" | "restart" | "queue" | "parallel";
 
@@ -304,14 +305,14 @@ export function useStream<A, E>(
   stream: Stream.Stream<A, E, never>,
   onValue: (value: A) => void,
 ): void;
-export function provideLayer<ROut, E, RIn>(
+export function provideLayer<ROut, E, RIn, VE, VR>(
   layer: Layer.Layer<ROut, E, RIn>,
-  child: View,
-): View;
-export function provideTheme(
+  child: View<VE, VR | ROut>,
+): View<VE | E, Exclude<VR, ROut> | RIn>;
+export function provideTheme<VE, VR>(
   theme: import("./shared").Theme,
-  child: View,
-): View;
+  child: View<VE, VR>,
+): View<VE, VR>;
 export function createStyleSheet<Rule extends string>(
   name: string,
   rules: Readonly<Record<Rule, import("./shared").StyleSpec>>,
@@ -417,7 +418,7 @@ export function Table<T, E = never, R = never>(
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export function useCollectionController<
   T,
 >(): import("./shared").CollectionController<T>;
@@ -440,7 +441,7 @@ export function Menu<T, E = never, R = never>(
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export const MenuItem: ComponentType<MenuItemProps>;
 export function MenuBar<T, E = never, R = never>(
   props: MenuProps<
@@ -448,14 +449,14 @@ export function MenuBar<T, E = never, R = never>(
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export function ContextMenu<T, E = never, R = never>(
   props: MenuProps<
     T,
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export const Dialog: ComponentType<DialogProps>;
 export const AlertDialog: ComponentType<DialogProps>;
 export function Select<T, E = never, R = never>(
@@ -464,14 +465,14 @@ export function Select<T, E = never, R = never>(
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export function ListBox<T, E = never, R = never>(
   props: SelectProps<
     T,
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export const Tabs: ComponentType<TabsProps>;
 export function CommandPalette<T, E = never, R = never>(
   props: CommandPaletteProps<
@@ -479,7 +480,7 @@ export function CommandPalette<T, E = never, R = never>(
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
   >,
-): View;
+): View<E, R>;
 export const CodeView: ComponentType<CodeViewProps>;
 export const DiffView: ComponentType<DiffViewProps>;
 export const Toast: ComponentType<ToastProps>;

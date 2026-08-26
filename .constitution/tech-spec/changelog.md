@@ -2,6 +2,15 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.9] — 2026-08-26
+
+### Fixed
+
+- Parameterized View and RenderSession requirements so Collection loader/Stream and post-mount handler failures or environments remain visible through render, mount, and test APIs.
+- Made static items and Data Sources mutually exclusive Collection authorities with one canonical key function.
+- Added named replay and benchmark cross-field validators for reachable expectations, sample counts, metric definitions/types/statistics, and required checks; bounded every executable fuzz command.
+- Renamed native Transcript block generation to content version to keep it distinct from range-request generation.
+
 ## [v9.0.8] — 2026-08-26
 
 ### Fixed

@@ -311,7 +311,7 @@ export interface TestRenderOptions {
   readonly automaticTraceOnFailure?: boolean;
 }
 
-export function testRender(
-  view: View,
+export function testRender<E, R>(
+  view: View<E, R>,
   options?: TestRenderOptions,
-): Effect.Effect<TestHarness, TuvrenError, Scope.Scope>;
+): Effect.Effect<TestHarness, TuvrenError | E, Scope.Scope | R>;

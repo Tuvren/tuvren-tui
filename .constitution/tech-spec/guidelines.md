@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.8** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.9** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -85,6 +85,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - A public Component exposes its props, lifecycle, declared controllers, and semantic APIs, but never its private Primitive root. Composition internals may change without creating a public escape hatch to native identities or duplicated mutable state.
 - The bare entrypoint must not import the Imperative SDK implementation eagerly unless tree shaking proves that no additional startup or bundle cost results.
 - `render` and resource-producing APIs return Effect values. Lifetimes use scopes; Commands use typed interruptible Effects; external updates and Events expose Streams where streaming is the right model.
+- `View<E, R>` carries failures and environments from effectful Data Sources or mutation Streams through Component composition into `render`, `mount`, and `testRender`. `provideLayer` discharges the provided environment and adds Layer failures/inputs. A mounted `RenderSession<E>.awaitExit` retains every handler and View failure that can occur after setup.
 - Do not wrap an Effect API in a Promise and call it Effect-native. Promise conversion exists only at the outer Host Environment integration edge.
 - The UI executor is the sole caller of context-bound ABI functions, including input polling, Event and diagnostic drains, mutation, rendering, suspend, resume, and shutdown. Worker callbacks, Effects, Streams, Components, and imperative helpers enqueue typed work.
 - Reactivity is private. Public state hooks return Tuvren-owned interfaces and must not expose Signal identity, scheduling, equality, or disposal.
@@ -92,7 +93,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Public errors are tagged or classed `TuvrenError` variants and include stable code, category, operation, optional Component identity, cause, and remediation. Internal statuses never escape.
 - Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries require a Command ID; they never duplicate the action body. Registry lookup failures are `TuvrenError` subclasses with the standard stable metadata.
 - Keymaps use branded hierarchical scope identities; omitted scope identifies the global root in bindings, rebindings, conflict reports, and queries. A Key Sequence is a nonempty ordered array of Key Strokes. Named keys use the lowercase names declared by `NamedKey`; text keys pass through `keyGrapheme`, which requires one NFC grapheme and lowercases logical alphabetic keys while Shift remains a modifier. Modifier fields are an order-independent set. When `physicalCode` is present, its USB HID usage ID is the match discriminator and `key` is the logical fallback for terminals without physical codes. Chords use array order, default to a 1,000 ms inter-stroke timeout, accept 50–5,000 ms, and reset on mismatch, timeout, scope change, focus change, or shutdown. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
-- `DataSource.loadRange` receives an `AbortSignal`. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
+- `DataSource.loadRange` receives an `AbortSignal`. A Collection binding is exactly one of static `items + getKey` or `dataSource` with its own canonical `getKey`; the declarations reject two simultaneous authorities or duplicate identity functions. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
 - Collection selection is a generation-stamped keyed mutation rather than a visible-node flag, so selection survives projection and eviction. Native Collection state maintains both a stable-key map and an explicit ordered-key vector with a synchronized position index. Host-side generic items never cross the ABI; transactions carry bounded typed projection descriptors containing stable keys, projected RuntimeNodes, and estimated heights.
 - Transcript append, insert, replace, reset, and reload records embed the same discriminated TextContent payload used by Text Components. Patch and stream chunks are bounded UTF-8 edits against the existing block Text Document.
 - Animation creation returns an interruptible handle in both SDKs. Cancellation and replacement are native animation-registry operations, and completion reports `completed`, `cancelled`, or `replaced` without making dropped presentations part of logical time. Replacement resolves the old handle as `replaced` and returns a new handle with a distinct ID and completion lifecycle.
@@ -134,6 +135,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Terminal tests include modern, compatible, multiplexer, denial, timeout, malformed response, partial write, disconnect, suspend, resume, and restoration cases.
 - Property tests cover transaction atomicity, Event order, Command concurrency, stale generation, eviction protection, grapheme coordinates, and style precedence.
 - Fuzz targets cover transaction batches, Event batches, formatted text, terminal responses, clipboard chunks, Diagnostic Traces, snapshots, profiles, and replay fixtures.
+- Every directly executable fuzz verification uses the pinned target plus `-max_total_time=60`; longer CI campaigns may raise the declared duration through the owning script but never leave a ticket command unbounded.
 - Performance evidence publishes pinned versions, hardware, warmup, samples, statistics, raw schema-valid results, engine time, terminal-write time, and input-to-Surface time.
 - Benchmark evidence declares every non-core metric with a unit and value type, records per-sample values plus per-metric statistics, and carries named pass/fail checks for correctness properties such as timeout, reentrancy, exactly-once disposition, idle passes, animation accuracy, boundary calls, CPU overhead, and allocation behavior.
 - Benchmark adaptation uses 120 Hz, 90 Hz, and 60 Hz tiers with hysteresis and an explicit degradation allowlist.
@@ -157,6 +159,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Before decompression or object allocation, durable readers enforce the encoded size from `contracts/durable-file-limits.json`. Streaming parsers enforce the decoded size, nesting depth, and per-string UTF-8 byte limit during parsing; decompression aborts at the decoded expansion bound. Schema array maxima are additional constraints, not substitutes for byte and depth limits.
 - Diagnostic snapshots encode the dense Surface as `row-major-rle-v1`. A cross-field validator requires every run count to be positive and their checked sum to equal `width × height`; reconstruction expands runs in row-major order and rejects overflow, underfill, or trailing cells. This keeps ordinary snapshots compact while still representing the 3,000 × 1,000 stretch Surface inside an explicit 512 MiB encoded/1 GiB decoded ceiling.
 - Historical schema files never change after publication. Readers consult `contracts/schema-migrations.json`, migrate only registered versions into the current in-memory model, and reject unknown versions before interpreting payload fields.
+- `validateApplicationReplay` rejects nonmonotonic event time and unreachable or duplicate zero-based expectation indexes. `validateBenchmarkResult` recomputes core/custom statistics and checks sample count, metric definitions, value types, and required named checks. Both validators run in `check:contracts`; the release-candidate gate additionally requires every release-gating check to pass.
 
 ## Commits
 
@@ -208,10 +211,10 @@ bun run bench:comparative        # OD-01 fixtures and raw results
 bun run bench:devtools           # Off, passive, and full-trace overhead
 bun run study:onboarding         # 5/10/30/10-minute adoption tasks
 bun run study:style-defect       # Median source-location task
-cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode
-cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode
-cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response
-cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz transaction_decode -- -max_total_time=60
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz event_decode -- -max_total_time=60
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz terminal_response -- -max_total_time=60
+cargo +nightly-2026-08-20 fuzz run --fuzz-dir native/fuzz durable_files -- -max_total_time=60
 cargo audit
 cargo deny check
 bun audit --cwd ts

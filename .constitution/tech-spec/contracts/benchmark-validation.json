@@ -1,0 +1,13 @@
+{
+  "validator": "validateBenchmarkResult",
+  "invariants": [
+    "method.sampleCount equals samples.length",
+    "every sample.metrics key and summary.metrics key exists in metricDefinitions",
+    "every metricDefinitions key appears in every sample.metrics object and in summary.metrics",
+    "number, integer, and boolean metric values match the declared valueType in every sample and summary",
+    "each summary statistic is recomputed from the corresponding samples, except exact Boolean metrics which require identical sample values",
+    "core summary values are recomputed from samples using method.statistic",
+    "check names are unique and every required suite check is present",
+    "check:contracts rejects structural or recomputation drift; check:release-candidate additionally requires every release-gating check to pass"
+  ]
+}

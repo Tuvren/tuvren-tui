@@ -588,14 +588,7 @@ export interface CollectionController<T> {
   visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
 }
 
-export interface VirtualCollectionBinding<
-  T,
-  LoadResult = never,
-  Mutations = never,
-> {
-  readonly items?: readonly T[];
-  readonly dataSource?: DataSource<T, LoadResult>;
-  readonly mutations?: Mutations;
+export interface VirtualCollectionObservers<T> {
   readonly controller?: CollectionController<T>;
   readonly estimatedCount?: number;
   readonly onVisibleRangeChange?: (
@@ -604,6 +597,26 @@ export interface VirtualCollectionBinding<
   readonly onFocusChange?: (key: CollectionKey | undefined) => void;
   readonly onReloadRequest?: (generation: number) => void;
 }
+
+export type VirtualCollectionBinding<
+  T,
+  LoadResult = never,
+  Mutations = never,
+> = VirtualCollectionObservers<T> &
+  (
+    | {
+        readonly items: readonly T[];
+        readonly getKey: (item: T) => CollectionKey;
+        readonly dataSource?: never;
+        readonly mutations?: Mutations;
+      }
+    | {
+        readonly dataSource: DataSource<T, LoadResult>;
+        readonly items?: never;
+        readonly getKey?: never;
+        readonly mutations?: Mutations;
+      }
+  );
 export interface ScrollBoxProps extends CommonProps<
   "root" | "viewport" | "scrollbar"
 > {
@@ -618,19 +631,20 @@ export interface OverlayProps extends CommonProps<"backdrop" | "root"> {
 }
 export interface TableColumn<T = unknown> {
   readonly key: string;
-  readonly header: View;
-  readonly render: (item: T) => View;
+  readonly header: View<unknown, unknown>;
+  readonly render: (item: T) => View<unknown, unknown>;
   readonly width?: Dimension;
 }
-export interface TableProps<T = unknown, LoadResult = never, Mutations = never>
-  extends
-    CommonProps<"root" | "header" | "row" | "cell">,
-    VirtualCollectionBinding<T, LoadResult, Mutations> {
-  readonly getKey: (item: T) => CollectionKey;
-  readonly columns: readonly TableColumn<T>[];
-  readonly selectedKeys?: readonly CollectionKey[];
-  readonly onSelectionChange?: (keys: readonly CollectionKey[]) => void;
-}
+export type TableProps<
+  T = unknown,
+  LoadResult = never,
+  Mutations = never,
+> = CommonProps<"root" | "header" | "row" | "cell"> &
+  VirtualCollectionBinding<T, LoadResult, Mutations> & {
+    readonly columns: readonly TableColumn<T>[];
+    readonly selectedKeys?: readonly CollectionKey[];
+    readonly onSelectionChange?: (keys: readonly CollectionKey[]) => void;
+  };
 export interface TranscriptBlock {
   readonly id: TranscriptBlockId;
   readonly version: number;
@@ -726,29 +740,42 @@ export interface SplitPaneProps extends CommonProps<
   readonly defaultRatio?: number;
   readonly onRatioChange?: (ratio: number) => void;
 }
-export interface SelectProps<T = unknown, LoadResult = never, Mutations = never>
-  extends
-    CommonProps<"root" | "trigger" | "list" | "option">,
-    VirtualCollectionBinding<T, LoadResult, Mutations>,
-    FormControlProps<CollectionKey | undefined> {
-  readonly selectedKey?: CollectionKey;
-  readonly defaultSelectedKey?: CollectionKey;
-  readonly getKey: (item: T) => CollectionKey;
-  readonly renderItem: (item: T) => View;
-  readonly onSelectionChange?: (key: CollectionKey | undefined) => void;
-}
+export type SelectProps<
+  T = unknown,
+  LoadResult = never,
+  Mutations = never,
+> = CommonProps<"root" | "trigger" | "list" | "option"> &
+  VirtualCollectionBinding<T, LoadResult, Mutations> &
+  FormControlProps<CollectionKey | undefined> & {
+    readonly selectedKey?: CollectionKey;
+    readonly defaultSelectedKey?: CollectionKey;
+    readonly renderItem: (item: T) => View<unknown, unknown>;
+    readonly onSelectionChange?: (key: CollectionKey | undefined) => void;
+  };
+
+export type ComponentPropsWithChildren<Props, E, R> = Omit<
+  Props,
+  "children"
+> & {
+  readonly children?: View<E, R> | readonly View<E, R>[];
+};
 
 export interface ComponentType<Props = object> {
-  (props: Props): View;
+  <E = never, R = never>(
+    props: ComponentPropsWithChildren<Props, E, R>,
+  ): View<E, R>;
 }
 
-export type View = ViewNode | string | number | boolean | null | undefined;
-export type ViewChildren = View | readonly View[];
+export type View<E = never, R = never> =
+  ViewNode<E, R> | string | number | boolean | null | undefined;
+export type ViewChildren =
+  View<unknown, unknown> | readonly View<unknown, unknown>[];
 
-export interface ViewNode {
+export interface ViewNode<E = never, R = never> {
   readonly type: string | ComponentType<never>;
   readonly key?: CollectionKey;
   readonly props: Readonly<Record<string, unknown>>;
+  readonly __requirements?: Readonly<{ error: E; environment: R }>;
 }
 
 export type ButtonProps = CommonProps<"root" | "label" | "indicator"> & {
@@ -785,26 +812,27 @@ export interface ProgressProps extends CommonProps<
   readonly min?: number;
   readonly max?: number;
 }
-export interface MenuProps<T = unknown, LoadResult = never, Mutations = never>
-  extends
-    CommonProps<"root" | "item" | "separator">,
-    VirtualCollectionBinding<T, LoadResult, Mutations> {
-  readonly getKey?: (item: T) => CollectionKey;
-  readonly renderItem?: (item: T) => View;
-}
+export type MenuProps<
+  T = unknown,
+  LoadResult = never,
+  Mutations = never,
+> = CommonProps<"root" | "item" | "separator"> &
+  VirtualCollectionBinding<T, LoadResult, Mutations> & {
+    readonly renderItem: (item: T) => View<unknown, unknown>;
+  };
 export interface MenuItemProps extends CommonProps<
   "root" | "label" | "keybinding"
 > {
   readonly command: CommandId;
 }
 
-export interface CommandPaletteProps<
+export type CommandPaletteProps<
   T = unknown,
   LoadResult = never,
   Mutations = never,
-> extends SelectProps<T, LoadResult, Mutations> {
+> = SelectProps<T, LoadResult, Mutations> & {
   readonly commandForItem: (item: T) => CommandId;
-}
+};
 export interface DialogProps extends CommonProps<
   "backdrop" | "root" | "title" | "description" | "actions"
 > {
@@ -842,7 +870,8 @@ export interface FocusScopeProps extends CommonProps<"root"> {
 }
 
 export interface ErrorBoundaryProps extends CommonProps<"root" | "fallback"> {
-  readonly fallback: View | ((error: TuvrenError) => View);
+  readonly fallback:
+    View<unknown, unknown> | ((error: TuvrenError) => View<unknown, unknown>);
 }
 
 export interface AnimationSpec {

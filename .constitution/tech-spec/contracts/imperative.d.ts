@@ -49,6 +49,7 @@ export type {
   CommandId,
   CommonProps,
   ComponentId,
+  ComponentPropsWithChildren,
   DataSource,
   CollectionController,
   CollectionMutation,
