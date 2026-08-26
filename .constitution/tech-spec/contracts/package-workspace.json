@@ -4,6 +4,7 @@
   "type": "module",
   "packageManager": "bun@1.4.0",
   "workspaces": ["ts", "packages/@tuvren/*"],
+  "devDependencies": { "typescript": "5.9.3" },
   "scripts": {
     "build:package": "bun run scripts/build-package.ts",
     "check:toolchain": "bun run scripts/check-toolchain.ts",
@@ -13,7 +14,7 @@
     "check:capability-map": "bun run scripts/check-capability-map.ts",
     "check:release-candidate": "bun run scripts/check-release-candidate.ts",
     "test:semantic": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-semantic.test.ts",
-    "test:host": "bun test ts/test-ffi.test.ts ts/test-jsx.test.ts ts/test-commands.test.ts ts/test-effect.test.ts ts/test-animation.test.ts ts/test-examples.test.ts ts/test-install.test.ts ts/test-runner.test.ts",
+    "test:host": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-ffi.test.ts ts/test-jsx.test.ts ts/test-commands.test.ts ts/test-effect.test.ts ts/test-animation.test.ts ts/test-examples.test.ts ts/test-install.test.ts ts/test-runner.test.ts",
     "test:animation": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-animation.test.ts",
     "test:terminal": "cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-terminal.test.ts",
     "test:platform-smoke": "bun run scripts/test-platform-smoke.ts",

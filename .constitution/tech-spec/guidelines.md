@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.19** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.20** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -114,6 +114,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - `contracts/native-abi.h` is the ABI source of truth. Native exports and the Bun symbol table must be generated from or mechanically checked against it.
 - All integers use fixed widths. Sizes and offsets are unsigned and checked before addition or multiplication. Floating values use IEEE-754 fields, never undocumented integer bit casts.
 - Transaction and Event batches use little-endian versioned records with trailing byte arenas. Decoders reject unknown major versions, invalid lengths, overlapping regions, duplicate identities where forbidden, and trailing garbage.
+- Validation converts each transaction command to its typed `ValidatedPayload` and preserves every behavior-bearing header/fixed-record field, including render request, initial generation, Collection indexes, Transcript flags, complete animation values/policy, terminal target/timeout, and diagnostic flags. Runtime mutation never reparses or receives a raw payload byte slice. Contract checks compare C fields to Rust validated-model ownership so a successful decode cannot silently discard semantics.
 - Transaction-local node references have the high bit set. Rust allocates private IDs only while committing a fully validated transaction and returns caller-owned local-to-runtime mappings; no host-selected RuntimeNode ID is accepted.
 - Each opcode and property family uses the fixed record named by `native-abi.h`. Generic bytes are valid only for declared UTF-8 or opaque content fields, never as a substitute for layout, style, text-edit, Collection, Transcript, animation, terminal, or diagnostic records. Checked-in byte fixtures must decode identically in Rust and TypeScript.
 - Wire enums use the fixed numeric tables in `native-abi.h`, never C enum layout. Dimension constraints carry independently tagged minimum, preferred, and maximum atoms; Grid tracks carry typed dimension or minmax records. Numeric Collection keys are finite IEEE-754 values with negative zero normalized and NaN or infinity rejected.
@@ -210,7 +211,7 @@ bun run check:toolchain          # Assert exact Bun, stable/nightly Rust, cargo-
 bun run check:contracts          # Typecheck declarations, compile ABI header, validate every JSON Schema and contract file
 bun run check:abi-parity         # Compare implemented symbols and TypeScript/Rust decoding over every checked-in ABI byte fixture
 bun run check:native             # Run rustfmt, locked Clippy with warnings denied, and locked native tests on Rust 1.98.0
-bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit # Brownfield: currently exits 2 with 188 errors; Stage 4 schedules repair
+bun node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit # Root-workspace TypeScript 5.9.3; Brownfield errors are repaired by TUI-A008
 bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile
 bun run --cwd .constitution/tech-spec/contracts check
 bun run build:package            # Emit the exact public and platform package layouts declared by the package contracts

@@ -63,6 +63,7 @@ pub struct TransactionCommand {
 #[derive(Debug)]
 pub struct ValidatedTransaction<'a> {
     pub transaction_id: u64,
+    pub request_render: bool,
     pub commands: Vec<ValidatedCommand<'a>>,
 }
 
@@ -72,7 +73,7 @@ pub struct ValidatedCommand<'a> {
     pub target: u32,
     pub property: u32,
     pub generation: u64,
-    pub payload: &'a [u8],
+    pub payload: ValidatedPayload<'a>,
     pub argument0: u32,
     pub argument1: u32,
 }
@@ -89,6 +90,7 @@ pub enum ValidatedPayload<'a> {
     Create {
         local: NodeReference,
         primitive: u16,
+        initial_generation: u32,
     },
     Child {
         parent: NodeReference,
@@ -113,6 +115,7 @@ pub enum ValidatedPayload<'a> {
     },
     Layout(LayoutPayload<'a>),
     Style(StylePayload<'a>),
+    Semantic(SemanticPayload<'a>),
     TextContent(TextContentPayload<'a>),
     TextDocumentConfig(TextDocumentConfigPayload<'a>),
     TextEdit(TextEditPayload<'a>),
@@ -135,6 +138,12 @@ pub struct LayoutPayload<'a> {
 pub struct StylePayload<'a> {
     pub fixed_record: &'a [u8],
     pub rules: &'a [u8],
+}
+
+#[derive(Clone, Debug)]
+pub struct SemanticPayload<'a> {
+    pub kind: u16,
+    pub entries: &'a [u8],
 }
 
 #[derive(Clone, Debug)]
@@ -173,6 +182,8 @@ pub struct CollectionPayload<'a> {
     pub key: ValidatedCollectionKey<'a>,
     pub item_descriptors: &'a [u8],
     pub keys: &'a [u8],
+    pub index: u64,
+    pub secondary_index: u64,
     pub generation: u64,
 }
 
@@ -193,6 +204,7 @@ pub struct TranscriptPayload<'a> {
     pub generation: u64,
     pub index: u64,
     pub range: (u32, u32),
+    pub flags: u32,
 }
 
 #[derive(Clone, Debug)]
@@ -205,6 +217,8 @@ pub enum ValidatedTranscriptContent<'a> {
 #[derive(Clone, Copy, Debug)]
 pub struct AnimationPayload {
     pub property: u16,
+    pub value_tag: u16,
+    pub reduced_motion: u16,
     pub animation_id: u64,
     pub timeline_id: u64,
     pub easing: u16,
@@ -212,6 +226,16 @@ pub struct AnimationPayload {
     pub sequence_index: u32,
     pub duration_nanos: u64,
     pub delay_nanos: u64,
+    pub repeat_count: u32,
+    pub flags: u32,
+    pub from: Option<ValidatedAnimationValue>,
+    pub to: ValidatedAnimationValue,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum ValidatedAnimationValue {
+    Number(f64),
+    Rgba(u32),
 }
 
 #[repr(C)]
@@ -258,7 +282,9 @@ pub struct QueryResult {
 #[derive(Clone, Debug)]
 pub struct TerminalPayload<'a> {
     pub kind: u16,
+    pub target: u32,
     pub request_id: u64,
+    pub timeout_nanos: u64,
     pub media_type: &'a str,
     pub data: &'a [u8],
 }
@@ -266,6 +292,7 @@ pub struct TerminalPayload<'a> {
 #[derive(Clone, Copy, Debug)]
 pub struct DiagnosticPayload {
     pub mode: u16,
+    pub flags: u32,
     pub record_byte_limit: u64,
     pub snapshot_byte_limit: u64,
 }
@@ -276,6 +303,8 @@ pub struct DiagnosticPayload {
 // coordinates, generations, exact fixed-record sizes, nested arena ranges, and
 // trailing bytes. Numeric Collection keys must be finite; negative zero is
 // canonicalized to positive-zero bits and NaN or infinity is rejected. It
-// converts every command to ValidatedPayload and enforces
-// the opcode/property/value compatibility matrix in native-abi.h. Runtime
-// mutation accepts only ValidatedTransaction, never the untrusted byte slice.
+// preserves the validated request-render flag and every operation-bearing fixed
+// field, converts every command to ValidatedPayload (never a raw payload slice),
+// and enforces the opcode/property/value compatibility matrix in native-abi.h.
+// Runtime mutation accepts only ValidatedTransaction, never the untrusted byte
+// slice or a partially decoded fixed record.

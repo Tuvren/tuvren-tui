@@ -2,6 +2,13 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.20] — 2026-08-26
+
+### Fixed
+
+- Made the validated Rust transaction model field-complete for render requests, creation, Collection, Transcript, animation, terminal, and diagnostic operations and removed raw post-validation payload bytes.
+- Assigned TypeScript 5.9.3 to the root private workspace and made the strict host aggregate build the locked release library before running FFI-backed suites.
+
 ## [v9.0.19] — 2026-08-26
 
 ### Fixed

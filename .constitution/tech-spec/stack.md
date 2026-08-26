@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.19** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.20** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -19,7 +19,7 @@ Versions were checked against official release documentation or registries on 20
 | Rust toolchain | `1.98.0`, edition `2024` | Adopt | Current stable toolchain; one pinned `rust-toolchain.toml` drives local and CI builds. MSRV equals the pinned release until `1.0.0`. |
 | Fuzz-only Rust toolchain | `nightly-2026-08-20` with `rust-src`; cargo-fuzz `0.13.2`; GCC `15.2.0` C++ compiler | Adopt for fuzz jobs only | The dated nightly exists in the official Rust distribution. cargo-fuzz requires nightly, LLVM sanitizer support, and a C++11 compiler; `devenv.nix` provisions and verifies this isolated toolchain without changing the stable production MSRV. Release-gating fuzz jobs run on Linux x64 and arm64 workers. |
 | Host runtime | Bun `1.4.0` | Trial | Current stable host and package manager. The 1.4 runtime is a major internal rewrite; it must pass all five target, FFI, lifecycle, and benchmark gates before final `0.1.0`. |
-| Host language compiler | TypeScript `5.9.3` | Adopt | Contract declarations pass on this baseline. The Brownfield application source currently fails its own strict check with 188 errors, led by duplicate fields and unsafe Bun FFI casts; Stage 4 must schedule reconciliation. TypeScript `7.0.2` is Hold because its isolated migration check also fails. |
+| Host language compiler | TypeScript `5.9.3` | Adopt | The root private workspace owns this exact development dependency and every host check runs `node_modules/typescript/bin/tsc`; published packages do not carry the compiler. Contract declarations pass on this baseline. The Brownfield application source currently fails its own strict check with 188 errors, led by duplicate fields and unsafe Bun FFI casts; Stage 4 must schedule reconciliation. TypeScript `7.0.2` is Hold because its isolated migration check also fails. |
 | Declarative application model | Effect `3.22.1` | Adopt | Required peer range `>=3.22.1 <4`; CI and development pin `3.22.1`. Effect 4 prerelease builds are unsupported. |
 | Private Reactivity | `@preact/signals-core` `1.14.4` | Adopt internally | Current compatible minor, used only inside reconciliation and hooks. No Signal type or constructor is exported publicly; a scheduled lane tests the latest compatible minor. |
 | Native bridge | `bun:ffi` from Bun `1.4.0` | Trial | Private high-performance C ABI bridge. Bun documents it as experimental, so five-target loading, malformed-input fuzzing, panic containment, and ABI benchmarks are release gates. No callback from Rust into TypeScript is permitted. |
