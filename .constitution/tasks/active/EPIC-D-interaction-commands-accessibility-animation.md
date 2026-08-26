@@ -119,7 +119,7 @@ Primitive and synthetic-component fixtures query by role and accessible properti
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked && bun run test:animation`
 - **Expected Success Output:** native deterministic-time fixtures plus Effect and imperative host suites prove completion resolves only after the executor drains the matching Animation Event; TUI-H001 later owns timing benchmarks
 - **STOP Conditions:** STOP if dropped presentations slow logical time or suppress final state.
-- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, native cancellation and replacement that returns a distinct observable handle, typed completion delivered as an Animation Event through the executor-owned drain before handle resolution, manual test time, global reduced motion, and accessible per-animation overrides.
+- **Description:** Implement interpolation, easing, delay, repetition, reversal, chaining, groups, interruptible SDK handles, a distinct validated cancellation payload containing only animation identity, replacement that returns a distinct observable handle, typed completion delivered as an Animation Event through the executor-owned drain before handle resolution, manual test time, global reduced motion, and accessible per-animation overrides.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
