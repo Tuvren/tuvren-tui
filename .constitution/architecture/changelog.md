@@ -2,6 +2,12 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.2] — 2026-08-26
+
+### Fixed
+
+- Routed text-editing and Virtual Collection interaction transitions through explicit executor-owned serialized operations, matching the governing single-writer invariant and the corrected input flow.
+
 ## [v4.0.1] — 2026-08-26
 
 ### Fixed

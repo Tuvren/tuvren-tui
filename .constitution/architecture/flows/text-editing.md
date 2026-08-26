@@ -18,10 +18,12 @@ sequenceDiagram
     participant Present as Presentation Pipeline
 
     EU->>Session: Navigate, select, edit, paste, undo, redo, find, or replace
-    Session->>Interact: Deliver normalized input
+    Session->>Exec: Enqueue normalized bounded input
+    Exec->>Interact: Begin serialized executor-owned editing operation
     Interact->>Content: Apply editing action at grapheme boundary
     Content->>Content: Update Text Document and operation history
-    Content-->>Orch: Emit controlled-value or validation change when applicable
+    Content-->>Exec: Commit edit and ordered change record
+    Exec-->>Orch: Emit controlled-value or validation change when applicable
     Dev->>Orch: Accept or replace controlled value
     Orch->>Exec: Submit latest-generation controlled update
     Exec->>Content: Apply accepted authority value
@@ -30,4 +32,4 @@ sequenceDiagram
 
 ## Failure path
 
-Read-only, disabled, maximum-length, validation, secure-entry, or stale-generation rules reject or contain the edit according to the declared mode. Invalid clipboard input is bounded and sanitized before it can alter the Text Document.
+Read-only, disabled, maximum-length, validation, secure-entry, or stale-generation rules reject or contain the edit according to the declared mode. Invalid clipboard input is bounded and sanitized before it can alter the Text Document. Terminal decoding and Interaction routing never mutate the Text Document outside the executor-owned operation.
