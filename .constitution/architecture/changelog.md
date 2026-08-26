@@ -2,6 +2,12 @@
 
 This changelog records Stage 2 architecture versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v4.0.1] — 2026-08-26
+
+### Fixed
+
+- Made the UI Executor initiation and ownership of input, Interaction, and Composition transitions explicit in the input flow, removing an apparent second native mutation path.
+
 ## [v4.0.0] — 2026-08-26
 
 ### Added
