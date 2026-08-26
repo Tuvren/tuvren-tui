@@ -2,7 +2,7 @@
 
 ## Version
 
-**v4.0.2** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
+**v4.0.3** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
 
 ## Trust boundaries
 
