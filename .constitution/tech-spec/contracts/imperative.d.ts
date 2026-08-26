@@ -84,6 +84,7 @@ export type {
   TableProps,
   TabsProps,
   TerminalCapabilities,
+  TerminalProfile,
   TextAreaProps,
   TextContent,
   TextDocument,

@@ -1,0 +1,16 @@
+{
+  "description": "ABI 2.0 transaction requests terminal capabilities as request 77 with a 500 ms timeout",
+  "byteLength": 128,
+  "bytesHex": "5455565202000000010000000000000001000000300000002800000058000000280000000000000000000000000000000e0000000000000000000000000000005800000028000000000000000000000000000000000000002800060000000000000000000000000000000000000000004d000000000000000065cd1d00000000",
+  "expected": {
+    "transactionId": "1",
+    "commands": [
+      {
+        "opcode": "TERMINAL_REQUEST",
+        "kind": "QUERY_CAPABILITIES",
+        "requestId": "77",
+        "timeoutNanos": "500000000"
+      }
+    ]
+  }
+}

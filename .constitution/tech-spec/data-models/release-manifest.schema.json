@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tuvren.dev/schema/release-manifest-1.json",
+  "$id": "https://tuvren.dev/schema/release-manifest/1.0.0/schema.json",
   "title": "Tuvren atomic release manifest",
   "type": "object",
   "additionalProperties": false,

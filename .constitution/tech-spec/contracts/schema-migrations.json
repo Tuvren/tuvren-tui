@@ -2,11 +2,47 @@
   "registryVersion": "1.0.0",
   "readerWindow": "current-major-and-immediately-previous-major-for-one-sdk-minor",
   "families": [
-    { "name": "terminal-profile", "current": "1.0.0", "migrations": [] },
-    { "name": "diagnostic-snapshot", "current": "1.0.0", "migrations": [] },
-    { "name": "diagnostic-trace", "current": "1.0.0", "migrations": [] },
-    { "name": "application-replay", "current": "1.0.0", "migrations": [] },
-    { "name": "benchmark-result", "current": "1.0.0", "migrations": [] },
-    { "name": "release-manifest", "current": "1.0.0", "migrations": [] }
+    {
+      "name": "terminal-profile",
+      "current": "1.0.0",
+      "artifact": "data-models/terminal-profile.schema.json",
+      "id": "https://tuvren.dev/schema/terminal-profile/1.0.0/schema.json",
+      "migrations": []
+    },
+    {
+      "name": "diagnostic-snapshot",
+      "current": "1.0.0",
+      "artifact": "data-models/diagnostic-snapshot.schema.json",
+      "id": "https://tuvren.dev/schema/diagnostic-snapshot/1.0.0/schema.json",
+      "migrations": []
+    },
+    {
+      "name": "diagnostic-trace",
+      "current": "1.0.0",
+      "artifact": "data-models/diagnostic-trace.schema.json",
+      "id": "https://tuvren.dev/schema/diagnostic-trace/1.0.0/schema.json",
+      "migrations": []
+    },
+    {
+      "name": "application-replay",
+      "current": "1.0.0",
+      "artifact": "data-models/application-replay.schema.json",
+      "id": "https://tuvren.dev/schema/application-replay/1.0.0/schema.json",
+      "migrations": []
+    },
+    {
+      "name": "benchmark-result",
+      "current": "1.0.0",
+      "artifact": "data-models/benchmark-result.schema.json",
+      "id": "https://tuvren.dev/schema/benchmark-result/1.0.0/schema.json",
+      "migrations": []
+    },
+    {
+      "name": "release-manifest",
+      "current": "1.0.0",
+      "artifact": "data-models/release-manifest.schema.json",
+      "id": "https://tuvren.dev/schema/release-manifest/1.0.0/schema.json",
+      "migrations": []
+    }
   ]
 }

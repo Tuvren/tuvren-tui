@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tuvren.dev/schema/application-replay-1.json",
+  "$id": "https://tuvren.dev/schema/application-replay/1.0.0/schema.json",
   "title": "Tuvren application replay",
   "type": "object",
   "additionalProperties": false,
@@ -10,7 +10,7 @@
     "name": { "type": "string", "minLength": 1, "maxLength": 256 },
     "description": { "type": "string", "maxLength": 4096 },
     "terminalProfile": {
-      "$ref": "https://tuvren.dev/schema/terminal-profile-1.json"
+      "$ref": "https://tuvren.dev/schema/terminal-profile/1.0.0/schema.json"
     },
     "events": {
       "type": "array",
@@ -51,7 +51,7 @@
         "properties": {
           "afterEvent": { "type": "integer", "minimum": 0 },
           "snapshot": {
-            "$ref": "https://tuvren.dev/schema/diagnostic-snapshot-1.json"
+            "$ref": "https://tuvren.dev/schema/diagnostic-snapshot/1.0.0/schema.json"
           }
         }
       }

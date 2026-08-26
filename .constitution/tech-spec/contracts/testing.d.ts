@@ -1,12 +1,7 @@
 import type * as Effect from "effect/Effect";
 import type * as Scope from "effect/Scope";
 import type * as TestClock from "effect/TestClock";
-import type {
-  ComponentId,
-  TerminalCapabilities,
-  TuvrenError,
-  View,
-} from "./shared";
+import type { ComponentId, TerminalProfile, TuvrenError, View } from "./shared";
 
 export interface SemanticMatch {
   readonly role: string;
@@ -59,10 +54,46 @@ export interface DiagnosticTrace {
   readonly schemaVersion: string;
   readonly traceId: string;
   readonly createdAt: string;
+  readonly sdkVersion?: string;
+  readonly terminalProfile: TerminalProfile;
+  readonly redaction: Readonly<{
+    fullContent: boolean;
+    input: "redacted";
+    clipboard: "redacted";
+    terminalPayloads: "redacted";
+    environment: "redacted";
+    absolutePaths: "redacted";
+  }>;
   readonly records: readonly Readonly<{
     sequence: string;
-    kind: string;
+    kind:
+      | "input"
+      | "event"
+      | "command"
+      | "effect-span"
+      | "reconcile"
+      | "transaction"
+      | "mutation"
+      | "dirty"
+      | "layout"
+      | "text"
+      | "render"
+      | "diff"
+      | "terminal-write"
+      | "error"
+      | "cleanup"
+      | "unattributed";
     timestampNanos: string;
+    correlation: Readonly<{
+      contextId?: string;
+      eventId?: string;
+      commandId?: string;
+      effectSpanId?: string;
+      transactionId?: string;
+      renderRequestId?: string;
+      componentId?: string;
+    }>;
+    payload: Readonly<Record<string, unknown>>;
   }>[];
   readonly snapshots: readonly DiagnosticSnapshot[];
   readonly wrapCount: number;
@@ -96,6 +127,8 @@ export type SyntheticInput =
       readonly pressed: boolean;
     }
   | { readonly type: "wheel"; readonly deltaRows: number }
+  | { readonly type: "focus" }
+  | { readonly type: "blur" }
   | {
       readonly type: "resize";
       readonly width: number;
@@ -115,6 +148,11 @@ export interface TestDriver {
   ): Effect.Effect<void, TuvrenError>;
   scroll(deltaRows: number): Effect.Effect<void, TuvrenError>;
   resize(width: number, height: number): Effect.Effect<void, TuvrenError>;
+  focus(): Effect.Effect<void, TuvrenError>;
+  blur(): Effect.Effect<void, TuvrenError>;
+  rawEvent(
+    event: Readonly<Record<string, unknown>>,
+  ): Effect.Effect<void, TuvrenError>;
   advanceTime(milliseconds: number): Effect.Effect<void>;
 }
 
@@ -144,7 +182,7 @@ export interface TestHarness {
 export interface TestRenderOptions {
   readonly width?: number;
   readonly height?: number;
-  readonly terminal?: Partial<TerminalCapabilities>;
+  readonly terminal?: Partial<TerminalProfile>;
   readonly automaticTraceOnFailure?: boolean;
 }
 
