@@ -48,7 +48,19 @@ import type {
   View,
 } from "./shared";
 
-export { TuvrenError } from "./shared";
+export {
+  TuvrenApplicationError,
+  TuvrenCapabilityError,
+  TuvrenClipboardError,
+  TuvrenCommandError,
+  TuvrenDistributionError,
+  TuvrenError,
+  TuvrenPermissionError,
+  TuvrenResourceError,
+  TuvrenRuntimeError,
+  TuvrenTerminalError,
+  TuvrenValidationError,
+} from "./shared";
 export type {
   AnimationCompletion,
   AnimationSpec,
@@ -152,6 +164,9 @@ export type {
   TranscriptController,
   TranscriptOperation,
   TuvrenEvent,
+  TuvrenErrorCategory,
+  TuvrenErrorCode,
+  TuvrenErrorVariant,
   View,
   ViewChildren,
   ViewNode,
@@ -190,7 +205,7 @@ export interface CommandContext {
 }
 
 export interface Command<A = void, E = never, R = never> {
-  readonly id: CommandId;
+  readonly id: CommandId<A, E, R>;
   readonly title: string;
   readonly description?: string;
   readonly category?: string;
@@ -201,8 +216,8 @@ export interface Command<A = void, E = never, R = never> {
   readonly run: (context: CommandContext) => Effect.Effect<A, E, R>;
 }
 
-export interface KeyBinding {
-  readonly command: CommandId;
+export interface KeyBinding<A = unknown, E = unknown, R = unknown> {
+  readonly command: CommandId<A, E, R>;
   readonly sequence: KeySequence;
   readonly scope?: import("./shared").KeymapScopeId;
   readonly when?: (context: CommandContext) => boolean;
@@ -216,10 +231,10 @@ export interface CommandService {
     command: Command<A, E, R>,
     context?: Partial<CommandContext>,
   ): Effect.Effect<A, E | TuvrenError, R>;
-  invokeById(
-    id: CommandId,
+  invokeById<A, E, R>(
+    id: CommandId<A, E, R>,
     context?: Partial<CommandContext>,
-  ): Effect.Effect<unknown, TuvrenError | RegisteredCommandError>;
+  ): Effect.Effect<A, E | TuvrenError | RegisteredCommandError, R>;
 }
 
 export class RegisteredCommandError extends TuvrenError {
@@ -256,7 +271,13 @@ export interface KeymapService {
   ): Effect.Effect<CommandId | undefined, TuvrenError>;
 }
 
-export interface ClipboardError extends TuvrenError {
+export interface ClipboardError extends TuvrenError<
+  | "TUVREN_CLIPBOARD_UNAVAILABLE"
+  | "TUVREN_CLIPBOARD_DENIED"
+  | "TUVREN_CLIPBOARD_BUSY"
+  | "TUVREN_CLIPBOARD_MALFORMED"
+  | "TUVREN_CLIPBOARD_TIMED_OUT"
+> {
   readonly category: "clipboard";
   readonly status:
     "unavailable" | "denied" | "busy" | "malformed" | "timed-out";
@@ -299,12 +320,23 @@ export interface State<A> {
 }
 
 export function useState<A>(initial: A | (() => A)): State<A>;
-export function useCommand<A, E, R>(command: Command<A, E, R>): void;
-export function useKeymap(binding: KeyBinding): void;
-export function useStream<A, E>(
-  stream: Stream.Stream<A, E, never>,
+export interface ComponentRequirement<E = never, R = never> {
+  readonly __componentRequirement?: Readonly<{ error: E; environment: R }>;
+}
+export function useCommand<A, E, R>(
+  command: Command<A, E, R>,
+): ComponentRequirement<E, R>;
+export function useKeymap(
+  binding: KeyBinding,
+): ComponentRequirement<TuvrenError>;
+export function useStream<A, E, R>(
+  stream: Stream.Stream<A, E, R>,
   onValue: (value: A) => void,
-): void;
+): ComponentRequirement<E, R>;
+export function withRequirements<VE, VR, E, R>(
+  view: View<VE, VR>,
+  ...requirements: readonly ComponentRequirement<E, R>[]
+): View<VE | E, VR | R>;
 export function provideLayer<ROut, E, RIn, VE, VR>(
   layer: Layer.Layer<ROut, E, RIn>,
   child: View<VE, VR | ROut>,
@@ -399,7 +431,10 @@ export function toStyledText(
   adapter: (value: unknown) => import("./shared").StyledText,
 ): import("./shared").StyledText;
 export function componentId(value: string): import("./shared").ComponentId;
-export function commandId(value: string): CommandId;
+export function commandId<A = void, E = never, R = never>(
+  value: string,
+): CommandId<A, E, R>;
+export function graphemeIndex(value: number): import("./shared").GraphemeIndex;
 export function keymapScopeId(value: string): import("./shared").KeymapScopeId;
 export function keyGrapheme(value: string): import("./shared").KeyGrapheme;
 export function transcriptBlockId(
@@ -412,13 +447,27 @@ export const Input: ComponentType<InputProps>;
 export const TextArea: ComponentType<TextAreaProps>;
 export const ScrollBox: ComponentType<ScrollBoxProps>;
 export const Overlay: ComponentType<OverlayProps>;
-export function Table<T, E = never, R = never>(
-  props: TableProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+export function Table<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    TableProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
 export function useCollectionController<
   T,
 >(): import("./shared").CollectionController<T>;
@@ -426,7 +475,14 @@ export const Transcript: ComponentType<TranscriptProps>;
 export function useTranscriptController(): import("./shared").TranscriptController;
 export const SplitPane: ComponentType<SplitPaneProps>;
 export const FocusScope: ComponentType<FocusScopeProps>;
-export const ErrorBoundary: ComponentType<ErrorBoundaryProps>;
+export function ErrorBoundary<
+  ChildE,
+  ChildR,
+  FallbackE = never,
+  FallbackR = never,
+>(
+  props: ErrorBoundaryProps<ChildE, ChildR, FallbackE, FallbackR>,
+): View<FallbackE, ChildR | FallbackR>;
 export const Button: ComponentType<ButtonProps>;
 export const ToggleButton: ComponentType<ToggleButtonProps>;
 export const Checkbox: ComponentType<CheckboxProps>;
@@ -435,52 +491,136 @@ export const RadioGroup: ComponentType<RadioGroupProps>;
 export const ProgressBar: ComponentType<ProgressProps>;
 export const Meter: ComponentType<ProgressProps>;
 export const Spinner: ComponentType<ProgressProps>;
-export function Menu<T, E = never, R = never>(
-  props: MenuProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+export function Menu<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    MenuProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
 export const MenuItem: ComponentType<MenuItemProps>;
-export function MenuBar<T, E = never, R = never>(
-  props: MenuProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+export function MenuBar<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    MenuProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
-export function ContextMenu<T, E = never, R = never>(
-  props: MenuProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
+export function ContextMenu<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    MenuProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
 export const Dialog: ComponentType<DialogProps>;
 export const AlertDialog: ComponentType<DialogProps>;
-export function Select<T, E = never, R = never>(
-  props: SelectProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+export function Select<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    SelectProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
-export function ListBox<T, E = never, R = never>(
-  props: SelectProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
+export function ListBox<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    SelectProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
 export const Tabs: ComponentType<TabsProps>;
-export function CommandPalette<T, E = never, R = never>(
-  props: CommandPaletteProps<
-    T,
-    Effect.Effect<RangeLoadResult<T>, E, R>,
-    Stream.Stream<import("./shared").CollectionMutation<T>, E, R>
+export function CommandPalette<
+  T,
+  E = never,
+  R = never,
+  RenderE = never,
+  RenderR = never,
+  ChildE = never,
+  ChildR = never,
+>(
+  props: import("./shared").ComponentPropsWithChildren<
+    CommandPaletteProps<
+      T,
+      Effect.Effect<RangeLoadResult<T>, E, R>,
+      Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
+      RenderE,
+      RenderR
+    >,
+    ChildE,
+    ChildR
   >,
-): View<E, R>;
+): View<E | RenderE | ChildE, R | RenderR | ChildR>;
 export const CodeView: ComponentType<CodeViewProps>;
 export const DiffView: ComponentType<DiffViewProps>;
 export const Toast: ComponentType<ToastProps>;

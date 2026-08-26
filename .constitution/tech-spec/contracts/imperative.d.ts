@@ -32,7 +32,19 @@ import type {
   TuvrenEvent,
 } from "./shared";
 
-export { TuvrenError } from "./shared";
+export {
+  TuvrenApplicationError,
+  TuvrenCapabilityError,
+  TuvrenClipboardError,
+  TuvrenCommandError,
+  TuvrenDistributionError,
+  TuvrenError,
+  TuvrenPermissionError,
+  TuvrenResourceError,
+  TuvrenRuntimeError,
+  TuvrenTerminalError,
+  TuvrenValidationError,
+} from "./shared";
 export type {
   AnimationCompletion,
   AnimationSpec,
@@ -133,6 +145,9 @@ export type {
   TranscriptController,
   TranscriptOperation,
   TuvrenEvent,
+  TuvrenErrorCategory,
+  TuvrenErrorCode,
+  TuvrenErrorVariant,
   View,
   ViewChildren,
   ViewNode,
@@ -147,16 +162,14 @@ export interface ImperativeRunOptions {
   readonly theme?: import("./shared").Theme;
 }
 
-export type ImperativePrimitiveProps<Props extends object> = Omit<
-  Props,
-  "children"
->;
-export type ImperativeComponentProps<Props extends object> = Omit<
-  Props,
-  "children"
-> & {
-  readonly children?: ImperativeChild | readonly ImperativeChild[];
-};
+export type ImperativePrimitiveProps<Props extends object> =
+  Props extends object ? Omit<Props, "children"> : never;
+export type ImperativeComponentProps<Props extends object> =
+  Props extends object
+    ? Omit<Props, "children"> & {
+        readonly children?: ImperativeChild | readonly ImperativeChild[];
+      }
+    : never;
 
 export abstract class Primitive<Props extends object = object> {
   readonly props: Readonly<Props>;
@@ -410,7 +423,7 @@ export type ImperativeResult<A, E> =
   | { readonly ok: false; readonly error: E };
 
 export interface ImperativeCommand<A = void, E = never> {
-  readonly id: import("./shared").CommandId;
+  readonly id: import("./shared").CommandId<A, E, never>;
   readonly title: string;
   readonly description?: string;
   readonly category?: string;
@@ -429,10 +442,10 @@ export interface ImperativeCommandRegistry {
     command: ImperativeCommand<A, E>,
     context?: Partial<ImperativeCommandContext>,
   ): ImperativeCommandInvocation<A, E>;
-  invokeById(
-    id: import("./shared").CommandId,
+  invokeById<A, E>(
+    id: import("./shared").CommandId<A, E, never>,
     context?: Partial<ImperativeCommandContext>,
-  ): ImperativeCommandInvocation<unknown, ImperativeRegisteredCommandError>;
+  ): ImperativeCommandInvocation<A, E | ImperativeRegisteredCommandError>;
 }
 
 export class ImperativeRegisteredCommandError extends TuvrenError {
@@ -558,7 +571,10 @@ export function toStyledText(
   adapter: (value: unknown) => import("./shared").StyledText,
 ): import("./shared").StyledText;
 export function componentId(value: string): import("./shared").ComponentId;
-export function commandId(value: string): import("./shared").CommandId;
+export function commandId<A = void, E = never>(
+  value: string,
+): import("./shared").CommandId<A, E, never>;
+export function graphemeIndex(value: number): import("./shared").GraphemeIndex;
 export function keymapScopeId(value: string): import("./shared").KeymapScopeId;
 export function keyGrapheme(value: string): import("./shared").KeyGrapheme;
 export function transcriptBlockId(

@@ -103,7 +103,11 @@
             "componentId": { "type": "string" }
           }
         },
-        "payload": { "type": "object" }
+        "payload": {
+          "type": "object",
+          "maxProperties": 8,
+          "$comment": "validateDiagnosticTraceRecords enforces the exact kind-selected payload contract"
+        }
       }
     }
   }
