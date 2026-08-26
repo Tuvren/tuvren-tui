@@ -97,7 +97,7 @@ const theme = defineTheme(
     },
   },
 );
-const managed: Effect.Effect<void, TuvrenError> = render(
+const managed: Effect.Effect<void, TuvrenError | "save-failed"> = render(
   provideTheme(theme, root),
 );
 const jsxNode = jsx(Box, { children: "content" });
@@ -134,7 +134,7 @@ const requiredRender: Effect.Effect<
 > = render(requiredRoot);
 const observedSession: Effect.Effect<
   void,
-  TuvrenError | "event-handler-error",
+  TuvrenError | "save-failed" | "event-handler-error",
   Scope.Scope
 > = Effect.flatMap(
   mount(root, { onEvent: () => failingHandler }),
@@ -174,12 +174,21 @@ const idInvocation: Effect.Effect<
   TuvrenError | "command-error",
   Database
 > = commandService.invokeById(typedCommandId);
+const typedCommandButton = Button({ command: typedCommandId });
+const typedCommandButtonRender: Effect.Effect<
+  void,
+  TuvrenError | "command-error",
+  Database
+> = render(typedCommandButton);
+// @ts-expect-error A bound Command cannot erase its failure or environment.
+const erasedCommandButtonRender: Effect.Effect<void, TuvrenError> =
+  render(typedCommandButton);
 const initialCursor = graphemeIndex(0);
 const boundTextArea = TextArea({ document: textDocumentService });
 const acceptedReplayTrace: ReplayInput = runtimeReplayTrace;
 const replayCaptureHarness: Effect.Effect<
   TestHarness<true>,
-  TuvrenError,
+  TuvrenError | "save-failed",
   Scope.Scope
 > = testRender(root, {
   runtimeReplayCapture: {
@@ -253,6 +262,8 @@ void rendererRender;
 void recoveredRender;
 void streamRender;
 void idInvocation;
+void typedCommandButtonRender;
+void erasedCommandButtonRender;
 void initialCursor;
 void boundTextArea;
 void acceptedReplayTrace;

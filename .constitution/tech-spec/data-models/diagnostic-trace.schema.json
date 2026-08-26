@@ -132,10 +132,13 @@
             "parentRecordId": { "type": "string", "minLength": 1 },
             "eventId": { "type": "string", "minLength": 1 },
             "commandId": { "type": "string", "minLength": 1 },
+            "commandInstanceId": { "type": "string", "minLength": 1 },
             "effectSpanId": { "type": "string", "minLength": 1 },
             "transactionId": { "type": "string", "minLength": 1 },
             "renderRequestId": { "type": "string", "minLength": 1 },
-            "componentId": { "type": "string", "minLength": 1 }
+            "componentId": { "type": "string", "minLength": 1 },
+            "subjectId": { "type": "string", "minLength": 1 },
+            "subjectKind": { "enum": ["component", "text-document"] }
           }
         },
         "payload": {

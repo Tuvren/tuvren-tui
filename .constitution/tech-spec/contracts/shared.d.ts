@@ -842,10 +842,16 @@ export interface ViewNode<E = never, R = never> {
   readonly __requirements?: Readonly<{ error: E; environment: R }>;
 }
 
-export type ButtonProps = CommonProps<"root" | "label" | "indicator"> & {
-  readonly command: CommandId;
+export type ButtonProps<A = void, E = never, R = never> = CommonProps<
+  "root" | "label" | "indicator"
+> & {
+  readonly command: CommandId<A, E, R>;
 };
-export type ToggleButtonProps = ButtonProps &
+export type ToggleButtonProps<A = void, E = never, R = never> = ButtonProps<
+  A,
+  E,
+  R
+> &
   StateAuthority<boolean, "pressed", "defaultPressed"> & {
     readonly onPressedChange?: (pressed: boolean) => void;
   };
@@ -886,11 +892,11 @@ export type MenuProps<
   > & {
     readonly renderItem: (item: T) => View<RenderE, RenderR>;
   };
-export interface MenuItemProps extends CommonProps<
+export type MenuItemProps<A = void, E = never, R = never> = CommonProps<
   "root" | "label" | "keybinding"
-> {
-  readonly command: CommandId;
-}
+> & {
+  readonly command: CommandId<A, E, R>;
+};
 
 export type CommandPaletteProps<
   T = unknown,
@@ -898,8 +904,11 @@ export type CommandPaletteProps<
   Mutations = never,
   RenderE = never,
   RenderR = never,
+  CommandA = unknown,
+  CommandE = never,
+  CommandR = never,
 > = SelectProps<T, LoadResult, Mutations, RenderE, RenderR> & {
-  readonly commandForItem: (item: T) => CommandId;
+  readonly commandForItem: (item: T) => CommandId<CommandA, CommandE, CommandR>;
 };
 export type DialogProps = CommonProps<
   "backdrop" | "root" | "title" | "description" | "actions"

@@ -19,6 +19,31 @@
     "contextId": { "type": "string", "minLength": 1 },
     "transactionId": { "type": "string", "pattern": "^[0-9]+$" },
     "renderRequestId": { "type": "string", "pattern": "^[0-9]+$" },
+    "traceBasis": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "atSequence"],
+          "properties": {
+            "kind": { "const": "retained" },
+            "atSequence": { "type": "string", "pattern": "^[0-9]+$" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "boundarySequence"],
+          "properties": {
+            "kind": { "const": "wrap-baseline" },
+            "boundarySequence": {
+              "type": "string",
+              "pattern": "^[0-9]+$"
+            }
+          }
+        }
+      ]
+    },
     "surface": { "$ref": "#/$defs/surface" },
     "semanticTree": {
       "type": "array",

@@ -269,13 +269,15 @@ export class Transcript extends Component<
   readonly controller: import("./shared").TranscriptController;
   constructor(props: ImperativeComponentProps<TranscriptProps>);
 }
-export class Button extends Component<ImperativeComponentProps<ButtonProps>> {
-  constructor(props: ImperativeComponentProps<ButtonProps>);
-}
-export class ToggleButton extends Component<
-  ImperativeComponentProps<ToggleButtonProps>
+export class Button<A = void, E = never> extends Component<
+  ImperativeComponentProps<ButtonProps<A, E, never>>
 > {
-  constructor(props: ImperativeComponentProps<ToggleButtonProps>);
+  constructor(props: ImperativeComponentProps<ButtonProps<A, E, never>>);
+}
+export class ToggleButton<A = void, E = never> extends Component<
+  ImperativeComponentProps<ToggleButtonProps<A, E, never>>
+> {
+  constructor(props: ImperativeComponentProps<ToggleButtonProps<A, E, never>>);
 }
 export class Checkbox extends Component<
   ImperativeComponentProps<CheckboxProps>
@@ -315,10 +317,10 @@ export class Menu<T = unknown> extends Component<
     >,
   );
 }
-export class MenuItem extends Component<
-  ImperativeComponentProps<MenuItemProps>
+export class MenuItem<A = void, E = never> extends Component<
+  ImperativeComponentProps<MenuItemProps<A, E, never>>
 > {
-  constructor(props: ImperativeComponentProps<MenuItemProps>);
+  constructor(props: ImperativeComponentProps<MenuItemProps<A, E, never>>);
 }
 export class MenuBar<T = unknown> extends Component<
   ImperativeComponentProps<
@@ -379,15 +381,37 @@ export class ListBox<T = unknown> extends Component<
 export class Tabs extends Component<ImperativeComponentProps<TabsProps>> {
   constructor(props: ImperativeComponentProps<TabsProps>);
 }
-export class CommandPalette<T = unknown> extends Component<
+export class CommandPalette<
+  T = unknown,
+  CommandA = unknown,
+  CommandE = never,
+> extends Component<
   ImperativeComponentProps<
-    CommandPaletteProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+    CommandPaletteProps<
+      T,
+      ImperativeRangeLoad<T>,
+      ImperativeMutations<T>,
+      never,
+      never,
+      CommandA,
+      CommandE,
+      never
+    >
   >
 > {
   readonly controller: import("./shared").CollectionController<T>;
   constructor(
     props: ImperativeComponentProps<
-      CommandPaletteProps<T, ImperativeRangeLoad<T>, ImperativeMutations<T>>
+      CommandPaletteProps<
+        T,
+        ImperativeRangeLoad<T>,
+        ImperativeMutations<T>,
+        never,
+        never,
+        CommandA,
+        CommandE,
+        never
+      >
     >,
   );
 }

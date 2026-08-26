@@ -498,8 +498,20 @@ export function ErrorBoundary<
 >(
   props: ErrorBoundaryProps<ChildE, ChildR, FallbackE, FallbackR>,
 ): View<FallbackE, ChildR | FallbackR>;
-export const Button: ComponentType<ButtonProps>;
-export const ToggleButton: ComponentType<ToggleButtonProps>;
+export function Button<A, E, R, ChildE = never, ChildR = never>(
+  props: import("./shared").ComponentPropsWithChildren<
+    ButtonProps<A, E, R>,
+    ChildE,
+    ChildR
+  >,
+): View<E | ChildE, R | ChildR>;
+export function ToggleButton<A, E, R, ChildE = never, ChildR = never>(
+  props: import("./shared").ComponentPropsWithChildren<
+    ToggleButtonProps<A, E, R>,
+    ChildE,
+    ChildR
+  >,
+): View<E | ChildE, R | ChildR>;
 export const Checkbox: ComponentType<CheckboxProps>;
 export const Radio: ComponentType<RadioProps>;
 export const RadioGroup: ComponentType<RadioGroupProps>;
@@ -527,7 +539,13 @@ export function Menu<
     ChildR
   >,
 ): View<E | RenderE | ChildE, R | RenderR | ChildR>;
-export const MenuItem: ComponentType<MenuItemProps>;
+export function MenuItem<A, E, R, ChildE = never, ChildR = never>(
+  props: import("./shared").ComponentPropsWithChildren<
+    MenuItemProps<A, E, R>,
+    ChildE,
+    ChildR
+  >,
+): View<E | ChildE, R | ChildR>;
 export function MenuBar<
   T,
   E = never,
@@ -621,6 +639,9 @@ export function CommandPalette<
   R = never,
   RenderE = never,
   RenderR = never,
+  CommandA = unknown,
+  CommandE = never,
+  CommandR = never,
   ChildE = never,
   ChildR = never,
 >(
@@ -630,20 +651,23 @@ export function CommandPalette<
       Effect.Effect<RangeLoadResult<T>, E, R>,
       Stream.Stream<import("./shared").CollectionMutation<T>, E, R>,
       RenderE,
-      RenderR
+      RenderR,
+      CommandA,
+      CommandE,
+      CommandR
     >,
     ChildE,
     ChildR
   >,
-): View<E | RenderE | ChildE, R | RenderR | ChildR>;
+): View<E | RenderE | CommandE | ChildE, R | RenderR | CommandR | ChildR>;
 export const CodeView: ComponentType<CodeViewProps>;
 export const DiffView: ComponentType<DiffViewProps>;
 export const Toast: ComponentType<ToastProps>;
 export const Notification: ComponentType<ToastProps>;
 
 export const DevtoolsCommands: {
-  readonly toggle: CommandId;
-  readonly pick: CommandId;
-  readonly record: CommandId;
-  readonly saveTrace: CommandId;
+  readonly toggle: CommandId<void, TuvrenError, never>;
+  readonly pick: CommandId<void, TuvrenError, never>;
+  readonly record: CommandId<void, TuvrenError, never>;
+  readonly saveTrace: CommandId<void, TuvrenError, never>;
 };

@@ -616,9 +616,23 @@ pub struct DiagnosticRecord {
     pub kind: u16,
     pub event_id: Option<u64>,
     pub command_instance_id: Option<u64>,
+    pub effect_span_id: Option<u64>,
     pub transaction_id: Option<u64>,
     pub render_request_id: Option<u64>,
+    pub subject: Option<DiagnosticSubject>,
     pub payload: Vec<u8>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct DiagnosticSubject {
+    pub id: u64,
+    pub kind: DiagnosticSubjectKind,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum DiagnosticSubjectKind {
+    Component,
+    TextDocument,
 }
 
 #[derive(Clone, Debug)]
