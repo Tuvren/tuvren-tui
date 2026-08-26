@@ -2,21 +2,21 @@
 
 ## Version
 
-**v10.0.6** — corresponds to the latest entry in `.constitution/tasks/changelog.md`.
+**v10.0.7** — corresponds to the latest entry in `.constitution/tasks/changelog.md`.
 
 ## Active backlog summary
 
-- **Total active story points:** 377 across 61 tickets. Completed and deferred work contributes 0.
+- **Total active story points:** 385 across 62 tickets. Completed and deferred work contributes 0.
   - Epic A — Runtime foundation and public SDK boundary: 53
   - Epic B — Composition, layout, styling, and Components: 69
   - Epic C — Text, rich content, and editing: 34
   - Epic D — Interaction, Commands, accessibility, and animation: 41
   - Epic E — Virtual Collections, transient feedback, and Transcript: 32
   - Epic F — Modern terminal session and Screen Modes: 34
-  - Epic G — Diagnostics, testing, devtools, and recovery: 42
+  - Epic G — Diagnostics, testing, devtools, and recovery: 50
   - Epic H — Performance and adoption evidence: 27
   - Epic I — Distribution, examples, OpenCode evidence, and atomic release: 45
-- **Critical path (119 points):**
+- **Critical path (127 points):**
   1. `TUI-A001`
   2. `TUI-A008`
   3. `TUI-A002`
@@ -28,20 +28,21 @@
   9. `TUI-F002`
   10. `TUI-D002`
   11. `TUI-D004`
-  12. `TUI-E002`
-  13. `TUI-B009`
-  14. `TUI-I004`
-  15. `TUI-H006`
-  16. `TUI-I005`
-  17. `TUI-H004`
-  18. `TUI-I006`
-  19. `TUI-I007`
+  12. `TUI-G008`
+  13. `TUI-G003`
+  14. `TUI-B009`
+  15. `TUI-I004`
+  16. `TUI-H006`
+  17. `TUI-I005`
+  18. `TUI-H004`
+  19. `TUI-I006`
+  20. `TUI-I007`
 
 The path is the longest effort-weighted chain under the declared dependencies. Tickets whose prerequisites are satisfied may execute in parallel; the one-work-item execution workflow still reviews and integrates their milestone commits independently.
 
 ## Planning assumptions
 
-- This is a Brownfield replacement plan for the realigned PRD v3.0.0, Architecture v4.0.2, and TechSpec v9.0.7. It supersedes the prior Plugin-era active Epics U–Z instead of preserving incompatible work as active.
+- This is a Brownfield replacement plan for the realigned PRD v3.0.0, Architecture v4.0.3, and TechSpec v9.0.8. It supersedes the prior Plugin-era active Epics U–Z instead of preserving incompatible work as active.
 - `.constitution/tasks/completed/` remains historical continuity and was listed, not read or modified. Superseded active files are removed rather than moved into completed history because they were plans, not delivered scope.
 - The current source remains useful Brownfield evidence, but target paths and commands follow Stage 3. TUI-A001 owns the root workspace and developer environment, TUI-A008 owns host migration/strict repair, TUI-A010 owns native module migration, and TUI-A009 owns contract validation.
 - OD-02 uses evidence builder `TUI-D007`, report-only spike `TUI-D001`, and gated implementation `TUI-D003`. A No-Go requires Stage 1–3 Evolution and Stage 4 replanning; it does not authorize an improvised interaction contract.
@@ -132,6 +133,7 @@ flowchart LR
     G5[TUI-G005]
     G6[TUI-G006]
     G7[TUI-G007]
+    G8[TUI-G008]
   end
   subgraph H["H — Performance evidence"]
     H1[TUI-H001]
@@ -234,6 +236,7 @@ flowchart LR
   A4 --> G1
   G1 --> G2
   G2 --> G3
+  G8 --> G3
   G3 --> G4
   G1 --> G5
   A6 --> G5
@@ -245,6 +248,20 @@ flowchart LR
   F2 --> G7
   C3 --> G7
   F3 --> G7
+  A5 --> G8
+  A6 --> G8
+  B2 --> G8
+  B3 --> G8
+  C2 --> G8
+  C3 --> G8
+  D2 --> G8
+  D4 --> G8
+  D6 --> G8
+  E1 --> G8
+  E4 --> G8
+  F1 --> G8
+  F3 --> G8
+  G1 --> G8
   A4 --> H1
   C1 --> H1
   D2 --> H1

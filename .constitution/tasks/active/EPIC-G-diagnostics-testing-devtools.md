@@ -12,15 +12,15 @@ Implement one causal observation surface and public proof harness for P0-N01–P
 - **Scope (In-Scope Files):** `native/src/diagnostics/`, diagnostic ABI codec, correlation and wrap tests
 - **Scope (Out-of-Scope Files):** browser/server inspector, raw private identities in public output
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
-- **Expected Success Output:** every late Render Pass has a causal path or explicit unattributed-defect record
+- **Expected Success Output:** bounded sink, identity, wrap, and unattributed-defect protocol fixtures pass; TUI-G008 owns producer-complete causal accounting
 - **STOP Conditions:** STOP if recording can grow beyond 64 MiB or silently discard the retained causal path.
-- **Description:** Connect input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, text, render, diff, terminal write, error, and cleanup identities in bounded deltas and periodic snapshots.
+- **Description:** Implement the bounded Diagnostic Graph record/sink protocol, causal identity types, wrap behavior, and producer hook interface. TUI-G008 owns integration across producers after their kernels exist.
 - **Acceptance:**
   - **Mode:** invariant
   - **Evidence:**
 
 ```text
-Causality fixtures traverse every phase, verify stable error metadata, force ring wrap, preserve the newest complete causal interval, and account for every unexplained late Render Pass.
+Sink fixtures verify causal linking, stable error metadata, forced ring wrap, preservation of the newest complete causal interval, and explicit unattributed-defect records; they do not claim producer-complete instrumentation before TUI-G008.
 ```
 
 #### TUI-G002 Implement bounded durable codecs, migrations, and redaction
@@ -48,7 +48,7 @@ Fuzz and golden tests reject unknown versions and expansion attacks, migrate onl
 
 - **Type:** Feature
 - **Effort:** 8
-- **Dependencies:** TUI-D005, TUI-G002
+- **Dependencies:** TUI-D005, TUI-G002, TUI-G008
 - **Category:** DX
 - **Capabilities:** P0-N05–P0-N06, P0-N15, REL-02
 - **Scope (In-Scope Files):** `ts/src/testing/`, headless test ABI, semantic query, replay, snapshot, trace, cleanup and leak fixtures
@@ -147,4 +147,25 @@ Seed host, target, artifact, version, load, initialization, render, source-map, 
 
 ```text
 The machine-readable inventory maps 100% of boundaries to validators and named owners; transaction, Event/formatted-content, terminal/clipboard, and durable-file targets plus malformed/size/timeout/correlation suites all pass under sanitizers where supported.
+```
+
+#### TUI-G008 Integrate causal emission across every producer
+
+- **Type:** Feature
+- **Effort:** 8
+- **Dependencies:** TUI-A005, TUI-A006, TUI-B002, TUI-B003, TUI-C002, TUI-C003, TUI-D002, TUI-D004, TUI-D006, TUI-E001, TUI-E004, TUI-F001, TUI-F003, TUI-G001
+- **Category:** DX
+- **Capabilities:** P0-N03, P0-N10, P0-N13–P0-N14, TOOL-05
+- **Scope (In-Scope Files):** `native/src/context.rs`, `native/src/transaction.rs`, `native/src/composition/`, `native/src/interaction/`, `native/src/content/`, `native/src/animation/`, `native/src/presentation/`, `native/src/terminal/`, `native/src/diagnostics/`, `ts/src/runtime/`, `ts/src/commands/`, cross-phase causal fixtures
+- **Scope (Out-of-Scope Files):** new producer behavior, remote telemetry, unbounded diagnostic payloads
+- **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-runner.test.ts`
+- **Expected Success Output:** every required producer phase emits a bounded linked record and every late Render Pass has a causal path or explicit unattributed-defect record
+- **STOP Conditions:** STOP if instrumentation changes producer ordering, allocates on the diagnostic-off steady-state path, or retains sensitive content outside policy.
+- **Description:** Connect the G001 sink to input, Event, Command, Effect span, reconciliation, transaction, mutation, dirtying, layout, text, Collection, Transcript, animation, render, diff, terminal, clipboard, error, and cleanup producers after their owning kernels exist.
+- **Acceptance:**
+  - **Mode:** invariant
+  - **Evidence:**
+
+```text
+Cross-phase fixtures traverse every producer, preserve causal identities through failure and cleanup, prove diagnostic-off allocation behavior, exercise wrap boundaries, and account for every unexplained late Render Pass without changing runtime order.
 ```
