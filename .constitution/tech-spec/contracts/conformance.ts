@@ -28,6 +28,7 @@ import {
   useTranscriptController,
   withRequirements,
   type CommandService,
+  type ControllerEnqueueDisposition,
   type RangeLoadResult,
   type TuvrenError,
   type TextDocumentService,
@@ -44,6 +45,7 @@ import {
 import {
   Box as ImperativeBox,
   Text as ImperativeText,
+  Transcript as ImperativeTranscript,
   keyGrapheme as imperativeKeyGrapheme,
   keymapScopeId as imperativeKeymapScopeId,
   run as runImperative,
@@ -232,6 +234,13 @@ const transcriptViewB = Transcript({
   mode: "bounded-local",
   controller: transcriptControllerB,
 });
+const transcriptDisposition: ControllerEnqueueDisposition =
+  transcriptControllerA.followLiveEdge(true);
+new ImperativeTranscript({
+  mode: "bounded-local",
+  // @ts-expect-error Imperative Transcript owns its controller and forbids injection.
+  controller: transcriptControllerA,
+});
 const acceptedReplayTrace: ReplayInput = runtimeReplayTrace;
 const replayCaptureHarness: Effect.Effect<
   TestHarness<true>,
@@ -321,6 +330,7 @@ void initialCursor;
 void boundTextArea;
 void transcriptViewA;
 void transcriptViewB;
+void transcriptDisposition;
 void acceptedReplayTrace;
 void replayCaptureHarness;
 void rejectedReplayTrace;

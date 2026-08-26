@@ -110,6 +110,7 @@ extern "C" {
 #define TUVREN_MAX_TRANSACTION_BYTES (8u * 1024u * 1024u)
 #define TUVREN_MAX_TRANSACTION_COMMANDS 65535u
 #define TUVREN_MAX_QUERY_INPUT_BYTES (8u * 1024u * 1024u)
+#define TUVREN_NO_COMMAND_INDEX UINT32_MAX
 
 #ifdef __cplusplus
 #define TUVREN_STATIC_ASSERT(condition, message) static_assert(condition, message)
@@ -1339,8 +1340,8 @@ typedef struct TuvrenDiagnosticConfigPayload {
 
 typedef struct TuvrenApplyResult {
     uint16_t size;
-    uint16_t status;
-    uint32_t failed_command_index;
+    uint16_t status; /* TuvrenStatus */
+    uint32_t failed_command_index; /* TUVREN_NO_COMMAND_INDEX if not applicable */
     uint64_t transaction_id;
     uint64_t render_request_id;
     uint32_t mapping_count;
@@ -1514,11 +1515,37 @@ typedef struct TuvrenRenderResult {
 
 typedef struct TuvrenDrainResult {
     uint16_t size;
-    uint16_t status;
+    uint16_t status; /* TuvrenStatus */
     uint32_t record_count;
     uint64_t required_bytes;
     uint64_t written_bytes;
 } TuvrenDrainResult;
+
+/* Status and output contract (all exports below except tui_abi_version):
+ * - The int32_t return is exactly one nonnegative TuvrenStatus value. Negative
+ *   or private status values never cross the ABI.
+ * - A required null result pointer returns INVALID_INPUT. When a result struct
+ *   is present, the callee initializes its entire fixed record and writes its
+ *   sizeof value. Apply, Query, and Drain result.status equals the function
+ *   return. Caller data buffers may be null only when their capacity is zero.
+ * - Apply OK initializes every count/ID and writes only reported mapping/result
+ *   elements. BUFFER_TOO_SMALL performs no mutation or partial write, sets only
+ *   required_* counts beyond size/status, zeros IDs and written counts, and uses
+ *   TUVREN_NO_COMMAND_INDEX. INVALID_INPUT may set failed_command_index only
+ *   when one decoded command is responsible; every other failure uses the
+ *   sentinel and zeros IDs/counts.
+ * - Query OK initializes value_tag, generation, range, values, and byte counts,
+ *   with unused fields zero. BUFFER_TOO_SMALL sets required_bytes only and
+ *   writes no semantic value. INVALID_INPUT, STALE_CONTEXT, UNAVAILABLE, and
+ *   PANIC_CONTAINED zero every field after size/status.
+ * - Drain OK reports records/bytes actually written. BUFFER_TOO_SMALL writes no
+ *   partial record, reports total pending record_count and required_bytes, and
+ *   sets written_bytes zero. Other failures zero all fields after size/status.
+ * - Render OK initializes every RenderResult field. On failure, a nonnull
+ *   RenderResult contains size and zeros in every other field. Context creation
+ *   sets out_context zero before work and leaves it zero on failure. No failure
+ *   leaves caller-visible output partially initialized. Cross-language fixtures
+ *   cover every status/output matrix row. */
 
 /* Returns (TUVREN_ABI_MAJOR << 16) | TUVREN_ABI_MINOR. */
 TUVREN_API uint32_t tui_abi_version(void);

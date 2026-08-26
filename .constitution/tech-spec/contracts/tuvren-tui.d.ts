@@ -79,6 +79,7 @@ export type {
   CommandId,
   CommandPaletteProps,
   CommonProps,
+  ControllerEnqueueDisposition,
   ComponentId,
   ComponentPropsWithChildren,
   ComponentType,

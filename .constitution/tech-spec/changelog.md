@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.18] — 2026-08-26
+
+### Fixed
+
+- Completed Interaction and Animation Event delivery through the UI Executor with no native-to-host callback path.
+- Defined Transcript unbound, teardown, cache-clear, pending-cancel, and rebind dispositions and removed declarative controller injection from imperative constructors.
+- Added the canonical strict host aggregate to release candidates and specified every ABI return/result status and output-initialization rule.
+
 ## [v9.0.17] — 2026-08-26
 
 ### Fixed
