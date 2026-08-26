@@ -1,75 +1,86 @@
 # Vision
 
-## 0. Version
+## Version
 
-**v2.7.0** — corresponds to the latest entry in `.constitution/prd/changelog.md`.
+**v3.0.0** — corresponds to the latest entry in `.constitution/prd/changelog.md`.
 
----
+## Executive summary
 
-## 1. Executive Summary & Target Archetype
+Tuvren is a general-purpose terminal UI library for developers building interactive applications such as agent clients, developer tools, dashboards, editors, operational consoles, and forms. It combines an approachable typed SDK with a high-performance built-in runtime so developers can ship polished terminal experiences without learning systems programming, managing a native binary, or accepting the resource costs of a host-only UI stack.
 
-- **Target Archetype:** General-purpose terminal UI framework and SDK for TypeScript-first developers, with a productized imperative core as the approved public release direction and Bun-native ergonomics in the current runtime posture.
-- **Vision:** Terminal interface development becomes as productive as web UI development without sacrificing performance, inspectability, or the ability to ship demanding terminal products from a TypeScript workflow.
-- **Problem:** Developers building terminal applications in the TypeScript ecosystem still face a forced trade-off between ergonomic but resource-heavy solutions, performant but ergonomically hostile primitives, and toolkit surfaces that do not feel productized or extensible enough to trust for real application delivery.
+The product addresses a persistent trade-off: terminal developers can choose low-level native toolkits with strong performance, or higher-level SDKs with easier authoring but weaker efficiency, runtime behavior, and diagnostics. Tuvren must make that compromise unnecessary.
 
----
+## Archetype
 
-## 2. Jobs to Be Done (JTBD)
+- **Primary:** `Library/SDK`
+- **Secondary:** `System/Native`
+- **Confidence:** `high`
+- **Rationale:** The public product is an SDK embedded into applications, so `Library/SDK` governs its adoption, compatibility, and developer-experience contract. A built-in native runtime owns the demanding terminal, text, interaction, and rendering behavior, so `System/Native` adds frame-budget, memory, lifecycle, and platform requirements. Tuvren can create command-line applications, but it is not itself primarily a command-line tool.
 
-### Primary
-> "When building interactive terminal applications in TypeScript, I want a general-purpose framework with composable interface primitives, native performance, and productized release ergonomics, so I can ship polished terminal apps in hours instead of days without dropping into a systems-language-heavy workflow."
+## Jobs to be done
 
-### Secondary
-> "When building demanding terminal products such as agent consoles, operator dashboards, repo inspectors, or other information-dense tools, I want the same framework to stay stable under streaming output, long transcripts, dense panes, and heavy inspection surfaces."
+### Build a polished terminal application quickly
 
-### Tertiary
-> "When using Bun as my primary runtime, I want a TUI framework designed for Bun's foreign-function model from day one, so I don't fight compatibility shims or WASM overhead."
+When I build an interactive terminal application, I want a coherent declarative SDK with strong defaults and an explicit imperative escape hatch, so I can reach a useful result quickly without learning native implementation details.
 
----
+### Sustain demanding interactive workloads
 
-## 3. Product Posture
+When my application displays streaming output, large documents, virtual collections, dense panes, or frequent updates, I want responsiveness and memory use to remain predictable, so the terminal experience can serve as the product rather than a temporary prototype.
 
-- **Current Product Emphasis:** Tuvren tells a general-purpose framework story. Its showcase and proving grounds remain demanding agentic and developer-facing products because those workloads stress the performance, viewport, and inspectability requirements that motivated the project in the first place.
-- **JTBD Priority Order:** Ship Faster > Productized Trust > Framework Foundations > Bun-native DX > Own the Full Stack
+### Trust behavior across terminal environments
 
----
+When I distribute a terminal application, I want input, layout, text, accessibility, cleanup, and capability fallback to behave consistently across supported platforms and terminal tiers, so I do not need application-specific terminal workarounds.
 
-## 4. Capability Roadmap Context
+### Diagnose behavior without rebuilding the product
 
-| Wave | Scope Emphasis | Summary |
-| --- | --- | --- |
-| **v0** | Core interaction surface | Widget composition, layout, styling, keyboard and mouse input, scrolling, cross-platform terminal handling, and rich text rendering |
-| **v1** | Product polish | Animation system and theming foundation |
-| **v2** | Hardening and advanced DX | Core hardening, tree operations for reconciler support, theme inheritance, TextArea, choreography, lightweight JSX reconciler, and foundational accessibility |
-| **v3** | Productization and framework foundations | Public rename to Tuvren, package topology, onboarding polish, general-purpose framework positioning, and the queued command/keymap foundation wave |
-| **v4** | Declarative and extensibility expansion | Effect-based declarative integration and pre-GA plugin-slot boundaries once command/keymap foundations stabilize |
-| **v5** | SDK productization and public pre-GA release | Expert-level SDK DX across imperative, JSX, Effect, plugin, composite, example, and devtools surfaces, followed by the first public npm release as `0.1.0` and a feedback loop before any `v1.0` compatibility guarantees |
+When an interface is visually or behaviorally wrong, I want to inspect the relevant component, style source, event path, semantic state, and render cause locally, so I can find and prove a fix without reverse-engineering the runtime.
 
----
+### Extend the SDK without forking it
 
-## 5. Brownfield Transition Note
+When my team develops reusable application patterns, I want to package Components, Commands, Keymaps, helpers, and application services against public contracts, so we can share them without depending on private runtime internals.
 
-- **Public name:** `Tuvren` / `tuvren-tui` (Epic P shipped the hard-cut rename)
-- **Current source-tree reality:** The repo, packages, examples, and release workflow use `Tuvren` / `tuvren-tui` naming. The rename from Kraken is complete as of Epic P.
-- **Planning rule:** This PRD governs the future public product direction. Downstream artifacts must keep the current Brownfield naming explicit anywhere implementation reality still differs.
+## Positioning
 
----
+For developers who need rich terminal applications with modern SDK ergonomics and native-class efficiency, Tuvren is a general-purpose terminal UI library that offers a preferred declarative workflow, a capable imperative workflow, and a runtime designed for demanding interaction. Unlike host-only UI libraries, Tuvren moves sustained and correctness-sensitive work into its built-in runtime; unlike low-level native toolkits, it does not require application developers to work in a systems language.
 
-## Appendix: Operator Preferences
+## Product principles
 
-_The following are developer-stated implementation preferences. They are preserved for downstream stages but are not product requirements by themselves._
+- **One obvious starting point:** The default installation and import lead to the preferred declarative workflow; the imperative workflow remains complete and explicit.
+- **Native behavior, not native burden:** Developers benefit from native execution but do not manage, extend, or debug the native boundary in ordinary use.
+- **General purpose by contract:** Agent consoles and developer tools are representative stress cases, not a specialist product identity.
+- **Modern terminals are the moat:** Tuvren takes advantage of detected modern capabilities while preserving a safe compatible tier.
+- **Correctness before visual approximation:** Text positions, focus, events, accessibility, cleanup, and data ownership do not degrade to preserve frame rate.
+- **Promotion by evidence:** Reusable behavior moves deeper into the runtime only when measurement shows that composition, batching, identity, caching, and delta updates cannot meet the approved budget.
+- **Inspectability is part of usability:** Local diagnostics, semantic tests, traces, and performance evidence are product capabilities rather than contributor-only tools.
 
-| Preference | Value |
-| --- | --- |
-| Future public product name | `Tuvren` |
-| Future public package name | `tuvren-tui` |
-| Hosting organization move | Complete; canonical remote is `Tuvren/tuvren-tui` |
-| First public npm release | `0.1.0` pre-GA after SDK productization; `v1.0` compatibility guarantees come later |
-| Core implementation language | Rust |
-| Target runtime | Bun |
-| FFI mechanism | `bun:ffi` |
-| Layout engine | Taffy |
-| Terminal backend | crossterm |
-| Future declarative path | Imperative core remains canonical; declarative integration should center on `Effect`, not React or Solid parity |
-| Build artifact | `cdylib` |
-| Dev environment | `devenv` (Nix) |
+## Release horizons
+
+| Horizon | Product meaning |
+| :-- | :-- |
+| `0.1.0` / P0 | The first public pre-GA release. Every P0 capability and release constraint must pass representative public examples and acceptance evidence. |
+| `0.2.0` / P1 | The next planned capability wave, including bidirectional text, advanced editor behavior, richer visual surfaces, application orchestration, and assistive-technology bridges. |
+| Later / P2 | Evidence-led ecosystem and platform expansion. These items do not delay `0.1.0` or `0.2.0` unless promoted through a later PRD Evolution pass. |
+| `1.0.0` | Compatibility guarantees begin only after public feedback validates the SDK contracts. No date is implied. |
+
+## Appendix: Operator preferences
+
+The following user-approved implementation preferences guide downstream Architecture and TechSpec work. They are not product requirements by themselves.
+
+| Area | Preference |
+| :-- | :-- |
+| Public identity | Product name `Tuvren`; package name `tuvren-tui`; first public release `0.1.0` pre-GA |
+| Ordinary installation | `bun add tuvren-tui`, followed by an import and application run |
+| Host and engine | TypeScript SDK on Bun, backed by a Rust `cdylib` through `bun:ffi`; Rust is the sole mutable UI authority |
+| Declarative model | The bare `tuvren-tui` import is Effect-first and uses JSX as view syntax; Effect is a required peer dependency; the reactive mechanism and Signals remain private |
+| Imperative model | The stable imperative foundation is available from `tuvren-tui/imperative`; raw FFI is not public SDK surface |
+| Public entrypoints | `tuvren-tui`, `tuvren-tui/jsx-runtime`, `tuvren-tui/jsx-dev-runtime`, `tuvren-tui/testing`, `tuvren-tui/imperative`, and `tuvren-tui/imperative/testing`; no `tuvren-tui/effect` entrypoint |
+| Public styling names | `StyleSpec`, `StyleSheet`, `ThemeTokens`, and `ThemeRecipes` |
+| Effect-native behavior | Rendering returns an Effect; scoped resources own lifetimes; Commands may return typed interruptible Effects; Streams carry events and external updates; Services and Layers supply dependencies; the native manual clock integrates with Effect TestClock |
+| Runtime internals | Taffy for layout and crossterm for terminal integration, subject to downstream verification |
+| Terminal protocols | Detection-first support for Kitty keyboard, clipboard, paste, and graphics capabilities; OSC 52 text fallback; Sixel fallback for images where appropriate |
+| Supported host release | Bun only for `0.1.0`; preserve an internal host-adapter boundary for later Node.js evaluation; evaluate Deno only with demonstrated demand |
+| Supported native targets | glibc Linux x64 and arm64, macOS arm64 and x64, and Windows x64; musl/Alpine is unsupported initially |
+| Build environment | `devenv` with Nix |
+| Comparative references | Match or beat OpenTUI across representative workloads, remain within the evidence-ratified margin of Ratatui on comparable hot paths, and materially outperform Ink and similar host-only alternatives |
+| Local devtools commands | `bunx tuvren dev ENTRY`, `bunx tuvren doctor`, and `bunx tuvren trace view TRACE_FILE`; framework Commands `tuvren.devtools.toggle`, `tuvren.devtools.pick`, `tuvren.devtools.record`, and `tuvren.devtools.saveTrace`; no examples command is approved |
+| Reference integration | An OpenCode example may demonstrate performance and developer experience only; it must not imply a supported OpenCode protocol contract |

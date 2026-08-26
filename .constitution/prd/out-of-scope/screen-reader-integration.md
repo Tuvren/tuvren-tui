@@ -1,11 +1,6 @@
-# Out of Scope: Full Screen-Reader Integration Beyond Foundational Accessibility
+# Operating-system assistive-technology bridges
 
-Full screen-reader integration beyond foundational accessibility is deferred to v2.
-
-## Rationale
-
-Foundational accessibility (role, label, description metadata on TuiNode) is part of v2 scope. Full screen-reader integration — including live region announcements, focus management beyond keyboard nav, and AT-specific output — requires deeper platform integration work and user testing that is not compatible with the pre-v1 delivery timeline.
-
-## Anti-Pattern Avoided
-
-Epic 4 (Input & Focus) already covers keyboard-driven focus traversal. That is distinct from screen-reader output, which is tracked as a v2 commitment per the non-functional constraints.
+- **Context:** Tuvren can connect its Semantic Tree and announcement model to operating-system assistive technologies.
+- **Decision:** Deferred to P1 `0.2.0`.
+- **Reason:** Platform bridges require environment-specific integration and user testing. P0 must first prove keyboard completeness, semantic metadata, reduced motion, semantic snapshots, and announcements.
+- **Consequences:** Downstream work must not defer P0 accessibility foundations. It must also avoid claiming full screen-reader integration until the P1 bridge and user evidence exist.

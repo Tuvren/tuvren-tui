@@ -1,41 +1,85 @@
 # Changelog
 
-Local Stage 1 Changelog. Tracks semantic versioning for the PRD layer.
+This changelog records Stage 1 product-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
----
+## [v3.0.0] — 2026-08-26
 
-## v2.7.0
+### Added
 
-- Bumped host bundle budget from 75KB to 100KB to accommodate framework-level services (commands/keymaps, Effect, plugin slots) shipped in Epics R–T while keeping the TypeScript layer intentionally thin.
+- Declared `Library/SDK` as the primary archetype and `System/Native` as the secondary archetype with high confidence.
+- Defined the complete P0 `0.1.0`, P1 `0.2.0`, and evidence-led P2 capability horizons.
+- Added atomic requirements for the Declarative SDK, Imperative SDK, Components, native-backed Primitives, layout, styling, text, editing, Events, Commands, Virtual Collections, Transcript behavior, terminal integration, clipboard, accessibility, animation, devtools, testing, safety, distribution, and release evidence.
+- Added the 120 Hz goal, 90 Hz degraded tier, 60 Hz failure threshold, reference workload envelope, adoption timing, devtools overhead, privacy, reliability, and platform release meters.
+- Added approved canonical terms for Component, Primitive, RuntimeNode, SDK surfaces, styling, rich text, data projection, semantics, terminal capability, and diagnostics.
 
-## v2.6.0
+### Changed
 
-- Clarified Epic 12 as a package-first Effect application surface over the same native runtime authority and aligned the product language with the shipped Epic S package model.
+- Reframed Tuvren as a truly general-purpose terminal UI library rather than an agent-focused toolkit or command-line application.
+- Made the preferred declarative workflow the default product experience while retaining a capability-complete imperative foundation and advanced embedding surface.
+- Replaced the earlier Widget vocabulary and solution-shaped domain context with a technology-independent Component and Primitive product model.
+- Replaced broad roadmap epics with testable product outcomes and explicit release priorities.
+- Promoted accessibility foundations, animation, rich clipboard behavior, Grid, the first-party Component catalog, and local devtools into the P0 contract.
+- Moved bidirectional text, advanced editor behavior, cell and image surfaces, application routing, form orchestration, spring and keyframe animation, and assistive-technology bridges to P1 `0.2.0`.
+- Limited `0.1.0` third-party extensibility to ordinary package composition and reserved Runtime Extension and Plugin contracts for evidence-led evolution.
 
-## v2.5.0
+### Removed
 
-- Sequenced the next framework waves as commands/keymaps, Effect, plugin slots, SDK productization, and first public npm release as a pre-GA `0.1.0` feedback loop.
+- Removed Plugin slots, background rendering, a public reactive primitive, a separate declarative package entrypoint, and raw native-boundary knowledge from the initial product contract.
+- Removed browser framework parity, general browser layout emulation, generic runtime-tree persistence, and a built-in remote-session service from the active roadmap.
 
-## v2.4.0
+### Security
 
-- Reframed the product as a general-purpose framework, activated productization and framework-foundation scope, and adopted the future public name Tuvren with an explicit Brownfield transition note.
+- Made untrusted terminal, clipboard, subprocess, content, trace, and native-boundary handling a measured release requirement.
+- Added default diagnostic redaction and artifact-provenance gates.
 
-## v2.3.0
+## [v2.7.0]
 
-- Reformatted to the current stage-1 framework skeleton while preserving approved scope, roadmap context, and operator preferences.
+### Changed
 
-## v2.2.0
+- Increased the host bundle budget from 75 KB to 100 KB to accommodate planned framework services while keeping the host layer intentionally thin.
 
-- Added Epic 11 (Commands & Keymap Foundations) as P0 capability.
+## [v2.6.0]
 
-## v2.1.0
+### Changed
 
-- Added Epic 10 (Productized Installation & Release Trust) as P0 capability.
+- Clarified the planned package-first declarative application surface over the same native runtime authority.
 
-## v2.0.0
+## [v2.5.0]
 
-- Major rewrite to reflect the shift from specialist library to general-purpose framework posture.
+### Added
 
-## v1.x series
+- Sequenced commands and keymaps, declarative integration, extension slots, SDK productization, and a first public pre-GA release.
 
-- Earlier version history preserved in git logs.
+## [v2.4.0]
+
+### Changed
+
+- Reframed the product as a general-purpose framework and adopted the Tuvren public identity.
+
+## [v2.3.0]
+
+### Changed
+
+- Reformatted Stage 1 to the prior constitution skeleton while preserving approved scope and operator preferences.
+
+## [v2.2.0]
+
+### Added
+
+- Added Commands and Keymaps as a P0 capability.
+
+## [v2.1.0]
+
+### Added
+
+- Added productized installation and release trust as a P0 capability.
+
+## [v2.0.0]
+
+### Changed
+
+- Rewrote the product contract from a specialist library to a general-purpose framework posture.
+
+## [v1.x]
+
+Earlier Stage 1 history remains available in version control.
