@@ -54,22 +54,54 @@ pub enum PositionMode {
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum FlexDirection { Row, RowReverse, Column, ColumnReverse }
+pub enum FlexDirection {
+    Row,
+    RowReverse,
+    Column,
+    ColumnReverse,
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum FlexWrap { NoWrap, Wrap, WrapReverse }
+pub enum FlexWrap {
+    NoWrap,
+    Wrap,
+    WrapReverse,
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum AlignMode { Start, End, Center, Stretch, Baseline }
+pub enum AlignMode {
+    Start,
+    End,
+    Center,
+    Stretch,
+    Baseline,
+}
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum JustifyMode { Start, End, Center, SpaceBetween, SpaceAround, SpaceEvenly, Stretch }
+pub enum JustifyMode {
+    Start,
+    End,
+    Center,
+    SpaceBetween,
+    SpaceAround,
+    SpaceEvenly,
+    Stretch,
+}
 
 #[derive(Clone, Debug, PartialEq)]
-pub enum GridTrack { Dimension(DimensionSpec), Fraction(f32), MinMax(DimensionSpec, DimensionSpec) }
+pub enum GridTrack {
+    Dimension(DimensionSpec),
+    Fraction(f32),
+    MinMax(DimensionSpec, DimensionSpec),
+}
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
-pub struct GridPlacement { pub row: Option<u32>, pub column: Option<u32>, pub row_span: u32, pub column_span: u32 }
+pub struct GridPlacement {
+    pub row: Option<u32>,
+    pub column: Option<u32>,
+    pub row_span: u32,
+    pub column_span: u32,
+}
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum DimensionAtom {
@@ -148,10 +180,7 @@ pub struct ResponsiveCondition {
 #[derive(Clone, Debug)]
 pub enum Resolvable<T> {
     Literal(T),
-    Token {
-        name: String,
-        fallback: Option<T>,
-    },
+    Token { name: String, fallback: Option<T> },
 }
 
 #[derive(Clone, Debug)]
@@ -327,9 +356,22 @@ pub struct SemanticNode {
     pub role: Option<String>,
     pub name: Option<String>,
     pub description: Option<String>,
-    pub value: Option<String>,
-    pub states: BTreeMap<String, String>,
+    pub value: Option<SemanticValue>,
+    pub states: BTreeMap<String, SemanticState>,
     pub relationships: BTreeMap<String, Vec<RuntimeNodeId>>,
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum SemanticValue {
+    String(String),
+    Number(f64),
+}
+
+#[derive(Clone, Debug, PartialEq)]
+pub enum SemanticState {
+    Boolean(bool),
+    String(String),
+    Number(f64),
 }
 
 #[derive(Clone, Debug)]
@@ -355,7 +397,10 @@ pub enum TextContent {
     Plain(String),
     Styled(Vec<StyledContentSpan>),
     Markdown(String),
-    Code { source: String, language: Option<String> },
+    Code {
+        source: String,
+        language: Option<String>,
+    },
     SanitizedAnsi(String),
 }
 
@@ -380,8 +425,14 @@ pub enum IndentationStyle {
 
 #[derive(Clone, Debug)]
 pub enum TextValidationRule {
-    MinimumLength { graphemes: u64, message: String },
-    MaximumLength { graphemes: u64, message: String },
+    MinimumLength {
+        graphemes: u64,
+        message: String,
+    },
+    MaximumLength {
+        graphemes: u64,
+        message: String,
+    },
     Pattern {
         pattern: String,
         case_insensitive: bool,
@@ -470,6 +521,8 @@ pub struct VirtualCollectionState {
     pub scroll_anchor: Option<CollectionKey>,
     pub scroll_offset_rows: i64,
     pub scroll_offset_pixels: Option<i64>,
+    pub scroll_observed_transaction_id: u64,
+    pub scroll_observed_render_request_id: u64,
     pub request_generation: u64,
     pub usage: BoundedUsage,
 }

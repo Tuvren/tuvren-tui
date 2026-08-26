@@ -104,6 +104,7 @@ extern "C" {
 #define TUVREN_TRANSCRIPT_LIVE_EDGE 0x00000008u
 #define TUVREN_DIAGNOSTIC_CONFIG_INCLUDE_FULL_CONTENT 0x00000001u
 #define TUVREN_DIAGNOSTIC_CONFIG_INCLUDE_SOURCE 0x00000002u
+#define TUVREN_DIAGNOSTIC_CONFIG_RUNTIME_REPLAY_CAPTURE 0x00000004u
 #define TUVREN_NODE_REF_LOCAL_BIT 0x80000000u
 #define TUVREN_MAX_TRANSACTION_BYTES (8u * 1024u * 1024u)
 #define TUVREN_MAX_TRANSACTION_COMMANDS 65535u
@@ -353,7 +354,8 @@ typedef enum TuvrenBorderKind {
 
 typedef enum TuvrenSemanticPayloadKind {
     TUVREN_SEMANTIC_STATES = 1,
-    TUVREN_SEMANTIC_RELATIONSHIPS = 2
+    TUVREN_SEMANTIC_RELATIONSHIPS = 2,
+    TUVREN_SEMANTIC_VALUE = 3
 } TuvrenSemanticPayloadKind;
 
 typedef enum TuvrenAnimationProperty {
@@ -558,7 +560,9 @@ typedef enum TuvrenProperty {
  * SET_PROPERTY_BYTES + VALUE_LAYOUT/LayoutPayload; style 0x0201..0x0204
  * requires SET_PROPERTY_BYTES + VALUE_STYLE/StylePayload; TEXT_CONTENT requires
  * SET_PROPERTY_BYTES + VALUE_TEXT_CONTENT/TextContentPayload; SEMANTIC_ROLE,
- * NAME, DESCRIPTION, VALUE require SET_PROPERTY_BYTES + VALUE_UTF8;
+ * NAME and DESCRIPTION require SET_PROPERTY_BYTES + VALUE_UTF8;
+ * SEMANTIC_VALUE requires SET_PROPERTY_BYTES +
+ * VALUE_SEMANTIC/SemanticPayload;
  * TEXT_DOCUMENT_CONFIG requires SET_PROPERTY_BYTES +
  * VALUE_TEXT_DOCUMENT_CONFIG/TextDocumentConfigPayload; TEXT_SELECTION
  * requires SET_PROPERTY_BYTES + VALUE_GRAPHEME_RANGE/GraphemeRange;
@@ -659,7 +663,8 @@ typedef enum TuvrenDiagnosticKind {
     TUVREN_DIAGNOSTIC_TERMINAL_WRITE = 13,
     TUVREN_DIAGNOSTIC_ERROR = 14,
     TUVREN_DIAGNOSTIC_CLEANUP = 15,
-    TUVREN_DIAGNOSTIC_UNATTRIBUTED = 16
+    TUVREN_DIAGNOSTIC_UNATTRIBUTED = 16,
+    TUVREN_DIAGNOSTIC_CONTEXT = 17
 } TuvrenDiagnosticKind;
 
 typedef struct TuvrenKeyEventPayload {
@@ -844,9 +849,17 @@ typedef struct TuvrenContextOptions {
     uint32_t height_cells;
     uint32_t screen_mode; /* TuvrenScreenMode */
     uint32_t external_output_mode; /* TuvrenExternalOutputMode */
+    uint16_t diagnostic_mode; /* TuvrenDiagnosticMode */
+    uint16_t reserved;
+    uint32_t diagnostic_flags; /* TUVREN_DIAGNOSTIC_CONFIG_* */
     uint64_t queue_byte_limit;
     uint64_t diagnostic_byte_limit;
 } TuvrenContextOptions;
+
+/* RUNTIME_REPLAY_CAPTURE is accepted only at context creation together with
+ * FULL_TRACE and INCLUDE_FULL_CONTENT. The Host Environment requires explicit
+ * confirmation before encoding it. Later DIAGNOSTIC_CONFIGURE transactions
+ * may change ordinary tracing but cannot make a partial trace replay-capable. */
 
 typedef struct TuvrenTransactionHeader {
     uint32_t magic;
@@ -1080,11 +1093,18 @@ typedef struct TuvrenSemanticPayload {
 typedef struct TuvrenSemanticEntry {
     uint32_t key_offset;
     uint32_t key_length;
-    uint32_t value_offset;
-    uint32_t value_length;
+    uint32_t value_offset_or_low;
+    uint32_t value_length_or_high;
     uint32_t value_tag; /* UTF8/U64/I64/F64; BYTES is packed u32 node refs */
     uint32_t reserved;
 } TuvrenSemanticEntry;
+
+/* Semantic VALUE contains exactly one entry with an empty key and UTF8 or F64
+ * value. STATES uses nonempty UTF-8 keys and UTF8, F64, or U64 restricted to
+ * zero/one. RELATIONSHIPS uses nonempty keys and BYTES containing packed u32
+ * node references. UTF8/BYTES use value_offset_or_low and
+ * value_length_or_high as an arena range. Numeric tags split the exact 64-bit
+ * scalar representation into low/high 32-bit words; F64 must be finite. */
 
 typedef struct TuvrenTextContentPayload {
     uint16_t size;
@@ -1203,6 +1223,8 @@ typedef struct TuvrenCollectionScrollPositionPayload {
     int64_t offset_rows;
     int64_t offset_pixels; /* INT64_MIN when pixel position is unavailable */
     uint64_t generation;
+    uint64_t observed_transaction_id;
+    uint64_t observed_render_request_id;
 } TuvrenCollectionScrollPositionPayload;
 
 /* Numeric Collection keys are finite IEEE-754 doubles. Encoders normalize
@@ -1377,7 +1399,9 @@ typedef struct TuvrenQueryResult {
  * TuvrenCollectionScrollPositionPayload plus any UTF-8 anchor key in the same
  * output buffer; key_offset is relative to the output-buffer start. A missing
  * anchor uses key_tag/key offsets/key number zero. String and numeric anchors
- * follow the same canonical key rules as Collection mutations.
+ * follow the same canonical key rules as Collection mutations. The executor
+ * copies committed results into the SDK controller cache; public
+ * lastScrollPosition() access never calls this query synchronously.
  * TERMINAL_CAPABILITIES writes exactly one
  * TuvrenTerminalCapabilitiesPayload. Every BUFFER_TOO_SMALL response reports
  * required_bytes and writes no partial semantic value. */
@@ -1550,7 +1574,7 @@ TUVREN_API int32_t tui_context_check_leaks(
  * tui_error_copy writes one bounded UTF-8 JSON object into caller-owned output.
  */
 
-TUVREN_STATIC_ASSERT(sizeof(TuvrenContextOptions) == 40, "TuvrenContextOptions ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenContextOptions) == 48, "TuvrenContextOptions ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTransactionHeader) == 48, "TuvrenTransactionHeader ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTransactionCommand) == 40, "TuvrenTransactionCommand ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenNodeMapping) == 8, "TuvrenNodeMapping ABI size");
@@ -1577,7 +1601,7 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenTextValidationRuleRecord) == 32, "TuvrenTextVa
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 48, "TuvrenTextEditPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 80, "TuvrenCollectionMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionItemRecord) == 40, "TuvrenCollectionItemRecord ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionScrollPositionPayload) == 48, "TuvrenCollectionScrollPositionPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionScrollPositionPayload) == 64, "TuvrenCollectionScrollPositionPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 72, "TuvrenTranscriptMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptBlockRecord) == 32, "TuvrenTranscriptBlockRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");

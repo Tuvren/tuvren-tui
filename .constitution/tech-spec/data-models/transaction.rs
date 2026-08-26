@@ -86,12 +86,31 @@ pub enum NodeReference {
 #[derive(Clone, Debug)]
 pub enum ValidatedPayload<'a> {
     None,
-    Create { local: NodeReference, primitive: u16 },
-    Child { parent: NodeReference, child: NodeReference, index: u32 },
-    ScalarU64 { property: u32, value: u64 },
-    ScalarI64 { property: u32, value: i64 },
-    ScalarF64 { property: u32, value: f64 },
-    Bytes { property: u32, value: &'a [u8] },
+    Create {
+        local: NodeReference,
+        primitive: u16,
+    },
+    Child {
+        parent: NodeReference,
+        child: NodeReference,
+        index: u32,
+    },
+    ScalarU64 {
+        property: u32,
+        value: u64,
+    },
+    ScalarI64 {
+        property: u32,
+        value: i64,
+    },
+    ScalarF64 {
+        property: u32,
+        value: f64,
+    },
+    Bytes {
+        property: u32,
+        value: &'a [u8],
+    },
     Layout(LayoutPayload<'a>),
     Style(StylePayload<'a>),
     TextContent(TextContentPayload<'a>),

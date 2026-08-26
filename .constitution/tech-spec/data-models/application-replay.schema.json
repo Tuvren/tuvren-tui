@@ -140,7 +140,8 @@
         "action": { "enum": ["press", "repeat", "release"] },
         "keyCode": {
           "oneOf": [
-            { "type": "integer", "minimum": 0, "maximum": 1114111 },
+            { "type": "integer", "minimum": 0, "maximum": 55295 },
+            { "type": "integer", "minimum": 57344, "maximum": 1114111 },
             {
               "enum": [
                 1114112, 1114113, 1114114, 1114115, 1114116, 1114117, 1114118,
@@ -218,10 +219,26 @@
       "properties": {
         "cellX": { "type": "integer", "minimum": 0, "maximum": 2999 },
         "cellY": { "type": "integer", "minimum": 0, "maximum": 999 },
-        "deltaRows": { "type": "number" },
-        "deltaColumns": { "type": "number" },
-        "deltaPixelX": { "type": "number" },
-        "deltaPixelY": { "type": "number" },
+        "deltaRows": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "deltaColumns": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "deltaPixelX": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
+        "deltaPixelY": {
+          "type": "integer",
+          "minimum": -2147483648,
+          "maximum": 2147483647
+        },
         "modifiers": { "$ref": "#/$defs/modifiers" }
       }
     },

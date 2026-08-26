@@ -5,6 +5,8 @@
     "expectations.afterEvent is a zero-based event index strictly less than events.length",
     "expectations.afterEvent values are unique and ordered increasingly",
     "each expectation snapshot passes validateDiagnosticSnapshotRuns",
+    "key keyCode is either a Unicode scalar excluding UTF-16 surrogates or one registered named-key code",
+    "wheel row, column, and pixel deltas are signed 32-bit integers and therefore encode without rounding or saturation",
     "external-update numbers are finite and every encoded string and aggregate payload stays inside durable-file-limits.json"
   ]
 }

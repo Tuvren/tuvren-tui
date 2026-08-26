@@ -2,6 +2,15 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.12] — 2026-08-26
+
+### Fixed
+
+- Separated Trace-owned record identity from backward parent linkage and restricted runtime replay to confirmed no-wrap capture from context initialization using exact Event and transaction batches.
+- Preserved semantic string/number/boolean scalar types through tagged native storage and ABI encoding; added Issue registry validation and wire-exact replay key/wheel constraints.
+- Defined Collection scroll-position access as an executor-populated committed cache observation and made controlled Collection selection paths intent-only until the controlling prop commits.
+- Added contextually unavailable Command completion/error mapping and split static contract self-validation from post-implementation ABI parity work.
+
 ## [v9.0.11] — 2026-08-26
 
 ### Fixed

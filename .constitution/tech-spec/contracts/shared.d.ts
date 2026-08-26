@@ -481,6 +481,22 @@ export type StateAuthority<
       readonly [Key in Uncontrolled]?: Value;
     });
 
+export type SelectionAuthority<
+  Value,
+  Controlled extends string,
+  Uncontrolled extends string,
+> =
+  | ({ readonly [Key in Controlled]: Value } & {
+      readonly [Key in Uncontrolled]?: never;
+    } & {
+      readonly onSelectionChange: (value: Value) => void;
+    })
+  | ({ readonly [Key in Controlled]?: never } & {
+      readonly [Key in Uncontrolled]?: Value;
+    } & {
+      readonly onSelectionChange?: (value: Value) => void;
+    });
+
 export type InputProps = CommonProps<
   "root" | "value" | "placeholder" | "cursor"
 > &
@@ -611,7 +627,7 @@ export interface CollectionController<T> {
   focusKey(key: CollectionKey | undefined): void;
   setSelection(keys: readonly CollectionKey[]): void;
   visibleRange(): Readonly<{ start: number; end: number; generation: number }>;
-  scrollPosition(): CollectionScrollPosition;
+  lastScrollPosition(): CollectionScrollPosition | undefined;
 }
 
 export interface CollectionScrollPosition {
@@ -619,6 +635,8 @@ export interface CollectionScrollPosition {
   readonly offsetRows: number;
   readonly offsetPixels?: number;
   readonly generation: number;
+  readonly observedTransactionId: bigint;
+  readonly observedRenderRequestId: bigint;
 }
 
 export interface VirtualCollectionObservers<T> {
@@ -674,10 +692,13 @@ export type TableProps<
   RenderE = never,
   RenderR = never,
 > = CommonProps<"root" | "header" | "row" | "cell"> &
-  VirtualCollectionBinding<T, LoadResult, Mutations> & {
+  VirtualCollectionBinding<T, LoadResult, Mutations> &
+  SelectionAuthority<
+    readonly CollectionKey[],
+    "selectedKeys",
+    "defaultSelectedKeys"
+  > & {
     readonly columns: readonly TableColumn<T, RenderE, RenderR>[];
-    readonly selectedKeys?: readonly CollectionKey[];
-    readonly onSelectionChange?: (keys: readonly CollectionKey[]) => void;
   };
 export interface TranscriptBlock {
   readonly id: TranscriptBlockId;
@@ -788,14 +809,14 @@ export type SelectProps<
   RenderR = never,
 > = CommonProps<"root" | "trigger" | "list" | "option"> &
   VirtualCollectionBinding<T, LoadResult, Mutations> &
-  FormControlProps<CollectionKey | undefined> & {
-    readonly renderItem: (item: T) => View<RenderE, RenderR>;
-    readonly onSelectionChange?: (key: CollectionKey | undefined) => void;
-  } & StateAuthority<
+  FormControlProps<CollectionKey | undefined> &
+  SelectionAuthority<
     CollectionKey | undefined,
     "selectedKey",
     "defaultSelectedKey"
-  >;
+  > & {
+    readonly renderItem: (item: T) => View<RenderE, RenderR>;
+  };
 
 export type ComponentPropsWithChildren<Props, E, R> = Props extends unknown
   ? Omit<Props, "children"> & {
@@ -1050,6 +1071,7 @@ export type TuvrenErrorCode =
   | "TUVREN_QUEUE_SATURATED"
   | "TUVREN_COMMAND_NOT_REGISTERED"
   | "TUVREN_COMMAND_DISABLED"
+  | "TUVREN_COMMAND_UNAVAILABLE"
   | "TUVREN_COMMAND_INTERRUPTED"
   | "TUVREN_COMMAND_REJECTED"
   | "TUVREN_CLIPBOARD_UNAVAILABLE"
@@ -1110,6 +1132,7 @@ export class TuvrenResourceError extends TuvrenError<
 export class TuvrenCommandError extends TuvrenError<
   | "TUVREN_COMMAND_NOT_REGISTERED"
   | "TUVREN_COMMAND_DISABLED"
+  | "TUVREN_COMMAND_UNAVAILABLE"
   | "TUVREN_COMMAND_INTERRUPTED"
   | "TUVREN_COMMAND_REJECTED"
 > {

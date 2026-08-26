@@ -11,6 +11,7 @@
     "terminalProfile",
     "redaction",
     "replay",
+    "capture",
     "rootCorrelation",
     "records",
     "snapshots",
@@ -53,13 +54,23 @@
         "applicationInput": { "enum": ["available", "redacted"] }
       }
     },
+    "capture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["startedAt", "completePrefix"],
+      "properties": {
+        "startedAt": { "enum": ["context-initialization", "attached"] },
+        "completePrefix": { "type": "boolean" }
+      }
+    },
     "rootCorrelation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["contextId", "initialSequence"],
+      "required": ["contextId", "initialSequence", "initialRecordId"],
       "properties": {
         "contextId": { "type": "string", "minLength": 1 },
-        "initialSequence": { "type": "string", "pattern": "^[0-9]+$" }
+        "initialSequence": { "type": "string", "pattern": "^[0-9]+$" },
+        "initialRecordId": { "type": "string", "minLength": 1 }
       }
     },
     "wrapCount": { "type": "integer", "minimum": 0 },
@@ -92,6 +103,7 @@
         "timestampNanos": { "type": "string", "pattern": "^[0-9]+$" },
         "kind": {
           "enum": [
+            "context",
             "input",
             "event",
             "command",
@@ -113,9 +125,11 @@
         "correlation": {
           "type": "object",
           "additionalProperties": false,
-          "minProperties": 1,
+          "required": ["recordId", "contextId"],
           "properties": {
+            "recordId": { "type": "string", "minLength": 1 },
             "contextId": { "type": "string", "minLength": 1 },
+            "parentRecordId": { "type": "string", "minLength": 1 },
             "eventId": { "type": "string", "minLength": 1 },
             "commandId": { "type": "string", "minLength": 1 },
             "effectSpanId": { "type": "string", "minLength": 1 },

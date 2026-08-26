@@ -68,6 +68,12 @@
       "componentContext": true
     },
     {
+      "code": "TUVREN_COMMAND_UNAVAILABLE",
+      "category": "command",
+      "operation": "command.invoke",
+      "componentContext": true
+    },
+    {
       "code": "TUVREN_COMMAND_INTERRUPTED",
       "category": "command",
       "operation": "command.interrupt",

@@ -9,6 +9,7 @@
     "semanticTree ids are unique and every child and relationship target names an existing semanticTree id",
     "a nonempty semanticTree has exactly one root, every other node has exactly one parent, and child edges contain no self-edge or cycle",
     "every semanticTree node is reachable from the root and no child appears twice under one parent",
-    "Semantic value and state entries match the exact scalar declaration contract"
+    "Semantic value and state entries match the exact scalar declaration contract",
+    "each Issue code, category, operation tuple matches one entry in error-codes.json"
   ]
 }
