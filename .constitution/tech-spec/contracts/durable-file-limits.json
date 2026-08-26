@@ -8,8 +8,8 @@
       "maxStringBytes": 16384
     },
     "diagnostic-snapshot": {
-      "maxEncodedBytes": 33554432,
-      "maxDecodedBytes": 134217728,
+      "maxEncodedBytes": 536870912,
+      "maxDecodedBytes": 1073741824,
       "maxDepth": 32,
       "maxStringBytes": 8388608
     },

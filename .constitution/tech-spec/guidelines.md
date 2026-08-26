@@ -8,6 +8,8 @@
 
 ```text
 tuvren-tui/
+├── package.json                      # Private Bun workspace and canonical scripts
+├── bun.lock                          # Canonical host/workspace dependency lock
 ├── native/
 │   ├── src/
 │   │   ├── lib.rs                    # Private C ABI entrypoints only
@@ -38,8 +40,7 @@ tuvren-tui/
 │   │   └── jsx/                      # JSX transforms and private reconciler
 │   ├── test/
 │   ├── package.json
-│   ├── tsconfig.json
-│   └── bun.lock
+│   └── tsconfig.json
 ├── packages/                         # Private exact-version platform packages
 ├── examples/
 │   ├── flagship/                     # Dashboard/form, editor/inspector, streaming, inline/split
@@ -131,6 +132,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Platform packages and ABI versions are exact-match implementation details; no cross-version ABI compatibility is promised.
 - Durable schema readers reject unknown major versions and may accept known older majors only through explicit migrations.
 - Before decompression or object allocation, durable readers enforce the encoded size from `contracts/durable-file-limits.json`. Streaming parsers enforce the decoded size, nesting depth, and per-string UTF-8 byte limit during parsing; decompression aborts at the decoded expansion bound. Schema array maxima are additional constraints, not substitutes for byte and depth limits.
+- Diagnostic snapshots encode the dense Surface as `row-major-rle-v1`. A cross-field validator requires every run count to be positive and their checked sum to equal `width × height`; reconstruction expands runs in row-major order and rejects overflow, underfill, or trailing cells. This keeps ordinary snapshots compact while still representing the 3,000 × 1,000 stretch Surface inside an explicit 512 MiB encoded/1 GiB decoded ceiling.
 - Historical schema files never change after publication. Readers consult `contracts/schema-migrations.json`, migrate only registered versions into the current in-memory model, and reject unknown versions before interpreting payload fields.
 
 ## Commits
@@ -139,7 +141,7 @@ Use Conventional Commits with a descriptive subject and body when the change has
 
 ## Verification commands
 
-### Existing commands
+### Brownfield commands that exist before migration
 
 ```bash
 cargo build --manifest-path native/Cargo.toml --release
@@ -165,6 +167,7 @@ bun run ts/bench-render.ts
 Stage 4 must schedule these commands before relying on them as gates:
 
 ```bash
+bun install --frozen-lockfile    # Install the target root workspace and produce no nested ts lock
 bun run check:contracts          # Typecheck declarations, compile ABI header, validate every JSON Schema and contract file
 bun ts/node_modules/typescript/bin/tsc -p ts/tsconfig.json --noEmit # Brownfield: currently exits 2 with 188 errors; Stage 4 schedules repair
 bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile

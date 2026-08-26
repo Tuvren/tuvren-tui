@@ -245,14 +245,111 @@ export interface TerminalProfile {
   }>;
 }
 
-export interface TuvrenEvent<Payload = unknown> {
-  readonly id: bigint;
-  readonly type: string;
-  readonly target?: ComponentId;
-  readonly timestampNanos: bigint;
-  readonly cancelable: boolean;
-  readonly payload: Payload;
+export interface TuvrenEventPayloadMap {
+  readonly key: Readonly<{
+    action: "press" | "repeat" | "release";
+    keyCode: number;
+    physicalCode?: number;
+    text?: string;
+    modifiers: readonly ("shift" | "control" | "alt" | "super")[];
+  }>;
+  readonly text: Readonly<{ text: string }>;
+  readonly pointerMove: Readonly<{
+    cellX: number;
+    cellY: number;
+    pixelX?: number;
+    pixelY?: number;
+    buttons: readonly number[];
+    modifiers: readonly string[];
+  }>;
+  readonly pointerButton: Readonly<{
+    action: "press" | "release";
+    cellX: number;
+    cellY: number;
+    button: number;
+    clickCount: number;
+    modifiers: readonly string[];
+  }>;
+  readonly wheel: Readonly<{
+    cellX: number;
+    cellY: number;
+    deltaRows: number;
+    deltaColumns: number;
+    deltaPixelX?: number;
+    deltaPixelY?: number;
+    modifiers: readonly string[];
+  }>;
+  readonly focus: Readonly<Record<never, never>>;
+  readonly blur: Readonly<Record<never, never>>;
+  readonly resize: Readonly<{
+    widthCells: number;
+    heightCells: number;
+    widthPixels?: number;
+    heightPixels?: number;
+    cellWidthPixels?: number;
+    cellHeightPixels?: number;
+  }>;
+  readonly paste: Readonly<{ text: string; truncated: boolean }>;
+  readonly clipboard: Readonly<{
+    requestId: bigint;
+    status:
+      | "unavailable"
+      | "denied"
+      | "busy"
+      | "completed"
+      | "malformed"
+      | "timed-out";
+    target: ClipboardTarget;
+    mediaType?: string;
+    bytes?: Uint8Array;
+    finalChunk: boolean;
+  }>;
+  readonly range: Readonly<{
+    state: "loading" | "empty" | "ready" | "error";
+    start: number;
+    count: number;
+    totalCount: number;
+    generation: number;
+    retryable: boolean;
+    message?: string;
+  }>;
+  readonly eviction: Readonly<{
+    resource: "collection" | "transcript";
+    identities: readonly (CollectionKey | TranscriptBlockId)[];
+    generation: number;
+  }>;
+  readonly animation: Readonly<{
+    animationId: bigint;
+    status: "completed" | "cancelled" | "replaced";
+  }>;
+  readonly announcement: Readonly<{
+    text: string;
+    politeness: "polite" | "assertive";
+  }>;
+  readonly terminal: Readonly<{
+    kind:
+      | "capabilities-changed"
+      | "suspended"
+      | "resumed"
+      | "disconnected"
+      | "write-failed";
+    status: string;
+    capabilities?: TerminalCapabilities;
+  }>;
 }
+
+export type TuvrenEvent<
+  Type extends keyof TuvrenEventPayloadMap = keyof TuvrenEventPayloadMap,
+> = {
+  readonly [Kind in Type]: {
+    readonly id: bigint;
+    readonly type: Kind;
+    readonly target?: ComponentId;
+    readonly timestampNanos: bigint;
+    readonly cancelable: boolean;
+    readonly payload: TuvrenEventPayloadMap[Kind];
+  };
+}[Type];
 
 export interface SemanticSpec {
   readonly role?: string;
@@ -618,7 +715,7 @@ export interface AnimationSpec {
   readonly to: number | Color;
   readonly durationMs: number;
   readonly delayMs?: number;
-  readonly easing?: string;
+  readonly easing?: "linear" | "ease-in" | "ease-out" | "ease-in-out";
   readonly repeat?: number | "infinite";
   readonly reverse?: boolean;
   readonly reducedMotion?: "finish" | "skip" | "replace";

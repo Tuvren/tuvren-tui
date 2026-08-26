@@ -150,6 +150,10 @@ pub struct TranscriptPayload<'a> {
 pub struct AnimationPayload {
     pub property: u16,
     pub animation_id: u64,
+    pub timeline_id: u64,
+    pub easing: u16,
+    pub timeline_mode: u16,
+    pub sequence_index: u32,
     pub duration_nanos: u64,
     pub delay_nanos: u64,
 }

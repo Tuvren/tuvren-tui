@@ -1,0 +1,10 @@
+{
+  "validator": "validateDiagnosticSnapshotRuns",
+  "invariants": [
+    "surface.cellEncoding equals row-major-rle-v1",
+    "each cellRuns item has count greater than zero",
+    "checked sum of cellRuns[*].count equals checked surface.width multiplied by surface.height",
+    "runs expand consecutively in row-major order with no omitted or trailing cells",
+    "cursor coordinates, when present, are inside the Surface"
+  ]
+}

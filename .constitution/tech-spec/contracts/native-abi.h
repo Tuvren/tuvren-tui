@@ -27,6 +27,65 @@ extern "C" {
 #define TUVREN_DIMENSION_HAS_MINIMUM 0x0001u
 #define TUVREN_DIMENSION_HAS_PREFERRED 0x0002u
 #define TUVREN_DIMENSION_HAS_MAXIMUM 0x0004u
+#define TUVREN_RESPONSIVE_MIN_WIDTH_CELLS 0x00000001u
+#define TUVREN_RESPONSIVE_MAX_WIDTH_CELLS 0x00000002u
+#define TUVREN_RESPONSIVE_MIN_HEIGHT_CELLS 0x00000004u
+#define TUVREN_RESPONSIVE_MAX_HEIGHT_CELLS 0x00000008u
+#define TUVREN_RESPONSIVE_MIN_WIDTH_PERCENT 0x00000010u
+#define TUVREN_RESPONSIVE_MAX_WIDTH_PERCENT 0x00000020u
+#define TUVREN_RESPONSIVE_MIN_HEIGHT_PERCENT 0x00000040u
+#define TUVREN_RESPONSIVE_MAX_HEIGHT_PERCENT 0x00000080u
+#define TUVREN_STYLE_HAS_FOREGROUND 0x00000001u
+#define TUVREN_STYLE_HAS_BACKGROUND 0x00000002u
+#define TUVREN_STYLE_HAS_ATTRIBUTES 0x00000004u
+#define TUVREN_STYLE_HAS_BORDER 0x00000008u
+#define TUVREN_STYLE_HAS_PADDING 0x00000010u
+#define TUVREN_STYLE_HAS_OPACITY 0x00000020u
+#define TUVREN_STYLE_HAS_RULES 0x00000040u
+#define TUVREN_STYLE_ATTR_BOLD 0x00000001u
+#define TUVREN_STYLE_ATTR_ITALIC 0x00000002u
+#define TUVREN_STYLE_ATTR_UNDERLINE 0x00000004u
+#define TUVREN_STYLE_ATTR_DIM 0x00000008u
+#define TUVREN_STYLE_ATTR_INVERSE 0x00000010u
+#define TUVREN_ANIMATION_HAS_FROM 0x00000001u
+#define TUVREN_ANIMATION_REPEAT_INFINITE 0x00000002u
+#define TUVREN_ANIMATION_REVERSE 0x00000004u
+#define TUVREN_DIAGNOSTIC_REDACTED 0x00000001u
+#define TUVREN_DIAGNOSTIC_RING_WRAPPED 0x00000002u
+#define TUVREN_DIAGNOSTIC_SNAPSHOT_BOUNDARY 0x00000004u
+#define TUVREN_EVENT_MOD_SHIFT 0x00000001u
+#define TUVREN_EVENT_MOD_CONTROL 0x00000002u
+#define TUVREN_EVENT_MOD_ALT 0x00000004u
+#define TUVREN_EVENT_MOD_SUPER 0x00000008u
+#define TUVREN_CAP_SYNC_OUTPUT 0x0000000000000001ull
+#define TUVREN_CAP_HYPERLINKS 0x0000000000000002ull
+#define TUVREN_CAP_ENHANCED_KEYBOARD 0x0000000000000004ull
+#define TUVREN_CAP_POINTER 0x0000000000000008ull
+#define TUVREN_CAP_FOCUS 0x0000000000000010ull
+#define TUVREN_CAP_PASTE_EVENTS 0x0000000000000020ull
+#define TUVREN_CAP_RICH_CLIPBOARD 0x0000000000000040ull
+#define TUVREN_CAP_PIXEL_GEOMETRY 0x0000000000000080ull
+#define TUVREN_CAP_THEME_DETECTION 0x0000000000000100ull
+#define TUVREN_CAP_PALETTE_DETECTION 0x0000000000000200ull
+#define TUVREN_CAP_WIDTH_NEGOTIATION 0x0000000000000400ull
+#define TUVREN_STYLE_STATE_FOCUSED 0x0000000000000001ull
+#define TUVREN_STYLE_STATE_POINTER_OVER 0x0000000000000002ull
+#define TUVREN_STYLE_STATE_ACTIVE 0x0000000000000004ull
+#define TUVREN_STYLE_STATE_DISABLED 0x0000000000000008ull
+#define TUVREN_STYLE_STATE_SELECTED 0x0000000000000010ull
+#define TUVREN_STYLE_STATE_CHECKED 0x0000000000000020ull
+#define TUVREN_STYLE_STATE_MIXED 0x0000000000000040ull
+#define TUVREN_STYLE_STATE_EXPANDED 0x0000000000000080ull
+#define TUVREN_STYLE_STATE_INVALID 0x0000000000000100ull
+#define TUVREN_PASTE_TRUNCATED 0x0001u
+#define TUVREN_CLIPBOARD_FINAL_CHUNK 0x00000001u
+#define TUVREN_RANGE_RETRYABLE 0x00000001u
+#define TUVREN_TRANSCRIPT_STREAMING 0x00000001u
+#define TUVREN_TRANSCRIPT_COLLAPSED 0x00000002u
+#define TUVREN_TRANSCRIPT_SELECTED 0x00000004u
+#define TUVREN_TRANSCRIPT_LIVE_EDGE 0x00000008u
+#define TUVREN_DIAGNOSTIC_CONFIG_INCLUDE_FULL_CONTENT 0x00000001u
+#define TUVREN_DIAGNOSTIC_CONFIG_INCLUDE_SOURCE 0x00000002u
 #define TUVREN_NODE_REF_LOCAL_BIT 0x80000000u
 #define TUVREN_MAX_TRANSACTION_BYTES (8u * 1024u * 1024u)
 #define TUVREN_MAX_TRANSACTION_COMMANDS 65535u
@@ -54,6 +113,20 @@ typedef enum TuvrenContextMode {
     TUVREN_CONTEXT_INTERACTIVE = 1,
     TUVREN_CONTEXT_HEADLESS = 2
 } TuvrenContextMode;
+
+typedef enum TuvrenScreenMode {
+    TUVREN_SCREEN_ALTERNATE = 1,
+    TUVREN_SCREEN_INLINE = 2,
+    TUVREN_SCREEN_SPLIT_FOOTER = 3,
+    TUVREN_SCREEN_HEADLESS = 4
+} TuvrenScreenMode;
+
+typedef enum TuvrenExternalOutputMode {
+    TUVREN_OUTPUT_CAPTURE = 1,
+    TUVREN_OUTPUT_SCROLLBACK = 2,
+    TUVREN_OUTPUT_PASSTHROUGH = 3,
+    TUVREN_OUTPUT_DISABLED = 4
+} TuvrenExternalOutputMode;
 
 typedef enum TuvrenTransactionOpcode {
     TUVREN_TX_CREATE_NODE = 1,
@@ -191,6 +264,110 @@ typedef enum TuvrenGridTrackKind {
     TUVREN_GRID_TRACK_MINMAX = 3
 } TuvrenGridTrackKind;
 
+typedef enum TuvrenBorderKind {
+    TUVREN_BORDER_NONE = 0,
+    TUVREN_BORDER_SINGLE = 1,
+    TUVREN_BORDER_DOUBLE = 2,
+    TUVREN_BORDER_ROUNDED = 3,
+    TUVREN_BORDER_HEAVY = 4
+} TuvrenBorderKind;
+
+typedef enum TuvrenSemanticPayloadKind {
+    TUVREN_SEMANTIC_STATES = 1,
+    TUVREN_SEMANTIC_RELATIONSHIPS = 2
+} TuvrenSemanticPayloadKind;
+
+typedef enum TuvrenAnimationProperty {
+    TUVREN_ANIMATE_FOREGROUND = 1,
+    TUVREN_ANIMATE_BACKGROUND = 2,
+    TUVREN_ANIMATE_OPACITY = 3,
+    TUVREN_ANIMATE_POSITION_X = 4,
+    TUVREN_ANIMATE_POSITION_Y = 5,
+    TUVREN_ANIMATE_WIDTH = 6,
+    TUVREN_ANIMATE_HEIGHT = 7,
+    TUVREN_ANIMATE_SCROLL_ROW = 8,
+    TUVREN_ANIMATE_SCROLL_COLUMN = 9
+} TuvrenAnimationProperty;
+
+typedef enum TuvrenAnimationEasing {
+    TUVREN_EASING_LINEAR = 1,
+    TUVREN_EASING_EASE_IN = 2,
+    TUVREN_EASING_EASE_OUT = 3,
+    TUVREN_EASING_EASE_IN_OUT = 4
+} TuvrenAnimationEasing;
+
+typedef enum TuvrenAnimationTimelineMode {
+    TUVREN_TIMELINE_SEQUENCE = 1,
+    TUVREN_TIMELINE_PARALLEL = 2
+} TuvrenAnimationTimelineMode;
+
+typedef enum TuvrenPointerButton {
+    TUVREN_POINTER_PRIMARY = 1,
+    TUVREN_POINTER_MIDDLE = 2,
+    TUVREN_POINTER_SECONDARY = 3,
+    TUVREN_POINTER_AUXILIARY_1 = 4,
+    TUVREN_POINTER_AUXILIARY_2 = 5
+} TuvrenPointerButton;
+
+typedef enum TuvrenNamedKeyCode {
+    TUVREN_KEY_ENTER = 0x00110000,
+    TUVREN_KEY_ESCAPE = 0x00110001,
+    TUVREN_KEY_BACKSPACE = 0x00110002,
+    TUVREN_KEY_TAB = 0x00110003,
+    TUVREN_KEY_DELETE = 0x00110004,
+    TUVREN_KEY_INSERT = 0x00110005,
+    TUVREN_KEY_HOME = 0x00110006,
+    TUVREN_KEY_END = 0x00110007,
+    TUVREN_KEY_PAGE_UP = 0x00110008,
+    TUVREN_KEY_PAGE_DOWN = 0x00110009,
+    TUVREN_KEY_ARROW_UP = 0x0011000A,
+    TUVREN_KEY_ARROW_DOWN = 0x0011000B,
+    TUVREN_KEY_ARROW_LEFT = 0x0011000C,
+    TUVREN_KEY_ARROW_RIGHT = 0x0011000D,
+    TUVREN_KEY_F1 = 0x00110101,
+    TUVREN_KEY_F24 = 0x00110118
+} TuvrenNamedKeyCode;
+/* Function-key codes F1 through F24 are contiguous from TUVREN_KEY_F1. */
+
+typedef enum TuvrenIdentityTag {
+    TUVREN_IDENTITY_UTF8 = 1,
+    TUVREN_IDENTITY_NUMBER = 2,
+    TUVREN_IDENTITY_NODE = 3
+} TuvrenIdentityTag;
+
+typedef enum TuvrenTerminalTier {
+    TUVREN_TERMINAL_MODERN = 1,
+    TUVREN_TERMINAL_COMPATIBLE = 2
+} TuvrenTerminalTier;
+
+typedef enum TuvrenTerminalTheme {
+    TUVREN_TERMINAL_THEME_UNKNOWN = 0,
+    TUVREN_TERMINAL_THEME_LIGHT = 1,
+    TUVREN_TERMINAL_THEME_DARK = 2
+} TuvrenTerminalTheme;
+
+typedef enum TuvrenTerminalMultiplexer {
+    TUVREN_MULTIPLEXER_NONE = 0,
+    TUVREN_MULTIPLEXER_TMUX = 1,
+    TUVREN_MULTIPLEXER_ZELLIJ = 2,
+    TUVREN_MULTIPLEXER_SCREEN = 3,
+    TUVREN_MULTIPLEXER_UNKNOWN = 4
+} TuvrenTerminalMultiplexer;
+
+typedef enum TuvrenAmbiguousWidth {
+    TUVREN_AMBIGUOUS_WIDTH_NEGOTIATED = 0,
+    TUVREN_AMBIGUOUS_WIDTH_ONE = 1,
+    TUVREN_AMBIGUOUS_WIDTH_TWO = 2
+} TuvrenAmbiguousWidth;
+
+typedef enum TuvrenTerminalEventKind {
+    TUVREN_TERMINAL_CAPABILITIES_CHANGED = 1,
+    TUVREN_TERMINAL_SUSPENDED = 2,
+    TUVREN_TERMINAL_RESUMED = 3,
+    TUVREN_TERMINAL_DISCONNECTED = 4,
+    TUVREN_TERMINAL_WRITE_FAILED = 5
+} TuvrenTerminalEventKind;
+
 typedef enum TuvrenTextEditKind {
     TUVREN_TEXT_INSERT = 1,
     TUVREN_TEXT_DELETE = 2,
@@ -319,13 +496,223 @@ typedef enum TuvrenEventType {
     TUVREN_EVENT_TERMINAL = 15
 } TuvrenEventType;
 
-typedef struct TuvrenContextOptions {
+typedef enum TuvrenKeyAction {
+    TUVREN_KEY_PRESS = 1,
+    TUVREN_KEY_REPEAT = 2,
+    TUVREN_KEY_RELEASE = 3
+} TuvrenKeyAction;
+
+typedef enum TuvrenPointerButtonAction {
+    TUVREN_POINTER_PRESS = 1,
+    TUVREN_POINTER_RELEASE = 2
+} TuvrenPointerButtonAction;
+
+typedef enum TuvrenClipboardStatus {
+    TUVREN_CLIPBOARD_UNAVAILABLE = 1,
+    TUVREN_CLIPBOARD_DENIED = 2,
+    TUVREN_CLIPBOARD_BUSY = 3,
+    TUVREN_CLIPBOARD_COMPLETED = 4,
+    TUVREN_CLIPBOARD_MALFORMED = 5,
+    TUVREN_CLIPBOARD_TIMED_OUT = 6
+} TuvrenClipboardStatus;
+
+typedef enum TuvrenRangeState {
+    TUVREN_RANGE_LOADING = 1,
+    TUVREN_RANGE_EMPTY = 2,
+    TUVREN_RANGE_READY = 3,
+    TUVREN_RANGE_ERROR = 4
+} TuvrenRangeState;
+
+typedef enum TuvrenAnimationStatus {
+    TUVREN_ANIMATION_COMPLETED = 1,
+    TUVREN_ANIMATION_CANCELLED = 2,
+    TUVREN_ANIMATION_REPLACED = 3
+} TuvrenAnimationStatus;
+
+typedef enum TuvrenAnnouncementPoliteness {
+    TUVREN_ANNOUNCEMENT_POLITE = 1,
+    TUVREN_ANNOUNCEMENT_ASSERTIVE = 2
+} TuvrenAnnouncementPoliteness;
+
+typedef enum TuvrenDiagnosticKind {
+    TUVREN_DIAGNOSTIC_INPUT = 1,
+    TUVREN_DIAGNOSTIC_EVENT = 2,
+    TUVREN_DIAGNOSTIC_COMMAND = 3,
+    TUVREN_DIAGNOSTIC_EFFECT_SPAN = 4,
+    TUVREN_DIAGNOSTIC_RECONCILE = 5,
+    TUVREN_DIAGNOSTIC_TRANSACTION = 6,
+    TUVREN_DIAGNOSTIC_MUTATION = 7,
+    TUVREN_DIAGNOSTIC_DIRTY = 8,
+    TUVREN_DIAGNOSTIC_LAYOUT = 9,
+    TUVREN_DIAGNOSTIC_TEXT = 10,
+    TUVREN_DIAGNOSTIC_RENDER = 11,
+    TUVREN_DIAGNOSTIC_DIFF = 12,
+    TUVREN_DIAGNOSTIC_TERMINAL_WRITE = 13,
+    TUVREN_DIAGNOSTIC_ERROR = 14,
+    TUVREN_DIAGNOSTIC_CLEANUP = 15,
+    TUVREN_DIAGNOSTIC_UNATTRIBUTED = 16
+} TuvrenDiagnosticKind;
+
+typedef struct TuvrenKeyEventPayload {
     uint16_t size;
-    uint16_t mode;
+    uint16_t action; /* TuvrenKeyAction */
+    uint32_t modifiers;
+    uint32_t key_code; /* Unicode scalar or TuvrenNamedKeyCode */
+    uint32_t physical_code; /* USB HID usage ID; 0 when unavailable */
+    uint32_t text_offset;
+    uint32_t text_length;
+} TuvrenKeyEventPayload;
+
+typedef struct TuvrenTextEventPayload {
+    uint16_t size;
+    uint16_t reserved;
+    uint32_t utf8_offset;
+    uint32_t utf8_length;
+} TuvrenTextEventPayload;
+
+typedef struct TuvrenPointerMoveEventPayload {
+    uint16_t size;
+    uint16_t reserved;
+    int32_t cell_x;
+    int32_t cell_y;
+    int32_t pixel_x;
+    int32_t pixel_y;
+    uint32_t buttons_mask; /* bit (TuvrenPointerButton - 1) */
+    uint32_t modifiers;
+} TuvrenPointerMoveEventPayload;
+
+typedef struct TuvrenPointerButtonEventPayload {
+    uint16_t size;
+    uint16_t action; /* TuvrenPointerButtonAction */
+    int32_t cell_x;
+    int32_t cell_y;
+    uint32_t button; /* TuvrenPointerButton */
+    uint32_t click_count;
+    uint32_t modifiers;
+    uint32_t reserved;
+} TuvrenPointerButtonEventPayload;
+
+typedef struct TuvrenWheelEventPayload {
+    uint16_t size;
+    uint16_t reserved;
+    int32_t cell_x;
+    int32_t cell_y;
+    int32_t delta_rows;
+    int32_t delta_columns;
+    int32_t delta_pixel_x;
+    int32_t delta_pixel_y;
+    uint32_t modifiers;
+    uint32_t reserved1;
+} TuvrenWheelEventPayload;
+
+typedef struct TuvrenResizeEventPayload {
+    uint16_t size;
+    uint16_t reserved;
     uint32_t width_cells;
     uint32_t height_cells;
-    uint32_t screen_mode;
-    uint32_t external_output_mode;
+    uint32_t width_pixels;
+    uint32_t height_pixels;
+    uint32_t cell_width_pixels;
+    uint32_t cell_height_pixels;
+} TuvrenResizeEventPayload;
+
+typedef struct TuvrenPasteEventPayload {
+    uint16_t size;
+    uint16_t flags;
+    uint32_t utf8_offset;
+    uint32_t utf8_length;
+} TuvrenPasteEventPayload;
+
+typedef struct TuvrenClipboardEventPayload {
+    uint16_t size;
+    uint16_t status; /* TuvrenClipboardStatus */
+    uint32_t target; /* TuvrenClipboardTarget */
+    uint32_t media_type_offset;
+    uint32_t media_type_length;
+    uint32_t data_offset;
+    uint32_t data_length;
+    uint64_t request_id;
+    uint32_t flags;
+    uint32_t reserved;
+} TuvrenClipboardEventPayload;
+
+typedef struct TuvrenRangeEventPayload {
+    uint16_t size;
+    uint16_t state; /* TuvrenRangeState */
+    uint32_t start;
+    uint32_t count;
+    uint32_t total_count;
+    uint32_t message_offset;
+    uint32_t message_length;
+    uint32_t flags;
+    uint32_t reserved;
+    uint64_t generation;
+} TuvrenRangeEventPayload;
+
+typedef struct TuvrenEvictionEventPayload {
+    uint16_t size;
+    uint16_t resource_kind; /* TUVREN_PRIMITIVE_COLLECTION or TRANSCRIPT */
+    uint32_t identities_offset;
+    uint32_t identity_count;
+    uint32_t identity_record_bytes;
+    uint64_t generation;
+} TuvrenEvictionEventPayload;
+
+typedef struct TuvrenIdentityRecord {
+    uint16_t size;
+    uint16_t tag; /* TuvrenIdentityTag */
+    uint32_t utf8_offset;
+    uint32_t utf8_length;
+    uint32_t node_reference;
+    double number;
+} TuvrenIdentityRecord;
+
+typedef struct TuvrenAnimationEventPayload {
+    uint16_t size;
+    uint16_t status; /* TuvrenAnimationStatus */
+    uint32_t reserved;
+    uint64_t animation_id;
+} TuvrenAnimationEventPayload;
+
+typedef struct TuvrenAnnouncementEventPayload {
+    uint16_t size;
+    uint16_t politeness; /* TuvrenAnnouncementPoliteness */
+    uint32_t text_offset;
+    uint32_t text_length;
+} TuvrenAnnouncementEventPayload;
+
+typedef struct TuvrenTerminalEventPayload {
+    uint16_t size;
+    uint16_t event_kind; /* TuvrenTerminalEventKind */
+    uint32_t status; /* TuvrenStatus */
+    uint32_t payload_offset;
+    uint32_t payload_length;
+} TuvrenTerminalEventPayload;
+
+typedef struct TuvrenTerminalCapabilitiesPayload {
+    uint16_t size;
+    uint16_t tier; /* TuvrenTerminalTier */
+    uint32_t color_depth; /* 16, 256, or 16777216 */
+    uint64_t capability_flags; /* TUVREN_CAP_* */
+    uint32_t width_cells;
+    uint32_t height_cells;
+    uint32_t terminal_width_pixels;
+    uint32_t terminal_height_pixels;
+    uint32_t cell_width_pixels;
+    uint32_t cell_height_pixels;
+    uint16_t theme; /* TuvrenTerminalTheme */
+    uint16_t multiplexer; /* TuvrenTerminalMultiplexer */
+    uint16_t ambiguous_width; /* TuvrenAmbiguousWidth */
+    uint16_t reserved;
+} TuvrenTerminalCapabilitiesPayload;
+
+typedef struct TuvrenContextOptions {
+    uint16_t size;
+    uint16_t mode; /* TuvrenContextMode */
+    uint32_t width_cells;
+    uint32_t height_cells;
+    uint32_t screen_mode; /* TuvrenScreenMode */
+    uint32_t external_output_mode; /* TuvrenExternalOutputMode */
     uint64_t queue_byte_limit;
     uint64_t diagnostic_byte_limit;
 } TuvrenContextOptions;
@@ -357,6 +744,10 @@ typedef struct TuvrenTransactionCommand {
     uint64_t generation;
 } TuvrenTransactionCommand;
 
+/* TransactionCommand.flags and every field named reserved must be zero in ABI
+ * 2.0. Decoders reject nonzero values so later minor versions may assign them
+ * without ambiguity. */
+
 /* A create command uses target = TUVREN_NODE_REF_LOCAL_BIT | local_id. The
  * runtime allocates the private node ID and returns the mapping after the full
  * transaction commits. Other commands in the same transaction may use that
@@ -368,7 +759,7 @@ typedef struct TuvrenNodeMapping {
 
 typedef struct TuvrenCreateNodePayload {
     uint16_t size;
-    uint16_t primitive_kind;
+    uint16_t primitive_kind; /* TuvrenPrimitiveKind */
     uint32_t initial_generation;
 } TuvrenCreateNodePayload;
 
@@ -381,8 +772,8 @@ typedef struct TuvrenChildPayload {
 } TuvrenChildPayload;
 
 typedef struct TuvrenDimensionAtom {
-    uint16_t tag;
-    uint16_t flags;
+    uint16_t tag; /* TuvrenDimensionTag */
+    uint16_t flags; /* must be zero in ABI 2.0 */
     float value;
 } TuvrenDimensionAtom;
 
@@ -396,7 +787,7 @@ typedef struct TuvrenDimension {
 
 typedef struct TuvrenGridTrack {
     uint16_t size;
-    uint16_t kind;
+    uint16_t kind; /* TuvrenGridTrackKind */
     float fraction;
     uint32_t reserved;
     TuvrenDimension minimum;
@@ -465,8 +856,8 @@ typedef struct TuvrenStylePayload {
     uint32_t present_mask;
     uint32_t foreground_rgba;
     uint32_t background_rgba;
-    uint32_t attributes;
-    uint32_t border;
+    uint32_t attributes; /* TUVREN_STYLE_ATTR_* */
+    uint32_t border; /* TuvrenBorderKind */
     uint16_t padding_top;
     uint16_t padding_right;
     uint16_t padding_bottom;
@@ -477,13 +868,13 @@ typedef struct TuvrenStylePayload {
 } TuvrenStylePayload;
 
 typedef struct TuvrenStyleRulePayload {
-    uint64_t state_mask;
+    uint64_t state_mask; /* TUVREN_STYLE_STATE_* */
     TuvrenResponsiveCondition responsive;
     uint16_t mode; /* TuvrenThemeMode */
     uint16_t reduced_motion; /* TuvrenOptionalBoolean */
     uint16_t capability_tier; /* TuvrenCapabilityTier */
     uint16_t reserved0;
-    uint32_t minimum_colors;
+    uint32_t minimum_colors; /* 0, 16, 256, or 16777216 */
     uint32_t name_offset;
     uint32_t name_length;
     uint32_t style_offset;
@@ -499,7 +890,7 @@ typedef struct TuvrenGraphemeRange {
 
 typedef struct TuvrenSemanticPayload {
     uint16_t size;
-    uint16_t kind;
+    uint16_t kind; /* TuvrenSemanticPayloadKind */
     uint32_t entries_offset;
     uint32_t entry_count;
     uint32_t reserved;
@@ -510,13 +901,13 @@ typedef struct TuvrenSemanticEntry {
     uint32_t key_length;
     uint32_t value_offset;
     uint32_t value_length;
-    uint32_t value_tag;
+    uint32_t value_tag; /* UTF8/U64/I64/F64; BYTES is packed u32 node refs */
     uint32_t reserved;
 } TuvrenSemanticEntry;
 
 typedef struct TuvrenTextEditPayload {
     uint16_t size;
-    uint16_t edit_kind;
+    uint16_t edit_kind; /* TuvrenTextEditKind */
     TuvrenGraphemeRange range;
     uint32_t utf8_offset;
     uint32_t utf8_length;
@@ -525,8 +916,8 @@ typedef struct TuvrenTextEditPayload {
 
 typedef struct TuvrenCollectionMutationPayload {
     uint16_t size;
-    uint16_t mutation_kind;
-    uint16_t key_tag;
+    uint16_t mutation_kind; /* TuvrenCollectionMutationKind */
+    uint16_t key_tag; /* TuvrenCollectionKeyTag */
     uint16_t reserved0;
     uint32_t key_offset;
     uint32_t key_length;
@@ -544,36 +935,45 @@ typedef struct TuvrenCollectionMutationPayload {
 
 typedef struct TuvrenTranscriptMutationPayload {
     uint16_t size;
-    uint16_t mutation_kind;
+    uint16_t mutation_kind; /* TuvrenTranscriptMutationKind */
     uint32_t block_id_offset;
     uint32_t block_id_length;
     uint32_t content_offset;
     uint32_t content_length;
     uint64_t version;
     uint64_t generation;
-    uint32_t flags;
+    uint32_t flags; /* TUVREN_TRANSCRIPT_* */
     uint32_t reserved;
 } TuvrenTranscriptMutationPayload;
 
 typedef struct TuvrenAnimationPayload {
     uint16_t size;
-    uint16_t property;
+    uint16_t property; /* TuvrenAnimationProperty */
     uint16_t value_tag;
     uint16_t reduced_motion; /* TuvrenReducedMotionMode */
+    uint16_t easing; /* TuvrenAnimationEasing */
+    uint16_t timeline_mode; /* TuvrenAnimationTimelineMode */
     uint64_t animation_id;
+    uint64_t timeline_id;
     uint64_t duration_nanos;
     uint64_t delay_nanos;
     uint32_t repeat_count;
     uint32_t flags;
+    uint32_t sequence_index;
+    uint32_t reserved;
     double from_number;
     double to_number;
     uint32_t from_rgba;
     uint32_t to_rgba;
 } TuvrenAnimationPayload;
 
+/* Animation value_tag is F64 for opacity/position/dimension/scroll and U64 for
+ * packed RGBA color. from fields are read only with TUVREN_ANIMATION_HAS_FROM.
+ * repeat_count is ignored with REPEAT_INFINITE. */
+
 typedef struct TuvrenTerminalRequestPayload {
     uint16_t size;
-    uint16_t request_kind;
+    uint16_t request_kind; /* TuvrenTerminalRequestKind */
     uint32_t target; /* TuvrenClipboardTarget or 0 when not applicable */
     uint32_t media_type_offset;
     uint32_t media_type_length;
@@ -583,10 +983,15 @@ typedef struct TuvrenTerminalRequestPayload {
     uint64_t timeout_nanos;
 } TuvrenTerminalRequestPayload;
 
+/* READ_CLIPBOARD uses target and zero data fields; WRITE_CLIPBOARD requires
+ * target, media type, and data; ANNOUNCE requires UTF-8 data with target 0;
+ * SUSPEND, RESUME, and QUERY_CAPABILITIES require all arena fields and target
+ * to be zero. */
+
 typedef struct TuvrenDiagnosticConfigPayload {
     uint16_t size;
     uint16_t mode; /* TuvrenDiagnosticMode */
-    uint32_t flags;
+    uint32_t flags; /* TUVREN_DIAGNOSTIC_CONFIG_INCLUDE_* */
     uint64_t record_byte_limit;
     uint64_t snapshot_byte_limit;
 } TuvrenDiagnosticConfigPayload;
@@ -627,11 +1032,25 @@ typedef struct TuvrenEventRecord {
     int32_t argument3;
 } TuvrenEventRecord;
 
+/* Event payload compatibility: KEY/KeyEventPayload, TEXT/TextEventPayload,
+ * POINTER_MOVE/PointerMoveEventPayload, POINTER_BUTTON/PointerButtonEventPayload,
+ * WHEEL/WheelEventPayload, RESIZE/ResizeEventPayload, PASTE/PasteEventPayload,
+ * CLIPBOARD/ClipboardEventPayload, RANGE/RangeEventPayload,
+ * EVICTION/EvictionEventPayload, ANIMATION/AnimationEventPayload,
+ * ANNOUNCEMENT/AnnouncementEventPayload, TERMINAL/TerminalEventPayload.
+ * FOCUS and BLUR have payload_length 0. argument0..argument3 are reserved and
+ * must be zero in ABI 2.0; typed data lives only in the named payload record.
+ * Every nested offset is relative to the batch start and inside its arena. */
+/* TERMINAL_CAPABILITIES_CHANGED requires TerminalEventPayload's nested payload
+ * to be exactly one TerminalCapabilitiesPayload. Other Terminal Event kinds
+ * require nested payload_length 0. Eviction identity_record_bytes must equal
+ * sizeof(TuvrenIdentityRecord). */
+
 typedef struct TuvrenDiagnosticRecord {
     uint64_t sequence;
     uint64_t timestamp_nanos;
-    uint16_t kind;
-    uint16_t flags;
+    uint16_t kind; /* TuvrenDiagnosticKind */
+    uint16_t flags; /* TUVREN_DIAGNOSTIC_* record flags */
     uint32_t reserved;
     uint64_t event_id;
     uint64_t command_instance_id;
@@ -650,7 +1069,7 @@ typedef struct TuvrenRenderOptions {
 
 typedef struct TuvrenRenderResult {
     uint16_t size;
-    uint16_t presentation_tier_hz;
+    uint16_t presentation_tier_hz; /* 0, 60, 90, or 120 */
     uint32_t dirty_cells;
     uint64_t render_request_id;
     uint64_t engine_nanos;
@@ -761,12 +1180,27 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenSemanticEntry) == 24, "TuvrenSemanticEntry ABI
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEditPayload) == 32, "TuvrenTextEditPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenCollectionMutationPayload) == 56, "TuvrenCollectionMutationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTranscriptMutationPayload) == 48, "TuvrenTranscriptMutationPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 64, "TuvrenAnimationPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationPayload) == 88, "TuvrenAnimationPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalRequestPayload) == 40, "TuvrenTerminalRequestPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticConfigPayload) == 24, "TuvrenDiagnosticConfigPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenApplyResult) == 32, "TuvrenApplyResult ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRecordBatchHeader) == 32, "TuvrenRecordBatchHeader ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenEventRecord) == 48, "TuvrenEventRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenKeyEventPayload) == 24, "TuvrenKeyEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTextEventPayload) == 12, "TuvrenTextEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenPointerMoveEventPayload) == 28, "TuvrenPointerMoveEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenPointerButtonEventPayload) == 28, "TuvrenPointerButtonEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenWheelEventPayload) == 36, "TuvrenWheelEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenResizeEventPayload) == 28, "TuvrenResizeEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenPasteEventPayload) == 12, "TuvrenPasteEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenClipboardEventPayload) == 40, "TuvrenClipboardEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenRangeEventPayload) == 40, "TuvrenRangeEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenEvictionEventPayload) == 24, "TuvrenEvictionEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenIdentityRecord) == 24, "TuvrenIdentityRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationEventPayload) == 16, "TuvrenAnimationEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenAnnouncementEventPayload) == 12, "TuvrenAnnouncementEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalEventPayload) == 16, "TuvrenTerminalEventPayload ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalCapabilitiesPayload) == 48, "TuvrenTerminalCapabilitiesPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticRecord) == 64, "TuvrenDiagnosticRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRenderOptions) == 16, "TuvrenRenderOptions ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRenderResult) == 40, "TuvrenRenderResult ABI size");
