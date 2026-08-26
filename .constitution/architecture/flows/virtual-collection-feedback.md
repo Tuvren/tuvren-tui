@@ -16,10 +16,9 @@ sequenceDiagram
     participant App as Application
     participant Present as Presentation Pipeline
 
-    EU->>Interact: Navigate, select, or scroll collection
-    Interact->>Exec: Enqueue keyed interaction intent
-    Exec->>Interact: Begin serialized executor-owned collection operation
-    Interact->>Content: Update focus and requested visible range
+    EU->>Exec: Deliver normalized navigate, select, or scroll input
+    Exec->>Interact: Begin serialized hit-test and keyed-intent derivation
+    Interact->>Content: Update focus and requested visible range inside the operation
     alt Application-controlled selection
         Interact-->>Orch: Emit keyed selection intent without native selection commit
         Orch->>App: Invoke required selection-change handler
