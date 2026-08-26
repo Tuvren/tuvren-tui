@@ -14,7 +14,7 @@ Deliver detection-first modern-terminal behavior and a safe compatible tier for 
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** modern, compatible, remote-shell, and multiplexer profiles pass independently
 - **STOP Conditions:** STOP if one unavailable capability demotes unrelated supported behavior or response bytes leak into input Events.
-- **Description:** Implement negotiation, detection-first capability state, modern and compatible tiers, color/palette/theme/geometry/width results, per-capability degradation, bounded pending requests, correlation, and restoration states.
+- **Description:** Implement negotiation, detection-first capability state, declarative and imperative snapshot queries, modern and compatible tiers, color/palette/theme/geometry/width results, per-capability degradation, bounded pending requests, correlation, and restoration states.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
@@ -56,7 +56,7 @@ Protocol fixtures and fuzzing prove exact normalized Events, partial-read recove
 - **Verification Command:** `cargo test --manifest-path native/Cargo.toml --locked`
 - **Expected Success Output:** read/write/fallback/status fixtures pass with bounded request storage
 - **STOP Conditions:** STOP if a read can start without an explicit application request or content can enter default diagnostics.
-- **Description:** Implement clipboard and primary selection, media discovery, bounded binary chunks, typed correlated statuses, OSC-compatible paths, richer Kitty-level behavior where available, paste Events, text convenience, timeout, validation, and fallback.
+- **Description:** Implement clipboard and primary selection, typed media discovery, bounded binary chunks, typed correlated statuses, OSC-compatible paths, richer Kitty-level behavior where available, validated UTF-8 text convenience in both SDKs, paste Events, timeout, validation, and fallback.
 - **Acceptance:**
   - **Mode:** gherkin
   - **Evidence:**

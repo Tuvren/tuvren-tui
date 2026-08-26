@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.6 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with Architecture v4.0.2 executor-owned text/Collection transitions and TechSpec v9.0.7 indentation, clipboard, capability-query, structured Keymap, global-scope, Command-error, form-control, Markdown/ANSI, and schema-exact replay contracts.
+- Kept the approved 61-ticket, 377-point, 139-edge graph, 119-point critical path, and 152/152 P0 coverage because existing tickets already own the corrected obligations.
+
 ## v10.0.5 — 2026-08-26
 
 ### Fixed

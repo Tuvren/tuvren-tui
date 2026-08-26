@@ -77,7 +77,7 @@ The checker proves one final disposition, no double default, bounded wait, deter
 - **Verification Command:** `cargo build --manifest-path native/Cargo.toml --release --locked && bun test ts/test-commands.test.ts`
 - **Expected Success Output:** `exit 0`
 - **STOP Conditions:** STOP if registration loses the Command environment or ID invocation loses the typed failure envelope.
-- **Description:** Implement typed result/failure Commands, captured Effect environments, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, visibility/enablement/activation, Command-bound buttons/menu items/palette entries, hierarchical scopes, chords, conflict reports, rebinding, and deterministic precedence.
+- **Description:** Implement typed result/failure Commands and `TuvrenError` lookup failures, captured Effect environments, imperative equivalents, reject/restart/queue/parallel concurrency, interruption, visibility/enablement/activation, Command-bound buttons/menu items/palette entries, hierarchical and global scopes, structured normalized Key Sequences, bounded chord timing, conflict reports, rebinding, and deterministic precedence.
 - **Acceptance:**
   - **Mode:** contract_test
   - **Evidence:**
