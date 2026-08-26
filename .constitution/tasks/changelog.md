@@ -4,6 +4,13 @@ Local Stage 4 Changelog. Tracks semantic versioning for the Tasks layer.
 
 ---
 
+## v10.0.11 — 2026-08-26
+
+### Fixed
+
+- Reconciled Stage 4 with TechSpec v9.0.12 owned-versus-parent Trace identity, context-initialized no-wrap replay, transaction-only mutation replay, tagged semantic scalars, Issue/replay wire validation, executor-cached Collection position, intent-only controlled selection, and contextual Command rejection.
+- Moved production ABI symbol/byte parity from pre-implementation TUI-A009 to its executable owner TUI-A003 without changing ticket dependencies, and retained the 62-ticket, 385-point, 154-edge graph, 127-point critical path, and 152/152 P0 coverage.
+
 ## v10.0.10 — 2026-08-26
 
 ### Fixed
