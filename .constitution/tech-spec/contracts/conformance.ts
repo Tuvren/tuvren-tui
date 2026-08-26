@@ -4,14 +4,17 @@ import type * as Scope from "effect/Scope";
 import {
   Box,
   Button,
+  CommandPalette,
   Commands,
   ErrorBoundary,
   Input,
   Menu,
+  MenuItem,
   Select,
   Terminal,
   Text,
   TextArea,
+  ToggleButton,
   commandId,
   componentId,
   defineTheme,
@@ -175,14 +178,46 @@ const idInvocation: Effect.Effect<
   Database
 > = commandService.invokeById(typedCommandId);
 const typedCommandButton = Button({ command: typedCommandId });
+const typedCommandToggle = ToggleButton({ command: typedCommandId });
+const typedCommandMenuItem = MenuItem({ command: typedCommandId });
+const typedCommandPalette = CommandPalette({
+  items: ["typed"],
+  getKey: (item: string) => item,
+  renderItem: (item: string) => Text({ content: item }),
+  commandForItem: () => typedCommandId,
+});
 const typedCommandButtonRender: Effect.Effect<
   void,
   TuvrenError | "command-error",
   Database
 > = render(typedCommandButton);
+const typedCommandToggleRender: Effect.Effect<
+  void,
+  TuvrenError | "command-error",
+  Database
+> = render(typedCommandToggle);
+const typedCommandMenuItemRender: Effect.Effect<
+  void,
+  TuvrenError | "command-error",
+  Database
+> = render(typedCommandMenuItem);
+const typedCommandPaletteRender: Effect.Effect<
+  void,
+  TuvrenError | "command-error",
+  Database
+> = render(typedCommandPalette);
 // @ts-expect-error A bound Command cannot erase its failure or environment.
 const erasedCommandButtonRender: Effect.Effect<void, TuvrenError> =
   render(typedCommandButton);
+// @ts-expect-error A bound ToggleButton cannot erase Command requirements.
+const erasedCommandToggleRender: Effect.Effect<void, TuvrenError> =
+  render(typedCommandToggle);
+// @ts-expect-error A bound MenuItem cannot erase Command requirements.
+const erasedCommandMenuItemRender: Effect.Effect<void, TuvrenError> =
+  render(typedCommandMenuItem);
+// @ts-expect-error A CommandPalette cannot erase item Command requirements.
+const erasedCommandPaletteRender: Effect.Effect<void, TuvrenError> =
+  render(typedCommandPalette);
 const initialCursor = graphemeIndex(0);
 const boundTextArea = TextArea({ document: textDocumentService });
 const acceptedReplayTrace: ReplayInput = runtimeReplayTrace;
@@ -263,7 +298,13 @@ void recoveredRender;
 void streamRender;
 void idInvocation;
 void typedCommandButtonRender;
+void typedCommandToggleRender;
+void typedCommandMenuItemRender;
+void typedCommandPaletteRender;
 void erasedCommandButtonRender;
+void erasedCommandToggleRender;
+void erasedCommandMenuItemRender;
+void erasedCommandPaletteRender;
 void initialCursor;
 void boundTextArea;
 void acceptedReplayTrace;

@@ -111,7 +111,13 @@
       "optional": { "retainedBytes": "integer" }
     },
     "unattributed": {
-      "required": { "description": "string" },
+      "required": {
+        "reason": {
+          "type": "string",
+          "enum": ["ring-wrap", "tooling-defect"]
+        },
+        "description": "string"
+      },
       "optional": { "phase": "string" }
     }
   },
@@ -126,15 +132,19 @@
     "record.timestampNanos values are nondecreasing in record order",
     "each record owns correlation.recordId plus the kind-required domain identity: eventId for Event; commandId and commandInstanceId for Command; effectSpanId for Effect span; transactionId for transaction or mutation; subjectId plus subjectKind component for reconcile/layout; subjectId plus component or text-document subjectKind for text; and renderRequestId for render/diff/terminal write",
     "numeric native domain identities parse as unsigned 64-bit strings (subject IDs are trace-scoped and opaque), subjectId and subjectKind appear together, and optional componentId is a declared public Component identity rather than a private runtime handle",
+    "correlation.commandId equals payload.commandId on Command records and correlation.effectSpanId equals payload.spanId on Effect-span records; payload.parentSpanId, when present, names an earlier Effect-span record and agrees with the causal parent chain",
+    "each commandInstanceId maps to exactly one commandId throughout the Trace; each subjectId maps to exactly one subjectKind and, when present, one public componentId throughout the Trace",
     "correlation.parentRecordId is the only backward causal reference; when present it resolves to an earlier retained record, while a root record omits it; domain identities label the current record and are not interpreted as parent references",
-    "wrapCount greater than zero permits missing predecessors only before the first retained sequence and requires one unattributed boundary record",
+    "wrapCount greater than zero permits missing predecessors only before the first retained sequence and requires the first retained record to be the sole unattributed reason ring-wrap boundary; wrapCount zero forbids ring-wrap records while ordinary unattributed records use reason tooling-defect",
     "redaction.fullContent true requires input, clipboard, and terminalPayloads plus replay.applicationInput to equal included/available; fullContent false requires them to equal redacted and forbids encoded fields",
     "replay.runtime available additionally requires fullContent, capture.startedAt context-initialization, capture.completePrefix true, wrapCount zero, and an unbroken record prefix whose first record is context/initialized with ABI 2.0; every other trace declares runtime redacted and completePrefix false",
     "encoded replay fields decode from canonical base64 into exact ABI 2.0 Event batches or complete transaction batches and pass the same validators used by live input; mutation records are diagnostic metadata only and runtime replay applies their value-bearing transaction exactly once",
     "a replay-capable Trace requires encodedEventBatchBase64 on every input record and encodedTransactionBase64 on every committed transaction record, forbids encoded bytes on rejected transactions, and verifies decoded byte counts against payload metadata",
     "committed transaction records forbid failedCommandIndex; rejected records forbid encodedTransactionBase64 and use failedCommandIndex only when rejection identifies one decoded command",
     "every embedded snapshot passes validateDiagnosticSnapshotRuns, has contextId equal to rootCorrelation.contextId, declares traceBasis, and has each embedded Issue interval ordered and contained in the Trace's retained sequence domain",
-    "a retained snapshot traceBasis.atSequence names a retained record and snapshot transactionId/renderRequestId equal the latest matching retained identities at or before that sequence, using the explicit zero sentinel only when no such identity exists yet",
+    "embedded snapshotId values are unique so every baselineSnapshotId reference resolves unambiguously",
+    "a retained snapshot traceBasis.atSequence names a retained record and snapshot transactionId/renderRequestId equal the latest matching retained identities at or before that sequence; without wrap the explicit zero sentinel is used only when no such identity exists yet",
+    "after wrap, a retained snapshot whose transaction or render identity has not yet been superseded by a retained record requires traceBasis.baselineSnapshotId naming the sole wrap baseline and inherits only the still-unsuperseded identity from that baseline; the reference is forbidden after both identities are superseded",
     "a wrap-baseline snapshot is allowed only when wrapCount is positive; exactly one may exist; its boundarySequence equals the first retained unattributed boundary record; its context must match while its transaction/render identities may predate the retained domain",
     "runtime replay rejects a record kind whose registered payload contract or migration is unavailable, a trace without a reachable empty-context starting state, or any missing sequence"
   ]

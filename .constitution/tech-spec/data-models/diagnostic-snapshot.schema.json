@@ -27,7 +27,8 @@
           "required": ["kind", "atSequence"],
           "properties": {
             "kind": { "const": "retained" },
-            "atSequence": { "type": "string", "pattern": "^[0-9]+$" }
+            "atSequence": { "type": "string", "pattern": "^[0-9]+$" },
+            "baselineSnapshotId": { "type": "string", "minLength": 1 }
           }
         },
         {

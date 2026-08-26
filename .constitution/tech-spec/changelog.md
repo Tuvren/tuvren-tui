@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.15] — 2026-08-26
+
+### Fixed
+
+- Required duplicate Command/Effect identities to agree, stabilized Command-instance and diagnostic-subject mappings, and added typed ring-wrap versus tooling-defect records.
+- Made retained post-wrap snapshots explicitly inherit still-current transaction/render identities from the sole wrap baseline.
+- Added positive and negative requirement-propagation probes for all four bound Command surfaces and listed `check:abi-parity` in the canonical verification inventory.
+
 ## [v9.0.14] — 2026-08-26
 
 ### Fixed
