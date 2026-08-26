@@ -24,9 +24,11 @@ sequenceDiagram
     Exec->>Comp: Apply ordered RuntimeNode changes
     Comp->>Comp: Resolve controlled or uncontrolled authority per property
     Comp-->>Obs: Record Component-to-Primitive mapping and dirty causes
-    Comp-->>SDK: Expose typed changes and semantic state
+    Comp-->>Exec: Complete operation with typed change and semantic records
+    Exec-->>Orch: Deliver completed records after native work
+    Orch-->>SDK: Expose typed changes and semantic state
 ```
 
 ## Failure path
 
-Invalid composition, conflicting property authority, or unsupported Component state rejects with Component context before corrupting the retained tree. A failed package composition has no privileged recovery path and cannot register private runtime behavior.
+Invalid composition, conflicting property authority, or unsupported Component state rejects with Component context before corrupting the retained tree. The Composition kernel never calls the SDK or orchestration; typed records return through the executor only after native completion. A failed package composition has no privileged recovery path and cannot register private runtime behavior.
