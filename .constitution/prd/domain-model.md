@@ -9,7 +9,7 @@ classDiagram
     class ComponentAuthor
     class TerminalEnvironment
 
-    class DeclarativeSDK
+    class EffectUISDK
     class ImperativeSDK
     class Component {
         public properties
@@ -28,8 +28,8 @@ classDiagram
     class LayoutConstraint
     class StyleSpec
     class StyleSheet
-    class ThemeToken
-    class ThemeRecipe
+    class ThemeTokens
+    class ThemeRecipes
 
     class Event {
         identity
@@ -63,10 +63,10 @@ classDiagram
     class DiagnosticGraph
     class DiagnosticTrace
 
-    Developer --> DeclarativeSDK : uses by default
+    Developer --> EffectUISDK : uses by default
     Developer --> ImperativeSDK : uses explicitly
     ComponentAuthor --> Component : packages
-    DeclarativeSDK --> Component : describes
+    EffectUISDK --> Component : describes
     ImperativeSDK --> Primitive : controls
     Component *-- Primitive : composes
     CompositionTree *-- Component : contains
@@ -77,8 +77,8 @@ classDiagram
     Primitive --> LayoutConstraint : is arranged by
     Component --> StyleSheet : accepts
     StyleSheet *-- StyleSpec : registers
-    ThemeRecipe --> Component : supplies defaults
-    ThemeRecipe --> ThemeToken : resolves
+    ThemeRecipes --> Component : supplies defaults
+    ThemeRecipes --> ThemeTokens : resolves
 
     EndUser --> Event : originates
     Event --> Component : targets

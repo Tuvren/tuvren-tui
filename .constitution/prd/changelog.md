@@ -8,7 +8,7 @@ This changelog records Stage 1 product-contract versions. It follows Semantic Ve
 
 - Declared `Library/SDK` as the primary archetype and `System/Native` as the secondary archetype with high confidence.
 - Defined the complete P0 `0.1.0`, P1 `0.2.0`, and evidence-led P2 capability horizons.
-- Added atomic requirements for the Declarative SDK, Imperative SDK, Components, native-backed Primitives, layout, styling, text, editing, Events, Commands, Virtual Collections, Transcript behavior, terminal integration, clipboard, accessibility, animation, devtools, testing, safety, distribution, and release evidence.
+- Added atomic requirements for the Effect UI SDK, Imperative SDK, Components, native-backed Primitives, layout, styling, text, editing, Events, Commands, Virtual Collections, Transcript behavior, terminal integration, clipboard, accessibility, animation, devtools, testing, safety, distribution, and release evidence.
 - Added the 120 Hz goal, 90 Hz degraded tier, 60 Hz failure threshold, reference workload envelope, adoption timing, devtools overhead, privacy, reliability, and platform release meters.
 - Added approved canonical terms for Component, Primitive, RuntimeNode, SDK surfaces, styling, rich text, data projection, semantics, terminal capability, and diagnostics.
 
@@ -20,7 +20,7 @@ This changelog records Stage 1 product-contract versions. It follows Semantic Ve
 - Replaced broad roadmap epics with testable product outcomes and explicit release priorities.
 - Promoted accessibility foundations, animation, rich clipboard behavior, Grid, the first-party Component catalog, and local devtools into the P0 contract.
 - Moved bidirectional text, advanced editor behavior, cell and image surfaces, application routing, form orchestration, spring and keyframe animation, and assistive-technology bridges to P1 `0.2.0`.
-- Limited `0.1.0` third-party extensibility to ordinary package composition and reserved Runtime Extension and Plugin contracts for evidence-led evolution.
+- Limited `0.1.0` third-party extensibility to ordinary package composition and reserved RuntimeExtension and Plugin contracts for evidence-led evolution.
 
 ### Removed
 

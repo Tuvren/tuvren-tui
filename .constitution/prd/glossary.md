@@ -16,15 +16,18 @@
 | Surface | A rectangular terminal display area produced from a Composition Tree. | Screen, Canvas, View, Buffer |
 | Layout Constraint | A rule governing the position or dimensions of a Component or Primitive. | CSS Rule, Style, Layout Rule |
 | Render Pass | One bounded cycle that reconciles accepted changes and updates a Surface. | Tick, Paint, Draw, Frame |
-| Declarative SDK | The preferred public workflow in which a Developer describes a view and structured application behavior. | Framework-specific SDK, View SDK, Reactive SDK |
+| Effect UI SDK | The preferred declarative SDK built around the Effect TypeScript ecosystem. | Effect SDK, Declarative SDK, JSX SDK |
 | Imperative SDK | The public workflow in which a Developer explicitly creates and updates UI objects while using managed lifecycle defaults. | Raw API, Boundary API, Low-Level SDK |
+| JSX syntax | The view-authoring syntax used by the Effect UI SDK; it does not imply browser, virtual-DOM, or React semantics. | JSX SDK, JSX Runtime, Component Model |
+| Reactivity | The public capability that keeps a described view synchronized with accepted state; its mechanism remains private. | Signal, Signals API, Observable Model |
 | Event | A normalized occurrence routed through an interaction hierarchy, such as input, focus, resize, or paste. | Callback, Signal, Message, Action |
 | Command | A reusable named application action with metadata, availability conditions, execution behavior, and a stable identity. | Callback, Handler, Event, Action |
 | Keymap | A scoped mapping from a key sequence to a Command. | Shortcut, Hotkey, Binding |
 | StyleSpec | One typed declaration of visual properties and optional state or environment variants. | Style, Rule, CSS |
 | StyleSheet | A registered collection of named StyleSpecs and supported conditions. | Theme, CSS File, Palette |
-| Theme Token | A semantic value shared across visual decisions, such as color, spacing, or motion. | Variable, Constant, Theme Value |
-| Theme Recipe | A reusable set of Component-level styling defaults. | Theme, StyleSheet, Skin |
+| Theme | A coherent collection of semantic values and reusable Component styling decisions. | Skin, Palette, StyleSheet |
+| ThemeTokens | Semantic values shared across visual decisions, such as colors, spacing, and motion values. | Theme Token, Variables, Theme Values |
+| ThemeRecipes | Reusable Component-level styling defaults. | Theme Recipe, StyleSheet, Skin |
 | StyledText | The canonical structured rich-text value composed of content and styled spans. | Rich String, Attributed String, Markup |
 | Text Document | Editable or inspectable textual content with grapheme-based public positions. | TextBuffer, String, Blob |
 | Transcript | An ordered, block-oriented body of long-lived, streaming, or reloadable content. | Log, Feed, Stream |
@@ -39,5 +42,5 @@
 | Screen Mode | The way an application shares or owns terminal rows and scrollback. | Display Mode, Renderer Mode |
 | Diagnostic Graph | A local causal model connecting Components, Primitives, layout, styles, Events, Commands, semantics, and Render Passes. | Debug Tree, Inspector DOM |
 | Diagnostic Trace | A bounded, versioned record of causal runtime activity suitable for inspection and replay. | Log File, Event Dump, Recording |
-| Runtime Extension | A future contract for contributing runtime behavior with defined activation and cleanup; it is not part of the initial release. | Plugin, Addon, Hook |
-| Plugin | A packaged, discoverable Runtime Extension with lifecycle, installation, permissions, and compatibility guarantees. | Package, Component Library, Runtime Extension |
+| RuntimeExtension | A future contract for contributing runtime behavior with defined activation and cleanup; it is not part of the initial release. | Runtime Extension, Plugin, Addon, Hook |
+| Plugin | A packaged, discoverable RuntimeExtension with lifecycle, installation, permissions, and compatibility guarantees. | Package, Component Library, Runtime Extension |

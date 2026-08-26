@@ -35,10 +35,10 @@ Frame adaptation must use hysteresis to avoid oscillation among 120 Hz, 90 Hz, a
 
 | ID | Scale | Meter | Goal | Stretch | Fail |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| DX-01 | Time from an empty supported project to first render | Moderated task using only published documentation and the ordinary install path | At most 5 minutes | At most 3 minutes | More than 10 minutes or any native setup requirement fails |
-| DX-02 | Time to complete an interactive Hello World | Moderated task including input, state change, and clean exit | At most 10 minutes | At most 5 minutes | More than 20 minutes fails |
-| DX-03 | Time to complete a small application | Moderated task with multiple Primitives, input, state updates, and cleanup | At most 30 minutes | At most 20 minutes | More than 60 minutes fails |
-| DX-04 | Time to add a semantic interaction test | Moderated task starting from the completed Hello World | At most 10 minutes | At most 5 minutes | More than 20 minutes fails |
+| DX-01 | Time from an empty supported project to first render | Moderated task using only published documentation and the ordinary install path | At most 5 minutes | Not set | More than 5 minutes or any native setup requirement fails |
+| DX-02 | Time to complete an interactive Hello World | Moderated task including input, state change, and clean exit | At most 10 minutes | Not set | More than 10 minutes fails |
+| DX-03 | Time to complete a small application | Moderated task with multiple Primitives, input, state updates, and cleanup | At most 30 minutes | Not set | More than 30 minutes fails |
+| DX-04 | Time to add a semantic interaction test | Moderated task starting from the completed Hello World | At most 10 minutes | Not set | More than 10 minutes fails |
 | DX-05 | Public capability parity | Automated inventory mapping public Primitives and first-party Components to both SDK workflows | 100% of Primitives have safe imperative wrappers and 100% of first-party Components are available declaratively | Not applicable | Any unexplained capability gap fails release |
 | DX-06 | Private-native-detail exposure | Public API, examples, errors, and onboarding audit | 0 ordinary workflows expose raw native calls, numeric native identities, native toolchains, or manual native binary management | 0 across advanced workflows except explicitly named diagnostics | Any such requirement in the default workflow fails release |
 
@@ -62,14 +62,15 @@ Frame adaptation must use hysteresis to avoid oscillation among 120 Hz, 90 Hz, a
 | OPS-03 | Public example coverage | Traceability matrix from shipped capability to published example and acceptance evidence | 100% coverage; every performance claim also maps to a reproducible benchmark | Multiple representative examples for high-risk capabilities | Any shipped capability without evidence fails final release |
 | OPS-04 | Pre-GA change communication | Release audit for each breaking public change | Changelog and migration guidance in the same release; one-minor deprecation where safe; automated migration when practical | No avoidable breaking changes | An undocumented breaking change fails release |
 | OPS-05 | Versioned evidence schemas | Compatibility tests for Diagnostic Trace and snapshot schemas | Schema versions evolve independently of the SDK version and fail incompatibility explicitly | Readers support the documented compatibility window | Silent misinterpretation or unversioned schema change fails |
+| OPS-06 | OpenCode reference evidence | Deterministic replay and live-adapter performance and developer-experience fixtures | Meets every absolute performance constraint and every comparative gate ratified through OD-01 without leaking OpenCode contracts into the SDK | Exceeds the evidence-ratified comparative goals | Omitting the reference, missing an applicable gate, or coupling core SDK contracts to OpenCode fails final release |
 
 ## Devtools constraints
 
 | ID | Scale | Meter | Goal | Stretch | Fail |
 | :-- | :-- | :-- | :-- | :-- | :-- |
-| TOOL-01 | Cost when diagnostics are disabled | Representative benchmark comparison | Less than 1% overhead and 0 diagnostic allocations | Statistically indistinguishable | 1% or more overhead or any diagnostic allocation fails |
+| TOOL-01 | Cost when diagnostics are disabled | Representative benchmark comparison | Less than 1% CPU overhead and no steady-state diagnostic allocation | Statistically indistinguishable | 1% or more CPU overhead or steady-state diagnostic allocation fails |
 | TOOL-02 | Passive diagnostic cost | Representative benchmark comparison | Less than 3% overhead | Less than 2% | 3% or more fails |
-| TOOL-03 | Full-trace cost | Representative benchmark comparison under bounded recording | Less than 10% overhead | Less than 7% | 10% or more or unbounded storage fails |
+| TOOL-03 | Full-trace cost | Representative benchmark comparison under bounded recording | Less than 10% overhead with bounded memory and visible overhead reporting | Less than 7% | 10% or more, unbounded storage, or hidden overhead fails |
 | TOOL-04 | Time to locate a seeded style defect | Moderated task from visible layout defect to the responsible StyleSpec source | Median under 60 seconds | Median under 30 seconds | Median of 120 seconds or more fails |
 | TOOL-05 | Render causality | Instrumented late-Render-Pass fixtures | Every late Render Pass has a complete causal path or an explicit unattributed-defect marker | 100% complete causal paths | A late pass with neither explanation nor defect marker fails |
 
