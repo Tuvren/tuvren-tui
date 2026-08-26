@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.7] — 2026-08-26
+
+### Fixed
+
+- Added Text Document indentation policy, clipboard media discovery and text helpers, imperative capability snapshots, and matching native request/query records.
+- Replaced opaque Keymap strings with normalized structured Key Sequences, made global scope addressable by omission, required Command-bound Buttons, and made registry failures proper `TuvrenError` subclasses.
+- Unified required/error/submission form-control properties, declared the exact Markdown and ANSI sanitization profile, and tightened testing types to immutable schema versions and serializable external-update values.
+
 ## [v9.0.6] — 2026-08-26
 
 ### Fixed

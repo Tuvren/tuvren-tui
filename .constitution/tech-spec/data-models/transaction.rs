@@ -142,6 +142,8 @@ pub struct TextDocumentConfigPayload<'a> {
     pub flags: u32,
     pub line_ending: u16,
     pub tab_width: u32,
+    pub indentation_style: u16,
+    pub indentation_width: u16,
     pub max_graphemes: u64,
     pub validation_rules: &'a [u8],
 }
@@ -202,6 +204,7 @@ pub enum QueryKind {
     TextEncode,
     CollectionVisibleRange,
     TranscriptVisibleRange,
+    TerminalCapabilities,
 }
 
 #[derive(Clone, Debug)]

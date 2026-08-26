@@ -21,6 +21,7 @@ import { jsx } from "./jsx-runtime";
 import {
   Box as ImperativeBox,
   Text as ImperativeText,
+  keyGrapheme as imperativeKeyGrapheme,
   keymapScopeId as imperativeKeymapScopeId,
   run as runImperative,
   type ImperativeCommand,
@@ -105,7 +106,11 @@ const imperative: Promise<void> = runImperative((app) => {
   );
   app.keymaps.register({
     command: save,
-    keys: "ctrl+s",
+    sequence: {
+      strokes: [
+        { key: imperativeKeyGrapheme("s"), modifiers: { control: true } },
+      ],
+    },
     scope: editorScope.id,
   });
 });

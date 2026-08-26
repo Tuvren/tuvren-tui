@@ -1,7 +1,13 @@
 import type * as Effect from "effect/Effect";
 import type * as Scope from "effect/Scope";
 import type * as TestClock from "effect/TestClock";
-import type { ComponentId, TerminalProfile, TuvrenError, View } from "./shared";
+import type {
+  Brand,
+  ComponentId,
+  TerminalProfile,
+  TuvrenError,
+  View,
+} from "./shared";
 
 export interface SemanticMatch {
   readonly role: string;
@@ -21,7 +27,7 @@ export interface SemanticElement {
 }
 
 export interface DiagnosticSnapshot {
-  readonly schemaVersion: string;
+  readonly schemaVersion: "1.0.0";
   readonly snapshotId: string;
   readonly contextId: string;
   readonly transactionId: string;
@@ -51,7 +57,7 @@ export interface DiagnosticSnapshot {
 }
 
 export interface DiagnosticTrace {
-  readonly schemaVersion: string;
+  readonly schemaVersion: "1.0.0";
   readonly traceId: string;
   readonly createdAt: string;
   readonly sdkVersion?: string;
@@ -142,9 +148,19 @@ export interface ApplicationReplayPayloadMap {
     widthPixels?: number;
     heightPixels?: number;
   }>;
-  readonly "external-update": Readonly<Record<string, unknown>>;
+  readonly "external-update": ExternalUpdatePayload;
   readonly clock: Readonly<{ elapsedMilliseconds: number }>;
 }
+
+export type JsonNumber = Brand<number, "JsonNumber">;
+export type JsonScalar = null | boolean | JsonNumber | string;
+export type ExternalUpdateValue =
+  JsonScalar | readonly JsonScalar[] | Readonly<Record<string, JsonScalar>>;
+export type ExternalUpdatePayload = Readonly<
+  Record<string, ExternalUpdateValue>
+>;
+
+export function jsonNumber(value: number): JsonNumber;
 
 export type ApplicationReplayEvent<
   Kind extends keyof ApplicationReplayPayloadMap =

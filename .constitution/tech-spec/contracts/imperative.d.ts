@@ -1,3 +1,4 @@
+import { TuvrenError } from "./shared";
 import type {
   BoxProps,
   BorderStyle,
@@ -40,6 +41,7 @@ export type {
   BoxProps,
   ButtonProps,
   CheckboxProps,
+  ClipboardMediaTypes,
   ClipboardPayload,
   ClipboardTarget,
   CodeViewProps,
@@ -64,7 +66,12 @@ export type {
   KeymapRebinding,
   KeymapScope,
   KeymapScopeId,
+  KeySequence,
+  KeyStroke,
+  KeyGrapheme,
+  NamedKey,
   ExternalOutputMode,
+  FormControlProps,
   FocusScopeProps,
   InputProps,
   LayoutSpec,
@@ -426,10 +433,13 @@ export interface ImperativeCommandRegistry {
   ): ImperativeCommandInvocation<unknown, ImperativeRegisteredCommandError>;
 }
 
-export interface ImperativeRegisteredCommandError {
+export class ImperativeRegisteredCommandError extends TuvrenError {
   readonly _tag: "ImperativeRegisteredCommandError";
+  readonly code: "TUVREN_COMMAND_NOT_REGISTERED";
+  readonly category: "command";
+  readonly operation: "command.invokeById";
   readonly command: import("./shared").CommandId;
-  readonly cause: unknown;
+  readonly remediation: "Register the Command in the active scope before invoking its ID.";
 }
 
 export interface ImperativeCommandInvocation<A, E> {
@@ -442,7 +452,7 @@ export interface ImperativeCommandInvocation<A, E> {
 
 export interface ImperativeKeyBinding {
   readonly command: import("./shared").CommandId;
-  readonly keys: string;
+  readonly sequence: import("./shared").KeySequence;
   readonly scope?: import("./shared").KeymapScopeId;
   readonly when?: (context: ImperativeCommandContext) => boolean;
 }
@@ -464,7 +474,7 @@ export interface ImperativeKeymapRegistry {
   ): readonly import("./shared").KeymapConflict[];
   rebind(rebinding: import("./shared").KeymapRebinding): void;
   resolve(
-    keys: string,
+    sequence: import("./shared").KeySequence,
     focusedScopes: readonly import("./shared").KeymapScopeId[],
     context?: Partial<ImperativeCommandContext>,
   ): import("./shared").CommandId | undefined;
@@ -486,11 +496,22 @@ export interface ImperativeApp {
   render(): void;
   pollInput(timeoutMs?: number): number;
   drainEvents(): readonly TuvrenEvent[];
+  capabilities(): import("./shared").TerminalCapabilities;
   readClipboard(
     target?: import("./shared").ClipboardTarget,
   ): Promise<import("./shared").ClipboardPayload>;
   writeClipboard(
     payload: import("./shared").ClipboardPayload,
+    target?: import("./shared").ClipboardTarget,
+  ): Promise<void>;
+  clipboardMediaTypes(
+    target?: import("./shared").ClipboardTarget,
+  ): Promise<import("./shared").ClipboardMediaTypes>;
+  readClipboardText(
+    target?: import("./shared").ClipboardTarget,
+  ): Promise<string>;
+  writeClipboardText(
+    text: string,
     target?: import("./shared").ClipboardTarget,
   ): Promise<void>;
   announce(message: string): void;
@@ -537,6 +558,7 @@ export function toStyledText(
 export function componentId(value: string): import("./shared").ComponentId;
 export function commandId(value: string): import("./shared").CommandId;
 export function keymapScopeId(value: string): import("./shared").KeymapScopeId;
+export function keyGrapheme(value: string): import("./shared").KeyGrapheme;
 export function transcriptBlockId(
   value: string,
 ): import("./shared").TranscriptBlockId;

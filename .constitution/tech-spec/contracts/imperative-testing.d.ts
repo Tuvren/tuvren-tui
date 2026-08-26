@@ -18,6 +18,7 @@ export type {
   ReplayFile,
   ReplayInput,
 } from "./testing";
+export { jsonNumber } from "./testing";
 
 export interface ImperativeTestOptions {
   readonly width?: number;

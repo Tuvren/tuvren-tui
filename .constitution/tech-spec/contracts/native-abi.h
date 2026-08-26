@@ -261,7 +261,8 @@ typedef enum TuvrenQueryKind {
     TUVREN_QUERY_TEXT_FIND = 2,
     TUVREN_QUERY_TEXT_ENCODE = 3,
     TUVREN_QUERY_COLLECTION_VISIBLE_RANGE = 4,
-    TUVREN_QUERY_TRANSCRIPT_VISIBLE_RANGE = 5
+    TUVREN_QUERY_TRANSCRIPT_VISIBLE_RANGE = 5,
+    TUVREN_QUERY_TERMINAL_CAPABILITIES = 6
 } TuvrenQueryKind;
 
 typedef enum TuvrenTextEncoding {
@@ -282,6 +283,11 @@ typedef enum TuvrenLineEnding {
     TUVREN_LINE_ENDING_LF = 1,
     TUVREN_LINE_ENDING_CRLF = 2
 } TuvrenLineEnding;
+
+typedef enum TuvrenIndentationStyle {
+    TUVREN_INDENTATION_TABS = 1,
+    TUVREN_INDENTATION_SPACES = 2
+} TuvrenIndentationStyle;
 
 typedef enum TuvrenTextValidationKind {
     TUVREN_TEXT_VALIDATION_MINIMUM_LENGTH = 1,
@@ -485,7 +491,8 @@ typedef enum TuvrenTerminalRequestKind {
     TUVREN_TERMINAL_ANNOUNCE = 3,
     TUVREN_TERMINAL_SUSPEND = 4,
     TUVREN_TERMINAL_RESUME = 5,
-    TUVREN_TERMINAL_QUERY_CAPABILITIES = 6
+    TUVREN_TERMINAL_QUERY_CAPABILITIES = 6,
+    TUVREN_TERMINAL_DISCOVER_CLIPBOARD_MEDIA_TYPES = 7
 } TuvrenTerminalRequestKind;
 
 typedef enum TuvrenPrimitiveKind {
@@ -533,6 +540,8 @@ typedef enum TuvrenProperty {
     TUVREN_PROP_STATE_CHECKED = 0x0404,
     TUVREN_PROP_STATE_EXPANDED = 0x0405,
     TUVREN_PROP_STATE_INVALID = 0x0406,
+    TUVREN_PROP_STATE_REQUIRED = 0x0407,
+    TUVREN_PROP_STATE_ERROR = 0x0408,
     TUVREN_PROP_SEMANTIC_ROLE = 0x0501,
     TUVREN_PROP_SEMANTIC_NAME = 0x0502,
     TUVREN_PROP_SEMANTIC_DESCRIPTION = 0x0503,
@@ -551,9 +560,10 @@ typedef enum TuvrenProperty {
  * TEXT_DOCUMENT_CONFIG requires SET_PROPERTY_BYTES +
  * VALUE_TEXT_DOCUMENT_CONFIG/TextDocumentConfigPayload; TEXT_SELECTION
  * requires SET_PROPERTY_BYTES + VALUE_GRAPHEME_RANGE/GraphemeRange;
- * TEXT_CURSOR, WRAP, TAB_WIDTH and state 0x0401..0x0406 require
- * SET_PROPERTY_U64 + VALUE_U64; semantic states and relationships require
- * SET_PROPERTY_BYTES + VALUE_SEMANTIC/SemanticPayload;
+ * TEXT_CURSOR, WRAP, TAB_WIDTH and state 0x0401..0x0407 require
+ * SET_PROPERTY_U64 + VALUE_U64; STATE_ERROR requires SET_PROPERTY_BYTES +
+ * VALUE_UTF8; semantic states and relationships require SET_PROPERTY_BYTES +
+ * VALUE_SEMANTIC/SemanticPayload;
  * TEXT_EDIT/TextEditPayload; COLLECTION_APPLY/CollectionMutationPayload;
  * TRANSCRIPT_APPLY/TranscriptMutationPayload; ANIMATION_APPLY and
  * ANIMATION_REPLACE/AnimationPayload; ANIMATION_CANCEL/AnimationPayload with
@@ -1070,9 +1080,10 @@ typedef struct TuvrenStyledSpanRecord {
 typedef struct TuvrenTextDocumentConfigPayload {
     uint16_t size;
     uint16_t line_ending; /* TuvrenLineEnding */
+    uint16_t indentation_style; /* TuvrenIndentationStyle */
+    uint16_t indentation_width; /* ignored for tabs */
     uint32_t flags; /* TUVREN_TEXT_CONFIG_* */
     uint32_t tab_width;
-    uint32_t reserved;
     uint64_t max_graphemes;
     uint32_t validation_rules_offset;
     uint32_t validation_rule_count;
@@ -1092,9 +1103,9 @@ typedef struct TuvrenTextValidationRuleRecord {
 /* Length rules use grapheme_limit and zero pattern fields. Pattern rules use a
  * bounded UTF-8 Rust-regex expression plus declared flags and set
  * grapheme_limit to zero. Every rule requires a bounded UTF-8 message. Native
- * input applies read-only, required, maximum-length, line-ending, secure-entry,
- * and validation rules before accepting an edit; Rust never invokes a host
- * validation callback. */
+ * input applies read-only, required, maximum-length, line-ending, indentation,
+ * secure-entry, and validation rules before accepting an edit; Rust never
+ * invokes a host validation callback. */
 
 typedef struct TuvrenTextEditPayload {
     uint16_t size;
@@ -1213,8 +1224,12 @@ typedef struct TuvrenTerminalRequestPayload {
 
 /* READ_CLIPBOARD uses target and zero data fields; WRITE_CLIPBOARD requires
  * target, media type, and data; ANNOUNCE requires UTF-8 data with target 0;
- * SUSPEND, RESUME, and QUERY_CAPABILITIES require all arena fields and target
- * to be zero. */
+ * DISCOVER_CLIPBOARD_MEDIA_TYPES uses target and zero data fields, then emits
+ * one Clipboard Event per media type and marks the final chunk; an empty result
+ * emits one completed final Event with an empty media type. SUSPEND,
+ * RESUME, and QUERY_CAPABILITIES require all arena fields and target to be
+ * zero. Text convenience APIs use bounded UTF-8 with the text/plain media type
+ * over the ordinary READ and WRITE requests. */
 
 typedef struct TuvrenDiagnosticConfigPayload {
     uint16_t size;
@@ -1286,8 +1301,9 @@ typedef struct TuvrenQueryResult {
  * and returns the match range; no match returns UNAVAILABLE. TEXT_ENCODE uses
  * argument0 as TuvrenTextEncoding and writes encoded bytes. Collection and
  * Transcript visible-range queries write no bytes and return their generation
- * and resident range. Every BUFFER_TOO_SMALL response reports required_bytes
- * and writes no partial semantic value. */
+ * and resident range. TERMINAL_CAPABILITIES writes exactly one
+ * TuvrenTerminalCapabilitiesPayload. Every BUFFER_TOO_SMALL response reports
+ * required_bytes and writes no partial semantic value. */
 
 typedef struct TuvrenRecordBatchHeader {
     uint32_t magic;

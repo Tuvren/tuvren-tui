@@ -3,6 +3,7 @@ export type Brand<T, Name extends string> = T & { readonly __brand: Name };
 export type ComponentId = Brand<string, "ComponentId">;
 export type CommandId = Brand<string, "CommandId">;
 export type KeymapScopeId = Brand<string, "KeymapScopeId">;
+export type KeyGrapheme = Brand<string, "KeyGrapheme">;
 export type TranscriptBlockId = Brand<string, "TranscriptBlockId">;
 export type GraphemeIndex = Brand<number, "GraphemeIndex">;
 export type CollectionKey = string | number;
@@ -425,18 +426,25 @@ export interface TextDocumentConfig {
   readonly validation?: readonly TextValidationRule[];
   readonly lineEnding?: "lf" | "crlf";
   readonly tabWidth?: number;
+  readonly indentation?:
+    Readonly<{ style: "tabs" }> | Readonly<{ style: "spaces"; width: number }>;
+}
+
+export interface FormControlProps<Value> {
+  readonly required?: boolean;
+  readonly error?: string;
+  readonly onSubmit?: (value: Value) => void;
 }
 export interface InputProps
   extends
     CommonProps<"root" | "value" | "placeholder" | "cursor">,
-    TextDocumentConfig {
+    TextDocumentConfig,
+    FormControlProps<string> {
   readonly value?: string;
   readonly defaultValue?: string;
   readonly onValueChange?: (value: string) => void;
   readonly placeholder?: string;
   readonly name?: string;
-  readonly error?: string;
-  readonly onSubmit?: (value: string) => void;
 }
 export interface TextAreaProps extends InputProps {
   readonly wrap?: "soft" | "none";
@@ -696,15 +704,13 @@ export interface SplitPaneProps extends CommonProps<
 export interface SelectProps<T = unknown, LoadResult = never, Mutations = never>
   extends
     CommonProps<"root" | "trigger" | "list" | "option">,
-    VirtualCollectionBinding<T, LoadResult, Mutations> {
+    VirtualCollectionBinding<T, LoadResult, Mutations>,
+    FormControlProps<CollectionKey | undefined> {
   readonly selectedKey?: CollectionKey;
   readonly defaultSelectedKey?: CollectionKey;
   readonly getKey: (item: T) => CollectionKey;
   readonly renderItem: (item: T) => View;
   readonly onSelectionChange?: (key: CollectionKey | undefined) => void;
-  readonly error?: string;
-  readonly validate?: (key: CollectionKey | undefined) => string | undefined;
-  readonly onSubmit?: (key: CollectionKey | undefined) => void;
 }
 
 export interface ComponentType<Props = object> {
@@ -720,35 +726,32 @@ export interface ViewNode {
   readonly props: Readonly<Record<string, unknown>>;
 }
 
-export type ButtonProps = CommonProps<"root" | "label" | "indicator"> &
-  (
-    | { readonly command: CommandId; readonly onPress?: never }
-    | { readonly command?: never; readonly onPress: () => void }
-    | { readonly command?: never; readonly onPress?: never }
-  );
+export type ButtonProps = CommonProps<"root" | "label" | "indicator"> & {
+  readonly command: CommandId;
+};
 export type ToggleButtonProps = ButtonProps & {
   readonly pressed?: boolean;
   readonly defaultPressed?: boolean;
   readonly onPressedChange?: (pressed: boolean) => void;
 };
-export interface CheckboxProps extends CommonProps<"root" | "box" | "label"> {
+export interface CheckboxProps
+  extends
+    CommonProps<"root" | "box" | "label">,
+    FormControlProps<boolean | "mixed"> {
   readonly checked?: boolean | "mixed";
   readonly defaultChecked?: boolean | "mixed";
   readonly onCheckedChange?: (checked: boolean | "mixed") => void;
-  readonly error?: string;
-  readonly onSubmit?: (checked: boolean | "mixed") => void;
 }
 export interface RadioProps extends CommonProps<
   "root" | "indicator" | "label"
 > {
   readonly value: string;
 }
-export interface RadioGroupProps extends CommonProps<"root" | "item"> {
+export interface RadioGroupProps
+  extends CommonProps<"root" | "item">, FormControlProps<string | undefined> {
   readonly value?: string;
   readonly defaultValue?: string;
   readonly onValueChange?: (value: string) => void;
-  readonly error?: string;
-  readonly onSubmit?: (value: string) => void;
 }
 export interface ProgressProps extends CommonProps<
   "root" | "track" | "fill" | "label"
@@ -767,7 +770,7 @@ export interface MenuProps<T = unknown, LoadResult = never, Mutations = never>
 export interface MenuItemProps extends CommonProps<
   "root" | "label" | "keybinding"
 > {
-  readonly command?: CommandId;
+  readonly command: CommandId;
 }
 
 export interface CommandPaletteProps<
@@ -851,15 +854,71 @@ export interface KeymapScope {
   readonly priority?: number;
 }
 
+export type NamedKey =
+  | "backspace"
+  | "tab"
+  | "enter"
+  | "escape"
+  | "insert"
+  | "delete"
+  | "home"
+  | "end"
+  | "page-up"
+  | "page-down"
+  | "arrow-up"
+  | "arrow-down"
+  | "arrow-left"
+  | "arrow-right"
+  | "f1"
+  | "f2"
+  | "f3"
+  | "f4"
+  | "f5"
+  | "f6"
+  | "f7"
+  | "f8"
+  | "f9"
+  | "f10"
+  | "f11"
+  | "f12"
+  | "f13"
+  | "f14"
+  | "f15"
+  | "f16"
+  | "f17"
+  | "f18"
+  | "f19"
+  | "f20"
+  | "f21"
+  | "f22"
+  | "f23"
+  | "f24";
+
+export interface KeyStroke {
+  readonly key: NamedKey | KeyGrapheme;
+  readonly modifiers?: Readonly<{
+    shift?: boolean;
+    control?: boolean;
+    alt?: boolean;
+    super?: boolean;
+  }>;
+  readonly physicalCode?: number;
+}
+
+export interface KeySequence {
+  readonly strokes: readonly [KeyStroke, ...KeyStroke[]];
+  readonly timeoutMs?: number;
+}
+
 export interface KeymapRebinding {
   readonly command: CommandId;
-  readonly keys: string | null;
-  readonly scope: KeymapScopeId;
+  readonly sequence: KeySequence | null;
+  readonly scope?: KeymapScopeId;
 }
 
 export interface KeymapConflict {
-  readonly keys: string;
-  readonly scope: KeymapScopeId;
+  readonly sequence: KeySequence;
+  readonly scope?: KeymapScopeId;
   readonly commands: readonly CommandId[];
   readonly winner: CommandId;
   readonly reason:
@@ -869,6 +928,11 @@ export interface KeymapConflict {
 export interface ClipboardPayload {
   readonly mediaType: string;
   readonly bytes: Uint8Array;
+}
+
+export interface ClipboardMediaTypes {
+  readonly target: ClipboardTarget;
+  readonly mediaTypes: readonly string[];
 }
 
 export type ClipboardTarget = "clipboard" | "primary";
