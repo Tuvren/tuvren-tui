@@ -75,6 +75,7 @@ The following user-approved implementation preferences guide downstream Architec
 | Imperative model | The stable imperative foundation is available from `tuvren-tui/imperative`; raw FFI is not public SDK surface |
 | Public entrypoints | `tuvren-tui`, `tuvren-tui/jsx-runtime`, `tuvren-tui/jsx-dev-runtime`, `tuvren-tui/testing`, `tuvren-tui/imperative`, and `tuvren-tui/imperative/testing`; no `tuvren-tui/effect` entrypoint |
 | Public styling names | `StyleSpec`, `StyleSheet`, `ThemeTokens`, and `ThemeRecipes` |
+| Effect dependency | Support exactly one stable Effect major as a required peer dependency; Stage 3 must verify and record that major |
 | Effect-native behavior | Rendering returns an Effect; scoped resources own lifetimes; Commands may return typed interruptible Effects; Streams carry events and external updates; Services and Layers supply dependencies; the native manual clock integrates with Effect TestClock |
 | Runtime internals | Taffy for layout and crossterm for terminal integration, subject to downstream verification |
 | Terminal protocols | Detection-first support for Kitty keyboard, clipboard, paste, and graphics capabilities; OSC 52 text fallback; Sixel fallback for images where appropriate |
@@ -83,4 +84,4 @@ The following user-approved implementation preferences guide downstream Architec
 | Build environment | `devenv` with Nix |
 | Comparative references | Match or beat OpenTUI across representative workloads, remain within the evidence-ratified margin of Ratatui on comparable hot paths, and materially outperform Ink and similar host-only alternatives |
 | Local devtools commands | `bunx tuvren dev ENTRY`, `bunx tuvren doctor`, and `bunx tuvren trace view TRACE_FILE`; framework Commands `tuvren.devtools.toggle`, `tuvren.devtools.pick`, `tuvren.devtools.record`, and `tuvren.devtools.saveTrace`; no examples command is approved |
-| Reference integration | An OpenCode example may demonstrate performance and developer experience only; it must not imply a supported OpenCode protocol contract |
+| Reference integration | The OpenCode client is a required release-gating performance and developer-experience reference; isolate its live protocol behind an application adapter, use deterministic replay in CI, and do not place OpenCode types or lifecycle rules in core SDK contracts |

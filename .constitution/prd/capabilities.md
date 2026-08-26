@@ -10,7 +10,7 @@ P0 defines the complete `0.1.0` product contract. P1 defines the planned `0.2.0`
 
 - **P0-A01:** The default SDK workflow must let a Developer describe a view declaratively and run it through a managed application lifecycle.
 - **P0-A02:** The imperative SDK must expose every public Primitive through safe wrappers without requiring access to the private native boundary.
-- **P0-A03:** The Declarative SDK and Imperative SDK must provide capability parity without requiring API-shape parity.
+- **P0-A03:** The Effect UI SDK and Imperative SDK must provide capability parity without requiring API-shape parity.
 - **P0-A04:** The managed lifecycle must own initialization, input processing, Render Pass scheduling, cleanup, and terminal restoration.
 - **P0-A05:** The Imperative SDK must offer an advanced embedding surface for Developers who need manual lifecycle and loop control.
 - **P0-A06:** Application work must be able to run concurrently while accepted UI mutations remain deterministically ordered and serialized.
@@ -31,7 +31,7 @@ P0 defines the complete `0.1.0` product contract. P1 defines the planned `0.2.0`
 - **P0-B05:** Tuvren must provide first-party `Select`, `ListBox`, `Tabs`, `CommandPalette`, `CodeView`, `DiffView`, `Toast`, and `Notification` Components.
 - **P0-B06:** Every stateful first-party Component must support a documented controlled mode or uncontrolled mode, and each mutable property must have exactly one authority at a time.
 - **P0-B07:** First-party Components must share consistent activation, disabled, validation, selection, focus, semantic-state, and animation behavior where those concepts apply.
-- **P0-B08:** A Component Author must be able to distribute ordinary packages containing Components, Commands, Keymaps, helpers, and application services without a formal Runtime Extension contract.
+- **P0-B08:** A Component Author must be able to distribute ordinary packages containing Components, Commands, Keymaps, helpers, and application services without a formal RuntimeExtension contract.
 - **P0-B09:** Form controls must share consistent value, validation, error, disabled, and submission behavior where those concepts apply.
 
 **Rationale:** A general-purpose library needs a coherent control catalog and stable composition model, not merely a rendering engine or a collection of unrelated examples.
@@ -59,10 +59,10 @@ P0 defines the complete `0.1.0` product contract. P1 defines the planned `0.2.0`
 - **P0-D01:** A Developer must be able to declare typed StyleSpecs and register named rules in a StyleSheet.
 - **P0-D02:** StyleSpecs must support focused, pointer-over, active, disabled, selected, checked, mixed, expanded, and invalid state conditions.
 - **P0-D03:** StyleSpecs must support light, dark, reduced-motion, width, height, color, and Capability Tier conditions.
-- **P0-D04:** A Developer must be able to define semantic Theme Tokens and reusable Theme Recipes.
+- **P0-D04:** A Developer must be able to define semantic ThemeTokens and reusable ThemeRecipes.
 - **P0-D05:** A Developer must be able to override first-party Component appearance at Theme, Component-instance, and stable named-slot levels.
 - **P0-D06:** A Component's internal Primitive tree must remain private and replaceable without invalidating supported style overrides.
-- **P0-D07:** Style resolution must use this deterministic order: runtime defaults, Theme Tokens, Theme Recipes, built-in Component recipe, instance StyleSheet, instance slot override, and explicit inline override.
+- **P0-D07:** Style resolution must use this deterministic order: runtime defaults, ThemeTokens, ThemeRecipes, built-in Component recipe, instance StyleSheet, instance slot override, and explicit inline override.
 - **P0-D08:** State or environment changes must update applicable styles without requiring application callbacks.
 - **P0-D09:** Diagnostics must identify winning, overridden, and inactive declarations with their sources and reasons.
 
@@ -109,14 +109,14 @@ P0 defines the complete `0.1.0` product contract. P1 defines the planned `0.2.0`
 
 - **P0-G01:** The system must normalize keyboard input, key repetition, key release, text input, pointer movement, click, drag, release, wheel, focus, blur, resize, and bounded paste input when the Terminal Environment can report them.
 - **P0-G02:** The system must route Events according to hit-testing, focus, modal state, and interaction-root boundaries.
-- **P0-G03:** A Developer must be able to observe Event capture, target, and bubble phases for Events declared interceptable.
-- **P0-G04:** A Developer must be able to stop propagation or prevent a supported cancelable default action before that action is applied.
-- **P0-G05:** Noncancelable or unintercepted Events must retain a low-latency path.
-- **P0-G06:** Event arbitration must preserve exactly-once completion, deterministic ordering, bounded pending storage, and recovery from handler failure or shutdown.
+- **P0-G03:** If OD-02 ratifies a feasible interception model, a Developer must be able to intercept supported cancelable Component interactions before their default behavior commits.
+- **P0-G04:** If OD-02 ratifies a feasible interception model, a Developer must be able to stop supported Event propagation or prevent supported default behavior.
+- **P0-G05:** Event classes that do not require application interception must retain a low-latency path.
+- **P0-G06:** Event processing must preserve deterministic ordering, bounded pending storage, and recovery from handler failure or shutdown.
 - **P0-G07:** A Developer must be able to define Focus Scopes that contain navigation, restore prior focus, or trap focus for modal content.
 - **P0-G08:** The system must support pointer capture and drag-and-drop behavior.
 
-**Rationale:** Predictable interaction requires one routing model across Primitives and Components. The final arbitration mechanism remains blocked on the feasibility evidence recorded as OD-02; downstream stages must not weaken these outcomes silently.
+**Rationale:** Predictable interaction requires one routing model across Primitives and Components. OD-02 blocks the final lifecycle, timing, and boundary mechanism. If its prototype fails, an explicit Stage 1 Evolution decision must revise or defer P0-G03 and P0-G04 before downstream stages select an alternative; they must not treat the provisional two-phase mechanism as settled.
 
 ### Epic P0-H — Commands and Keymaps
 
@@ -257,6 +257,7 @@ P0 defines the complete `0.1.0` product contract. P1 defines the planned `0.2.0`
 - **P0-O16:** Pre-release validation may use private or alpha artifacts, but those artifacts must not be represented as the final public release.
 - **P0-O17:** Saving a Diagnostic Trace with full application content must require explicit Developer confirmation.
 - **P0-O18:** A failed application context must not permanently prevent the process from creating a new application context.
+- **P0-O19:** The release must use the OpenCode client as a required performance and developer-experience reference without treating OpenCode as a supported integration contract.
 
 **Rationale:** Native-class performance is not useful if installation, recovery, security, privacy, or release evidence remains prototype-grade.
 
@@ -307,7 +308,7 @@ P0 defines the complete `0.1.0` product contract. P1 defines the planned `0.2.0`
 
 **Priority:** P2
 
-- **P2-A01:** Tuvren may define a Runtime Extension contract after real packages demonstrate needs that ordinary composition cannot meet.
+- **P2-A01:** Tuvren may define a RuntimeExtension contract after real packages demonstrate needs that ordinary composition cannot meet.
 - **P2-A02:** Tuvren may define a Plugin ecosystem only after discovery, installation, lifecycle, permissions, compatibility, and coordinated teardown are product commitments.
 - **P2-A03:** Devtools may add browser or editor inspectors, remote attachment, live editing, panel extensions, full time travel, state-preserving reload, specialized profilers, telemetry, or assisted diagnosis after local terminal-native workflows are proven.
 
