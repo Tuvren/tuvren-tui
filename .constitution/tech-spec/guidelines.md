@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.4** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.5** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -82,6 +82,7 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Compile with TypeScript `5.9.3`, `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `verbatimModuleSyntax`, `isolatedModules`, and declaration plus source-map output.
 - Ship ESM only. Do not add CommonJS wrappers.
 - Public code uses Component and Primitive. `RuntimeNode`, ABI handles, binary opcodes, and `@preact/signals-core` remain private.
+- A public Component exposes its props, lifecycle, declared controllers, and semantic APIs, but never its private Primitive root. Composition internals may change without creating a public escape hatch to native identities or duplicated mutable state.
 - The bare entrypoint must not import the Imperative SDK implementation eagerly unless tree shaking proves that no additional startup or bundle cost results.
 - `render` and resource-producing APIs return Effect values. Lifetimes use scopes; Commands use typed interruptible Effects; external updates and Events expose Streams where streaming is the right model.
 - Do not wrap an Effect API in a Promise and call it Effect-native. Promise conversion exists only at the outer Host Environment integration edge.
@@ -89,6 +90,10 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Reactivity is private. Public state hooks return Tuvren-owned interfaces and must not expose Signal identity, scheduling, equality, or disposal.
 - Validate `unknown` at public and durable-data boundaries. Do not introduce `any` to silence TypeScript 7 migration errors.
 - Public errors are tagged or classed `TuvrenError` variants and include stable code, category, operation, optional Component identity, cause, and remediation. Internal statuses never escape.
+- Declarative and imperative Commands expose the same title, description, category, visibility, enablement, activation condition, concurrency, typed success, typed failure, and interruption semantics. Buttons, menu items, and palette entries bind a Command ID; they never duplicate the action body.
+- Keymaps use branded hierarchical scope identities; an unscoped binding belongs to the global root. Resolution filters inactive bindings, then orders candidates by nearest focused scope, descending scope priority, an explicit user rebinding over a static binding, and finally most-recent registration. Conflict inspection reports every collision and its deterministic winner before invocation; rebinding and scope disposal update resolution atomically.
+- `DataSource.loadRange` receives an `AbortSignal`. Every Collection mutation carries its generation, and stale completions or mutations are discarded before they reach native state.
+- Animation creation returns an interruptible handle in both SDKs. Cancellation and replacement are native animation-registry operations, and completion reports `completed`, `cancelled`, or `replaced` without making dropped presentations part of logical time.
 
 ## ABI and codec standards
 
@@ -100,6 +105,8 @@ Migration may happen incrementally, but completed modules must follow this targe
 - Wire enums use the fixed numeric tables in `native-abi.h`, never C enum layout. Dimension constraints carry independently tagged minimum, preferred, and maximum atoms; Grid tracks carry typed dimension or minmax records. Numeric Collection keys are finite IEEE-754 values with negative zero normalized and NaN or infinity rejected.
 - Rust decoders read fields from bytes explicitly and never cast an untrusted or potentially unaligned buffer to a C or Rust struct. The C structs document layout for generated host codecs and conformance checks.
 - Callers own input and output buffers. The runtime never returns a pointer that outlives the call.
+- Public Text Document read operations and Collection or Transcript visible-range reads use the bounded `tui_query_copy` protocol. Result-bearing text mutations return indexed scalar command results from the same atomic transaction apply; the host never reconstructs native state from cached writes.
+- Style values may carry typed Theme-token references. The transaction encodes token names and optional fallbacks explicitly, Theme payloads carry typed token records, and Rust resolves them against the active Theme during style evaluation. Resolution proceeds from runtime defaults through ThemeTokens, ThemeRecipes, the built-in Component recipe, the instance StyleSheet, the instance slot override, and finally the inline StyleSpec; later levels win. A token reference changes only the value, not this precedence order.
 - Strings are UTF-8 inside the ABI. TypeScript string conversion is transparent; explicit UTF-16LE and UTF-16BE adapters validate byte order and length.
 - Public positions are grapheme indices. Internal byte offsets may exist only beside the content epoch they were derived from.
 - ABI status values are private: success, buffer-too-small, invalid-input, stale-context, unavailable, and panic-contained. TypeScript copies details immediately and maps them to public errors.

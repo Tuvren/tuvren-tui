@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.4** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.5** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -76,14 +76,14 @@ The native crate produces `cdylib` for the SDK and `rlib` for native tests and b
 | Layout and responsive behavior | `shared.d.ts`, transaction properties | Taffy-backed composition and style kernel |
 | Styling and Theme | `shared.d.ts`, transaction properties | Native StyleSheet and Theme registries with provenance |
 | Text and rich content | `shared.d.ts`, transaction byte arena | `TextDocument`, `GraphemePool`, StyledText decoder |
-| Text editing | both SDK declarations, transaction text-edit opcode | `TextDocument` operation history and clipboard service |
+| Text editing | both SDK declarations, transaction text-edit opcode, bounded query/copy-out ABI | `TextDocument` operation history and clipboard service |
 | Input, Event, focus, and direct manipulation | `shared.d.ts`, Event batch ABI | Interaction kernel; final interception records blocked by OD-02 |
-| Command and Keymap | `tuvren-tui.d.ts`, transaction ABI | Effect Command services and UI executor |
+| Command and Keymap | both SDK declarations, transaction ABI | Command registries, scoped Keymap resolution, and UI executor |
 | Virtual Collection and transient feedback | both SDK declarations | `VirtualCollectionState`, generations, Resident Projection |
 | Transcript and streaming data | `shared.d.ts`, transaction Transcript opcode | `TranscriptState`, stable block identities, Text Documents |
 | Terminal, Screen Mode, and clipboard | both SDK declarations, native ABI | `TerminalSession`, terminal profile schema |
 | Accessibility semantics | `shared.d.ts`, snapshot schema | `SemanticNode`, announcement Event, conformance harness |
-| Animation and time | both SDK declarations, transaction animation opcode | Native animation registry and manual clock |
+| Animation and time | both SDK declarations, apply/cancel/replace animation opcodes | Native animation registry and manual clock |
 | Devtools, testing, and diagnostics | testing declarations, trace and snapshot schemas | Diagnostic Graph and isolated replay context |
 | Installation, distribution, safety, and release | `cli.json`, release and benchmark schemas | Resolver, atomic release manifest, target smoke matrix |
 

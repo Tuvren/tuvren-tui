@@ -5,17 +5,20 @@ import type * as Scope from "effect/Scope";
 import type * as Stream from "effect/Stream";
 import type {
   BoxProps,
+  BorderStyle,
   ButtonProps,
   ClipboardPayload,
   ClipboardTarget,
   CheckboxProps,
   CodeViewProps,
+  CommandPaletteProps,
   CommandId,
   ComponentType,
   DialogProps,
   DiffViewProps,
   AnimationSpec,
   AnimationTimeline,
+  AnimationCompletion,
   ErrorBoundaryProps,
   FocusScopeProps,
   InputProps,
@@ -44,8 +47,10 @@ import type {
 
 export { TuvrenError } from "./shared";
 export type {
+  AnimationCompletion,
   AnimationSpec,
   AnimationTimeline,
+  BorderStyle,
   BoxProps,
   Brand,
   ButtonProps,
@@ -55,6 +60,7 @@ export type {
   CodeViewProps,
   CollectionKey,
   CommandId,
+  CommandPaletteProps,
   CommonProps,
   ComponentId,
   ComponentType,
@@ -70,6 +76,10 @@ export type {
   JustifyMode,
   GridTrack,
   GridPlacement,
+  KeymapConflict,
+  KeymapRebinding,
+  KeymapScope,
+  KeymapScopeId,
   ErrorBoundaryProps,
   ExternalOutputMode,
   FocusScopeProps,
@@ -91,6 +101,10 @@ export type {
   SemanticSpec,
   SplitPaneProps,
   StyleCondition,
+  StyleBoolean,
+  StyleBorder,
+  StyleColor,
+  StyleNumber,
   StyledSpan,
   StyledText,
   StyleSheet,
@@ -113,6 +127,9 @@ export type {
   TextProps,
   Theme,
   ThemeRecipes,
+  ThemeTextValue,
+  ThemeTokenReference,
+  ThemeTokenValue,
   ThemeTokens,
   ToastProps,
   ToggleButtonProps,
@@ -174,7 +191,7 @@ export interface Command<A = void, E = never, R = never> {
 export interface KeyBinding {
   readonly command: CommandId;
   readonly keys: string;
-  readonly scope?: string;
+  readonly scope?: import("./shared").KeymapScopeId;
   readonly when?: (context: CommandContext) => boolean;
 }
 
@@ -200,6 +217,27 @@ export interface RegisteredCommandError {
 
 export interface KeymapService {
   register(binding: KeyBinding): Effect.Effect<void, TuvrenError, Scope.Scope>;
+  createScope(
+    id: import("./shared").KeymapScopeId,
+    options?: Readonly<{
+      parent?: import("./shared").KeymapScopeId;
+      priority?: number;
+    }>,
+  ): Effect.Effect<import("./shared").KeymapScope, TuvrenError, Scope.Scope>;
+  bindings(
+    scope?: import("./shared").KeymapScopeId,
+  ): Effect.Effect<readonly KeyBinding[], TuvrenError>;
+  conflicts(
+    scope?: import("./shared").KeymapScopeId,
+  ): Effect.Effect<readonly import("./shared").KeymapConflict[], TuvrenError>;
+  rebind(
+    rebinding: import("./shared").KeymapRebinding,
+  ): Effect.Effect<void, TuvrenError>;
+  resolve(
+    keys: string,
+    focusedScopes: readonly import("./shared").KeymapScopeId[],
+    context?: Partial<CommandContext>,
+  ): Effect.Effect<CommandId | undefined, TuvrenError>;
 }
 
 export interface ClipboardError extends TuvrenError {
@@ -257,10 +295,25 @@ export function defineTheme(
   tokens: import("./shared").ThemeTokens,
   recipes: import("./shared").ThemeRecipes,
 ): import("./shared").Theme;
+export function themeToken<Value extends import("./shared").ThemeTokenValue>(
+  token: string,
+  fallback?: Value,
+): import("./shared").ThemeTokenReference<Value>;
+export interface AnimationHandle {
+  readonly id: bigint;
+  readonly completion: Effect.Effect<
+    import("./shared").AnimationCompletion,
+    TuvrenError
+  >;
+  readonly cancel: Effect.Effect<void, TuvrenError>;
+  replace(
+    spec: AnimationSpec | AnimationTimeline,
+  ): Effect.Effect<void, TuvrenError>;
+}
 export function animate(
   target: import("./shared").ComponentId,
   spec: AnimationSpec | AnimationTimeline,
-): Effect.Effect<void, TuvrenError>;
+): Effect.Effect<AnimationHandle, TuvrenError>;
 export interface TextDocumentService {
   readonly snapshot: Effect.Effect<import("./shared").TextDocumentSnapshot>;
   readonly changes: Stream.Stream<import("./shared").TextDocumentSnapshot>;
@@ -319,6 +372,7 @@ export function toStyledText(
 ): import("./shared").StyledText;
 export function componentId(value: string): import("./shared").ComponentId;
 export function commandId(value: string): CommandId;
+export function keymapScopeId(value: string): import("./shared").KeymapScopeId;
 export function transcriptBlockId(
   value: string,
 ): import("./shared").TranscriptBlockId;
@@ -392,7 +446,7 @@ export function ListBox<T, E = never, R = never>(
 ): View;
 export const Tabs: ComponentType<TabsProps>;
 export function CommandPalette<T, E = never, R = never>(
-  props: SelectProps<
+  props: CommandPaletteProps<
     T,
     Effect.Effect<RangeLoadResult<T>, E, R>,
     Stream.Stream<import("./shared").CollectionMutation<T>, E, R>

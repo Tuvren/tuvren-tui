@@ -2,6 +2,7 @@ export type Brand<T, Name extends string> = T & { readonly __brand: Name };
 
 export type ComponentId = Brand<string, "ComponentId">;
 export type CommandId = Brand<string, "CommandId">;
+export type KeymapScopeId = Brand<string, "KeymapScopeId">;
 export type TranscriptBlockId = Brand<string, "TranscriptBlockId">;
 export type GraphemeIndex = Brand<number, "GraphemeIndex">;
 export type CollectionKey = string | number;
@@ -34,6 +35,23 @@ export type Color =
       readonly b: number;
       readonly a?: number;
     };
+
+export interface ThemeTextValue {
+  readonly text: string;
+}
+
+export type ThemeTokenValue = Color | number | boolean | ThemeTextValue;
+
+export interface ThemeTokenReference<Value extends ThemeTokenValue> {
+  readonly token: string;
+  readonly fallback?: Value;
+}
+
+export type StyleColor = Color | ThemeTokenReference<Color>;
+export type StyleNumber = number | ThemeTokenReference<number>;
+export type StyleBoolean = boolean | ThemeTokenReference<boolean>;
+export type BorderStyle = "none" | "single" | "double" | "rounded" | "heavy";
+export type StyleBorder = BorderStyle | ThemeTokenReference<BorderStyle>;
 
 export type Dimension =
   | number
@@ -81,7 +99,8 @@ export interface GridPlacement {
 }
 
 export interface LayoutSpec {
-  readonly display?: "flex" | "grid" | "absolute";
+  readonly display?: "flex" | "grid";
+  readonly position?: "relative" | "absolute";
   readonly width?: Dimension;
   readonly height?: Dimension;
   readonly minWidth?: Dimension;
@@ -135,19 +154,20 @@ export interface StyleCondition extends ResponsiveCondition {
 }
 
 export interface StyleSpec {
-  readonly foreground?: Color;
-  readonly background?: Color;
-  readonly bold?: boolean;
-  readonly italic?: boolean;
-  readonly underline?: boolean;
-  readonly dim?: boolean;
-  readonly inverse?: boolean;
-  readonly border?: "none" | "single" | "double" | "rounded" | "heavy";
+  readonly foreground?: StyleColor;
+  readonly background?: StyleColor;
+  readonly bold?: StyleBoolean;
+  readonly italic?: StyleBoolean;
+  readonly underline?: StyleBoolean;
+  readonly dim?: StyleBoolean;
+  readonly inverse?: StyleBoolean;
+  readonly border?: StyleBorder;
   readonly padding?:
     | number
     | readonly [number, number]
-    | readonly [number, number, number, number];
-  readonly opacity?: number;
+    | readonly [number, number, number, number]
+    | ThemeTokenReference<number>;
+  readonly opacity?: StyleNumber;
   readonly variants?: readonly {
     readonly when: StyleCondition;
     readonly style: StyleSpec;
@@ -159,9 +179,7 @@ export interface StyleSheet<Rule extends string = string> {
   readonly rules: Readonly<Record<Rule, StyleSpec>>;
 }
 
-export type ThemeTokens = Readonly<
-  Record<string, Color | number | string | boolean>
->;
+export type ThemeTokens = Readonly<Record<string, ThemeTokenValue>>;
 export type ThemeRecipes = Readonly<Record<string, StyleSheet>>;
 
 export interface Theme {
@@ -440,6 +458,7 @@ export interface RangeRequest {
   readonly start: number;
   readonly count: number;
   readonly generation: number;
+  readonly signal: AbortSignal;
 }
 export interface RangeResult<T> {
   readonly generation: number;
@@ -463,10 +482,29 @@ export type RangeLoadResult<T> =
     };
 
 export type CollectionMutation<T> =
-  | { readonly type: "insert"; readonly index: number; readonly item: T }
-  | { readonly type: "update"; readonly key: CollectionKey; readonly item: T }
-  | { readonly type: "remove"; readonly key: CollectionKey }
-  | { readonly type: "move"; readonly key: CollectionKey; readonly to: number }
+  | {
+      readonly type: "insert";
+      readonly index: number;
+      readonly item: T;
+      readonly generation: number;
+    }
+  | {
+      readonly type: "update";
+      readonly key: CollectionKey;
+      readonly item: T;
+      readonly generation: number;
+    }
+  | {
+      readonly type: "remove";
+      readonly key: CollectionKey;
+      readonly generation: number;
+    }
+  | {
+      readonly type: "move";
+      readonly key: CollectionKey;
+      readonly to: number;
+      readonly generation: number;
+    }
   | {
       readonly type: "reset";
       readonly items: readonly T[];
@@ -658,6 +696,7 @@ export interface ViewNode {
 export interface ButtonProps extends CommonProps<
   "root" | "label" | "indicator"
 > {
+  readonly command?: CommandId;
   readonly onPress?: () => void;
 }
 export interface ToggleButtonProps extends ButtonProps {
@@ -702,6 +741,14 @@ export interface MenuItemProps extends CommonProps<
   "root" | "label" | "keybinding"
 > {
   readonly command?: CommandId;
+}
+
+export interface CommandPaletteProps<
+  T = unknown,
+  LoadResult = never,
+  Mutations = never,
+> extends SelectProps<T, LoadResult, Mutations> {
+  readonly commandForItem: (item: T) => CommandId;
 }
 export interface DialogProps extends CommonProps<
   "backdrop" | "root" | "title" | "description" | "actions"
@@ -767,6 +814,29 @@ export interface AnimationSpec {
 export interface AnimationTimeline {
   readonly animations: readonly AnimationSpec[];
   readonly mode?: "sequence" | "parallel";
+}
+
+export type AnimationCompletion = "completed" | "cancelled" | "replaced";
+
+export interface KeymapScope {
+  readonly id: KeymapScopeId;
+  readonly parent?: KeymapScopeId;
+  readonly priority?: number;
+}
+
+export interface KeymapRebinding {
+  readonly command: CommandId;
+  readonly keys: string | null;
+  readonly scope: KeymapScopeId;
+}
+
+export interface KeymapConflict {
+  readonly keys: string;
+  readonly scope: KeymapScopeId;
+  readonly commands: readonly CommandId[];
+  readonly winner: CommandId;
+  readonly reason:
+    "priority" | "scope-depth" | "rebinding" | "registration-order";
 }
 
 export interface ClipboardPayload {

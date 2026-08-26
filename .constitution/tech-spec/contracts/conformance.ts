@@ -13,6 +13,7 @@ import {
   defineTheme,
   provideTheme,
   render,
+  themeToken,
   type RangeLoadResult,
   type TuvrenError,
 } from "./tuvren-tui";
@@ -20,14 +21,17 @@ import { jsx } from "./jsx-runtime";
 import {
   Box as ImperativeBox,
   Text as ImperativeText,
+  keymapScopeId as imperativeKeymapScopeId,
   run as runImperative,
+  type ImperativeCommand,
 } from "./imperative";
 
+const save = commandId("app.save");
 const root = Box({
   id: componentId("app.root"),
   children: [
     Text({ content: "Hello" }),
-    Button({ onPress: () => undefined }),
+    Button({ command: save, onPress: () => undefined }),
     Select({
       dataSource: {
         getKey: (item: string) => item,
@@ -53,21 +57,57 @@ const root = Box({
   ],
 });
 
-const theme = defineTheme("contract", { accent: "#00ffff" }, {});
+const theme = defineTheme(
+  "contract",
+  {
+    accent: "#00ffff",
+    emphasis: true,
+    spacing: 1,
+    border: { text: "rounded" },
+  },
+  {
+    button: {
+      name: "button",
+      rules: {
+        root: {
+          foreground: themeToken("accent", "#ffffff"),
+          bold: themeToken("emphasis", true),
+          padding: themeToken("spacing", 0),
+          border: themeToken("border", "single"),
+        },
+      },
+    },
+  },
+);
 const managed: Effect.Effect<void, TuvrenError> = render(
   provideTheme(theme, root),
 );
 const jsxNode = jsx(Box, { children: "content" });
-const save = commandId("app.save");
 
 const terminalTag = Terminal;
 const commandTag = Commands;
+const imperativeSave: ImperativeCommand<number, "save-failed"> = {
+  id: save,
+  title: "Save",
+  concurrency: "restart",
+  enabled: () => true,
+  run: () => ({ ok: true, value: 1 }),
+};
 
 const imperative: Promise<void> = runImperative((app) => {
   const box = new ImperativeBox({});
   box.append(new ImperativeText({ content: "Hello" }));
   app.setTheme(theme);
   app.setRoot(box);
+  app.commands.register(imperativeSave);
+  const editorScope = app.keymaps.createScope(
+    imperativeKeymapScopeId("editor"),
+  );
+  app.keymaps.register({
+    command: save,
+    keys: "ctrl+s",
+    scope: editorScope.id,
+  });
 });
 
 void managed;

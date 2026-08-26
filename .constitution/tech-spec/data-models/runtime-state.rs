@@ -45,6 +45,11 @@ pub struct TranscriptBlockId(pub String);
 pub enum DisplayMode {
     Flex,
     Grid,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum PositionMode {
+    Relative,
     Absolute,
 }
 
@@ -85,6 +90,7 @@ pub struct DimensionSpec {
 #[derive(Clone, Debug)]
 pub struct LayoutSpec {
     pub display: DisplayMode,
+    pub position: PositionMode,
     pub width: DimensionSpec,
     pub height: DimensionSpec,
     pub min_width: Option<DimensionSpec>,
@@ -139,14 +145,31 @@ pub struct ResponsiveCondition {
     pub max_height_percent: Option<f32>,
 }
 
+#[derive(Clone, Debug)]
+pub enum Resolvable<T> {
+    Literal(T),
+    Token {
+        name: String,
+        fallback: Option<T>,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub enum ThemeTokenValue {
+    Color(u32),
+    Number(f64),
+    Text(String),
+    Boolean(bool),
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct StyleSpec {
-    pub foreground: Option<u32>,
-    pub background: Option<u32>,
-    pub attributes: u32,
-    pub border: Option<u8>,
-    pub padding: Option<[u16; 4]>,
-    pub opacity: Option<f32>,
+    pub foreground: Option<Resolvable<u32>>,
+    pub background: Option<Resolvable<u32>>,
+    pub attributes: BTreeMap<u32, Resolvable<bool>>,
+    pub border: Option<Resolvable<u8>>,
+    pub padding: Option<Resolvable<[u16; 4]>>,
+    pub opacity: Option<Resolvable<f32>>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -179,7 +202,7 @@ pub struct RegisteredStyleSheet {
 pub struct ThemeState {
     pub id: u32,
     pub name: String,
-    pub tokens: BTreeMap<String, String>,
+    pub tokens: BTreeMap<String, ThemeTokenValue>,
     pub recipes: BTreeMap<String, u32>,
     pub generation: u64,
 }
