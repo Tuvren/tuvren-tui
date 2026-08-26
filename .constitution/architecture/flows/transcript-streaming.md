@@ -24,11 +24,12 @@ sequenceDiagram
     Exec->>Interact: Begin serialized hit-test and keyed Transcript intent derivation
     Interact->>Content: Update anchor, selection, or follow intent inside the operation
     Content->>Content: Protect visible, anchored, selected, and streaming blocks
-    Content-->>Orch: Emit resident-range, eviction, or reload Event
+    Content-->>Exec: Complete native operation with resident-range, eviction, or reload Event
+    Exec-->>Orch: Deliver Event after native completion
     Content-->>Present: Provide visible blocks and stable anchor projection
     Present-->>EU: Preserve reading position or follow live edge as declared
 ```
 
 ## Failure path
 
-A stale update, missing durable range, or memory-pressure eviction cannot silently delete application-controlled history or displace a protected anchor. Interaction never mutates Transcript state outside an executor-owned operation. The local mode applies its declared bound; controlled mode requests reload from the application.
+A stale update, missing durable range, or memory-pressure eviction cannot silently delete application-controlled history or displace a protected anchor. Interaction never mutates Transcript state outside an executor-owned operation, and Content never calls orchestration directly. Events return through the executor and reach application code only after native completion. The local mode applies its declared bound; controlled mode requests reload from the application.

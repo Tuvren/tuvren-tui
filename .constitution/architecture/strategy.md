@@ -2,7 +2,7 @@
 
 ## Version
 
-**v4.0.5** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
+**v4.0.6** — corresponds to the latest entry in `.constitution/architecture/changelog.md`.
 
 ## Architectural pattern
 
