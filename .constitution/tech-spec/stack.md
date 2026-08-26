@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.0** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
+**v9.0.1** — corresponds to the latest entry in `.constitution/tech-spec/changelog.md`.
 
 ## Implementation posture
 
@@ -100,6 +100,8 @@ The SDK package and all platform packages publish atomically with the same exact
 Pre-`1.0` minor releases may break public SDK contracts only with a changelog, migration guide, one-minor deprecation when safe, and a codemod when practical. Diagnostic Trace, snapshot, terminal-profile, replay, benchmark-result, and release-manifest schemas version independently. Every exact schema version is a new immutable artifact with `$id` `https://tuvren.dev/schema/<family>/<semver>/schema.json`; its checked-in filename adds `-<semver>` once more than one version exists. A schema major may break readers, a minor may add optional fields, and a patch may only correct prose or narrow a validator defect through a newly versioned artifact—it never replaces a published file. Readers dispatch on `schemaVersion` before parsing the payload, support the current major and the immediately previous major for one SDK minor through a named migrator, and reject all unregistered versions. `contracts/schema-migrations.json` maps every supported version to its immutable artifact, exact `$id`, and named migration path.
 
 JSON Schema validates each durable shape but cannot enforce cross-artifact equality. Release verification must additionally run `validateAtomicReleaseManifest` as defined by `contracts/release-validation.json`; that validator proves exact artifact membership, SemVer, package/artifact version equality, ABI equality, checksums, package manifests, source revisions, and provenance before any publish begins.
+
+`bun run check:release-candidate` is the aggregate release gate. Its target implementation executes contract and capability checks; semantic, terminal, target, and package suites; every named fuzz target; the 100 KB bundle check; envelope, comparative, and devtools benchmarks; adoption studies; OpenCode replay and live evidence; supply-chain audits; and `validateAtomicReleaseManifest`. It fails on the first missing, skipped, stale, or nonconforming required result and writes the schema-valid evidence index consumed by release automation.
 
 Diagnostic snapshots use `row-major-rle-v1` cell runs. `validateDiagnosticSnapshotRuns` in `contracts/snapshot-validation.json` performs the checked cross-field sum, exact dense reconstruction, and cursor bounds that JSON Schema cannot express.
 

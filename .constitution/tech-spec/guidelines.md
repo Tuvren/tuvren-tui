@@ -2,7 +2,7 @@
 
 ## Version
 
-**v9.0.0** — corresponds to `.constitution/tech-spec/changelog.md`.
+**v9.0.1** — corresponds to `.constitution/tech-spec/changelog.md`.
 
 ## Target repository structure
 
@@ -174,6 +174,7 @@ bun install --cwd .constitution/tech-spec/contracts --frozen-lockfile
 bun run --cwd .constitution/tech-spec/contracts check
 bun run build:package            # Emit the exact public and platform package layouts declared by the package contracts
 bun run check:capability-map     # Prove every P0 ID has an example, test, flow, and task
+bun run check:release-candidate  # Run every P0 contract, semantic, terminal, fuzz, bundle, benchmark, adoption, target, package, OpenCode, and atomic-manifest gate
 bun run test:semantic            # Shared Effect and imperative semantic conformance
 bun run test:terminal            # Protocol, Screen Mode, restoration, and multiplexer profiles
 bun run test:platform-smoke      # Install/load/init/headless-render/shutdown on all five targets
