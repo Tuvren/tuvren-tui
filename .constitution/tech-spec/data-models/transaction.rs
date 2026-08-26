@@ -109,11 +109,11 @@ pub enum ValidatedPayload<'a> {
         property: u32,
         value: f64,
     },
-    Bytes {
+    Utf8 {
         property: u32,
-        value: &'a [u8],
+        value: &'a str,
     },
-    Layout(LayoutPayload<'a>),
+    Layout(LayoutPayload),
     Style(StylePayload<'a>),
     Semantic(SemanticPayload<'a>),
     TextContent(TextContentPayload<'a>),
@@ -126,24 +126,173 @@ pub enum ValidatedPayload<'a> {
     Diagnostic(DiagnosticPayload),
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct DimensionAtom {
+    pub tag: u16,
+    pub value: f32,
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct Dimension {
+    pub minimum: Option<DimensionAtom>,
+    pub preferred: Option<DimensionAtom>,
+    pub maximum: Option<DimensionAtom>,
+}
+
 #[derive(Clone, Debug)]
-pub struct LayoutPayload<'a> {
-    pub fixed_record: &'a [u8],
-    pub row_tracks: &'a [u8],
-    pub column_tracks: &'a [u8],
-    pub responsive_rules: &'a [u8],
+pub enum GridTrack {
+    Dimension(Dimension),
+    Fraction(f32),
+    MinMax {
+        minimum: Dimension,
+        maximum: Dimension,
+    },
+}
+
+#[derive(Clone, Debug, Default)]
+pub struct ResponsiveCondition {
+    pub min_width_cells: Option<f32>,
+    pub max_width_cells: Option<f32>,
+    pub min_height_cells: Option<f32>,
+    pub max_height_cells: Option<f32>,
+    pub min_width_percent: Option<f32>,
+    pub max_width_percent: Option<f32>,
+    pub min_height_percent: Option<f32>,
+    pub max_height_percent: Option<f32>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ResponsiveLayoutRule {
+    pub condition: ResponsiveCondition,
+    pub layout: Box<LayoutPayload>,
+}
+
+#[derive(Clone, Debug)]
+pub struct LayoutPayload {
+    pub display: u16,
+    pub position: u16,
+    pub flex_direction: u16,
+    pub flex_wrap: u16,
+    pub align_items: u16,
+    pub align_self: u16,
+    pub align_content: u16,
+    pub justify_content: u16,
+    pub width: Dimension,
+    pub height: Dimension,
+    pub min_width: Dimension,
+    pub max_width: Dimension,
+    pub min_height: Dimension,
+    pub max_height: Dimension,
+    pub flex_basis: Dimension,
+    pub top: Dimension,
+    pub right: Dimension,
+    pub bottom: Dimension,
+    pub left: Dimension,
+    pub grow: f32,
+    pub shrink: f32,
+    pub row_gap: f32,
+    pub column_gap: f32,
+    pub aspect_ratio: f32,
+    pub overflow: u32,
+    pub row_tracks: Vec<GridTrack>,
+    pub column_tracks: Vec<GridTrack>,
+    pub grid_row: u32,
+    pub grid_column: u32,
+    pub grid_row_span: u32,
+    pub grid_column_span: u32,
+    pub responsive_rules: Vec<ResponsiveLayoutRule>,
+}
+
+#[derive(Clone, Debug)]
+pub enum ThemeValue<'a> {
+    Color(u32),
+    Number(f64),
+    Text(&'a str),
+    Boolean(bool),
+}
+
+#[derive(Clone, Debug)]
+pub enum StyleValue<'a> {
+    Literal(ThemeValue<'a>),
+    Token {
+        name: &'a str,
+        fallback: Option<ThemeValue<'a>>,
+    },
+}
+
+#[derive(Clone, Debug)]
+pub struct AttributeToken<'a> {
+    pub attribute: u32,
+    pub token: &'a str,
+    pub fallback: Option<bool>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ScalarToken<'a, T> {
+    pub token: &'a str,
+    pub fallback: Option<T>,
+}
+
+#[derive(Clone, Debug)]
+pub struct ThemeToken<'a> {
+    pub name: &'a str,
+    pub value: ThemeValue<'a>,
+}
+
+#[derive(Clone, Debug)]
+pub struct StyleRule<'a> {
+    pub state_mask: u64,
+    pub responsive: ResponsiveCondition,
+    pub mode: u16,
+    pub reduced_motion: u16,
+    pub capability_tier: u16,
+    pub minimum_colors: u32,
+    pub name: &'a str,
+    pub style: Box<StylePayload<'a>>,
+    pub source: &'a str,
 }
 
 #[derive(Clone, Debug)]
 pub struct StylePayload<'a> {
-    pub fixed_record: &'a [u8],
-    pub rules: &'a [u8],
+    pub kind: u16,
+    pub present_mask: u32,
+    pub foreground: Option<StyleValue<'a>>,
+    pub background: Option<StyleValue<'a>>,
+    pub attributes: u32,
+    pub attribute_tokens: Vec<AttributeToken<'a>>,
+    pub border: u32,
+    pub border_token: Option<ScalarToken<'a, u32>>,
+    pub padding: [u16; 4],
+    pub padding_token: Option<ScalarToken<'a, u16>>,
+    pub opacity: Option<StyleValue<'a>>,
+    pub rules: Vec<StyleRule<'a>>,
+    pub theme_tokens: Vec<ThemeToken<'a>>,
+}
+
+#[derive(Clone, Debug)]
+pub enum SemanticScalar<'a> {
+    Boolean(bool),
+    Text(&'a str),
+    Number(f64),
+}
+
+#[derive(Clone, Debug)]
+pub enum SemanticEntry<'a> {
+    Value(SemanticScalar<'a>),
+    State {
+        key: &'a str,
+        value: SemanticScalar<'a>,
+    },
+    Relationship {
+        key: &'a str,
+        targets: Vec<NodeReference>,
+    },
 }
 
 #[derive(Clone, Debug)]
 pub struct SemanticPayload<'a> {
     pub kind: u16,
-    pub entries: &'a [u8],
+    pub entries: Vec<SemanticEntry<'a>>,
 }
 
 #[derive(Clone, Debug)]
@@ -162,7 +311,14 @@ pub struct TextContentPayload<'a> {
     pub kind: u16,
     pub source: &'a str,
     pub language: &'a str,
-    pub spans: &'a [u8],
+    pub spans: Vec<StyledSpan<'a>>,
+}
+
+#[derive(Clone, Debug)]
+pub struct StyledSpan<'a> {
+    pub text: &'a str,
+    pub style: StylePayload<'a>,
+    pub link: Option<&'a str>,
 }
 
 #[derive(Clone, Debug)]
@@ -173,15 +329,32 @@ pub struct TextDocumentConfigPayload<'a> {
     pub indentation_style: u16,
     pub indentation_width: u16,
     pub max_graphemes: u64,
-    pub validation_rules: &'a [u8],
+    pub validation_rules: Vec<TextValidationRule<'a>>,
+}
+
+#[derive(Clone, Debug)]
+pub enum TextValidationRule<'a> {
+    MinimumLength {
+        graphemes: u64,
+        message: &'a str,
+    },
+    MaximumLength {
+        graphemes: u64,
+        message: &'a str,
+    },
+    Pattern {
+        expression: &'a str,
+        flags: u32,
+        message: &'a str,
+    },
 }
 
 #[derive(Clone, Debug)]
 pub struct CollectionPayload<'a> {
     pub kind: u16,
     pub key: ValidatedCollectionKey<'a>,
-    pub item_descriptors: &'a [u8],
-    pub keys: &'a [u8],
+    pub item_descriptors: Vec<CollectionItem<'a>>,
+    pub keys: Vec<ValidatedIdentity<'a>>,
     pub index: u64,
     pub secondary_index: u64,
     pub generation: u64,
@@ -195,11 +368,24 @@ pub enum ValidatedCollectionKey<'a> {
 }
 
 #[derive(Clone, Debug)]
+pub struct CollectionItem<'a> {
+    pub key: ValidatedCollectionKey<'a>,
+    pub projected_node: NodeReference,
+    pub estimated_height: u32,
+}
+
+#[derive(Clone, Debug)]
+pub struct ValidatedIdentity<'a> {
+    pub key: ValidatedCollectionKey<'a>,
+    pub node: Option<NodeReference>,
+}
+
+#[derive(Clone, Debug)]
 pub struct TranscriptPayload<'a> {
     pub kind: u16,
     pub block_id: &'a str,
     pub content: ValidatedTranscriptContent<'a>,
-    pub records: &'a [u8],
+    pub records: Vec<TranscriptBlock<'a>>,
     pub version: u64,
     pub generation: u64,
     pub index: u64,
@@ -212,6 +398,14 @@ pub enum ValidatedTranscriptContent<'a> {
     None,
     Text(TextContentPayload<'a>),
     Utf8(&'a str),
+}
+
+#[derive(Clone, Debug)]
+pub struct TranscriptBlock<'a> {
+    pub id: &'a str,
+    pub content: Option<TextContentPayload<'a>>,
+    pub version: u64,
+    pub flags: u32,
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -266,7 +460,13 @@ pub struct ValidatedQuery<'a> {
     pub argument0: u32,
     pub generation: u64,
     pub range: (u32, u32),
-    pub payload: &'a [u8],
+    pub payload: ValidatedQueryPayload<'a>,
+}
+
+#[derive(Clone, Debug)]
+pub enum ValidatedQueryPayload<'a> {
+    None,
+    Utf8(&'a str),
 }
 
 #[derive(Clone, Debug, Default)]
@@ -306,5 +506,9 @@ pub struct DiagnosticPayload {
 // preserves the validated request-render flag and every operation-bearing fixed
 // field, converts every command to ValidatedPayload (never a raw payload slice),
 // and enforces the opcode/property/value compatibility matrix in native-abi.h.
-// Runtime mutation accepts only ValidatedTransaction, never the untrusted byte
-// slice or a partially decoded fixed record.
+// Nested offsets are resolved during decoding into typed dimensions, styles,
+// semantic scalars/relationships, spans, validation rules, Collection items,
+// identities, and Transcript blocks. Borrowed slices survive only as validated
+// UTF-8 strings or explicitly opaque terminal content. Runtime mutation accepts
+// only ValidatedTransaction, never the untrusted byte slice or a partially
+// decoded fixed/nested record.
