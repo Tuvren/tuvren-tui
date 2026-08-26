@@ -19,7 +19,16 @@ sequenceDiagram
     EU->>Interact: Navigate, select, or scroll collection
     Interact->>Exec: Enqueue keyed interaction intent
     Exec->>Interact: Begin serialized executor-owned collection operation
-    Interact->>Content: Update focus, selection, and requested visible range
+    Interact->>Content: Update focus and requested visible range
+    alt Application-controlled selection
+        Interact-->>Orch: Emit keyed selection intent without native selection commit
+        Orch->>App: Invoke required selection-change handler
+        App-->>Orch: Supply next controlled selection when accepted
+        Orch->>Exec: Submit controlled-selection transaction
+        Exec->>Content: Commit supplied keyed selection
+    else Bounded-local selection
+        Interact->>Content: Commit keyed selection and emit change notification
+    end
     Content-->>Exec: Commit projection state and keyed range demand
     Exec-->>Orch: Emit keyed range demand with generation
     Orch->>App: Request range through Data Source
@@ -34,4 +43,4 @@ sequenceDiagram
 
 ## Failure path
 
-Cancelled or stale range results do not alter the Resident Projection. Interaction and Content transitions occur only inside executor-owned operations. Missing stable keys, duplicate keys, overflow, and invalid variable heights produce typed Issues. Loading, empty, and error states remain navigable and semantic rather than collapsing into absent content.
+Cancelled or stale range results do not alter the Resident Projection. Interaction and Content transitions occur only inside executor-owned operations. Controlled selection never commits from interaction, a controller, or a mutation Stream; those paths emit intent until the application supplies the controlling prop transaction. Bounded-local mode commits and then notifies. Missing stable keys, duplicate keys, overflow, and invalid variable heights produce typed Issues. Loading, empty, and error states remain navigable and semantic rather than collapsing into absent content.

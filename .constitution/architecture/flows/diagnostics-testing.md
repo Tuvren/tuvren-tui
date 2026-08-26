@@ -33,9 +33,15 @@ sequenceDiagram
     opt Replay
         Dev->>Obs: Supply runtime trace or logical application input
         Obs-->>SDK: Produce validated bounded replay plan
-        SDK->>Orch: Open isolated replay application context
-        Orch->>Exec: Submit replay intents or test actions
-        Exec->>Runtime: Apply serialized work in isolated context
+        alt Captured runtime replay
+            SDK->>Exec: Open empty isolated runtime context without application handlers
+            Exec->>Runtime: Feed captured Event batches with outward application delivery suppressed
+            Exec->>Runtime: Apply captured transaction batches once at recorded sequence positions
+        else Logical application replay
+            SDK->>Orch: Open isolated application context with current handlers
+            Orch->>Exec: Submit logical test actions through normal orchestration
+            Exec->>Runtime: Apply resulting serialized work
+        end
         Runtime-->>Obs: Produce new semantic and visual evidence
     end
     opt Development watch change
@@ -49,4 +55,4 @@ sequenceDiagram
 
 ## Failure path
 
-Diagnostic overflow records a wrap marker. Unattributed late work becomes an explicit tooling defect. Malformed or incompatible traces reject before an isolated replay context starts. If focus transfer fails, application input remains paused until focus ownership is known or the supervisor restores the session. If watch cleanup fails, the old context is discarded and no private identity crosses into the replacement. If the inspector cannot start, the supervisor restores the terminal and emits a redacted report outside the failed context.
+Diagnostic overflow records a wrap marker. Unattributed late work becomes an explicit tooling defect. Malformed or incompatible traces reject before an isolated replay context starts. Runtime replay never executes current application handlers: captured Events drive only native interaction/default behavior, outward application delivery is suppressed, and captured application transactions are applied exactly once. Logical application replay intentionally executes current handlers and does not also inject captured transactions. If focus transfer fails, application input remains paused until focus ownership is known or the supervisor restores the session. If watch cleanup fails, the old context is discarded and no private identity crosses into the replacement. If the inspector cannot start, the supervisor restores the terminal and emits a redacted report outside the failed context.
