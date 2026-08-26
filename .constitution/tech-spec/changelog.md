@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.14] — 2026-08-26
+
+### Fixed
+
+- Propagated bound Command failure/environment requirements through Button, ToggleButton, MenuItem, and CommandPalette Views while preserving imperative typed IDs.
+- Added native Effect-span and opaque Component/Text-Document diagnostic subject identities plus the frozen `check:abi-parity` workspace script.
+- Bound embedded snapshots to the enclosing Trace context and a retained or explicit wrap-baseline transaction/render basis.
+
 ## [v9.0.13] — 2026-08-26
 
 ### Fixed

@@ -76,6 +76,7 @@ export interface DiagnosticSnapshot {
   readonly contextId: string;
   readonly transactionId: string;
   readonly renderRequestId: string;
+  readonly traceBasis?: DiagnosticSnapshotTraceBasis;
   readonly surface: Readonly<{
     width: number;
     height: number;
@@ -92,6 +93,14 @@ export interface DiagnosticSnapshot {
   readonly semanticTree: readonly SemanticElement[];
   readonly issues?: readonly DiagnosticIssue[];
 }
+
+export type DiagnosticSnapshotTraceBasis =
+  | Readonly<{ kind: "retained"; atSequence: string }>
+  | Readonly<{ kind: "wrap-baseline"; boundarySequence: string }>;
+
+export type EmbeddedDiagnosticSnapshot = DiagnosticSnapshot & {
+  readonly traceBasis: DiagnosticSnapshotTraceBasis;
+};
 
 export interface DiagnosticTrace<
   FullContent extends boolean = boolean,
@@ -164,14 +173,17 @@ export interface DiagnosticTrace<
       parentRecordId?: string;
       eventId?: string;
       commandId?: string;
+      commandInstanceId?: string;
       effectSpanId?: string;
       transactionId?: string;
       renderRequestId?: string;
       componentId?: string;
+      subjectId?: string;
+      subjectKind?: "component" | "text-document";
     }>;
     payload: Readonly<Record<string, unknown>>;
   }>[];
-  readonly snapshots: readonly DiagnosticSnapshot[];
+  readonly snapshots: readonly EmbeddedDiagnosticSnapshot[];
   readonly wrapCount: number;
 }
 

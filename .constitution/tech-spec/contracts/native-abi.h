@@ -667,6 +667,11 @@ typedef enum TuvrenDiagnosticKind {
     TUVREN_DIAGNOSTIC_CONTEXT = 17
 } TuvrenDiagnosticKind;
 
+typedef enum TuvrenDiagnosticSubjectKind {
+    TUVREN_DIAGNOSTIC_SUBJECT_COMPONENT = 1,
+    TUVREN_DIAGNOSTIC_SUBJECT_TEXT_DOCUMENT = 2
+} TuvrenDiagnosticSubjectKind;
+
 typedef struct TuvrenKeyEventPayload {
     uint16_t size;
     uint16_t action; /* TuvrenKeyAction */
@@ -1458,16 +1463,26 @@ typedef struct TuvrenDiagnosticRecord {
     uint32_t reserved;
     uint64_t event_id;
     uint64_t command_instance_id;
+    uint64_t effect_span_id;
     uint64_t transaction_id;
     uint64_t render_request_id;
+    uint64_t diagnostic_subject_id;
+    uint16_t diagnostic_subject_kind; /* TuvrenDiagnosticSubjectKind; zero if absent */
+    uint16_t reserved1;
+    uint32_t reserved2;
     uint32_t payload_offset;
     uint32_t payload_length;
 } TuvrenDiagnosticRecord;
 
 /* record_id is unique inside one context and serializes as correlation.recordId.
  * parent_record_id serializes as correlation.parentRecordId and must name an
- * earlier retained record. The drained context supplies correlation.contextId;
- * domain IDs label the current record and never substitute for parent_record_id. */
+ * earlier retained record. The drained context supplies correlation.contextId.
+ * command_instance_id is the invocation identity; stable CommandId text lives
+ * in the validated payload. effect_span_id maps Effect spans.
+ * diagnostic_subject_id is a trace-scoped opaque identity—not a RuntimeNode or
+ * TextDocument handle—and subject_kind distinguishes Component from standalone
+ * Text Document work. Zero means unavailable. Domain IDs label the current
+ * record and never substitute for parent_record_id. */
 
 typedef struct TuvrenRenderOptions {
     uint16_t size;
@@ -1637,7 +1652,7 @@ TUVREN_STATIC_ASSERT(sizeof(TuvrenAnimationEventPayload) == 16, "TuvrenAnimation
 TUVREN_STATIC_ASSERT(sizeof(TuvrenAnnouncementEventPayload) == 12, "TuvrenAnnouncementEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalEventPayload) == 16, "TuvrenTerminalEventPayload ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenTerminalCapabilitiesPayload) == 48, "TuvrenTerminalCapabilitiesPayload ABI size");
-TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticRecord) == 80, "TuvrenDiagnosticRecord ABI size");
+TUVREN_STATIC_ASSERT(sizeof(TuvrenDiagnosticRecord) == 104, "TuvrenDiagnosticRecord ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRenderOptions) == 16, "TuvrenRenderOptions ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenRenderResult) == 40, "TuvrenRenderResult ABI size");
 TUVREN_STATIC_ASSERT(sizeof(TuvrenDrainResult) == 24, "TuvrenDrainResult ABI size");
