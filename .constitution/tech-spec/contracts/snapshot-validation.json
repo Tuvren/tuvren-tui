@@ -10,6 +10,8 @@
     "a nonempty semanticTree has exactly one root, every other node has exactly one parent, and child edges contain no self-edge or cycle",
     "every semanticTree node is reachable from the root and no child appears twice under one parent",
     "Semantic value and state entries match the exact scalar declaration contract",
-    "each Issue code, category, operation tuple matches one entry in error-codes.json"
+    "each Issue code, category, operation tuple matches one entry in error-codes.json",
+    "each Issue traceInterval parses as unsigned 64-bit integers with startSequence less than or equal to endSequence",
+    "when the validator receives an enclosing Trace domain, each Issue traceInterval is wholly contained in that retained sequence domain"
   ]
 }

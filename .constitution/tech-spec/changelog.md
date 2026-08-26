@@ -2,6 +2,14 @@
 
 This changelog records Stage 3 implementation-contract versions. It follows Semantic Versioning and Keep a Changelog conventions.
 
+## [v9.0.13] — 2026-08-26
+
+### Fixed
+
+- Added native Diagnostic Record IDs and parent IDs required by public Trace causality and made Menu participate in controlled/local Collection selection.
+- Defined runtime replay as handler-suppressed native Event processing plus exactly-once captured transactions, distinct from logical application replay.
+- Closed transaction Trace statuses and extended Trace/snapshot validation to exact error tuples, ordered retained Issue intervals, and every embedded snapshot.
+
 ## [v9.0.12] — 2026-08-26
 
 ### Fixed

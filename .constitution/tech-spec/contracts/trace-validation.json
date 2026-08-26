@@ -42,7 +42,10 @@
     "transaction": {
       "required": {
         "payloadVersion": { "type": "string", "const": "1.0.0" },
-        "status": "string",
+        "status": {
+          "type": "string",
+          "enum": ["committed", "rejected"]
+        },
         "commandCount": "integer",
         "redacted": "boolean"
       },
@@ -116,6 +119,7 @@
     "each record payload matches exactly the contract selected by record.kind",
     "integer payload values are nonnegative safe integers unless the selected field explicitly allows signed values",
     "error-code and error-category values exist in error-codes.json and correspond",
+    "every error payload code, category, and operation matches one exact tuple in error-codes.json",
     "input content remains redacted unless trace.redaction.fullContent is true",
     "record.sequence values are unique and strictly increasing as unsigned 64-bit integers",
     "record correlation.recordId values are unique; correlation.contextId always equals rootCorrelation.contextId; when records is nonempty rootCorrelation.initialSequence and initialRecordId equal the first retained record, and when records is empty they identify the next root sequence and record identity",
@@ -127,6 +131,8 @@
     "replay.runtime available additionally requires fullContent, capture.startedAt context-initialization, capture.completePrefix true, wrapCount zero, and an unbroken record prefix whose first record is context/initialized with ABI 2.0; every other trace declares runtime redacted and completePrefix false",
     "encoded replay fields decode from canonical base64 into exact ABI 2.0 Event batches or complete transaction batches and pass the same validators used by live input; mutation records are diagnostic metadata only and runtime replay applies their value-bearing transaction exactly once",
     "a replay-capable Trace requires encodedEventBatchBase64 on every input record and encodedTransactionBase64 on every committed transaction record, forbids encoded bytes on rejected transactions, and verifies decoded byte counts against payload metadata",
+    "committed transaction records forbid failedCommandIndex; rejected records forbid encodedTransactionBase64 and use failedCommandIndex only when rejection identifies one decoded command",
+    "every embedded snapshot passes validateDiagnosticSnapshotRuns and each embedded Issue interval is ordered and contained in the Trace's retained sequence domain",
     "runtime replay rejects a record kind whose registered payload contract or migration is unavailable, a trace without a reachable empty-context starting state, or any missing sequence"
   ]
 }
